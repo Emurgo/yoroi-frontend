@@ -2,8 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { Typography, Tooltip } from '@mui/material';
-import { ReactComponent as InfoIcon } from '../../assets/images/info-icon.inline.svg';
+import { Typography, Tooltip } from '@mui/material'
+import { ReactComponent as InfoIcon }  from '../../assets/images/info-icon.inline.svg';
 import styles from './CustomTooltip.scss';
 import classnames from 'classnames';
 
@@ -24,29 +24,35 @@ export default class CustomTooltip extends Component<Props> {
     children: undefined,
     isPoolAvatar: false,
     placementTooltip: 'top',
-  };
+  }
 
   render(): Node {
     const { toolTip, children } = this.props;
-    const child = children == null ? this.makeDefaultChild() : children;
+    const child = (children == null) ? this.makeDefaultChild() : children;
 
     return (
-      <div className={classnames([styles.component, this.props.isPoolAvatar === true ? styles.PoolAvatarTooltip : null])}>
+      <div className={classnames([
+        styles.component,
+        this.props.isPoolAvatar === true
+          ? styles.PoolAvatarTooltip
+          : null
+        ])}
+      >
         <Tooltip
-          title={
-            <Typography component="div" variant="body3">
-              {toolTip}
-            </Typography>
-          }
+          title={<Typography component="div" variant="body3">{toolTip}</Typography>}
           placement="top"
         >
-          <span className={styles.infoIcon}>{child}</span>
+          <span className={styles.infoIcon}>
+            {child}
+          </span>
         </Tooltip>
       </div>
     );
   }
 
-  makeDefaultChild: () => Node = () => {
-    return <InfoIcon width="14" height="14" />;
-  };
+  makeDefaultChild: (() => Node) = () => {
+    return (
+      <InfoIcon width="14" height="14" />
+    );
+  }
 }

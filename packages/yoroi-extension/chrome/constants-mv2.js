@@ -1,7 +1,10 @@
 // @flow
 /* eslint-disable  import/no-unused-modules */
 
-import { Ports, portToPermission } from '../scripts-mv2/connections';
+import {
+  Ports,
+  portToPermission,
+} from '../scripts-mv2/connections';
 
 export function genCSP(request: {|
   isDev: boolean,

@@ -9,8 +9,11 @@
  * See this post which shows Fnv32a does very well compared to alternatives
  * https://softwareengineering.stackexchange.com/a/145633
  */
-function hashFnv32a(str: string, seed: number): number {
-  let hval = seed === undefined ? 0x811c9dc5 : seed;
+function hashFnv32a(
+  str: string,
+  seed: number,
+): number {
+  let hval = (seed === undefined) ? 0x811c9dc5 : seed;
 
   for (let i = 0, l = str.length; i < l; i++) {
     hval ^= str.charCodeAt(i);
@@ -20,7 +23,10 @@ function hashFnv32a(str: string, seed: number): number {
 }
 
 /** clears the n-th bit */
-function clearBit(num: number, bit: number): number {
+function clearBit(
+  num: number,
+  bit: number
+): number {
   return num & ~(1 << bit);
 }
 
@@ -29,7 +35,10 @@ function clearBit(num: number, bit: number): number {
  * On my macbook pro I get ~4hashes/second for a v2 address
  * I get about 1 collision every 500,000 addresses (so collisions are rare but possible)
  */
-export function digestForHash(str: string, seed: number): number {
+export function digestForHash(
+  str: string,
+  seed: number,
+): number {
   const buffer = new ArrayBuffer(8);
   const view = new DataView(buffer);
 

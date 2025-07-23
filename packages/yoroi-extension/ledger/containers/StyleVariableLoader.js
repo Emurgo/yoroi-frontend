@@ -3,10 +3,11 @@ import React from 'react';
 import type { Node } from 'react';
 import { map } from 'lodash';
 
-type Props = {| variables: { [key: string]: string } |};
+type Props = {|variables: { [key: string]: string }|};
 
 /** Allow to swap the CSS used at runtime to allow user-defined themes */
 export default class StyleVariableLoader extends React.Component<Props> {
+
   componentDidMount() {
     this.updateCSSVariables(this.props.variables);
   }
@@ -26,7 +27,5 @@ export default class StyleVariableLoader extends React.Component<Props> {
     });
   }
 
-  render(): Node {
-    return null;
-  }
+  render(): Node { return (null); }
 }

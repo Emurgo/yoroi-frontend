@@ -1,6 +1,9 @@
 // @flow
 
-declare var chrome: any;
+/*::
+declare var chrome:any;
+*/
+
 /*
 Passing messages from background script to popup
 */

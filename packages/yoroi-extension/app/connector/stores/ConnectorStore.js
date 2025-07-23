@@ -1,8 +1,18 @@
 /* eslint-disable promise/always-return */
 // @flow
-import type { ConnectingMessage, SigningMessage, WhitelistEntry } from '../../../chrome/extension/connector/types';
+import type {
+  ConnectingMessage,
+  SigningMessage,
+  WhitelistEntry,
+} from '../../../chrome/extension/connector/types';
 import type { StoresMap } from './index';
-import type { Anchor, CardanoConnectorSignRequest, SignSubmissionErrorType, TxDataInput, TxDataOutput } from '../types';
+import type {
+  Anchor,
+  CardanoConnectorSignRequest,
+  SignSubmissionErrorType,
+  TxDataInput,
+  TxDataOutput,
+} from '../types';
 import { LoadingWalletStates } from '../types';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
 import type { RemoteUnspentOutput } from '../../api/ada/lib/state-fetch/types';
@@ -20,7 +30,7 @@ import {
 } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { MultiToken } from '../../api/common/lib/MultiToken';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote } from '../../api/ada/transactions/utils';
+import { asAddressedUtxo, multiTokenFromCardanoValue, multiTokenFromRemote, } from '../../api/ada/transactions/utils';
 import {
   getDrepRewardAddressHexAndAddressing,
   getScriptRequiredSigningKeys,
@@ -63,11 +73,9 @@ import {
 } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import {
-  addressBech32ToHex,
-  transactionBodyHexToTransaction,
-  transactionHexToBodyHex,
-  transactionHexToHash,
-  transactionHexToWitnessSet,
+  addressBech32ToHex, transactionBodyHexToTransaction,
+  transactionHexToBodyHex, transactionHexToHash,
+  transactionHexToWitnessSet
 } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi, { findPath } from '../../api/ada';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
@@ -93,7 +101,9 @@ async function sendMsgSigningTx(): Promise<?SigningMessage> {
 }
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
-type SetWhitelistFunc = ({| whitelist: Array<WhitelistEntry> | void |}) => Promise<void>;
+type SetWhitelistFunc = ({|
+  whitelist: Array<WhitelistEntry> | void,
+|}) => Promise<void>;
 
 export default class ConnectorStore extends Store<StoresMap> {
   @observable unrecoverableError: string | null = null;
@@ -107,8 +117,8 @@ export default class ConnectorStore extends Store<StoresMap> {
   @observable getConnectorWhitelist: Request<GetWhitelistFunc> = new Request<GetWhitelistFunc>(
     this.api.localStorage.getWhitelist
   );
-  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<SetWhitelistFunc>(({ whitelist }) =>
-    this.api.localStorage.setWhitelist(whitelist)
+  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<SetWhitelistFunc>(
+    ({ whitelist }) => this.api.localStorage.setWhitelist(whitelist)
   );
 
   @observable signingMessage: ?SigningMessage = null;
@@ -198,7 +208,9 @@ export default class ConnectorStore extends Store<StoresMap> {
     const { signingMessage, connectedWallet: wallet } = this;
 
     if (signingMessage == null) {
-      throw new Error(`${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`);
+      throw new Error(
+        `${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`
+      );
     }
 
     if (!wallet) {
@@ -209,7 +221,11 @@ export default class ConnectorStore extends Store<StoresMap> {
       // sign and send the tx
       let txId;
       try {
-        txId = await this.signAndSendReorgTx(wallet, password, asAddressedUtxo(signingMessage.sign.tx.utxos));
+        txId = await this.signAndSendReorgTx(
+          wallet,
+          password,
+          asAddressedUtxo(signingMessage.sign.tx.utxos),
+        );
       } catch (error) {
         if (error instanceof WrongPassphraseError) {
           runInAction(() => {
@@ -243,10 +259,17 @@ export default class ConnectorStore extends Store<StoresMap> {
 
         const additionalRequiredSigners = RustModule.WasmScope(Module => {
           const { witnessSet } = resolveTxOrTxBody((tx: any), Module);
-          return witnessSet == null ? [] : [...getScriptRequiredSigningKeys(witnessSet, Module)];
+          return witnessSet == null ? []
+            : [...(getScriptRequiredSigningKeys(witnessSet, Module))];
         });
 
-        const witnessSetHex = transactionHexToWitnessSet(await this.hwSignTxHex(wallet, rawTx, additionalRequiredSigners));
+        const witnessSetHex = transactionHexToWitnessSet(
+          await this.hwSignTxHex(
+            wallet,
+            rawTx,
+            additionalRequiredSigners,
+          )
+        );
 
         userSignConfirm({
           tx,
@@ -256,7 +279,7 @@ export default class ConnectorStore extends Store<StoresMap> {
           password: '',
         });
       } else {
-        userSignConfirm({
+        userSignConfirm( {
           tx,
           uid: signingMessage.sign.uid,
           tabId: signingMessage.tabId,
@@ -339,7 +362,9 @@ export default class ConnectorStore extends Store<StoresMap> {
       return;
     }
     if (this.signingMessage == null) {
-      throw new Error(`${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`);
+      throw new Error(
+        `${nameof(this.confirmSignInTx)} confirming a tx but no signing message set`
+      );
     }
     const { signingMessage } = this;
     userSignReject({
@@ -357,7 +382,9 @@ export default class ConnectorStore extends Store<StoresMap> {
     });
 
     try {
-      const wallets = await getWallets(this.stores.profile.getCurrentNetworkId());
+      const wallets = await getWallets(
+        this.stores.profile.getCurrentNetworkId()
+      );
 
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.SUCCESS;
@@ -394,10 +421,12 @@ export default class ConnectorStore extends Store<StoresMap> {
     const network = getNetworkById(connectedWallet.networkId);
 
     if (!isCardanoHaskell(network)) {
-      throw new Error(`${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`);
+      throw new Error(
+        `${nameof(ConnectorStore)}::${nameof(this.createAdaTransaction)} unexpected wallet type`
+      );
     }
 
-    const submittedTxs = (await loadSubmittedTransactions()) || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
     const addressedUtxos = await this.api.ada._addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(connectedWallet.utxos),
       connectedWallet.publicDeriverId,
@@ -430,7 +459,9 @@ export default class ConnectorStore extends Store<StoresMap> {
     const foreignInputs = [];
 
     const allUsedUtxoIdsSet = new Set(
-      submittedTxs.flatMap(({ usedUtxos }) => (usedUtxos || []).map(({ txHash, index }) => `${txHash}${index}`))
+      submittedTxs.flatMap(({ usedUtxos }) =>
+        (usedUtxos || []).map(({ txHash, index }) => `${txHash}${index}`)
+      )
     );
 
     for (const input of iterateLenGet(txBody.inputs())) {
@@ -463,11 +494,10 @@ export default class ConnectorStore extends Store<StoresMap> {
     }
 
     // todo: review this:
-    const ownAddresses = new Set(
-      [...connectedWallet.allAddresses.utxoAddresses, ...connectedWallet.allAddresses.accountingAddresses].map(
-        a => a.address.Hash
-      )
-    );
+    const ownAddresses = new Set([
+      ...connectedWallet.allAddresses.utxoAddresses,
+      ...connectedWallet.allAddresses.accountingAddresses,
+    ].map(a => a.address.Hash));
 
     const outputs: Array<TxDataOutput> = [];
     for (const output of iterateLenGet(txBody.outputs())) {
@@ -475,10 +505,13 @@ export default class ConnectorStore extends Store<StoresMap> {
       outputs.push({
         address,
         isForeign: !ownAddresses.has(address),
-        value: multiTokenFromCardanoValue(output.amount(), {
-          defaultNetworkId: connectedWallet.networkId,
-          defaultIdentifier: connectedWallet.defaultTokenId,
-        }),
+        value: multiTokenFromCardanoValue(
+          output.amount(),
+          {
+            defaultNetworkId: connectedWallet.networkId,
+            defaultIdentifier: connectedWallet.defaultTokenId,
+          }
+        ),
       });
     }
     const fee = {
@@ -682,15 +715,12 @@ export default class ConnectorStore extends Store<StoresMap> {
           cip95Info.push({
             type: 'VotingProcedure',
             voterType: voter.kind(),
-            voterHash:
-              voter.to_constitutional_committee_hot_credential()?.to_scripthash()?.to_hex() ||
+            voterHash: voter.to_constitutional_committee_hot_credential()?.to_scripthash()?.to_hex() ||
               voter.to_constitutional_committee_hot_credential()?.to_keyhash()?.to_hex() ||
               voter.to_drep_credential()?.to_scripthash()?.to_hex() ||
               voter.to_drep_credential()?.to_keyhash()?.to_hex() ||
               voter.to_stake_pool_key_hash()?.to_hex() ||
-              (() => {
-                throw new Error('unexpected voter');
-              })(),
+              (() => { throw new Error('unexpected voter'); })(),
             govActionTxId: govActionId.transaction_id().to_hex(),
             govActionIndex: govActionId.index(),
             vote: votingProcedure.vote_kind(),
@@ -765,7 +795,7 @@ export default class ConnectorStore extends Store<StoresMap> {
       addressedUtxos,
       connectedWallet.submittedTransactions,
       usedAddress,
-      protocolParameters
+      protocolParameters,
     );
     // record the unsigned tx, so that after the user's approval, we can sign
     // it without re-generating
@@ -798,10 +828,12 @@ export default class ConnectorStore extends Store<StoresMap> {
       };
     });
   };
-  signAndSendReorgTx: (WalletState, string, Array<CardanoAddressedUtxo>) => Promise<string> = async (
-    publicDeriver,
-    password,
-    addressedUtxos
+  signAndSendReorgTx: (
+    WalletState,
+    string,
+    Array<CardanoAddressedUtxo>
+  ) => Promise<string> = async (
+    publicDeriver, password, addressedUtxos
   ) => {
     const signRequest = this.reorgTxSignRequest;
 
@@ -815,10 +847,13 @@ export default class ConnectorStore extends Store<StoresMap> {
       await signAndBroadcastTransaction({
         signRequest,
         password,
-        publicDeriverId: publicDeriver.publicDeriverId,
+        publicDeriverId: publicDeriver.publicDeriverId
       });
     } else {
-      const signedTxHex = await this.hwSignTxHex(publicDeriver, rawTxHex);
+      const signedTxHex = await this.hwSignTxHex(
+        publicDeriver,
+        rawTxHex,
+      );
       await broadcastTransaction({
         signedTxHex,
         publicDeriverId: publicDeriver.publicDeriverId,
@@ -878,7 +913,7 @@ export default class ConnectorStore extends Store<StoresMap> {
           networkId: defaultToken.defaultNetworkId,
         },
       ],
-      defaultToken
+      defaultToken,
     );
     for (const input of inputs) {
       if (ownAddresses.has(input.address)) {
@@ -900,7 +935,7 @@ export default class ConnectorStore extends Store<StoresMap> {
             amount: new BigNumber(fee.amount),
           },
         ],
-        defaultToken
+        defaultToken,
       )
     );
     return { total, amount };
@@ -928,7 +963,9 @@ export default class ConnectorStore extends Store<StoresMap> {
   _getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelist.execute();
   };
-  updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({ whitelist }) => {
+  updateConnectorWhitelist: ({| whitelist: Array<WhitelistEntry> |}) => Promise<void> = async ({
+    whitelist,
+  }) => {
     await this.setConnectorWhitelist.execute({ whitelist });
     await this.getConnectorWhitelist.execute();
   };
@@ -938,13 +975,15 @@ export default class ConnectorStore extends Store<StoresMap> {
     if (signingMessage == null) {
       return null;
     }
-    return this.wallets.find(wallet => wallet.publicDeriverId === signingMessage.publicDeriverId);
+    return this.wallets.find(
+      wallet => wallet.publicDeriverId === signingMessage.publicDeriverId
+    );
   }
 
   async hwSignTxHex(
     publicDeriver: WalletState,
     rawTxHex: string,
-    additionalRequiredSigners: Array<string> = []
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<string> {
     const ownAddressMap: {| [string]: Array<number> |} = {};
     for (const { address, path } of publicDeriver.allAddresses.utxoAddresses) {
@@ -954,11 +993,21 @@ export default class ConnectorStore extends Store<StoresMap> {
       ownAddressMap[address.Hash] = path;
     }
 
+
     if (publicDeriver.type === 'ledger') {
-      return this.ledgerSignTx(publicDeriver, rawTxHex, ownAddressMap, additionalRequiredSigners);
+      return this.ledgerSignTx(
+        publicDeriver,
+        rawTxHex,
+        ownAddressMap,
+        additionalRequiredSigners
+      );
     }
     if (publicDeriver.type === 'trezor') {
-      return this.trezorSignTx(publicDeriver, rawTxHex, ownAddressMap);
+      return this.trezorSignTx(
+        publicDeriver,
+        rawTxHex,
+        ownAddressMap,
+      );
     }
     throw new Error('unexpected wallet type');
   }
@@ -966,10 +1015,13 @@ export default class ConnectorStore extends Store<StoresMap> {
   async trezorSignTx(
     publicDeriver: WalletState,
     rawTxHex: string,
-    ownAddressMap: {| [string]: Array<number> |}
+    ownAddressMap: {| [string]: Array<number> |},
   ): Promise<string> {
     const network = getNetworkById(publicDeriver.networkId);
-    const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(network).reduce(
+      (acc, next) => Object.assign(acc, next),
+      {}
+    );
 
     const { addressedUtxos } = this;
     if (!addressedUtxos) {
@@ -985,7 +1037,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         config.ByronNetworkId,
         s => ownAddressMap[s],
         [],
-        addressedUtxos
+        addressedUtxos,
       );
     } catch (e) {
       console.error('toTrezorSignRequest failed: ', e);
@@ -1005,7 +1057,11 @@ export default class ConnectorStore extends Store<StoresMap> {
         })
       );
       if (!signResult.success) {
-        throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+        throw new Error(
+          `Trezor signing error: ${signResult.payload.error} (code=${String(
+            signResult.payload.code
+          )})`
+        );
       }
       trezorSignTxResp = signResult.payload;
     } catch (error) {
@@ -1036,10 +1092,13 @@ export default class ConnectorStore extends Store<StoresMap> {
     publicDeriver: WalletState,
     rawTxHex: string,
     ownAddressMap: {| [string]: Array<number> |},
-    additionalRequiredSigners: Array<string> = []
+    additionalRequiredSigners: Array<string> = [],
   ): Promise<string> {
     const network = getNetworkById(publicDeriver.networkId);
-    const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(network).reduce(
+      (acc, next) => Object.assign(acc, next),
+      {}
+    );
 
     const { addressedUtxos } = this;
     if (!addressedUtxos) {
@@ -1059,7 +1118,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         s => ownAddressMap[s],
         [],
         addressedUtxos,
-        additionalRequiredSigners
+        additionalRequiredSigners,
       );
     } catch (e) {
       console.error('toLedgerSignRequest failed: ', e);
@@ -1112,7 +1171,11 @@ export default class ConnectorStore extends Store<StoresMap> {
       },
     };
 
-    return buildSignedLedgerTransaction(rawTxHex, ledgerSignResult.witnesses, publicKeyInfo).txHex;
+    return buildSignedLedgerTransaction(
+      rawTxHex,
+      ledgerSignResult.witnesses,
+      publicKeyInfo,
+    ).txHex;
   }
 
   /**
@@ -1146,6 +1209,8 @@ function deserializeAnchor(anchor: ?RustModule.WalletV4.Anchor): Anchor | null {
     dataHash: anchor.anchor_data_hash().to_hex(),
   };
 }
+
+
 
 function bringWindowToForeground(): void {
   declare var chrome: any;

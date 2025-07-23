@@ -24,8 +24,7 @@ const messages = defineMessages({
   },
   restorePaperWalletDescription: {
     id: 'wallet.add.optionDialog.restore.paperWallet.description',
-    defaultMessage:
-      '!!!If you have generated a Yoroi paper wallet (which is usually printed and kept offline), you can choose this option to import the funds from your Yoroi paper wallet.',
+    defaultMessage: '!!!If you have generated a Yoroi paper wallet (which is usually printed and kept offline), you can choose this option to import the funds from your Yoroi paper wallet.',
   },
 });
 
@@ -37,10 +36,14 @@ type Props = {|
 
 @observer
 export default class WalletRestoreOptionDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const { onCancel, onRestore15, onRestore24 } = this.props;
+    const {
+      onCancel,
+      onRestore15,
+      onRestore24,
+    } = this.props;
 
     return (
       <Dialog
@@ -64,7 +67,9 @@ export default class WalletRestoreOptionDialog extends Component<Props> {
                 parentName="WalletRestoreOptionDialog"
                 type="normal24WordWallet"
                 title={intl.formatMessage(messages.restoreNormalTitle, { length: 24 })}
-                learnMoreText={intl.formatMessage(messages.restoreNormalDescription, { length: 24 })}
+                learnMoreText={intl.formatMessage(
+                  messages.restoreNormalDescription, { length: 24 }
+                )}
                 onSubmit={onRestore24}
               />
             )}

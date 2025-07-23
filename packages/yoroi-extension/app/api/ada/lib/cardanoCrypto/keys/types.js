@@ -16,7 +16,8 @@ export interface IKey {
   getType(): KeyKindType;
 }
 
-export interface IKeyDerivation {}
+export interface IKeyDerivation {
+}
 
 export interface IPrivate {
   sign(data: Buffer): Buffer;
@@ -26,7 +27,7 @@ export interface IPrivate {
    * The best we can do is return a generic type from this function
    * and have the user re-assert any functionality
    */
-  toPublic(): IKey & IPublic;
+  toPublic(): IKey & IPublic
 }
 
 export interface IPublic {

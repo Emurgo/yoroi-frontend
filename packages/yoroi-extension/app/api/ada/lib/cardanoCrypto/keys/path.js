@@ -28,6 +28,7 @@ function safeParseInt(str: string): number {
   return i;
 }
 
+
 function parseBIP32Index(str: string): number {
   let base = 0;
   if (str.endsWith("'")) {
@@ -44,12 +45,14 @@ export function bip32StringToPath(data: string): Array<number> {
   Precondition.checkIsString(data);
   Precondition.check(data.length > 0);
 
-  return data
-    .split('/')
+  return data.split('/')
     .filter(entry => entry !== 'm')
     .map(parseBIP32Index);
 }
 
 export function toDerivationPathString(derivationPath: Array<number>): string {
-  return `m/${derivationPath.map(item => (item % HARDENED) + (item >= HARDENED ? "'" : '')).join('/')}`;
+  return `m/${derivationPath
+    .map((item) => (item % HARDENED) + (item >= HARDENED ? "'" : ''))
+    .join('/')}`;
 }
+

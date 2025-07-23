@@ -136,6 +136,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
           </Typography>
           <CopyButton textToCopy={input.txHash} />
         </Stack>
+
       </Stack>
 
       {input.assets.length > 0 && (

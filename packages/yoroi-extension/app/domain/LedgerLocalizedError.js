@@ -5,7 +5,10 @@ import { IncorrectDeviceError, IncorrectVersionError } from './ExternalDeviceCom
 import globalMessages from '../i18n/global-messages';
 import { defineMessages } from 'react-intl';
 
-import { Logger, stringifyError } from '../utils/logging';
+import {
+  Logger,
+  stringifyError
+} from '../utils/logging';
 
 export const ledgerErrors: * = defineMessages({
   cancelOnDeviceError101: {
@@ -30,8 +33,7 @@ export const ledgerErrors: * = defineMessages({
   },
   cip15NotSupportedError106: {
     id: 'wallet.hw.ledger.catalyst.unsupported.106',
-    defaultMessage:
-      '!!!Please upgrade your Ledger firmware version to at least 2.0.0 and Caradano app version to 2.3.2 or above.',
+    defaultMessage: '!!!Please upgrade your Ledger firmware version to at least 2.0.0 and Caradano app version to 2.3.2 or above.',
   },
   cardanoAppNotRunning: {
     id: 'wallet.hw.ledger.app.not.running',
@@ -60,9 +62,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     localizableError = error;
   } else if (error && error.message) {
     {
-      const serialRegex = new RegExp(
-        'Error: Incorrect hardware wallet. This wallet was created with a device with serial ID ([0-9a-fA-F]+), but you are currently using ([0-9a-fA-F]+).'
-      );
+      const serialRegex = new RegExp('Error: Incorrect hardware wallet. This wallet was created with a device with serial ID ([0-9a-fA-F]+), but you are currently using ([0-9a-fA-F]+).');
       const serialRegexMatch = serialRegex.exec(error.message);
       if (serialRegexMatch) {
         return new IncorrectDeviceError({
@@ -73,9 +73,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
     }
     {
       // note: match all for supported version because it can be any semver expression
-      const versionRegex = new RegExp(
-        'Incorrect Cardano app version. Supports version (.*) but you have version ([0-9.]\\.[0-9.]\\.[0-9.])'
-      );
+      const versionRegex = new RegExp('Incorrect Cardano app version. Supports version (.*) but you have version ([0-9.]\\.[0-9.]\\.[0-9.])');
       const versionRegexMatch = versionRegex.exec(error.message);
       if (versionRegexMatch) {
         return new IncorrectVersionError({
@@ -88,21 +86,29 @@ export function convertToLocalizableError(error: Error): LocalizableError {
       return new LocalizableError(ledgerErrors.deviceVersionNoDataSigningSpecific);
     }
     if (/Invalid data supplied to Ledger/.test(error.message)) {
-      return new LocalizableError(ledgerErrors.deviceStatusError);
+      return new LocalizableError(
+        ledgerErrors.deviceStatusError
+      );
     }
     if (/Action rejected by user/.test(error.message)) {
-      return new LocalizableError(ledgerErrors.cancelOnDeviceError101);
+      return new LocalizableError(
+        ledgerErrors.cancelOnDeviceError101
+      );
     }
     if (
       // Not running the Cardano app on Ledger
       /General error 0x6e01/.test(error.message) ||
-      // Ledger is sleeping
-      /General error 0x5515/.test(error.message)
+        // Ledger is sleeping
+        /General error 0x5515/.test(error.message)
     ) {
-      return new LocalizableError(ledgerErrors.cardanoAppNotRunning);
+      return new LocalizableError(
+        ledgerErrors.cardanoAppNotRunning
+      );
     }
     if (/CIP-8 message signing not supported by Ledger app/.test(error.message)) {
-      return new LocalizableError(ledgerErrors.deviceVersionNoDataSigningSpecific);
+      return new LocalizableError(
+        ledgerErrors.deviceVersionNoDataSigningSpecific
+      );
     }
     // Ledger device related error happened, convert then to LocalizableError
     switch (error.message) {
@@ -130,14 +136,18 @@ export function convertToLocalizableError(error: Error): LocalizableError {
         localizableError = new LocalizableError(ledgerErrors.networkError105);
         break;
       case 'catalyst registration not supported':
-        localizableError = new LocalizableError(ledgerErrors.cip15NotSupportedError106);
+        localizableError = new LocalizableError(
+          ledgerErrors.cip15NotSupportedError106
+        );
         break;
       case 'DeviceVersionUnsupported: CIP36 registration not supported by Ledger app version 5.0.0.':
-        localizableError = new LocalizableError(ledgerErrors.cip36NotSupported);
+        localizableError = new LocalizableError(
+          ledgerErrors.cip36NotSupported
+        );
         break;
       default:
         /** we are not able to figure out why Error is thrown
-         * make it, Something unexpected happened */
+          * make it, Something unexpected happened */
         localizableError = new UnexpectedError();
         break;
     }
@@ -145,7 +155,7 @@ export function convertToLocalizableError(error: Error): LocalizableError {
 
   if (!localizableError) {
     /** we are not able to figure out why Error is thrown
-     * make it, Something unexpected happened */
+      * make it, Something unexpected happened */
     localizableError = new UnexpectedError();
   }
 

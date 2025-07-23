@@ -25,12 +25,12 @@ const messages = defineMessages({
   },
   share: {
     id: 'profile.analytics.share',
-    defaultMessage: '!!!Share user insights to help us fine tune Yoroi to better serve user preferences and needs.',
+    defaultMessage:
+      '!!!Share user insights to help us fine tune Yoroi to better serve user preferences and needs.',
   },
   line1: {
     id: 'profile.analytics.line1',
-    defaultMessage:
-      '!!!Provide anonymous analytics about visited extension pages, browser version, selected language, time of analytical events',
+    defaultMessage: '!!!Provide anonymous analytics about visited extension pages, browser version, selected language, time of analytical events',
   },
   line2: {
     id: 'profile.analytics.line2',
@@ -54,8 +54,7 @@ const messages = defineMessages({
   },
   collectedData: {
     id: 'profile.analytics.collectedData',
-    defaultMessage:
-      '!!!Collected data includes: visited Yoroi extension pages, browser version, selected language, time of analytical events',
+    defaultMessage: '!!!Collected data includes: visited Yoroi extension pages, browser version, selected language, time of analytical events',
   },
   rejectionImpact: {
     id: 'profile.analytics.rejectionImpact',
@@ -73,19 +72,19 @@ const messages = defineMessages({
 
 type Props = {|
   onOpt: boolean => void,
-  variant: 'startup' | 'settings',
-  isOptedIn: boolean,
-  privacyNotice: string,
+    variant: 'startup' | 'settings',
+    isOptedIn: boolean,
+    privacyNotice: string
 |};
 
 type State = {|
   isSubmitting: boolean,
-  showPrivacyNotice: boolean,
+  showPrivacyNotice: boolean
 |};
 
 @observer
 export default class OptForAnalyticsForm extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   state: State = { isSubmitting: false, showPrivacyNotice: false };
 
   onOpt: boolean => void = isOptIn => {
@@ -157,9 +156,7 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
             )}
 
             {isSettingsScreen ? (
-              <Box my="24px" color="ds.text_gray_medium">
-                {intl.formatMessage(messages.share)}
-              </Box>
+              <Box my="24px" color="ds.text_gray_medium">{intl.formatMessage(messages.share)}</Box>
             ) : (
               <div className={styles.illustration}>
                 <AnalyticsIllustration />
@@ -181,29 +178,34 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                     alignItems: 'flex-start',
                     justifyContent: 'flex-start',
                     gap: '8px',
-                    width: isStartupScreen ? '496px' : undefined,
+                    width: isStartupScreen ? '496px' : undefined
                   }}
                 >
                   <Box sx={{ flexShrink: 0, mt: '3px' }}>
                     <Icon />
                   </Box>
                   <Typography component="div" color="ds.text_gray_medium">
-                    <FormattedMessage {...msg} values={{ strong }} />
+                    <FormattedMessage {...msg} values={{ strong }}/>
                   </Typography>
                 </Box>
               ))}
             </Box>
+
           </div>
         </Box>
 
         <Box className={styles.component}>
           <div className={variant === 'startup' ? styles.centeredBox : ''}>
+
             {isSettingsScreen ? (
               <FormControlLabel
                 label={intl.formatMessage(messages.allow)}
                 control={
                   <Box ml="8px">
-                    <RevampSwitch checked={isOptedIn} onChange={event => this.onOpt(event.target.checked)} />
+                    <RevampSwitch
+                      checked={isOptedIn}
+                      onChange={event => this.onOpt(event.target.checked)}
+                    />
                   </Box>
                 }
                 labelPlacement="start"
@@ -214,27 +216,19 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 }}
               />
             ) : (
-              <Box
-                sx={{
-                  display: 'flex',
-                  gap: '16px',
-                  width: '343px',
-                  my: '32px',
-                }}
-              >
-                <Button
-                  sx={{ width: '163px' }}
-                  variant="secondary"
-                  size="medium"
-                  onClick={() => this.onOpt(false)}
-                  id="startupAnalytics-skip-button"
-                >
+              <Box sx={{
+                display: 'flex',
+                gap: '16px',
+                width: '343px',
+                my: '32px'
+              }}>
+                <Button sx={{ width: '163px' }} variant='secondary' size='medium' onClick={() => this.onOpt(false)} id="startupAnalytics-skip-button">
                   {intl.formatMessage(globalMessages.refuseLabel)}
                 </Button>
                 <LoadingButton
                   sx={{ width: '163px' }}
                   variant="primary"
-                  size="medium"
+                  size='medium'
                   onClick={() => this.onOpt(true)}
                   loading={this.state.isSubmitting}
                   id="startupAnalytics-accept-button"
@@ -259,15 +253,14 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                   href={environment.externalPrivacyPolicyURL()}
                 >
                   {intl.formatMessage(messages.privacyNotice)}
-                </Link>
+                </Link> 
               ) : (
-                <Box
-                  sx={{
-                    color: 'ds.text_primary_medium',
-                    '&:hover': {
+                <Box sx={{ 
+                    color: 'ds.text_primary_medium', 
+                    '&:hover': { 
                       cursor: 'pointer',
-                      textDecoration: 'underline',
-                    },
+                      textDecoration: 'underline'
+                    }
                   }}
                   onClick={this.togglePrivacyNotice}
                 >

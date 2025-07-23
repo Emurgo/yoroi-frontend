@@ -8,7 +8,10 @@ import environment from '../../environment';
  * so the WebPage will use the `localStorage`.
  */
 
+/*::
 declare var chrome: any;
+*/
+
 // =====
 //  get
 // =====

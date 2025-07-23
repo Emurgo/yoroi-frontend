@@ -22,15 +22,19 @@ import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/t
 import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 
 interface LoadingStore {
-  +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void;
+  +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void
 }
 
-export default class BaseProfileStore<
-  TStores: {
-    +loading: LoadingStore,
-    ...
-  },
-> extends Store<TStores> {
+export default class BaseProfileStore
+  <
+    TStores: {
+      +loading: LoadingStore,
+      ...
+    }
+  >
+  extends Store<TStores>
+{
+
   LANGUAGE_OPTIONS: Array<LanguageType> = [
     ...LANGUAGES,
     ...(!environment.isProduction()
@@ -68,77 +72,87 @@ export default class BaseProfileStore<
     fractionGroupSize: 0,
   };
 
-  @observable getProfileLocaleRequest: Request<(void) => Promise<?string>> = new Request<(void) => Promise<?string>>(
-    this.api.localStorage.getUserLocale
+  @observable getProfileLocaleRequest: Request<(void) => Promise<?string>> = new Request<
+    (void) => Promise<?string>
+  >(this.api.localStorage.getUserLocale);
+
+  @observable setProfileLocaleRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setUserLocale);
+
+  @observable unsetProfileLocaleRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetUserLocale);
+
+  @observable getUserRevampMigrationStatusRequest: Request<
+    (void) => Promise<boolean>
+  > = new Request<(void) => Promise<boolean>>(this.api.localStorage.getUserRevampMigrationStatus);
+
+  @observable setUserRevampMigrationStatusRequest: Request<
+    (boolean) => Promise<void>
+  > = new Request<(boolean) => Promise<void>>(this.api.localStorage.setUserRevampMigrationStatus);
+
+  @observable getLastAnnouncedFeatureVersionRequest: Request<
+    (void) => Promise<string | null>
+  > = new Request<(void) => Promise<string | null>>(
+    this.api.localStorage.getLastAnnouncedFeatureVersion
   );
 
-  @observable setProfileLocaleRequest: Request<(string) => Promise<void>> = new Request<(string) => Promise<void>>(
-    this.api.localStorage.setUserLocale
-  );
-
-  @observable unsetProfileLocaleRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
-    this.api.localStorage.unsetUserLocale
-  );
-
-  @observable getUserRevampMigrationStatusRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
-    this.api.localStorage.getUserRevampMigrationStatus
-  );
-
-  @observable setUserRevampMigrationStatusRequest: Request<(boolean) => Promise<void>> = new Request<(boolean) => Promise<void>>(
-    this.api.localStorage.setUserRevampMigrationStatus
-  );
-
-  @observable getLastAnnouncedFeatureVersionRequest: Request<(void) => Promise<string | null>> = new Request<
-    (void) => Promise<string | null>,
-  >(this.api.localStorage.getLastAnnouncedFeatureVersion);
-
-  @observable setLastAnnouncedFeatureVersionRequest: Request<(string) => Promise<void>> = new Request<(string) => Promise<void>>(
+  @observable setLastAnnouncedFeatureVersionRequest: Request<
+    (string) => Promise<void>
+  > = new Request<(string) => Promise<void>>(
     this.api.localStorage.setLastAnnouncedFeatureVersion
   );
 
-  @observable getComplexityLevelRequest: Request<(void) => Promise<?ComplexityLevelType>> = new Request<
-    (void) => Promise<?ComplexityLevelType>,
-  >(this.api.localStorage.getComplexityLevel);
-
-  @observable setComplexityLevelRequest: Request<(ComplexityLevelType) => Promise<void>> = new Request<
-    (ComplexityLevelType) => Promise<void>,
-  >(this.api.localStorage.setComplexityLevel);
-
-  @observable unsetComplexityLevelRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
-    this.api.localStorage.unsetComplexityLevel
+  @observable getComplexityLevelRequest: Request<
+    (void) => Promise<?ComplexityLevelType>
+  > = new Request<(void) => Promise<?ComplexityLevelType>>(
+    this.api.localStorage.getComplexityLevel
   );
 
-  @observable getLastLaunchVersionRequest: Request<(void) => Promise<string>> = new Request<(void) => Promise<string>>(
-    this.api.localStorage.getLastLaunchVersion
-  );
+  @observable setComplexityLevelRequest: Request<
+    (ComplexityLevelType) => Promise<void>
+  > = new Request<(ComplexityLevelType) => Promise<void>>(this.api.localStorage.setComplexityLevel);
 
-  @observable setLastLaunchVersionRequest: Request<(string) => Promise<void>> = new Request<(string) => Promise<void>>(
-    this.api.localStorage.setLastLaunchVersion
-  );
+  @observable unsetComplexityLevelRequest: Request<(void) => Promise<void>> = new Request<
+    (void) => Promise<void>
+  >(this.api.localStorage.unsetComplexityLevel);
 
-  @observable getHideBalanceRequest: Request<(void) => Promise<boolean>> = new Request<(void) => Promise<boolean>>(
-    this.api.localStorage.getHideBalance
-  );
+  @observable getLastLaunchVersionRequest: Request<(void) => Promise<string>> = new Request<
+    (void) => Promise<string>
+  >(this.api.localStorage.getLastLaunchVersion);
 
-  @observable setHideBalanceRequest: Request<(boolean) => Promise<void>> = new Request<(boolean) => Promise<void>>(
-    this.api.localStorage.setHideBalance
-  );
+  @observable setLastLaunchVersionRequest: Request<(string) => Promise<void>> = new Request<
+    (string) => Promise<void>
+  >(this.api.localStorage.setLastLaunchVersion);
 
-  @observable setUnitOfAccountRequest: Request<(UnitOfAccountSettingType) => Promise<void>> = new Request(
-    this.api.localStorage.setUnitOfAccount
-  );
+  @observable getHideBalanceRequest: Request<(void) => Promise<boolean>> = new Request<
+    (void) => Promise<boolean>
+  >(this.api.localStorage.getHideBalance);
 
-  @observable getUnitOfAccountRequest: Request<(void) => Promise<UnitOfAccountSettingType>> = new Request(
-    this.api.localStorage.getUnitOfAccount
-  );
+  @observable setHideBalanceRequest: Request<(boolean) => Promise<void>> = new Request<
+    (boolean) => Promise<void>
+  >(this.api.localStorage.setHideBalance);
 
-  @observable getIsAnalyticsAllowed: Request<(void) => Promise<?boolean>> = new Request(
-    this.api.localStorage.loadIsAnalyticsAllowed
-  );
+  @observable setUnitOfAccountRequest: Request<
+    (UnitOfAccountSettingType) => Promise<void>
+  > = new Request(this.api.localStorage.setUnitOfAccount);
 
-  @observable setBringSandboxRequest: Request<(boolean) => Promise<void>> = new Request(this.api.localStorage.setBringSandbox);
+  @observable getUnitOfAccountRequest: Request<
+    (void) => Promise<UnitOfAccountSettingType>
+  > = new Request(this.api.localStorage.getUnitOfAccount);
 
-  @observable getBringSandboxRequest: Request<(void) => Promise<boolean>> = new Request(this.api.localStorage.getBringSandbox);
+  @observable getIsAnalyticsAllowed: Request<
+    (void) => Promise<?boolean>
+  > = new Request(this.api.localStorage.loadIsAnalyticsAllowed);
+
+  @observable setBringSandboxRequest: Request<
+    (boolean) => Promise<void>
+    > = new Request(this.api.localStorage.setBringSandbox);
+
+  @observable getBringSandboxRequest: Request<
+    (void) => Promise<boolean>
+    > = new Request(this.api.localStorage.getBringSandbox);
 
   @observable _acceptedTosVersion: {| version: ?number |} = { version: undefined };
 
@@ -146,13 +160,25 @@ export default class BaseProfileStore<
 
   setup(): void {
     super.setup();
-    this.registerReactions([this._setBigNumberFormat, this._updateMomentJsLocaleAfterLocaleChange]);
+    this.registerReactions([
+      this._setBigNumberFormat,
+      this._updateMomentJsLocaleAfterLocaleChange,
+    ]);
     this._getSelectComplexityLevel(); // eagerly cache
     noop(this.lastAnnouncedFeatureVersion);
     this.getBringSandboxRequest.execute();
-    this.stores.loading.registerBlockingLoadingRequest(this._loadAcceptedTosVersion(), 'load-tos-version');
-    this.stores.loading.registerBlockingLoadingRequest(this._loadWhetherAnalyticsAllowed(), 'load-analytics-flag');
-    this.stores.loading.registerBlockingLoadingRequest(this._loadCurrentNetworkId(), 'load-current-network-id');
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadAcceptedTosVersion(),
+      'load-tos-version',
+    );
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadWhetherAnalyticsAllowed(),
+      'load-analytics-flag',
+    );
+    this.stores.loading.registerBlockingLoadingRequest(
+      this._loadCurrentNetworkId(),
+      'load-current-network-id',
+    );
   }
 
   getCurrentNetworkId(): number {
@@ -169,7 +195,7 @@ export default class BaseProfileStore<
 
   _loadCurrentNetworkId: () => Promise<void> = async () => {
     this._currentNetworkId = await this.api.localStorage.loadCurrentNetworkId();
-  };
+  }
 
   get selectedNetwork(): $ReadOnly<NetworkRow> {
     return getNetworkById(this.getCurrentNetworkId());
@@ -179,35 +205,33 @@ export default class BaseProfileStore<
     const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
     const AMPLI_FLUSH_INTERVAL_MS = 5000;
     if (ampli.load == null || typeof ampli.load !== 'function') {
-      throw new Error(`ampli.load is not available or not a function (${typeof ampli.load})`);
+      throw new Error(`ampli.load is not available or not a function (${typeof ampli.load})`)
     }
-    await ampli.load(
-      ({
-        environment: environment.isProduction() ? 'production' : 'development',
-        client: {
-          configuration: {
-            optOut: !isAnalyticsAllowed,
-            flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-            trackingOptions: {
-              ipAddress: false,
-            },
-            defaultTracking: false,
+    await ampli.load(({
+      environment: environment.isProduction() ? 'production' : 'development',
+      client: {
+        configuration: {
+          optOut: !isAnalyticsAllowed,
+          flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+          trackingOptions: {
+            ipAddress: false,
           },
+          defaultTracking: false,
         },
-      }: LoadOptionsWithEnvironment)
-    ).promise;
+      },
+    }: LoadOptionsWithEnvironment)).promise;
     if (environment.isDev()) {
       ampli.client.add({
         name: 'info-plugin',
         type: 'enrichment',
         setup: () => Promise.resolve(),
-        execute: async event => {
-          console.info('[metrics]', event.event_type, event.event_properties);
-          return Promise.resolve(event);
+        execute: async (event) => {
+          console.info('[metrics]', event.event_type, event.event_properties)
+          return Promise.resolve(event)
         },
       });
     }
-  };
+  }
 
   teardown(): void {
     super.teardown();
@@ -255,14 +279,15 @@ export default class BaseProfileStore<
   }
 
   @computed get lastAnnouncedFeatureVersion(): string | null {
-    if (!this.getLastAnnouncedFeatureVersionRequest.wasExecuted && !this.getLastAnnouncedFeatureVersionRequest.isExecuting) {
+    if (!this.getLastAnnouncedFeatureVersionRequest.wasExecuted
+      && !this.getLastAnnouncedFeatureVersionRequest.isExecuting) {
       this.getLastAnnouncedFeatureVersionRequest.execute();
     }
     return this.getLastAnnouncedFeatureVersionRequest.result ?? null;
   }
 
   @action
-  setLastAnnouncedFeatureVersion: string => Promise<void> = async version => {
+  setLastAnnouncedFeatureVersion: string => Promise<void> = async (version) => {
     await this.setLastAnnouncedFeatureVersionRequest.execute(version);
     await this.getLastAnnouncedFeatureVersionRequest.execute();
   };
@@ -340,14 +365,14 @@ export default class BaseProfileStore<
     runInAction(() => {
       this._acceptedTosVersion.version = acceptedTosVersion;
     });
-  };
+  }
 
   acceptTermsOfUse: void => Promise<void> = async () => {
     runInAction(() => {
       this._acceptedTosVersion.version = CURRENT_TOS_VERSION;
     });
     await this.api.localStorage.saveAcceptedTosVersion(CURRENT_TOS_VERSION);
-  };
+  }
 
   // ========== Complexity Level Choice ========== //
 
@@ -363,7 +388,9 @@ export default class BaseProfileStore<
     return !!this.getComplexityLevelRequest.result;
   }
 
-  selectComplexityLevel: ComplexityLevelType => Promise<void> = async (level: ComplexityLevelType): Promise<void> => {
+  selectComplexityLevel: ComplexityLevelType => Promise<void> = async (
+    level: ComplexityLevelType
+  ): Promise<void> => {
     await this.setComplexityLevelRequest.execute(level);
     await this.getComplexityLevelRequest.execute();
   };
@@ -387,7 +414,10 @@ export default class BaseProfileStore<
   };
 
   @computed get hasLoadedLastLaunchVersion(): boolean {
-    return this.getLastLaunchVersionRequest.wasExecuted && this.getLastLaunchVersionRequest.result !== null;
+    return (
+      this.getLastLaunchVersionRequest.wasExecuted &&
+      this.getLastLaunchVersionRequest.result !== null
+    );
   }
 
   // ========== Show/hide Balance ========== //
@@ -434,7 +464,7 @@ export default class BaseProfileStore<
     return this.getUnitOfAccountRequest.result;
   };
 
-  updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async setting => {
+  updateUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async (setting) => {
     await this.setUnitOfAccountRequest.execute(setting);
     if (setting.enabled) {
       refreshCurrentCoinPrice();
@@ -454,11 +484,11 @@ export default class BaseProfileStore<
     return this.getUnitOfAccountRequest.wasExecuted && this.getUnitOfAccountRequest.result !== null;
   }
 
-  onOptForAnalytics: boolean => void = isAnalyticsAllowed => {
+  onOptForAnalytics: (boolean) => void = (isAnalyticsAllowed) => {
     this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
     this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
     ampli.client.setOptOut(!isAnalyticsAllowed);
-  };
+  }
 
   @computed get isAnalyticsOpted(): boolean {
     return typeof this.getIsAnalyticsAllowed.result === 'boolean';

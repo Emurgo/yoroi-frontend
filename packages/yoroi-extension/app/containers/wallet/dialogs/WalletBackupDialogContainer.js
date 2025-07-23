@@ -11,10 +11,11 @@ type Props = {|
 
 @observer
 export default class WalletBackupDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-  onCancelBackup: () => void = () => {
+
+  onCancelBackup: (() => void) = () => {
     this.props.onClose();
     this.props.stores.walletBackup.cancelWalletBackup();
-  };
+  }
 
   render(): Node {
     const { stores } = this.props;
@@ -27,10 +28,10 @@ export default class WalletBackupDialogContainer extends Component<{| ...Props, 
       isTermDeviceAccepted,
       isTermRecoveryAccepted,
       isPrivacyNoticeAccepted,
-      currentStep,
+      currentStep
     } = stores.walletBackup;
     const { createWalletRequest } = stores.wallets;
-    const hasWord = enteredPhrase.length > 0;
+    const hasWord = (enteredPhrase.length > 0);
     return (
       <WalletBackupDialog
         // Global props for all dialogs

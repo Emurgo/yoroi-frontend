@@ -1,10 +1,16 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import type { AddressUtxoFunc } from '../../lib/state-fetch/types';
-import type { TransferTx } from '../../../../types/TransferTypes';
+import type {
+  AddressUtxoFunc,
+} from '../../lib/state-fetch/types';
+import type {
+  TransferTx
+} from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import type { Address, Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type {
+  Address, Addressing
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 import { buildYoroiTransferTx as legacyFormatYoroiTx } from '../byron/yoroiTransfer';
 import { toSenderUtxos } from './utils';
 import type { NetworkRow } from '../../lib/storage/database/primitives/tables';

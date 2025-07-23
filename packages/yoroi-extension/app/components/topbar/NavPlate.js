@@ -4,9 +4,9 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import styles from './NavPlate.scss';
-import { ReactComponent as ConceptualIcon } from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
-import { ReactComponent as TrezorIcon } from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
-import { ReactComponent as LedgerIcon } from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
+import { ReactComponent as ConceptualIcon }  from '../../assets/images/wallet-nav/conceptual-wallet.inline.svg';
+import { ReactComponent as TrezorIcon }  from '../../assets/images/wallet-nav/trezor-wallet.inline.svg';
+import { ReactComponent as LedgerIcon }  from '../../assets/images/wallet-nav/ledger-wallet.inline.svg';
 import { Typography, Tooltip } from '@mui/material';
 import { truncateLongName, maxNameLengthBeforeTruncation } from '../../utils/formatters';
 import type { WalletChecksum } from '@emurgo/cip4-js';
@@ -24,8 +24,9 @@ type Props = {|
 
 @observer
 export default class NavPlate extends Component<Props> {
-  static contextType: any = IntlContext;
-  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = walletType => {
+
+  static contextType:any = IntlContext;
+  getType: WalletType => $Exact<$npm$ReactIntl$MessageDescriptor> = (walletType) => {
     if (walletType === 'ledger') {
       return globalMessages.ledgerWallet;
     }
@@ -33,9 +34,9 @@ export default class NavPlate extends Component<Props> {
       return globalMessages.trezorWallet;
     }
     return globalMessages.standardWallet;
-  };
+  }
 
-  getIcon: WalletType => string = walletType => {
+  getIcon: WalletType => string = (walletType) => {
     if (walletType === 'ledger') {
       return LedgerIcon;
     }
@@ -43,7 +44,7 @@ export default class NavPlate extends Component<Props> {
       return TrezorIcon;
     }
     return ConceptualIcon;
-  };
+  }
 
   render(): Node {
     const intl = this.context;
@@ -59,15 +60,17 @@ export default class NavPlate extends Component<Props> {
         {iconComponent}
         <div className={styles.content}>
           <div className={styles.head}>
-            <h3 className={styles.name}>{this.generateNameElem(this.props.name)}</h3>
+            <h3 className={styles.name}>
+              {this.generateNameElem(this.props.name)}
+            </h3>
             <div className={styles.plate}>{accountPlateId}</div>
           </div>
           <div className={styles.type}>
-            {TypeIcon !== undefined && (
+            {TypeIcon !== undefined &&
               <span className={styles.typeIcon}>
                 <TypeIcon />
               </span>
-            )}
+            }
             {typeText}
           </div>
         </div>
@@ -75,7 +78,7 @@ export default class NavPlate extends Component<Props> {
     );
   }
 
-  generateNameElem: string => Node = walletName => {
+  generateNameElem: string => Node = (walletName) => {
     if (walletName.length <= maxNameLengthBeforeTruncation) {
       return walletName;
     }
@@ -94,5 +97,5 @@ export default class NavPlate extends Component<Props> {
         </Typography>
       </Tooltip>
     );
-  };
+  }
 }

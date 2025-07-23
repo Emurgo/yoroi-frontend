@@ -8,7 +8,7 @@ import { defineMessages, IntlContext } from 'react-intl';
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import globalMessages from '../../i18n/global-messages';
-import { ReactComponent as InvalidURIImg } from '../../assets/images/uri/invalid-uri.inline.svg';
+import { ReactComponent as InvalidURIImg }  from '../../assets/images/uri/invalid-uri.inline.svg';
 import RawHash from '../widgets/hashWrappers/RawHash';
 import { truncateAddress } from '../../utils/formatters';
 
@@ -34,8 +34,7 @@ const messages = defineMessages({
   },
   uriInvalidDialogInvalidAddressText2: {
     id: 'uri.invalid.dialog.warning.invalidAddressText2',
-    defaultMessage:
-      '!!!Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.',
+    defaultMessage: '!!!Please ask the receiver to check the address and make sure you have at least one wallet that supports this address type.',
   },
 });
 
@@ -47,11 +46,15 @@ type Props = {|
 
 @observer
 export default class URIInvalidDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   render(): Node {
     const { onClose, onSubmit, address } = this.props;
 
-    const dialogClasses = classnames([styles.component, 'URIInvalidDialog']);
+    const dialogClasses = classnames([
+      styles.component,
+      'URIInvalidDialog'
+    ]);
 
     const intl = this.context;
 
@@ -59,8 +62,8 @@ export default class URIInvalidDialog extends Component<Props> {
       {
         label: intl.formatMessage(globalMessages.continue),
         onClick: onSubmit,
-        primary: true,
-      },
+        primary: true
+      }
     ];
 
     return (
@@ -74,34 +77,38 @@ export default class URIInvalidDialog extends Component<Props> {
       >
         <div>
           <center>
-            <span className={styles.invalidURIImg}>
-              <InvalidURIImg />
-            </span>
+            <span className={styles.invalidURIImg}><InvalidURIImg /></span>
           </center>
           <div className={styles.warningText}>
-            {address !== null ? (
-              <>
-                <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText1)}</div>
-                <br />
-                <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText2)}</div>
-                <br />
-                <RawHash light>
-                  <span className={styles.address}>{truncateAddress(address)}</span>
-                </RawHash>
-              </>
-            ) : (
-              <>
-                <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-                  {intl.formatMessage(messages.uriInvalidDialogWarningText1)}
-                </Typography>
-                <Typography variant="body2" color="ds.text_gray_low">
-                  {intl.formatMessage(messages.uriInvalidDialogWarningText2)}
-                </Typography>
-              </>
-            )}
+            {
+              address !== null ? (
+                <>
+                  <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText1)}</div>
+                  <br />
+                  <div>{intl.formatMessage(messages.uriInvalidDialogInvalidAddressText2)}</div>
+                  <br />
+                  <RawHash light>
+                    <span className={styles.address}>
+                      {truncateAddress(address)}
+                    </span>
+                  </RawHash>
+                </>
+              ):
+              (
+                <>
+                  <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
+                    {intl.formatMessage(messages.uriInvalidDialogWarningText1)}
+                  </Typography>
+                  <Typography variant="body2" color="ds.text_gray_low">
+                    {intl.formatMessage(messages.uriInvalidDialogWarningText2)}
+                  </Typography>
+                </>
+              )
+            }
           </div>
         </div>
       </Dialog>
     );
   }
+
 }

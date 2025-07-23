@@ -20,13 +20,16 @@ const adaStores: WithNullableFields<AdaStoresMap> = observable({
 /** See `stores` index for description of this weird behavior
  * Note: stores created here are NOT initialized
  */
-export default (action((stores: StoresMap, api: Api): AdaStoresMap => {
-  const storeNames: Array<$Keys<typeof adaStoreClasses>> = Object.keys(adaStoreClasses);
-  storeNames.forEach(name => {
-    if (adaStores[name]) adaStores[name].teardown();
-  });
-  storeNames.forEach(name => {
-    adaStores[name] = (new adaStoreClasses[name](stores, api): any);
-  });
-  return (adaStores: any);
-}): (StoresMap, Api) => AdaStoresMap);
+export default (action(
+  (
+    stores: StoresMap,
+    api: Api,
+  ): AdaStoresMap => {
+    const storeNames: Array<$Keys<typeof adaStoreClasses>> = Object.keys(adaStoreClasses);
+    storeNames.forEach(name => { if (adaStores[name]) adaStores[name].teardown(); });
+    storeNames.forEach(name => {
+      adaStores[name] = ((new adaStoreClasses[name](stores, api)): any);
+    });
+    return (adaStores: any);
+  }
+): (StoresMap, Api) => AdaStoresMap);

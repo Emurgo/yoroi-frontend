@@ -20,13 +20,13 @@ export const PortfolioActionType = Object.freeze({
 
 export type PortfolioAction =
   | {
-      type: typeof PortfolioActionType.changeUnitOfAccount;
-      unitOfAccount: CurrencyType;
-    }
+    type: typeof PortfolioActionType.changeUnitOfAccount;
+    unitOfAccount: CurrencyType;
+  }
   | {
-      type: typeof PortfolioActionType.changeUnitOfAccountPair;
-      accountPair: AccountPair;
-    };
+    type: typeof PortfolioActionType.changeUnitOfAccountPair;
+    accountPair: AccountPair;
+  };
 
 // Define state type
 export type PortfolioState = {
@@ -45,7 +45,7 @@ export type PortfolioState = {
   openBuyDialog: () => void;
   backendServiceZero: string;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
-  isTestnet: boolean;
+  isTestnet: boolean,
 };
 
 // Define default state
@@ -62,7 +62,7 @@ export const defaultPortfolioState: PortfolioState = {
   primaryTokenInfo: null,
   isHiddenAmount: false,
   showWelcomeBanner: false,
-  openBuyDialog: () => {},
+  openBuyDialog: () => { },
   backendServiceZero: '',
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
   isTestnet: false,

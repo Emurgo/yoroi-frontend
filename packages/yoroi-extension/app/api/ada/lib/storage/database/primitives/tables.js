@@ -62,7 +62,7 @@ export type CardanoHaskellConfig = $ReadOnly<
     ...$ElementType<CardanoHaskellBaseConfig, 0>,
     ...$ElementType<CardanoHaskellBaseConfig, 1>,
     ...$ElementType<CardanoHaskellBaseConfig, 2>,
-  |}>,
+  |}>
 >;
 
 export type NetworkRow = {|

@@ -8,7 +8,7 @@ import { defineMessages, IntlContext } from 'react-intl';
 
 import Dialog from '../widgets/Dialog';
 import DialogCloseButton from '../widgets/DialogCloseButton';
-import { ReactComponent as PerformTxImg } from '../../assets/images/uri/perform-tx-uri.inline.svg';
+import { ReactComponent as PerformTxImg }  from '../../assets/images/uri/perform-tx-uri.inline.svg';
 
 import styles from './URILandingDialog.scss';
 import globalMessages from '../../i18n/global-messages';
@@ -39,8 +39,9 @@ type Props = {|
 
 @observer
 export default class URILandingDialog extends Component<Props> {
-  static contextType: any = IntlContext;
-  submit: () => void = () => {
+
+  static contextType:any = IntlContext;
+  submit: (() => void) = () => {
     this.props.onSubmit();
   };
 
@@ -48,7 +49,10 @@ export default class URILandingDialog extends Component<Props> {
     const { onClose } = this.props;
     const intl = this.context;
 
-    const dialogClasses = classnames([styles.component, 'URILandingDialog']);
+    const dialogClasses = classnames([
+      styles.component,
+      'URILandingDialog'
+    ]);
 
     return (
       <Dialog
@@ -59,21 +63,28 @@ export default class URILandingDialog extends Component<Props> {
         onClose={onClose}
       >
         <div>
-          <span className={styles.urlImage}>
-            <PerformTxImg />
-          </span>
+          <span className={styles.urlImage}><PerformTxImg/></span>
           <div className={styles.warningText}>
             {intl.formatMessage(messages.uriLandingDialogWarningLine1)}
             <ul>
-              <li>{intl.formatMessage(messages.uriLandingDialogWarningLine2)}</li>
-              <li>{intl.formatMessage(messages.uriLandingDialogWarningLine3)}</li>
+              <li>
+                {intl.formatMessage(messages.uriLandingDialogWarningLine2)}
+              </li>
+              <li>
+                {intl.formatMessage(messages.uriLandingDialogWarningLine3)}
+              </li>
             </ul>
           </div>
-          <Button variant="primary" onClick={this.submit} sx={{ margin: '30px auto 0', display: 'block' }}>
+          <Button
+            variant="primary"
+            onClick={this.submit}
+            sx={{ margin: '30px auto 0', display: 'block' }}
+          >
             {intl.formatMessage(globalMessages.uriLandingDialogConfirmLabel)}
           </Button>
         </div>
       </Dialog>
     );
   }
+
 }

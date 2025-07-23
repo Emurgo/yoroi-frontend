@@ -19,7 +19,9 @@ import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/n
 import type { ConnectorStoresProps } from '../stores';
 
 @observer
-export default class SignTxContainer extends Component<ConnectorStoresProps> {
+export default class SignTxContainer extends Component<
+  ConnectorStoresProps
+> {
   @observable notificationElementId: string = '';
 
   onUnload: (SyntheticEvent<>) => void = ev => {
@@ -34,7 +36,7 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConfirm: WalletState => string => Promise<void> = deriver => async password => {
+  onConfirm: (WalletState) => string => Promise<void> = deriver => async password => {
     const { signingMessage } = this.props.stores.connector;
     if (signingMessage == null) {
       throw new Error('missing the signing message');
@@ -62,9 +64,7 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
     window.removeEventListener('beforeunload', this.onUnload);
     window.removeEventListener('unload', this.onUnload);
     this.props.stores.connector.cancelSignInTx();
-    setTimeout(() => {
-      window.close();
-    }, 100);
+    setTimeout(() => { window.close(); }, 100);
   };
 
   renderLoading(): Node {
@@ -78,7 +78,11 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
   }
 
   renderError(errorMessage: string): Node {
-    return <FullscreenLayout bottomPadding={0}>{errorMessage}</FullscreenLayout>;
+    return (
+      <FullscreenLayout bottomPadding={0}>
+        {errorMessage}
+      </FullscreenLayout>
+    );
   }
 
   render(): Node {
@@ -95,7 +99,8 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
     const whitelistEntries = this.props.stores.connector.currentConnectorWhitelist;
     const connectedWebsite = whitelistEntries.find(
       cacheEntry =>
-        selectedWallet.publicDeriverId === cacheEntry.publicDeriverId && cacheEntry.url === signingMessage.requesterUrl
+        selectedWallet.publicDeriverId === cacheEntry.publicDeriverId &&
+        cacheEntry.url === signingMessage.requesterUrl
     );
 
     const tooltipNotification = {
@@ -116,18 +121,25 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
       }
     };
 
-    const getAddressToDisplay = addr => addressToDisplayString(addr, getNetworkById(selectedWallet.networkId));
+    const getAddressToDisplay = addr =>
+      addressToDisplayString(addr, getNetworkById(selectedWallet.networkId));
 
     const handleConfirm = password => this.onConfirm(selectedWallet)(password);
 
     const notification =
-      this.notificationElementId == null ? null : uiNotifications.getTooltipActiveNotification(this.notificationElementId);
+      this.notificationElementId == null
+        ? null
+        : uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     const signData =
-      signingMessage.sign.type === 'data' ? { address: signingMessage.sign.address, payload: signingMessage.sign.payload } : null;
+      signingMessage.sign.type === 'data'
+        ? { address: signingMessage.sign.address, payload: signingMessage.sign.payload }
+        : null;
 
     const selectedExplorer =
-      this.props.stores.explorers.selectedExplorer.get(selectedWallet.networkId) ??
+      this.props.stores.explorers.selectedExplorer.get(
+        selectedWallet.networkId
+      ) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();

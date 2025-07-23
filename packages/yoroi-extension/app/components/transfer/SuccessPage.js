@@ -20,24 +20,21 @@ type Props = {|
 
 @observer
 export default class SuccessPage extends Component<Props> {
-  static contextType: any = IntlContext;
-  static defaultProps: {| closeInfo: void |} = {
-    closeInfo: undefined,
+  static contextType:any = IntlContext;
+  static defaultProps: {|closeInfo: void|} = {
+    closeInfo: undefined
   };
 
   render(): Node {
     const { title, text } = this.props;
 
-    const actions =
-      this.props.closeInfo == null
-        ? undefined
-        : [
-            {
-              label: this.props.closeInfo.closeLabel,
-              onClick: this.props.closeInfo.onClose,
-              primary: true,
-            },
-          ];
+    const actions = this.props.closeInfo == null
+      ? undefined
+      : [{
+        label: this.props.closeInfo.closeLabel,
+        onClick: this.props.closeInfo.onClose,
+        primary: true
+      }];
 
     return (
       <Dialog
@@ -51,10 +48,21 @@ export default class SuccessPage extends Component<Props> {
         <div className={styles.component}>
           <div>
             <div className={styles.successImg} />
-            <Typography component="div" variant="body1" color="primary" textAlign="center" mt="16px" fontWeight={500}>
+            <Typography component="div"
+              variant="body1"
+              color="primary"
+              textAlign="center"
+              mt="16px"
+              fontWeight={500}
+            >
               {title}
             </Typography>
-            <Typography component="div" variant="body2" color="gray.900" textAlign="center" mt="4px">
+            <Typography component="div"
+              variant="body2"
+              color="gray.900"
+              textAlign="center"
+              mt="4px"
+            >
               {text}
             </Typography>
             {this.props.closeInfo == null && (

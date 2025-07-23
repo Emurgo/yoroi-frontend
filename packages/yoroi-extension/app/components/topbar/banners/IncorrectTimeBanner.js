@@ -2,9 +2,9 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { IntlContext, defineMessages } from 'react-intl';
+import { IntlContext, defineMessages, } from 'react-intl';
 import styles from './IncorrectTimeBanner.scss';
-import { ReactComponent as ShelleyTestnetWarningSvg } from '../../../assets/images/shelley-testnet-warning.inline.svg';
+import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
 import moment from 'moment';
 
 const messages = defineMessages({
@@ -28,7 +28,8 @@ type Props = {|
 
 @observer
 export default class IncorrectTimeBanner extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -46,13 +47,12 @@ export default class IncorrectTimeBanner extends Component<Props> {
 
     return (
       <div className={styles.component}>
-        <span className={styles.warningIcon}>
-          <ShelleyTestnetWarningSvg />
-        </span>
+        <span className={styles.warningIcon}><ShelleyTestnetWarningSvg /></span>
         <div className={styles.text}>
-          {intl.formatMessage(messages.incorrectTimeLine1)}
-          <br />
-          <span className={styles.preTime}>{intl.formatMessage(messages.incorrectTimeLine2)}</span>
+          {intl.formatMessage(messages.incorrectTimeLine1)}<br />
+          <span className={styles.preTime}>
+            {intl.formatMessage(messages.incorrectTimeLine2)}
+          </span>
           {differenceText}
           <br />
           {intl.formatMessage(messages.incorrectTimeLine3)}

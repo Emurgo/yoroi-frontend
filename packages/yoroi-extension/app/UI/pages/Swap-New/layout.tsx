@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import  { ReactNode } from 'react';
 import { useLocation } from 'react-router';
 import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import NavBarContainerRevamp from '../../../containers/NavBarContainerRevamp';

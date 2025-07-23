@@ -41,7 +41,7 @@ type Props = {|
 
 @observer
 export default class ConfirmPinDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   @observable pinForm: void | ReactToolboxMobxForm;
 
@@ -52,7 +52,14 @@ export default class ConfirmPinDialog extends Component<Props> {
 
   render(): Node {
     const intl = this.context;
-    const { stepsList, progressInfo, goBack, cancel, pinValidation, isProcessing } = this.props;
+    const {
+      stepsList,
+      progressInfo,
+      goBack,
+      cancel,
+      pinValidation,
+      isProcessing,
+    } = this.props;
 
     const dailogActions = [
       {
@@ -74,21 +81,28 @@ export default class ConfirmPinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        {
+        {(
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
               steps={stepsList.map(step => ({
                 message: step.message,
-                stepId: String(step.step),
+                stepId: String(step.step)
               }))}
               setCurrentStep={() => goBack()}
             />
-            <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="grayscale.900">
-              <FormattedMessage {...messages.line1} values={{ strong }} />
+            <Typography
+              component="div"
+              textAlign="center"
+              pt="24px"
+              pb="40px"
+              variant="body1"
+              color="grayscale.900"
+            >
+              <FormattedMessage {...messages.line1} values={{ strong }}/>
             </Typography>
           </>
-        }
+        )}
         <div className={styles.pinInputContainer}>
           <PinInput
             setForm={form => this.setPinForm(form)}

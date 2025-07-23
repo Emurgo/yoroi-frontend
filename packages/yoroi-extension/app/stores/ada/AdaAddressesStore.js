@@ -1,10 +1,14 @@
 // @flow
 
 import Store from '../base/Store';
-import type { StandardAddress, AddressTypeName } from '../../types/AddressFilterTypes';
+import type { StandardAddress, AddressTypeName, } from '../../types/AddressFilterTypes';
 import { AddressGroupTypes, AddressSubgroup } from '../../types/AddressFilterTypes';
-import { unwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
-import { filterAddressesByStakingKey } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import {
+  unwrapStakingKey,
+} from '../../api/ada/lib/storage/bridge/utils';
+import {
+  filterAddressesByStakingKey,
+} from '../../api/ada/lib/storage/bridge/delegationUtils';
 import type { StoresMap } from '../index';
 import { isResolvableDomain, resolverApiMaker } from '@yoroi/resolver';
 import { Api, Resolver } from '@yoroi/types';
@@ -17,11 +21,15 @@ export async function filterMangledAddresses(request: {|
 |}): Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> {
   const stakingKey = unwrapStakingKey(request.publicDeriver.stakingAddress);
 
-  const filterResult = filterAddressesByStakingKey<StandardAddress>(stakingKey, request.baseAddresses, false);
+  const filterResult = filterAddressesByStakingKey<StandardAddress>(
+    stakingKey,
+    request.baseAddresses,
+    false,
+  );
 
   const nonMangledSet = new Set(filterResult);
-  const result = request.baseAddresses.filter(info =>
-    request.invertFilter ? !nonMangledSet.has(info) : nonMangledSet.has(info)
+  const result = request.baseAddresses.filter(
+    info => (request.invertFilter ? !nonMangledSet.has(info) : nonMangledSet.has(info))
   );
 
   return result.map(info => ({
@@ -42,18 +50,15 @@ export type DomainResolverFunc = string => Promise<?DomainResolverResponse>;
 
 export function resolveAddressDomainNameServerName(nameServerTag: string): string {
   switch (nameServerTag) {
-    case Resolver.NameServer.Handle:
-      return 'ADA Handle';
-    case Resolver.NameServer.Cns:
-      return 'Cardano Name Service (CNS)';
-    case Resolver.NameServer.Unstoppable:
-      return 'Unstoppable Domains';
-    default:
-      return nameServerTag;
+    case Resolver.NameServer.Handle: return 'ADA Handle'
+    case Resolver.NameServer.Cns: return 'Cardano Name Service (CNS)'
+    case Resolver.NameServer.Unstoppable: return 'Unstoppable Domains'
+    default: return nameServerTag
   }
 }
 
 export default class AdaAddressesStore extends Store<StoresMap> {
+
   _domainResolverApi: ?{| getCardanoAddresses: ({| resolve: string |}) => Promise<any> |} = null;
 
   setup(): void {
@@ -64,7 +69,7 @@ export default class AdaAddressesStore extends Store<StoresMap> {
           apiKey: 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh',
         },
       },
-      cslFactory: ctx => RustModule.CrossCsl.init(ctx),
+      cslFactory: (ctx) => RustModule.CrossCsl.init(ctx),
     });
   }
 
@@ -106,16 +111,17 @@ export default class AdaAddressesStore extends Store<StoresMap> {
       const resolvedNameServer = resolveAddressDomainNameServerName(nameServer);
       if (address != null) {
         // Return success right away
-        const resultSuccess: DomainResolverResponse = { nameServer: resolvedNameServer, address, error: null };
+        const resultSuccess: DomainResolverResponse =
+          { nameServer: resolvedNameServer, address, error: null };
         return Promise.resolve(resultSuccess);
       }
       /* Non-success results are stored but not returned yet
        * in case next iterations might have success
        */
       if (
-        error instanceof Resolver.Errors.InvalidDomain ||
-        error instanceof Resolver.Errors.UnsupportedTld ||
-        error instanceof Resolver.Errors.NotFound
+        error instanceof Resolver.Errors.InvalidDomain
+        || error instanceof Resolver.Errors.UnsupportedTld
+        || error instanceof Resolver.Errors.NotFound
       ) {
         // ignore
       } else if (error instanceof Api.Errors.Forbidden) {
@@ -126,17 +132,17 @@ export default class AdaAddressesStore extends Store<StoresMap> {
         if (resultUnexpected == null) {
           resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
         }
-        console.error(`Error resolving domain address @ ${nameServer} (${error?.constructor?.name})`, error);
+        console.error(`Error resolving domain address @ ${nameServer} (${error?.constructor?.name})`, error)
       }
     }
     return Promise.resolve(resultForbidden ?? resultUnexpected ?? null);
   }
 
-  storewiseFilter: ({|
+  storewiseFilter: {|
     +publicDeriver: { stakingAddress: string, ... },
     storeName: AddressTypeName,
     addresses: $ReadOnlyArray<$ReadOnly<StandardAddress>>,
-  |}) => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async request => {
+  |} => Promise<$ReadOnlyArray<$ReadOnly<StandardAddress>>> = async (request) => {
     if (request.storeName.group === AddressGroupTypes.addressBook) {
       return request.addresses;
     }
@@ -155,5 +161,5 @@ export default class AdaAddressesStore extends Store<StoresMap> {
       });
     }
     return request.addresses;
-  };
+  }
 }

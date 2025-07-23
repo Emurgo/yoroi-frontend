@@ -46,7 +46,7 @@ type Props = {|
 
 @observer
 export default class ChangeWalletPasswordDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
@@ -67,7 +67,10 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
               if (repeatPasswordField.value.length > 0) {
                 repeatPasswordField.validate({ showErrors: true });
               }
-              return [isValidWalletPassword(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)];
+              return [
+                isValidWalletPassword(field.value),
+                this.context.formatMessage(globalMessages.invalidWalletPassword),
+              ];
             },
           ],
         },
@@ -143,7 +146,8 @@ export default class ChangeWalletPasswordDialog extends Component<Props> {
     const repeatedPassword = repeatedPasswordField.value;
 
     const disabledCondition =
-      isSubmitting || !(isValidWalletPassword(newPassword) && isValidRepeatPassword(newPassword, repeatedPassword));
+      isSubmitting ||
+      !(isValidWalletPassword(newPassword) && isValidRepeatPassword(newPassword, repeatedPassword));
 
     const actions = [
       {

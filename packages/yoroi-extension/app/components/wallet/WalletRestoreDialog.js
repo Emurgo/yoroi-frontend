@@ -12,7 +12,11 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import DialogCloseButton from '../widgets/DialogCloseButton';
 import DialogTextBlock from '../widgets/DialogTextBlock';
 import Dialog from '../widgets/Dialog';
-import { isValidWalletName, isValidWalletPassword, isValidRepeatPassword } from '../../utils/validations';
+import {
+  isValidWalletName,
+  isValidWalletPassword,
+  isValidRepeatPassword,
+} from '../../utils/validations';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import styles from './WalletRestoreDialog.scss';
@@ -81,7 +85,7 @@ export default class WalletRestoreDialog extends Component<Props> {
     introMessage: '',
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   getInitRecoveryPhrase: void => Array<string> = () => {
     if (this.props.initValues) {
       const str: string = (this.props.initValues.recoveryPhrase || '').trim();
@@ -92,99 +96,93 @@ export default class WalletRestoreDialog extends Component<Props> {
     return [];
   };
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        walletName:
-          this.props.isVerificationMode === true
-            ? undefined
-            : {
-                label: this.context.formatMessage(messages.walletNameInputLabel),
-                placeholder: '',
-                value: (this.props.initValues && this.props.initValues.walletName) || '',
-                validators: [
-                  ({ field }) => [isValidWalletName(field.value), this.context.formatMessage(globalMessages.invalidWalletName)],
-                ],
-              },
-        recoveryPhrase: {
-          label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
-          placeholder: '',
-          value: this.getInitRecoveryPhrase(),
-          validators: [
-            ({ field }) => {
-              const value = join(field.value, ' ');
-              const wordsLeft = this.props.numberOfMnemonics - field.value.length;
-              if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
-              if (wordsLeft > 0) {
-                return [false, this.context.formatMessage(globalMessages.shortRecoveryPhrase, { number: wordsLeft })];
-              }
-              return [this.props.mnemonicValidator(value), this.context.formatMessage(globalMessages.invalidRecoveryPhrase)];
-            },
-          ],
-        },
-        walletPassword:
-          this.props.isVerificationMode === true
-            ? undefined
-            : {
-                type: 'password',
-                label: this.context.formatMessage(globalMessages.newPasswordLabel),
-                placeholder: '',
-                value: (this.props.initValues && this.props.initValues.walletPassword) || '',
-                validators: [
-                  ({ field, form }) => {
-                    const repeatPasswordField = form.$('repeatPassword');
-                    if (repeatPasswordField.value.length > 0) {
-                      repeatPasswordField.validate({ showErrors: true });
-                    }
-                    return [isValidWalletPassword(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)];
-                  },
-                ],
-              },
-        repeatPassword:
-          this.props.isVerificationMode === true
-            ? undefined
-            : {
-                type: 'password',
-                label: this.context.formatMessage(globalMessages.repeatPasswordLabel),
-                placeholder: '',
-                value: (this.props.initValues && this.props.initValues.walletPassword) || '',
-                validators: [
-                  ({ field, form }) => {
-                    const walletPassword = form.$('walletPassword').value;
-                    return [
-                      isValidRepeatPassword(walletPassword, field.value),
-                      this.context.formatMessage(globalMessages.invalidRepeatPassword),
-                    ];
-                  },
-                ],
-              },
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
+    fields: {
+      walletName: this.props.isVerificationMode === true ? undefined : {
+        label: this.context.formatMessage(messages.walletNameInputLabel),
+        placeholder: '',
+        value: (this.props.initValues && this.props.initValues.walletName) || '',
+        validators: [({ field }) => (
+          [
+            isValidWalletName(field.value),
+            this.context.formatMessage(globalMessages.invalidWalletName)
+          ]
+        )],
+      },
+      recoveryPhrase: {
+        label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
+        placeholder: '',
+        value: this.getInitRecoveryPhrase(),
+        validators: [({ field }) => {
+          const value = join(field.value, ' ');
+          const wordsLeft = this.props.numberOfMnemonics - field.value.length;
+          if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
+          if (wordsLeft > 0) {
+            return [
+              false,
+              this.context.formatMessage(globalMessages.shortRecoveryPhrase,
+                { number: wordsLeft })
+            ];
+          }
+          return [
+            this.props.mnemonicValidator(value),
+            this.context.formatMessage(globalMessages.invalidRecoveryPhrase)
+          ];
+        }],
+      },
+      walletPassword: this.props.isVerificationMode === true ? undefined : {
+        type: 'password',
+        label: this.context.formatMessage(globalMessages.newPasswordLabel),
+        placeholder: '',
+        value: (this.props.initValues && this.props.initValues.walletPassword) || '',
+        validators: [({ field, form }) => {
+          const repeatPasswordField = form.$('repeatPassword');
+          if (repeatPasswordField.value.length > 0) {
+            repeatPasswordField.validate({ showErrors: true });
+          }
+          return [
+            isValidWalletPassword(field.value),
+            this.context.formatMessage(globalMessages.invalidWalletPassword)
+          ];
+        }],
+      },
+      repeatPassword: this.props.isVerificationMode === true ? undefined : {
+        type: 'password',
+        label: this.context.formatMessage(globalMessages.repeatPasswordLabel),
+        placeholder: '',
+        value: (this.props.initValues && this.props.initValues.walletPassword) || '',
+        validators: [({ field, form }) => {
+          const walletPassword = form.$('walletPassword').value;
+          return [
+            isValidRepeatPassword(walletPassword, field.value),
+            this.context.formatMessage(globalMessages.invalidRepeatPassword)
+          ];
+        }],
       },
     },
-    {
-      options: {
-        showErrorsOnInit: (() => {
-          if (this.props.initValues == null) {
-            return false;
-          }
-          const { initValues } = this.props;
-          return (
-            Object.keys(initValues)
-              .map(key => initValues[key])
-              .filter(val => val !== '' && val != null).length > 0
-          );
-        })(),
-        validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-      },
-      plugins: {
-        vjf: vjf(),
-      },
-    }
-  );
+  }, {
+    options: {
+      showErrorsOnInit: (() => {
+        if (this.props.initValues == null) {
+          return false;
+        }
+        const { initValues } = this.props;
+        return Object.keys(initValues)
+          .map(key => initValues[key])
+          .filter(val => val !== '' && val != null)
+          .length > 0;
+      })(),
+      validateOnChange: true,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
+    },
+  });
 
-  submit: () => void = () => {
+  submit: (() => void) = () => {
     this.form.submit({
-      onSuccess: async form => {
+      onSuccess: async (form) => {
         const { recoveryPhrase, walletName, walletPassword } = form.values();
         const walletData: WalletRestoreDialogValues = {
           recoveryPhrase: join(recoveryPhrase, ' '),
@@ -193,7 +191,7 @@ export default class WalletRestoreDialog extends Component<Props> {
         };
         await this.props.onSubmit(walletData);
       },
-      onError: () => {},
+      onError: () => {}
     });
   };
 
@@ -216,18 +214,36 @@ export default class WalletRestoreDialog extends Component<Props> {
   render(): Node {
     const intl = this.context;
     const { form } = this;
-    const { validWords, error, onCancel, onBack, isVerificationMode, mnemonicValidator, introMessage } = this.props;
-    const { walletName, walletPassword, repeatPassword, recoveryPhrase } = form.values();
+    const {
+      validWords,
+      error,
+      onCancel,
+      onBack,
+      isVerificationMode,
+      mnemonicValidator,
+      introMessage
+    } = this.props;
+    const {
+      walletName,
+      walletPassword,
+      repeatPassword,
+      recoveryPhrase
+    } = form.values();
 
-    const dialogClasses = classnames([styles.component, 'WalletRestoreDialog']);
+    const dialogClasses = classnames([
+      styles.component,
+      'WalletRestoreDialog',
+    ]);
 
-    const walletPasswordFieldsClasses = classnames([styles.walletPasswordFields, styles.show]);
+    const walletPasswordFieldsClasses = classnames([
+      styles.walletPasswordFields,
+      styles.show,
+    ]);
 
     const disabledCondition = () => {
       let condition = mnemonicValidator(join(recoveryPhrase, ' '));
       if (isVerificationMode !== true) {
-        condition =
-          condition &&
+        condition = condition &&
           isValidWalletName(walletName) &&
           isValidWalletPassword(walletPassword) &&
           isValidRepeatPassword(walletPassword, repeatPassword);
@@ -243,7 +259,9 @@ export default class WalletRestoreDialog extends Component<Props> {
     const actions = [
       {
         className: null,
-        label: intl.formatMessage(isVerificationMode === true ? messages.verifyButtonLabel : messages.importButtonLabel),
+        label: intl.formatMessage(
+          isVerificationMode === true ? messages.verifyButtonLabel : messages.importButtonLabel
+        ),
         primary: true,
         disabled: disabledCondition(),
         onClick: this.submit,
@@ -252,8 +270,9 @@ export default class WalletRestoreDialog extends Component<Props> {
 
     const dialogTitle = isVerificationMode === true ? messages.titleVerify : messages.title;
 
-    const introMessageBlock =
-      introMessage != null && introMessage !== '' ? <DialogTextBlock message={introMessage} subclass="component-input" /> : null;
+    const introMessageBlock = (introMessage != null && introMessage !== '')
+      ? (<DialogTextBlock message={introMessage} subclass="component-input" />)
+      : null;
     return (
       <Dialog
         className={dialogClasses}
@@ -264,19 +283,19 @@ export default class WalletRestoreDialog extends Component<Props> {
         backButton={onBack && <DialogBackButton onBack={onBack} />}
         closeButton={<DialogCloseButton onClose={onCancel} />}
       >
-        {isVerificationMode === true ? (
-          introMessageBlock
-        ) : (
-          <TextField
-            className={styles.walletName}
-            inputRef={input => {
-              this.walletNameInput = input;
-            }}
-            {...walletNameField.bind()}
-            done={walletNameField.isValid}
-            error={walletNameField.error}
-          />
-        )}
+
+        {isVerificationMode === true
+          ? introMessageBlock
+          : (
+            <TextField
+              className={styles.walletName}
+              inputRef={(input) => { this.walletNameInput = input; }}
+              {...walletNameField.bind()}
+              done={walletNameField.isValid}
+              error={walletNameField.error}
+            />
+          )
+        }
 
         <Autocomplete
           options={validWords}
@@ -288,9 +307,7 @@ export default class WalletRestoreDialog extends Component<Props> {
           {...recoveryPhraseField.bind()}
         />
 
-        {isVerificationMode === true ? (
-          ''
-        ) : (
+        {isVerificationMode === true ? '' : (
           <div className={styles.walletPassword}>
             <div className={walletPasswordFieldsClasses}>
               <TextField
@@ -309,8 +326,14 @@ export default class WalletRestoreDialog extends Component<Props> {
           </div>
         )}
 
-        {error && <div className={styles.error}>{intl.formatMessage(error, error.values)}</div>}
+        {error && (
+          <div className={styles.error}>
+            {intl.formatMessage(error, error.values)}
+          </div>
+        )}
+
       </Dialog>
     );
   }
+
 }

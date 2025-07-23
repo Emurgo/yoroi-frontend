@@ -14,7 +14,9 @@ const TransactionReviewLayout = ({ stores, children }: Props): any => {
   return (
     <GeneralPageLayout
       stores={stores}
-      navbar={<NavBarContainerRevamp stores={stores} title={<NavBarTitle title={strings.transactionReview} />} />}
+      navbar={
+        <NavBarContainerRevamp stores={stores} title={<NavBarTitle title={strings.transactionReview} />} />
+      }
     >
       {children}
     </GeneralPageLayout>

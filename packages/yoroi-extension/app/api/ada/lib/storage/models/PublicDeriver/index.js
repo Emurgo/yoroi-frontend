@@ -1,6 +1,6 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type { lf$Database, lf$Transaction, } from 'lovefield';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
 
@@ -12,22 +12,23 @@ import type {
   IPublicDeriverConstructor,
 } from './interfaces';
 
-import { getAllSchemaTables, raii, StaleStateError } from '../../database/utils';
+import { getAllSchemaTables, raii, StaleStateError, } from '../../database/utils';
 
-import type { PublicDeriverRow } from '../../database/walletTypes/core/tables';
-import { GetLastSyncForPublicDeriver, GetPublicDeriver } from '../../database/walletTypes/core/api/read';
-import { ModifyPublicDeriver } from '../../database/walletTypes/core/api/write';
+import type { PublicDeriverRow, } from '../../database/walletTypes/core/tables';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, } from '../../database/walletTypes/core/api/read';
+import { ModifyPublicDeriver, } from '../../database/walletTypes/core/api/write';
 
-import type { KeyDerivationRow } from '../../database/primitives/tables';
-import { GetKeyDerivation } from '../../database/primitives/api/read';
+import type { KeyDerivationRow, } from '../../database/primitives/tables';
+import { GetKeyDerivation, } from '../../database/primitives/api/read';
 import { addTraitsForCip1852Child } from './traits';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
-import { UtxoStorageApi } from '../utils';
+import { UtxoStorageApi, } from '../utils';
 import UtxoApi from '../../../state-fetch/utxoApi';
 import { networks } from '../../database/prepackaged/networks';
 
 /** Snapshot of a PublicDeriver in the database */
-export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> implements IPublicDeriver<Parent>, IGetLastSyncInfo {
+export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet>
+implements IPublicDeriver<Parent>, IGetLastSyncInfo {
   /**
    * Should only cache information we know will never change
    */
@@ -74,7 +75,8 @@ export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> impleme
   }
 
   isMainnet(): boolean {
-    return this.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId;
+    return this.getParent().getNetworkInfo().NetworkId
+      === networks.CardanoMainnet.NetworkId;
   }
 
   getPathToPublic(): Array<number> {
@@ -85,62 +87,93 @@ export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> impleme
     return this.derivationId;
   }
 
-  static async createPublicDeriver(pubDeriver: $ReadOnly<PublicDeriverRow>, parent: ConceptualWallet): Promise<PublicDeriver<>> {
-    return await refreshPublicDeriverFunctionality(parent.getDb(), pubDeriver, parent);
+  static async createPublicDeriver(
+    pubDeriver: $ReadOnly<PublicDeriverRow>,
+    parent: ConceptualWallet,
+  ): Promise<PublicDeriver<>> {
+    return await refreshPublicDeriverFunctionality(
+      parent.getDb(),
+      pubDeriver,
+      parent,
+    );
   }
 
   getFullPublicDeriverInfo: void => Promise<$ReadOnly<PublicDeriverRow>> = async () => {
     const deps = Object.freeze({
       GetPublicDeriver,
     });
-    const depTables = Object.keys(deps)
+    const depTables = Object
+      .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii<$ReadOnly<PublicDeriverRow>>(this.getDb(), depTables, async tx => {
-      const row = await deps.GetPublicDeriver.get(this.getDb(), tx, this.publicDeriverId);
-      if (row == null) {
-        throw new StaleStateError(`${nameof(this.getFullPublicDeriverInfo)} PublicDeriver==null`);
+    return await raii<$ReadOnly<PublicDeriverRow>>(
+      this.getDb(),
+      depTables,
+      async tx => {
+        const row = await deps.GetPublicDeriver.get(
+          this.getDb(), tx,
+          this.publicDeriverId,
+        );
+        if (row == null) {
+          throw new StaleStateError(`${nameof(this.getFullPublicDeriverInfo)} PublicDeriver==null`);
+        }
+        return row;
       }
-      return row;
-    });
-  };
+    );
+  }
 
   rawRename: (
     tx: lf$Transaction,
     deps: {| ModifyPublicDeriver: Class<ModifyPublicDeriver> |},
-    body: {| newName: string |}
+    body: {| newName: string, |},
   ) => Promise<void> = async (tx, deps, body) => {
-    return await deps.ModifyPublicDeriver.rename(this.getDb(), tx, {
-      pubDeriverId: this.publicDeriverId,
-      newName: body.newName,
-    });
-  };
-  rename: ({| newName: string |}) => Promise<void> = async body => {
+    return await deps.ModifyPublicDeriver.rename(
+      this.getDb(), tx,
+      {
+        pubDeriverId: this.publicDeriverId,
+        newName: body.newName,
+      }
+    );
+  }
+  rename: {| newName: string, |} => Promise<void> = async (body) => {
     const deps = Object.freeze({
       ModifyPublicDeriver,
     });
-    const depTables = Object.keys(deps)
+    const depTables = Object
+      .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii<void>(this.getDb(), depTables, async tx => this.rawRename(tx, deps, body));
+    return await raii<void>(
+      this.getDb(),
+      depTables,
+      async tx => this.rawRename(tx, deps, body)
+    );
   };
 
   rawGetLastSyncInfo: (
     tx: lf$Transaction,
     deps: {| GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver> |},
-    _body: IGetLastSyncInfoRequest
-  ) => Promise<IGetLastSyncInfoResponse> = async (tx, deps, _body) => {
-    return await deps.GetLastSyncForPublicDeriver.forId(this.getDb(), tx, this.publicDeriverId);
-  };
-  getLastSyncInfo: IGetLastSyncInfoRequest => Promise<IGetLastSyncInfoResponse> = async body => {
+    _body: IGetLastSyncInfoRequest,
+  ) => Promise<IGetLastSyncInfoResponse> = async (tx, deps, _body,) => {
+    return await deps.GetLastSyncForPublicDeriver.forId(
+      this.getDb(), tx,
+      this.publicDeriverId
+    );
+  }
+  getLastSyncInfo: IGetLastSyncInfoRequest => Promise<IGetLastSyncInfoResponse> = async (body) => {
     const deps = Object.freeze({
       GetLastSyncForPublicDeriver,
     });
-    const depTables = Object.keys(deps)
+    const depTables = Object
+      .keys(deps)
       .map(key => deps[key])
       .flatMap(table => getAllSchemaTables(this.getDb(), table));
-    return await raii<IGetLastSyncInfoResponse>(this.getDb(), depTables, async tx => this.rawGetLastSyncInfo(tx, deps, body));
-  };
+    return await raii<IGetLastSyncInfoResponse>(
+      this.getDb(),
+      depTables,
+      async tx => this.rawGetLastSyncInfo(tx, deps, body)
+    );
+  }
 
   getUtxoService: void => UtxoService = () => this.utxoService;
   getUtxoStorageApi: void => UtxoStorageApi = () => this.utxoStorageApi;
@@ -149,11 +182,20 @@ export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> impleme
 export async function refreshPublicDeriverFunctionality(
   db: lf$Database,
   pubDeriver: $ReadOnly<PublicDeriverRow>,
-  parent: ConceptualWallet
+  parent: ConceptualWallet,
 ): Promise<PublicDeriver<>> {
-  const keyDerivation = await getKeyDerivation(db, pubDeriver.KeyDerivationId);
+  const keyDerivation = await getKeyDerivation(
+    db,
+    pubDeriver.KeyDerivationId,
+  );
 
-  const result = await addTraitsForCip1852Child(db, pubDeriver, keyDerivation, parent, PublicDeriver);
+  const result = await addTraitsForCip1852Child(
+    db,
+    pubDeriver,
+    keyDerivation,
+    parent,
+    PublicDeriver,
+  );
   const finalClass = result.finalClass;
   const instance = new finalClass({
     publicDeriverId: pubDeriver.PublicDeriverId,
@@ -164,20 +206,31 @@ export async function refreshPublicDeriverFunctionality(
   return instance;
 }
 
-async function getKeyDerivation(db: lf$Database, keyDerivationId: number): Promise<$ReadOnly<KeyDerivationRow>> {
+async function getKeyDerivation(
+  db: lf$Database,
+  keyDerivationId: number,
+): Promise<$ReadOnly<KeyDerivationRow>> {
   const deps = Object.freeze({
     GetKeyDerivation,
   });
-  const depTables = Object.keys(deps)
+  const depTables = Object
+    .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  return await raii<$ReadOnly<KeyDerivationRow>>(db, depTables, async tx => {
-    const keyDerivationRow = await deps.GetKeyDerivation.get(db, tx, keyDerivationId);
-    if (keyDerivationRow === undefined) {
-      throw new StaleStateError(`${nameof(getKeyDerivation)} keyDerivationRow`);
+  return await raii<$ReadOnly<KeyDerivationRow>>(
+    db,
+    depTables,
+    async tx => {
+      const keyDerivationRow = await deps.GetKeyDerivation.get(
+        db, tx,
+        keyDerivationId,
+      );
+      if (keyDerivationRow === undefined) {
+        throw new StaleStateError(`${nameof(getKeyDerivation)} keyDerivationRow`);
+      }
+      return keyDerivationRow;
     }
-    return keyDerivationRow;
-  });
+  );
 }
 
 export type Cip1852PublicDeriver = PublicDeriver<ConceptualWallet>;

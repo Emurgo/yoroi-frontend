@@ -3,14 +3,14 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import CheckboxLabel from '../../common/CheckboxLabel';
+import CheckboxLabel from '../../common/CheckboxLabel'
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import Dialog from '../../widgets/Dialog';
 import DialogCloseButton from '../../widgets/DialogCloseButton';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletBackupPrivacyWarningDialog.scss';
-import { ReactComponent as RecoveryWatchingSvg } from '../../../assets/images/recovery-watching.inline.svg';
+import { ReactComponent as RecoveryWatchingSvg }  from '../../../assets/images/recovery-watching.inline.svg';
 
 const messages = defineMessages({
   recoveryPhraseInstructions: {
@@ -22,7 +22,7 @@ const messages = defineMessages({
   termNobodyWatching: {
     id: 'wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching',
     defaultMessage: '!!!Make sure nobody looks into your screen unless you want them to have access to your funds.',
-  },
+  }
 });
 
 type Props = {|
@@ -36,22 +36,32 @@ type Props = {|
 
 @observer
 export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
 
   render(): Node {
     const intl = this.context;
-    const { countdownRemaining, canPhraseBeShown, togglePrivacyNotice, onCancelBackup, isPrivacyNoticeAccepted, onContinue } =
-      this.props;
+    const {
+      countdownRemaining,
+      canPhraseBeShown,
+      togglePrivacyNotice,
+      onCancelBackup,
+      isPrivacyNoticeAccepted,
+      onContinue,
+    } = this.props;
     const countdownDisplay = countdownRemaining > 0 ? ` (${countdownRemaining})` : '';
-    const dialogClasses = classnames([styles.component, 'WalletBackupPrivacyWarningDialog']);
+    const dialogClasses = classnames([
+      styles.component,
+      'WalletBackupPrivacyWarningDialog',
+    ]);
 
     const actions = [
       {
         label: intl.formatMessage(globalMessages.continue) + countdownDisplay,
         onClick: onContinue,
         disabled: !canPhraseBeShown,
-        primary: true,
-      },
+        primary: true
+      }
     ];
 
     return (
@@ -63,10 +73,10 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
         onClose={onCancelBackup}
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
       >
-        <span className={styles.recoveryImage}>
-          <RecoveryWatchingSvg />
-        </span>
-        <WalletRecoveryInstructions instructionsText={<FormattedMessage {...messages.recoveryPhraseInstructions} />} />
+        <span className={styles.recoveryImage}><RecoveryWatchingSvg/></span>
+        <WalletRecoveryInstructions
+          instructionsText={<FormattedMessage {...messages.recoveryPhraseInstructions} />}
+        />
         <div className={styles.checkbox}>
           <CheckboxLabel
             label={intl.formatMessage(messages.termNobodyWatching)}
@@ -79,4 +89,5 @@ export default class WalletBackupPrivacyWarningDialog extends Component<Props> {
       </Dialog>
     );
   }
+
 }

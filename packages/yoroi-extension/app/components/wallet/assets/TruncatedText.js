@@ -37,9 +37,7 @@ export function CopyAddress({ text, children, pathId }: {| text: string, childre
   return (
     <Stack direction="row" alignItems="center">
       <TruncatedText id={`${localPathId}-info-text`}>{children}</TruncatedText>
-      <SButton onClick={onCopy} id={`${localPathId}-copy-button`}>
-        {isCopied ? <IconCopied /> : <IconCopy />}
-      </SButton>
+      <SButton onClick={onCopy} id={`${localPathId}-copy-button`}>{isCopied ? <IconCopied /> : <IconCopy />}</SButton>
     </Stack>
   );
 }

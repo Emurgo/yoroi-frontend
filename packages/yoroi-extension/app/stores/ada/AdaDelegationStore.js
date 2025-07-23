@@ -24,11 +24,12 @@ import { NotificationTopics } from '../../UI/features/notifications/module/Notif
 export default class AdaDelegationStore extends Store<StoresMap> {
   _recalculateDelegationInfoDisposer: Array<(void) => void> = [];
 
-  @action addObservedWallet: ({ publicDeriverId: number, networkId: number, defaultTokenId: string, ... }) => void = ({
-    publicDeriverId,
-    networkId,
-    defaultTokenId,
-  }) => {
+  @action addObservedWallet: ({
+    publicDeriverId: number,
+    networkId: number,
+    defaultTokenId: string,
+    ...
+  }) => void = ({ publicDeriverId, networkId, defaultTokenId }) => {
     this.stores.delegation.delegationRequests.push({
       publicDeriverId,
       mangledAmounts: new CachedRequest<MangledAmountFunc>(getUnmangleAmounts),
@@ -152,7 +153,10 @@ export default class AdaDelegationStore extends Store<StoresMap> {
     }
   };
 
-  updatePoolInfo: ({| network: $ReadOnly<NetworkRow>, allPoolIds: Array<string> |}) => Promise<void> = async request => {
+  updatePoolInfo: ({|
+    network: $ReadOnly<NetworkRow>,
+    allPoolIds: Array<string>,
+  |}) => Promise<void> = async request => {
     // update pool information
     const poolsCachedForNetwork = new Set<string>(
       this.stores.delegation.poolInfo.filter(next => next.networkId === request.network.NetworkId).map(next => next.poolId)

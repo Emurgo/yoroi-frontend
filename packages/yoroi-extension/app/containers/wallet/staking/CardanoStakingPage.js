@@ -41,7 +41,8 @@ type State = {|
 
 @observer
 export default class CardanoStakingPage extends Component<AllProps, State> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   state: State = {
     firstPool: undefined,
     selectedPoolId: undefined,
@@ -63,7 +64,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     const suggestedPoolId = this.props.poolTransition?.suggestedPool?.hash;
     if (suggestedPoolId != null) {
       runInAction(() => {
-        this.setState(s => ({ ...s, selectedPoolId: suggestedPoolId }));
+        this.setState(s =>
+          ({ ...s, selectedPoolId: suggestedPoolId }));
       });
     }
   }
@@ -83,7 +85,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
 
-    const isDevTestOrNightly = environment.isDev() || environment.isTest() || environment.isNightly();
+    const isDevTestOrNightly =
+      environment.isDev() || environment.isTest() || environment.isNightly();
 
     const selectedPlate = this.props.stores.wallets.activeWalletPlate;
     const stakingListBias = selectedPlate?.TextPart || 'bias';
@@ -95,20 +98,28 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     const locale = this.props.stores.profile.currentLocale;
 
     const balance = selectedWallet.balance;
-    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
+    const isStakeRegistered = this.props.stores.delegation.isStakeRegistered(
+      selectedWallet.publicDeriverId
+    );
     const isCurrentlyDelegating = this.props.stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
     const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
     const poolList = delegatedPoolId != null && isStakeRegistered ? [delegatedPoolId] : [];
 
     return (
       <>
-        {!selectedWallet.isTestnet && !isCurrentlyDelegating ? (
+        {(!selectedWallet.isTestnet && !isCurrentlyDelegating) ? (
           <WalletDelegationBanner
             stores={this.props.stores}
             isOpen={this.props.stores.transactions.showDelegationBanner}
             poolInfo={this.state.firstPool}
             isWalletWithNoFunds={isWalletWithNoFunds}
-            ticker={truncateToken(getTokenName(this.props.stores.tokenInfoStore.getDefaultTokenInfo(selectedWallet.networkId)))}
+            ticker={truncateToken(
+              getTokenName(
+                this.props.stores.tokenInfoStore.getDefaultTokenInfo(
+                  selectedWallet.networkId
+                )
+              )
+            )}
             isTestnet={isTestnet(getNetworkById(selectedWallet.networkId))}
           />
         ) : null}
@@ -128,9 +139,8 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
                 stores={this.props.stores}
               />
               {this._displayPoolInfo()}
-              <br />
-            </div>
-          )}
+              <br/>
+            </div>          )}
           {!selectedWallet.isTestnet && (
             <SeizaFetcherSection
               urlTemplate={urlTemplate}
@@ -143,6 +153,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
               }}
               stores={this.props.stores}
             />
+
           )}
         </Box>
       </>
@@ -160,9 +171,17 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
       return null;
     }
     const delegationStore = this.props.stores.delegation;
-    const rewardBalance = delegationStore.getRewardBalanceOrZero(publicDeriver);
-    const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(rewardBalance.getDefaultEntry());
-    return balance.joinAddCopy(rewardBalance).getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).toNumber();
+    const rewardBalance = delegationStore.getRewardBalanceOrZero(
+      publicDeriver
+    );
+    const tokenInfo = genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)(
+      rewardBalance.getDefaultEntry()
+    );
+    return balance
+      .joinAddCopy(rewardBalance)
+      .getDefaultEntry()
+      .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)
+      .toNumber();
   };
 
   _displayPoolInfo: void => void | Node = () => {
@@ -189,13 +208,17 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
     return (
       <StakePool
         purpose="delegation"
-        poolName={selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
+        poolName={
+          selectedPoolInfo.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)
+        }
         data={{
           description: selectedPoolInfo.info?.description ?? undefined,
           /* TODO: fill once we know this from the backend */
         }}
         selectedExplorer={
-          this.props.stores.explorers.selectedExplorer.get(selectedWallet.networkId) ??
+          this.props.stores.explorers.selectedExplorer.get(
+            selectedWallet.networkId
+          ) ??
           (() => {
             throw new Error('No explorer for wallet network');
           })()
@@ -218,7 +241,9 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
         notification={
           this.notificationElementId == null
             ? null
-            : this.props.stores.uiNotifications.getTooltipActiveNotification(this.notificationElementId)
+            : this.props.stores.uiNotifications.getTooltipActiveNotification(
+                this.notificationElementId
+              )
         }
         undelegate={undefined}
       />
@@ -227,9 +252,11 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
 
   _getPoolInfo: ({ networkId: number, ... }) => void | PoolMeta = publicDeriver => {
     const selectedPoolId = this.state.selectedPoolId;
-    return selectedPoolId == null
-      ? undefined
-      : this.props.stores.delegation.getLocalPoolInfo(publicDeriver.networkId, selectedPoolId);
+    return selectedPoolId == null ? undefined
+      : this.props.stores.delegation.getLocalPoolInfo(
+          publicDeriver.networkId,
+          selectedPoolId
+        );
   };
 
   _errorDialog: LocalizableError => Node = error => {

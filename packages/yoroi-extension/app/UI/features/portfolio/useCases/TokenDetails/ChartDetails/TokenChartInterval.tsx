@@ -76,8 +76,9 @@ export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
       changePercent: point.changePercent,
       changeValue: point.changeValue,
     })) || [];
-  const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo, isDragging } =
-    useChart(chartData);
+  const { CustomYAxisTick, CustomActiveDot, handleMouseMove, handleMouseDown, handleMouseUp, detailInfo, isDragging } = useChart(
+    chartData
+  );
 
   if (!isPrimaryToken) {
     return (

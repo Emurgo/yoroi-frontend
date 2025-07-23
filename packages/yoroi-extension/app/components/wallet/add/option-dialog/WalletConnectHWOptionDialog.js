@@ -18,13 +18,11 @@ const messages = defineMessages({
   },
   ledgerDescription: {
     id: 'wallet.add.optionDialog.connect.hw.ledger.learnMoreText',
-    defaultMessage:
-      '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
+    defaultMessage: '!!!A Ledger hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
   },
   trezorDescription: {
     id: 'wallet.add.optionDialog.connect.hw.trezor.learnMoreText',
-    defaultMessage:
-      '!!!A Trezor hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
+    defaultMessage: '!!!A Trezor hardware wallet is a small USB device that adds an extra level of security to your wallet. It is more secure because your private key never leaves the hardware wallet. This protects your funds even if your computer is compromised due to malware, phishing attempts, etc.',
   },
 });
 
@@ -36,10 +34,10 @@ type Props = {|
 
 @observer
 export default class WalletConnectHWOptionDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const { onCancel, onTrezor, onLedger } = this.props;
+    const { onCancel, onTrezor, onLedger, } = this.props;
 
     return (
       <Dialog

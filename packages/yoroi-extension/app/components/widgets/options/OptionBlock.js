@@ -31,7 +31,7 @@ type State = {|
 
 @observer
 export default class OptionBlock extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| learnMoreText: void |} = {
     learnMoreText: undefined,
   };
@@ -54,7 +54,7 @@ export default class OptionBlock extends Component<Props, State> {
 
     const getNetworkNameForId = () => {
       const nameArr = title.split(' ');
-      return nameArr.length === 1 ? 'Mainnet' : nameArr[1];
+      return nameArr.length === 1 ? 'Mainnet' : nameArr[1]
     };
 
     return (
@@ -66,7 +66,7 @@ export default class OptionBlock extends Component<Props, State> {
               onClick={onSubmit}
               type="button"
               className={classnames([styles.optionSubmitButton, `${parentName}_${type}`])}
-              id={'connectHWWallet-select' + getNetworkNameForId() + 'Network-button'}
+              id={'connectHWWallet-select' + getNetworkNameForId() +'Network-button'}
             >
               <div className={`${styles.optionImage} ${styles[type]}`} />
               <Typography className={styles.optionTitle} color="ds.text_gray_medium">

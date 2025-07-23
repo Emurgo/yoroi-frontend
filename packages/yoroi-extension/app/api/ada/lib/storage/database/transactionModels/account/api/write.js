@@ -1,18 +1,21 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
 
 import * as Tables from '../tables';
 import type {
-  AccountingTransactionInputInsert,
-  AccountingTransactionInputRow,
-  AccountingTransactionOutputInsert,
-  AccountingTransactionOutputRow,
-  DbAccountingInputs,
-  DbAccountingOutputs,
+  AccountingTransactionInputInsert, AccountingTransactionInputRow,
+  AccountingTransactionOutputInsert, AccountingTransactionOutputRow,
+  DbAccountingInputs, DbAccountingOutputs,
 } from '../tables';
 
-import { addBatchToTable } from '../../../utils';
+import {
+  addBatchToTable,
+} from '../../../utils';
+
 
 export class ModifyAccountingTransaction {
   static ownTables: {|
@@ -30,18 +33,22 @@ export class ModifyAccountingTransaction {
     request: {|
       accountingInputs: Array<AccountingTransactionInputInsert>,
       accountingOutputs: Array<AccountingTransactionOutputInsert>,
-    |}
-  ): Promise<{| ...DbAccountingInputs, ...DbAccountingOutputs |}> {
+    |},
+  ): Promise<{| ...DbAccountingInputs, ...DbAccountingOutputs, |}> {
     const { accountingInputs, accountingOutputs } = request;
-    const newInputs = await addBatchToTable<AccountingTransactionInputInsert, AccountingTransactionInputRow>(
-      db,
-      tx,
+    const newInputs = await addBatchToTable<
+      AccountingTransactionInputInsert,
+      AccountingTransactionInputRow
+    >(
+      db, tx,
       accountingInputs,
       ModifyAccountingTransaction.ownTables[Tables.AccountingTransactionInputSchema.name].name
     );
-    const newOutputs = await addBatchToTable<AccountingTransactionOutputInsert, AccountingTransactionOutputRow>(
-      db,
-      tx,
+    const newOutputs = await addBatchToTable<
+      AccountingTransactionOutputInsert,
+      AccountingTransactionOutputRow
+    >(
+      db, tx,
       accountingOutputs,
       ModifyAccountingTransaction.ownTables[Tables.AccountingTransactionOutputSchema.name].name
     );

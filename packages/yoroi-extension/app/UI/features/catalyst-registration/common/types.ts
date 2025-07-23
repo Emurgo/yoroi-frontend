@@ -9,11 +9,11 @@ export type StepAction =
   | { type: 'PREVIOUS_STEP' }
   | { type: 'RESET' }
   | { type: 'SET_ERROR'; error: string | null }
-  | { type: 'SET_STEP_STATE'; stepState: (typeof StepState)[keyof typeof StepState] };
+  | { type: 'SET_STEP_STATE'; stepState: typeof StepState[keyof typeof StepState] };
 
 export type StepStateType = {
   currentStep: number;
-  stepState: (typeof StepState)[keyof typeof StepState];
+  stepState: typeof StepState[keyof typeof StepState];
   error: string | null;
 };
 

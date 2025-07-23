@@ -77,7 +77,7 @@ export const toAddr: ({|
       +AddressId: number,
       +TokenListId: number,
       ...
-    }>,
+    }>
   >,
   addressLookupMap: Map<number, string>,
   tokens: $PropertyType<DbTokenInfo, 'tokens'>,

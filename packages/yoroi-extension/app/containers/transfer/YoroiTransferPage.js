@@ -2,7 +2,7 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import { IntlContext } from 'react-intl';
+import { IntlContext, } from 'react-intl';
 import validWords from 'bip39/src/wordlists/english.json';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
 import YoroiPaperWalletFormPage from './YoroiPaperWalletFormPage';
@@ -11,10 +11,10 @@ import YoroiTransferWaitingPage from './YoroiTransferWaitingPage';
 import YoroiTransferErrorPage from './YoroiTransferErrorPage';
 import YoroiTransferSuccessPage from './YoroiTransferSuccessPage';
 import config from '../../config';
-import { TransferStatus } from '../../types/TransferTypes';
+import { TransferStatus, } from '../../types/TransferTypes';
 import { ROUTES } from '../../routes-config';
 import globalMessages from '../../i18n/global-messages';
-import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
+import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { isValidEnglishAdaPaperMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
@@ -26,12 +26,16 @@ const SUCCESS_PAGE_STAY_TIME = 5 * 1000;
 
 @observer
 export default class YoroiTransferPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   goToCreateWallet: void => void = () => {
     this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
-  };
+  }
 
-  setupTransferFundsWithPaperMnemonic: (payload: {| paperPassword: string, recoveryPhrase: string |}) => void = payload => {
+  setupTransferFundsWithPaperMnemonic: ((payload: {|
+    paperPassword: string,
+    recoveryPhrase: string,
+  |}) => void) = (payload) => {
     this.props.stores.yoroiTransfer.setupTransferFundsWithPaperMnemonic({
       ...payload,
     });
@@ -64,31 +68,28 @@ export default class YoroiTransferPage extends Component<StoresProps> {
         } catch (_e) {
           // still need to re-route even if refresh failed
         }
-        const timeToRefresh = new Date().getTime() - preRefreshTime;
+        const timeToRefresh = (new Date().getTime()) - preRefreshTime;
         await new Promise(resolve => {
-          setTimeout(
-            () => {
-              if (walletsStore.selected != null) {
-                stores.routing.goToRoute({
-                  route: ROUTES.WALLETS.TRANSACTIONS,
-                });
-              }
-              resolve();
-            },
-            Math.max(SUCCESS_PAGE_STAY_TIME - timeToRefresh, 0)
-          );
+          setTimeout(() => {
+            if (walletsStore.selected != null) {
+              stores.routing.goToRoute({
+                route: ROUTES.WALLETS.TRANSACTIONS
+              });
+            }
+            resolve();
+          }, Math.max(SUCCESS_PAGE_STAY_TIME - timeToRefresh, 0));
         });
       },
       getDestinationAddress: yoroiTransfer.nextInternalAddress(wallet),
       rebuildTx: true,
     });
-  };
+  }
 
-  backToUninitialized: () => void = () => {
+  backToUninitialized: (() => void) = () => {
     this.props.stores.yoroiTransfer.backToUninitialized();
   };
 
-  cancelTransferFunds: () => void = () => {
+  cancelTransferFunds: (() => void) = () => {
     this.props.stores.yoroiTransfer.reset();
   };
 
@@ -107,9 +108,10 @@ export default class YoroiTransferPage extends Component<StoresProps> {
           <YoroiPaperWalletFormPage
             onSubmit={this.setupTransferFundsWithPaperMnemonic}
             onBack={this.backToUninitialized}
-            mnemonicValidator={mnemonic =>
-              isValidEnglishAdaPaperMnemonic(mnemonic, config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT)
-            }
+            mnemonicValidator={mnemonic => isValidEnglishAdaPaperMnemonic(
+              mnemonic,
+              config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+            )}
             validWords={validWords}
             mnemonicLength={config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT}
             passwordMatches={_password => true}
@@ -128,7 +130,9 @@ export default class YoroiTransferPage extends Component<StoresProps> {
       case TransferStatus.RESTORING_ADDRESSES:
       case TransferStatus.CHECKING_ADDRESSES:
       case TransferStatus.GENERATING_TX:
-        return <YoroiTransferWaitingPage status={yoroiTransfer.status} />;
+        return (
+          <YoroiTransferWaitingPage status={yoroiTransfer.status} />
+        );
       case TransferStatus.READY_TO_TRANSFER: {
         const { transferTx } = yoroiTransfer;
         if (transferTx == null) {
@@ -139,11 +143,9 @@ export default class YoroiTransferPage extends Component<StoresProps> {
           <TransferSummaryPage
             form={null}
             transferTx={transferTx}
-            selectedExplorer={
-              this.props.stores.explorers.selectedExplorer.get(publicDeriver.networkId) ??
-              (() => {
-                throw new Error('No explorer for wallet network');
-              })()
+            selectedExplorer={this.props.stores.explorers.selectedExplorer
+              .get(publicDeriver.networkId)
+                ?? (() => { throw new Error('No explorer for wallet network'); })()
             }
             getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
             onSubmit={{
@@ -153,7 +155,7 @@ export default class YoroiTransferPage extends Component<StoresProps> {
             isSubmitting={stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
             onCancel={{
               label: intl.formatMessage(globalMessages.cancel),
-              trigger: this.cancelTransferFunds,
+              trigger: this.cancelTransferFunds
             }}
             error={yoroiTransfer.error}
             dialogTitle={intl.formatMessage(globalMessages.walletSendConfirmationDialogTitle)}
@@ -162,17 +164,26 @@ export default class YoroiTransferPage extends Component<StoresProps> {
               publicDeriver.networkId,
               intl,
               undefined, // don't want to go to route from within a dialog
-              this.props.stores.addresses.addressSubgroupMap
+              this.props.stores.addresses.addressSubgroupMap,
             )}
             unitOfAccountSetting={stores.profile.unitOfAccount}
-            addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(publicDeriver.networkId))}
+            addressToDisplayString={
+              addr => addressToDisplayString(addr, getNetworkById(publicDeriver.networkId))
+            }
           />
         );
       }
       case TransferStatus.ERROR:
-        return <YoroiTransferErrorPage error={yoroiTransfer.error} onCancel={this.cancelTransferFunds} />;
+        return (
+          <YoroiTransferErrorPage
+            error={yoroiTransfer.error}
+            onCancel={this.cancelTransferFunds}
+          />
+        );
       case TransferStatus.SUCCESS:
-        return <YoroiTransferSuccessPage />;
+        return (
+          <YoroiTransferSuccessPage />
+        );
       default:
         return null;
     }

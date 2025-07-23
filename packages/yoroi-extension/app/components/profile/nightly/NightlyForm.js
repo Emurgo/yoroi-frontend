@@ -28,7 +28,8 @@ const messages = defineMessages({
   },
   warning2: {
     id: 'profile.nightly.warning2',
-    defaultMessage: '!!!Any transactions you send will be visible on-chain and in production servers.',
+    defaultMessage:
+      '!!!Any transactions you send will be visible on-chain and in production servers.',
   },
   recommendationHeader: {
     id: 'profile.nightly.recommendationHeader',
@@ -58,7 +59,7 @@ type State = {|
 
 @observer
 export default class NightlyForm extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     acknowledgedRisks: false,
   };
@@ -83,7 +84,7 @@ export default class NightlyForm extends Component<Props, State> {
               mb: '24px',
             }}
           >
-            <NightlyIconRevamp />
+            <NightlyIconRevamp/>
             <Typography component="div" variant="h1" fontWeight={500} mb="8px" mt="24px" lineHeight="24px">
               {intl.formatMessage(globalMessages.yoroiNightly)}
             </Typography>
@@ -102,7 +103,7 @@ export default class NightlyForm extends Component<Props, State> {
               <FormattedMessage
                 {...messages.header}
                 values={{
-                  strong: chunks => <strong>{chunks}</strong>,
+                  strong: chunks => <strong>{chunks}</strong>
                 }}
               />
             </Typography>

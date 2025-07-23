@@ -1,5 +1,5 @@
 // @flow
-import * as React from 'react';
+import * as React from 'react'
 import type { Node } from 'react';
 import { FormControl, FormHelperText, InputLabel, Select as SelectBase, useTheme } from '@mui/material';
 import { ReactComponent as ArrowIcon } from '../../assets/images/forms/arrow-dropdown.inline.svg';

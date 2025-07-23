@@ -1,6 +1,9 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
 
 import type {
   IConceptualWallet,
@@ -8,30 +11,41 @@ import type {
   IDerivePublicFromPrivateRequest,
   IDerivePublicFromPrivateResponse,
   IDerivePublicFromPrivate,
-  IGetPrivateDeriverKey,
-  IGetPrivateDeriverKeyRequest,
-  IGetPrivateDeriverKeyResponse,
-  IAddAdhocPublicDeriverRequest,
-  IAddAdhocPublicDeriverResponse,
+  IGetPrivateDeriverKey, IGetPrivateDeriverKeyRequest, IGetPrivateDeriverKeyResponse,
+  IAddAdhocPublicDeriverRequest, IAddAdhocPublicDeriverResponse,
   IAdhocPublicDeriver,
 } from './interfaces';
-import { WalletTypeOption } from './interfaces';
+import { WalletTypeOption, } from './interfaces';
 import { ConceptualWallet } from './index';
 import type { Cip1852WrapperRow } from '../../database/walletTypes/cip1852/tables';
-import { getAllSchemaTables, raii, mapToTables, StaleStateError } from '../../database/utils';
-import type { HwWalletMetaRow, ConceptualWalletRow } from '../../database/walletTypes/core/tables';
+import {
+  getAllSchemaTables,
+  raii,
+  mapToTables,
+  StaleStateError,
+} from '../../database/utils';
+import type { HwWalletMetaRow, ConceptualWalletRow, } from '../../database/walletTypes/core/tables';
 import { GetHwWalletMeta, GetConceptualWallet } from '../../database/walletTypes/core/api/read';
 
-import { Mixin } from 'mixwith';
+import {
+  Mixin,
+} from 'mixwith';
 
-import { DerivePublicDeriverFromKey, AddAdhocPublicDeriver } from '../../database/walletTypes/common/api/write';
-import { ModifyKey } from '../../database/primitives/api/write';
-import { GetNetworks, GetToken, GetKeyForDerivation } from '../../database/primitives/api/read';
-import type { NetworkRow, TokenRow } from '../../database/primitives/tables';
+import {
+  DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
+} from '../../database/walletTypes/common/api/write';
+import { ModifyKey, } from '../../database/primitives/api/write';
+import { GetNetworks, GetToken, GetKeyForDerivation, } from '../../database/primitives/api/read';
+import type { NetworkRow, TokenRow, } from '../../database/primitives/tables';
 
-import { rawChangePassword, normalizeToPubDeriverLevel } from '../keyUtils';
+import {
+  rawChangePassword,
+  normalizeToPubDeriverLevel,
+} from '../keyUtils';
 
-import type { IChangePasswordRequest, IChangePasswordResponse } from '../common/interfaces';
+import type {
+  IChangePasswordRequest, IChangePasswordResponse,
+} from '../common/interfaces';
 
 // ===========================
 //   DerivePublicFromPrivate
@@ -45,40 +59,37 @@ export async function derivePublicDeriver<Row>(
   body: IDerivePublicFromPrivateRequest,
   privateDeriverKeyDerivationId: number,
   privateDeriverLevel: number,
-  derivationTables: Map<number, string>
+  derivationTables: Map<number, string>,
 ): Promise<IDerivePublicFromPrivateResponse<Row>> {
-  return await deps.DerivePublicDeriverFromKey.add<{ ... }, Row>(
-    db,
-    tx,
+  return await deps.DerivePublicDeriverFromKey.add<{...}, Row>(
+    db, tx,
     {
       publicDeriverMeta: body.publicDeriverMeta,
       pathToPublic: privateKeyRow => {
-        const pubDeriverKey = body.decryptPrivateDeriver.preDerived
-          ? body.decryptPrivateDeriver.result
-          : normalizeToPubDeriverLevel({
-              privateKeyRow,
-              password: body.decryptPrivateDeriver.password,
-              path: body.path.map(entry => entry.index),
-            });
-
+        const pubDeriverKey = body.decryptPrivateDeriver.preDerived ?
+          body.decryptPrivateDeriver.result :
+          normalizeToPubDeriverLevel({
+            privateKeyRow,
+            password: body.decryptPrivateDeriver.password,
+            path: body.path.map(entry => entry.index),
+          });
+          
         return [
           ...body.path.slice(0, body.path.length - 1).map(pathEntry => ({
             index: pathEntry.index,
-            insert: insertRequest =>
-              Promise.resolve({
-                KeyDerivationId: insertRequest.keyDerivationId,
-                ...pathEntry.insert,
-              }),
+            insert: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
+              ...pathEntry.insert,
+            }),
             privateKey: null,
             publicKey: null,
           })),
           {
             index: body.path[body.path.length - 1].index,
-            insert: insertRequest =>
-              Promise.resolve({
-                KeyDerivationId: insertRequest.keyDerivationId,
-                ...body.path[body.path.length - 1].insert,
-              }),
+            insert: insertRequest => Promise.resolve({
+              KeyDerivationId: insertRequest.keyDerivationId,
+              ...body.path[body.path.length - 1].insert,
+            }),
             privateKey: null,
             publicKey: {
               Hash: pubDeriverKey.pubKeyHex,
@@ -94,55 +105,75 @@ export async function derivePublicDeriver<Row>(
     privateDeriverKeyDerivationId,
     privateDeriverLevel,
     conceptualWalletId,
-    derivationTables
+    derivationTables,
   );
 }
 
 type PublicFromPrivateDependencies = IConceptualWallet;
-const PublicFromPrivateMixin = (superclass: Class<PublicFromPrivateDependencies>) =>
-  class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
-    rawDerivePublicDeriverFromPrivate: <Row>(
-      lf$Transaction,
-      {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
-      IDerivePublicFromPrivateRequest,
-      Map<number, string>
-      // eslint-disable-next-line no-unused-vars
-    ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(tx, deps, body, derivationTables) => {
-      const id = super.getPrivateDeriverKeyDerivationId();
-      const level = super.getPrivateDeriverLevel();
-      if (id == null || level == null) {
-        throw new StaleStateError('rawDerivePublicDeriverFromPrivate no private deriver');
-      }
-      const result = await derivePublicDeriver(
-        super.getDb(),
-        tx,
-        { DerivePublicDeriverFromKey: deps.DerivePublicDeriverFromKey },
-        super.getConceptualWalletId(),
-        body,
-        id,
-        level,
-        derivationTables
-      );
-      return result;
-    };
-    derivePublicDeriverFromPrivate: <Row>(
-      body: IDerivePublicFromPrivateRequest
-      // eslint-disable-next-line no-unused-vars
-    ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(body) => {
-      const derivationTables = this.getDerivationTables();
-      const deps = Object.freeze({
-        DerivePublicDeriverFromKey,
-      });
-      const depTables = Object.keys(deps)
-        .map(key => deps[key])
-        .flatMap(table => getAllSchemaTables(super.getDb(), table));
-      return await raii(super.getDb(), [...depTables, ...mapToTables(super.getDb(), derivationTables)], async tx =>
-        this.rawDerivePublicDeriverFromPrivate(tx, deps, body, derivationTables)
-      );
-    };
-  };
-export const PublicFromPrivate: * = Mixin<PublicFromPrivateDependencies, IDerivePublicFromPrivate>(PublicFromPrivateMixin);
-const PublicFromPrivateInstance = ((PublicFromPrivate: any): ReturnType<typeof PublicFromPrivateMixin>);
+const PublicFromPrivateMixin = (
+  superclass: Class<PublicFromPrivateDependencies>
+) => (class PublicFromPrivate extends superclass implements IDerivePublicFromPrivate {
+
+  rawDerivePublicDeriverFromPrivate: <Row>(
+    lf$Transaction,
+    {| DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey> |},
+    IDerivePublicFromPrivateRequest,
+    Map<number, string>,
+    // eslint-disable-next-line no-unused-vars
+  ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(
+    tx,
+    deps,
+    body,
+    derivationTables
+  ) => {
+    const id = super.getPrivateDeriverKeyDerivationId();
+    const level = super.getPrivateDeriverLevel();
+    if (id == null || level == null) {
+      throw new StaleStateError('rawDerivePublicDeriverFromPrivate no private deriver');
+    }
+    const result = await derivePublicDeriver(
+      super.getDb(),
+      tx,
+      { DerivePublicDeriverFromKey: deps.DerivePublicDeriverFromKey },
+      super.getConceptualWalletId(),
+      body,
+      id,
+      level,
+      derivationTables,
+    );
+    return result;
+  }
+  derivePublicDeriverFromPrivate: <Row>(
+    body: IDerivePublicFromPrivateRequest,
+    // eslint-disable-next-line no-unused-vars
+  ) => Promise<IDerivePublicFromPrivateResponse<Row>> = async <Row>(body) => {
+    const derivationTables = this.getDerivationTables();
+    const deps = Object.freeze({
+      DerivePublicDeriverFromKey,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawDerivePublicDeriverFromPrivate(
+        tx, deps, body, derivationTables
+      )
+    );
+  }
+});
+export const PublicFromPrivate: * = Mixin<
+  PublicFromPrivateDependencies,
+  IDerivePublicFromPrivate,
+>(PublicFromPrivateMixin);
+const PublicFromPrivateInstance = (
+  (PublicFromPrivate: any): ReturnType<typeof PublicFromPrivateMixin>
+);
 export function asPublicFromPrivate<T: IConceptualWallet>(
   obj: T
 ): void | (IDerivePublicFromPrivate & PublicFromPrivateDependencies & T) {
@@ -157,74 +188,99 @@ export function asPublicFromPrivate<T: IConceptualWallet>(
 // ========================
 
 type GetPrivateDeriverKeyDependencies = IConceptualWallet;
-const GetPrivateDeriverKeyMixin = (superclass: Class<GetPrivateDeriverKeyDependencies>) =>
-  class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
-    rawGetPrivateDeriverKey: (
-      lf$Transaction,
-      {| GetKeyForDerivation: Class<GetKeyForDerivation> |},
-      IGetPrivateDeriverKeyRequest
-    ) => Promise<IGetPrivateDeriverKeyResponse> = async (tx, deps, _body) => {
-      const derivationId = super.getPrivateDeriverKeyDerivationId();
-      if (derivationId == null) {
-        throw new StaleStateError('GetPrivateDeriverKey::getPrivateDeriverKey derivationId=null');
-      }
-      const result = await deps.GetKeyForDerivation.get(super.getDb(), tx, derivationId, false, true);
+const GetPrivateDeriverKeyMixin = (
+  superclass: Class<GetPrivateDeriverKeyDependencies>
+) => (class GetPrivateDeriverKey extends superclass implements IGetPrivateDeriverKey {
 
-      if (result.privateKey == null) {
-        throw new StaleStateError('GetPrivateDeriverKey::getPrivateDeriverKey privateKey=null');
-      }
-      return {
-        keyRow: result.privateKey,
-        keyDerivation: result.KeyDerivation,
-      };
-    };
-    getPrivateDeriverKey: IGetPrivateDeriverKeyRequest => Promise<IGetPrivateDeriverKeyResponse> = async body => {
-      const deps = Object.freeze({
-        GetKeyForDerivation,
-      });
-      const depTables = Object.keys(deps)
-        .map(key => deps[key])
-        .flatMap(table => getAllSchemaTables(super.getDb(), table));
-      return await raii<IGetPrivateDeriverKeyResponse>(super.getDb(), depTables, async tx =>
-        this.rawGetPrivateDeriverKey(tx, deps, body)
-      );
-    };
+  rawGetPrivateDeriverKey: (
+    lf$Transaction,
+    {| GetKeyForDerivation: Class<GetKeyForDerivation> |},
+    IGetPrivateDeriverKeyRequest,
+  ) => Promise<IGetPrivateDeriverKeyResponse> = async (tx, deps, _body,) => {
+    const derivationId = super.getPrivateDeriverKeyDerivationId();
+    if (derivationId == null) {
+      throw new StaleStateError('GetPrivateDeriverKey::getPrivateDeriverKey derivationId=null');
+    }
+    const result = await deps.GetKeyForDerivation.get(
+      super.getDb(), tx,
+      derivationId,
+      false,
+      true,
+    );
 
-    rawChangePrivateDeriverPassword: (
-      lf$Transaction,
-      {|
-        GetKeyForDerivation: Class<GetKeyForDerivation>,
-        ModifyKey: Class<ModifyKey>,
-      |},
-      IChangePasswordRequest
-    ) => Promise<IChangePasswordResponse> = async (tx, deps, body) => {
-      const currentRow = await this.rawGetPrivateDeriverKey(tx, { GetKeyForDerivation: deps.GetKeyForDerivation }, undefined);
-      return rawChangePassword(
-        super.getDb(),
-        tx,
-        { ModifyKey: deps.ModifyKey },
-        {
-          ...body,
-          oldKeyRow: currentRow.keyRow,
-        }
-      );
+    if (result.privateKey == null) {
+      throw new StaleStateError('GetPrivateDeriverKey::getPrivateDeriverKey privateKey=null');
+    }
+    return {
+      keyRow: result.privateKey,
+      keyDerivation: result.KeyDerivation,
     };
-    changePrivateDeriverPassword: IChangePasswordRequest => Promise<IChangePasswordResponse> = async body => {
-      const deps = Object.freeze({
-        GetKeyForDerivation,
-        ModifyKey,
-      });
-      const depTables = Object.keys(deps)
-        .map(key => deps[key])
-        .flatMap(table => getAllSchemaTables(super.getDb(), table));
-      return await raii<IChangePasswordResponse>(super.getDb(), depTables, async tx =>
-        this.rawChangePrivateDeriverPassword(tx, deps, body)
-      );
-    };
-  };
+  }
+  getPrivateDeriverKey: (
+    IGetPrivateDeriverKeyRequest
+  ) => Promise<IGetPrivateDeriverKeyResponse> = async (body) => {
+    const deps = Object.freeze({
+      GetKeyForDerivation,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IGetPrivateDeriverKeyResponse>(
+      super.getDb(),
+      depTables,
+      async tx => this.rawGetPrivateDeriverKey(tx, deps, body)
+    );
+  }
 
-export const GetPrivateDeriverKey: * = Mixin<GetPrivateDeriverKeyDependencies, IGetPrivateDeriverKey>(GetPrivateDeriverKeyMixin);
-const GetPrivateDeriverKeyInstance = ((GetPrivateDeriverKey: any): ReturnType<typeof GetPrivateDeriverKeyMixin>);
+  rawChangePrivateDeriverPassword: (
+    lf$Transaction,
+    {|
+      GetKeyForDerivation: Class<GetKeyForDerivation>,
+      ModifyKey: Class<ModifyKey>,
+    |},
+    IChangePasswordRequest,
+  ) => Promise<IChangePasswordResponse> = async (tx, deps, body) => {
+    const currentRow = await this.rawGetPrivateDeriverKey(
+      tx,
+      { GetKeyForDerivation: deps.GetKeyForDerivation },
+      undefined,
+    );
+    return rawChangePassword(
+      super.getDb(), tx,
+      { ModifyKey: deps.ModifyKey, },
+      {
+        ...body,
+        oldKeyRow: currentRow.keyRow
+      },
+    );
+  }
+  changePrivateDeriverPassword: IChangePasswordRequest => Promise<IChangePasswordResponse> = async (
+    body,
+  ) => {
+    const deps = Object.freeze({
+      GetKeyForDerivation,
+      ModifyKey
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii<IChangePasswordResponse>(
+      super.getDb(),
+      depTables,
+      async tx => this.rawChangePrivateDeriverPassword(tx, deps, body)
+    );
+  }
+});
+
+export const GetPrivateDeriverKey: * = Mixin<
+  GetPrivateDeriverKeyDependencies,
+  IGetPrivateDeriverKey,
+>(GetPrivateDeriverKeyMixin);
+const GetPrivateDeriverKeyInstance = (
+  (GetPrivateDeriverKey: any): ReturnType<typeof GetPrivateDeriverKeyMixin>
+);
 export function asGetPrivateDeriverKey<T: IConceptualWallet>(
   obj: T
 ): void | (IGetPrivateDeriverKey & GetPrivateDeriverKeyDependencies & T) {
@@ -239,35 +295,58 @@ export function asGetPrivateDeriverKey<T: IConceptualWallet>(
 // ======================
 
 type AdhocPublicDeriverDepenencies = IConceptualWallet;
-const AdhocPublicDeriverMixin = (superclass: Class<AdhocPublicDeriverDepenencies>) =>
-  class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
-    rawAddAdhocPubicDeriver: <Row>(
-      lf$Transaction,
-      {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
-      IAddAdhocPublicDeriverRequest<any>,
-      Map<number, string>
-      // eslint-disable-next-line no-unused-vars
-    ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(tx, deps, body, derivationTables) => {
-      return await deps.AddAdhocPublicDeriver.add(super.getDb(), tx, body, super.getConceptualWalletId(), derivationTables);
-    };
-    addAdhocPubicDeriver: <Row>(
-      body: IAddAdhocPublicDeriverRequest<any>
-      // eslint-disable-next-line no-unused-vars
-    ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(body) => {
-      const derivationTables = this.getDerivationTables();
-      const deps = Object.freeze({
-        AddAdhocPublicDeriver,
-      });
-      const depTables = Object.keys(deps)
-        .map(key => deps[key])
-        .flatMap(table => getAllSchemaTables(super.getDb(), table));
-      return await raii(super.getDb(), [...depTables, ...mapToTables(super.getDb(), derivationTables)], async tx =>
-        this.rawAddAdhocPubicDeriver(tx, deps, body, derivationTables)
-      );
-    };
-  };
-export const AdhocPublicDeriver: * = Mixin<AdhocPublicDeriverDepenencies, IAdhocPublicDeriver>(AdhocPublicDeriverMixin);
-const AdhocPublicDeriverInstance = ((AdhocPublicDeriver: any): ReturnType<typeof AdhocPublicDeriverMixin>);
+const AdhocPublicDeriverMixin = (
+  superclass: Class<AdhocPublicDeriverDepenencies>
+) => (class AdhocPublicDeriver extends superclass implements IAdhocPublicDeriver {
+
+  rawAddAdhocPubicDeriver: <Row>(
+    lf$Transaction,
+    {| AddAdhocPublicDeriver: Class<AddAdhocPublicDeriver> |},
+    IAddAdhocPublicDeriverRequest<any>,
+    Map<number, string>,
+    // eslint-disable-next-line no-unused-vars
+  ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(
+    tx,
+    deps,
+    body,
+    derivationTables,
+  ) => {
+    return await deps.AddAdhocPublicDeriver.add(
+      super.getDb(), tx,
+      body,
+      super.getConceptualWalletId(),
+      derivationTables,
+    );
+  }
+  addAdhocPubicDeriver: <Row>(
+    body: IAddAdhocPublicDeriverRequest<any>,
+    // eslint-disable-next-line no-unused-vars
+  ) => Promise<IAddAdhocPublicDeriverResponse<Row>> = async <Row>(body) => {
+    const derivationTables = this.getDerivationTables();
+    const deps = Object.freeze({
+      AddAdhocPublicDeriver,
+    });
+    const depTables = Object
+      .keys(deps)
+      .map(key => deps[key])
+      .flatMap(table => getAllSchemaTables(super.getDb(), table));
+    return await raii(
+      super.getDb(),
+      [
+        ...depTables,
+        ...mapToTables(super.getDb(), derivationTables),
+      ],
+      async tx => this.rawAddAdhocPubicDeriver(tx, deps, body, derivationTables)
+    );
+  }
+});
+export const AdhocPublicDeriver: * = Mixin<
+  AdhocPublicDeriverDepenencies,
+  IAdhocPublicDeriver,
+>(AdhocPublicDeriverMixin);
+const AdhocPublicDeriverInstance = (
+  (AdhocPublicDeriver: any): ReturnType<typeof AdhocPublicDeriverMixin>
+);
 export function asAdhocPublicDeriver<T: IConceptualWallet>(
   obj: T
 ): void | (IAdhocPublicDeriver & AdhocPublicDeriverDepenencies & T) {
@@ -277,9 +356,10 @@ export function asAdhocPublicDeriver<T: IConceptualWallet>(
   return undefined;
 }
 
+
 export async function refreshConceptualWalletFunctionality(
   db: lf$Database,
-  conceptualWalletId: number
+  conceptualWalletId: number,
 ): Promise<IConceptualWalletConstructor> {
   const deps = Object.freeze({
     GetHwWalletMeta,
@@ -287,7 +367,8 @@ export async function refreshConceptualWalletFunctionality(
     GetNetworks,
     GetToken,
   });
-  const depTables = Object.keys(deps)
+  const depTables = Object
+    .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
   const result = await raii<{|
@@ -295,29 +376,43 @@ export async function refreshConceptualWalletFunctionality(
     fullInfo: $ReadOnly<ConceptualWalletRow>,
     networkInfo: $ReadOnly<NetworkRow>,
     defaultToken: $ReadOnly<TokenRow>,
-  |}>(db, depTables, async tx => {
-    const fullInfo = await deps.GetConceptualWallet.get(db, tx, conceptualWalletId);
-    if (fullInfo == null) {
-      throw new Error(`${nameof(refreshConceptualWalletFunctionality)} no conceptual wallet with id ${conceptualWalletId}`);
-    }
-    const hardwareInfo = await deps.GetHwWalletMeta.getMeta(db, tx, conceptualWalletId);
-    const allNetworks = await deps.GetNetworks.get(db, tx);
-    const networkForWallet = allNetworks.find(network => network.NetworkId === fullInfo.NetworkId);
-    if (networkForWallet == null)
-      throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing network ${fullInfo.NetworkId}`);
+  |}>(
+    db,
+    depTables,
+    async tx => {
+      const fullInfo = await deps.GetConceptualWallet.get(
+        db, tx,
+        conceptualWalletId,
+      );
+      if (fullInfo == null) {
+        throw new Error(`${nameof(refreshConceptualWalletFunctionality)} no conceptual wallet with id ${conceptualWalletId}`);
+      }
+      const hardwareInfo = await deps.GetHwWalletMeta.getMeta(
+        db, tx,
+        conceptualWalletId,
+      );
+      const allNetworks = await deps.GetNetworks.get(db, tx);
+      const networkForWallet = allNetworks.find(
+        network => network.NetworkId === fullInfo.NetworkId
+      );
+      if (networkForWallet == null) throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing network ${fullInfo.NetworkId}`);
 
-    const allTokens = await deps.GetToken.all(db, tx);
-    const tokenForWallet = allTokens.find(network => network.NetworkId === fullInfo.NetworkId);
-    if (tokenForWallet == null)
-      throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing token for ${fullInfo.NetworkId}`);
-    return {
-      hardwareInfo,
-      fullInfo,
-      networkInfo: networkForWallet,
-      defaultToken: tokenForWallet,
-    };
-  });
-  const walletType = result.hardwareInfo == null ? WalletTypeOption.WEB_WALLET : WalletTypeOption.HARDWARE_WALLET;
+      const allTokens = await deps.GetToken.all(db, tx);
+      const tokenForWallet = allTokens.find(
+        network => network.NetworkId === fullInfo.NetworkId
+      );
+      if (tokenForWallet == null) throw new Error(`${nameof(refreshConceptualWalletFunctionality)} missing token for ${fullInfo.NetworkId}`);
+      return {
+        hardwareInfo,
+        fullInfo,
+        networkInfo: networkForWallet,
+        defaultToken: tokenForWallet,
+      };
+    }
+  );
+  const walletType = result.hardwareInfo == null
+    ? WalletTypeOption.WEB_WALLET
+    : WalletTypeOption.HARDWARE_WALLET;
 
   return {
     db,
@@ -331,9 +426,12 @@ export async function refreshConceptualWalletFunctionality(
 
 export async function createAndRefreshCip1852Wallet(
   db: lf$Database,
-  row: $ReadOnly<Cip1852WrapperRow>
+  row: $ReadOnly<Cip1852WrapperRow>,
 ): Promise<ConceptualWallet> {
-  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(db, row.ConceptualWalletId);
+  const conceptualWalletCtorData = await refreshConceptualWalletFunctionality(
+    db,
+    row.ConceptualWalletId,
+  );
 
   let privateDeriverLevel = null;
   let privateDeriverKeyDerivationId = null;
@@ -354,7 +452,7 @@ export async function createAndRefreshCip1852Wallet(
     row.PublicDeriverLevel,
     row.SignerLevel,
     privateDeriverLevel,
-    privateDeriverKeyDerivationId
+    privateDeriverKeyDerivationId,
   );
   return (instance: any);
 }

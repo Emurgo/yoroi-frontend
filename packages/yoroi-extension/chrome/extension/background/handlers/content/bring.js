@@ -2,7 +2,7 @@
 import LocalStorageApi from '../../../../../app/api/localStorage';
 import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { getAllAddressesForDisplay } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
-import { PublicDeriver } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
+import { PublicDeriver, } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getDb } from '../../state';
 import { loadWalletsFromStorage } from '../../../../../app/api/ada/lib/storage/models/load';
 import { notifyAllTabsCashbackWalletChange } from '../yoroi/utils';
@@ -33,7 +33,7 @@ const handlers = Object.freeze({
     chrome.windows.create({
       ...popupProps,
       url: chrome.runtime.getURL('main_window_connector.html#/select-cashback-wallet'),
-      left: bounds.width + bounds.positionX - popupProps.width,
+      left: (bounds.width + bounds.positionX) - popupProps.width,
       top: bounds.positionY + 80,
     });
     return { ok: undefined };
@@ -61,7 +61,7 @@ const handlers = Object.freeze({
         result.push({
           id: publicDeriver.getPublicDeriverId(),
           address: (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address,
-          name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
+          name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name
         });
       }
     }
@@ -74,7 +74,7 @@ const handlers = Object.freeze({
       const localStorageApi = new LocalStorageApi();
       await localStorageApi.saveCashbackWalletId(id);
     }
-    notifyAllTabsCashbackWalletChange();
+    notifyAllTabsCashbackWalletChange()
     return { ok: undefined };
   },
 });
@@ -84,9 +84,8 @@ const handlers = Object.freeze({
 // return undefines if there is no saved cashback wallet but there are multiple wallets
 async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
-  const publicDerivers = (await loadWalletsFromStorage(db)).filter(
-    publicDeriver =>
-      !isAnyTrezorWallet(publicDeriver.getParent()) &&
+  const publicDerivers = (await loadWalletsFromStorage(db)).filter(publicDeriver =>
+    !isAnyTrezorWallet(publicDeriver.getParent()) &&
       publicDeriver.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   );
   if (!publicDerivers.length) {
@@ -96,7 +95,9 @@ async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   // try to load saved cashback wallet
   const localStorageApi = new LocalStorageApi();
   const savedCashbackWalletId = await localStorageApi.getCashbackWalletId();
-  const savedCashbackWallet = publicDerivers.find(publicDeriver => publicDeriver.getPublicDeriverId() === savedCashbackWalletId);
+  const savedCashbackWallet = publicDerivers.find(publicDeriver =>
+    publicDeriver.getPublicDeriverId() === savedCashbackWalletId
+  );
   if (savedCashbackWallet) {
     return savedCashbackWallet;
   }
@@ -111,16 +112,19 @@ async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
 }
 
 function sendRpcResponse(response: Object, tabId: number, messageUid: number) {
-  sendToInjector(tabId, {
-    type: 'bring_rpc_response',
-    uid: messageUid,
-    return: response,
-  });
+  sendToInjector(
+    tabId,
+    {
+      type: 'bring_rpc_response',
+      uid: messageUid,
+      return: response,
+    }
+  );
 }
 
 export async function handleBringRpc(message: Object, sender: Object) {
   const handler = handlers[message.function];
-
+  
   if (!handler) {
     throw new Error('missing Bring handler for ' + message.function);
   }

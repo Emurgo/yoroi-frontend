@@ -22,8 +22,8 @@ function findSubscriptionByTabId(tabId: number): ?SubscriptionEntry {
 }
 
 function deleteSubscription(subscription: SubscriptionEntry): void {
-  const index = subscriptions.findIndex(
-    ({ tabId, activeWalletId }) => tabId === subscription.tabId && activeWalletId === subscription.activeWalletId
+  const index = subscriptions.findIndex(({ tabId, activeWalletId }) =>
+    tabId === subscription.tabId && activeWalletId === subscription.activeWalletId
   );
   if (index !== -1) {
     subscriptions.splice(index, 1);
@@ -45,7 +45,9 @@ export function subscribe(tabId: number, activeWalletId: ?number) {
   addSubscription(tabId, activeWalletId);
 }
 
+/*::
 declare var chrome: any;
+*/
 chrome.tabs.onRemoved.addListener((tabId: number, _info) => {
   const subscription = findSubscriptionByTabId(tabId);
   if (subscription) {
@@ -57,11 +59,13 @@ export function getSubscriptions(): Array<SubscriptionEntry> {
   return subscriptions;
 }
 
-export function registerCallback(callback: Callback => void) {
+export function registerCallback(callback: (Callback) => void) {
   callbacks.push(callback);
 }
 
+/*::
 declare var chrome: any;
+*/
 export function emitUpdateToSubscriptions(data: Object): void {
   for (const { tabId } of getSubscriptions()) {
     chrome.tabs.sendMessage(tabId, { type: 'yoroi-emit-update', data: JSON.stringify(data) });

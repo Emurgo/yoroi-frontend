@@ -7,7 +7,12 @@ const webpack = require('webpack');
 
 const customPath = path.join(__dirname, './customPublicPath');
 
-const baseDevConfig = (networkName: string, isNightly: boolean, isLight: ?boolean = false, isE2E: ?boolean = false): * => ({
+const baseDevConfig = (
+  networkName /*: string */,
+  isNightly /*: boolean */,
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
+) /*: * */ => ({
   mode: 'development',
   optimization: commonConfig.optimization,
   experiments: commonConfig.experiments,
@@ -71,11 +76,11 @@ const baseDevConfig = (networkName: string, isNightly: boolean, isLight: ?boolea
 });
 
 const backgroundServiceWorkerConfig = (
-  networkName: string,
-  isNightly: boolean,
-  isLight: ?boolean = false,
-  isE2E: ?boolean = false
-): * => ({
+  networkName /*: string */,
+  isNightly /*: boolean */,
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
+) /*: * */ => ({
   mode: 'development',
   experiments: { asyncWebAssembly: true },
   resolve: commonConfig.resolve(),
@@ -144,11 +149,11 @@ const backgroundServiceWorkerConfig = (
 });
 
 const bringContentScriptConfig = (
-  networkName: string,
-  isNightly: boolean,
-  isLight: ?boolean = false,
-  isE2E: ?boolean = false
-): * => ({
+  networkName /*: string */,
+  isNightly /*: boolean */,
+  isLight /* : ?boolean */ = false,
+  isE2E /* : ?boolean */ = false
+) /*: * */ => ({
   mode: 'development',
   resolve: commonConfig.resolve(),
   devtool: 'source-map',
@@ -179,7 +184,7 @@ const bringContentScriptConfig = (
       maxChunks: 1,
     }),
     new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
-    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
+    new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/}),
   ],
   module: {
     rules: [

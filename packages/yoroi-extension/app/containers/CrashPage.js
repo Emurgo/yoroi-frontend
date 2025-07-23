@@ -7,7 +7,12 @@ import { downloadLogs } from '../utils/logging';
 
 @observer
 export default class CrashPage extends Component<{||}> {
+
   render(): Node {
-    return <Crashed onDownloadLogs={downloadLogs} />;
+    return (
+      <Crashed
+        onDownloadLogs={downloadLogs}
+      />
+    );
   }
 }

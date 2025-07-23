@@ -6,7 +6,12 @@ import { useTxReviewModal } from '../../../../UI/features/transaction-review/mod
 import { ampli } from '../../../../../ampli/index';
 
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
-  const { openTxReviewModal, stopLoadingTxReview, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
+  const {
+    openTxReviewModal,
+    stopLoadingTxReview,
+    startLoadingTxReview,
+    showTxResultModal,
+  } = useTxReviewModal();
 
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
   const wallet = stores.wallets.selected;

@@ -117,7 +117,9 @@ class NumericInputRP extends Component<NumericInputProps, State> {
    * 2. Clean the given value
    * 3. Final processing
    */
-  processValueChange(event: any): ?{|
+  processValueChange(
+    event: any
+  ): ?{|
     value: NumericInputValue,
     caretPosition: number,
     fallbackInputValue?: ?string,
@@ -448,7 +450,7 @@ class AmountInput extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const intl = this.context;
@@ -497,7 +499,7 @@ class AmountInputRevamp extends Component<AmountInputProps> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { error, fees, total, currency } = this.props;
     const intl = this.context;

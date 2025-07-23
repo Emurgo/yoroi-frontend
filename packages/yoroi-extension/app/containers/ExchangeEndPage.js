@@ -12,13 +12,19 @@ import type { StoresProps } from '../stores';
 
 @observer
 export default class ExchangeEndPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
 
     return (
-      <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={<SidebarContainer stores={stores} />} showInContainer>
-        <ExchangeEndPageContent onConfirm={() => stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })} />
+      <TopBarLayout
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
+        showInContainer
+      >
+        <ExchangeEndPageContent
+          onConfirm={() => stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
+        />
       </TopBarLayout>
     );
   }

@@ -16,7 +16,7 @@ import {
   TabPanel,
   Tabs,
   TextField,
-  Tooltip,
+  Tooltip
 } from '../overrides';
 import { commonTheme } from './common-theme';
 import { lightThemeBase } from './light-theme-base';
@@ -41,4 +41,6 @@ const lightThemeComponents = {
   },
 };
 
-export const baseLightTheme: Object = createTheme(deepmerge(commonTheme, deepmerge(lightThemeBase, lightThemeComponents)));
+export const baseLightTheme: Object = createTheme(
+  deepmerge(commonTheme, deepmerge(lightThemeBase, lightThemeComponents))
+);

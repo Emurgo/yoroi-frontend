@@ -8,7 +8,7 @@ export const ChipTypes = Object.freeze({
 
 interface Props {
   label: React.ReactNode;
-  type: (typeof ChipTypes)[keyof typeof ChipTypes];
+  type: typeof ChipTypes[keyof typeof ChipTypes];
   sx?: any;
 }
 

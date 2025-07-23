@@ -14,7 +14,8 @@ export function calculateAndFormatValue(
     /*
       Not that we expect any exception. just be defensive to avoid crashing the UI.
     */
-    Logger.error(`Error when calling calculateAndFormatValue(` + `${JSON.stringify(coinAmount)}, ${price}): ${error.message}`);
+    Logger.error(`Error when calling calculateAndFormatValue(` +
+      `${JSON.stringify(coinAmount)}, ${price}): ${error.message}`);
     return '-';
   }
 }

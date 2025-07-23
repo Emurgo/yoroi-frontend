@@ -3,13 +3,28 @@
 import '../test-config.forTests';
 import { RustModule } from '../cardanoCrypto/rustLoader';
 
-import { batchGetTransactionsHistoryForAddresses } from './batchedFetcher';
-import { genGetTransactionsHistoryForAddresses } from './mockNetwork.forTests';
-import { generateWalletRootKey } from '../cardanoCrypto/cryptoWallet';
-import { HARD_DERIVATION_START, WalletTypePurpose, CoinTypes, ChainDerivations } from '../../../../config/numbersConfig';
-import type { ConfigType } from '../../../../../config/config-types';
+import {
+  batchGetTransactionsHistoryForAddresses,
+} from './batchedFetcher';
+import {
+  genGetTransactionsHistoryForAddresses,
+} from './mockNetwork.forTests';
+import {
+  generateWalletRootKey,
+} from '../cardanoCrypto/cryptoWallet';
+import {
+  HARD_DERIVATION_START,
+  WalletTypePurpose,
+  CoinTypes,
+  ChainDerivations,
+} from '../../../../config/numbersConfig';
+import type {
+  ConfigType,
+} from '../../../../../config/config-types';
 import config from '../../../../config';
-import { networks } from '../storage/database/prepackaged/networks';
+import {
+  networks,
+} from '../storage/database/prepackaged/networks';
 import { bytesToHex } from '../../../../coreUtils';
 
 // populated by ConfigWebpackPlugin
@@ -22,9 +37,7 @@ beforeAll(async () => {
 });
 
 function generateWallet(): RustModule.WalletV2.Bip44ChainPublic {
-  const rootPk = generateWalletRootKey(
-    'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share'
-  );
+  const rootPk = generateWalletRootKey('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share');
   const v3Chain = rootPk
     .derive(WalletTypePurpose.BIP44)
     .derive(CoinTypes.CARDANO)
@@ -36,15 +49,20 @@ function generateWallet(): RustModule.WalletV2.Bip44ChainPublic {
   );
 }
 
-test('Batched history pagination', async done => {
+test('Batched history pagination', async (done) => {
   const chainKey = generateWallet();
 
   // We want to make sure both batching on addresses and transactions is executed
-  const numIterations = Math.max(CONFIG.app.addressRequestSize, config.wallets.TRANSACTION_REQUEST_SIZE) * 2 + 1;
+  const numIterations = (Math.max(
+    CONFIG.app.addressRequestSize,
+    config.wallets.TRANSACTION_REQUEST_SIZE,
+  ) * 2) + 1;
 
   const addresses = [];
   for (let i = 0; i < numIterations; i++) {
-    const pubKey = chainKey.address_key(RustModule.WalletV2.AddressKeyIndex.new(i));
+    const pubKey = chainKey.address_key(
+      RustModule.WalletV2.AddressKeyIndex.new(i)
+    );
     if (network.BaseConfig[0].ByronNetworkId == null) {
       throw new Error(`missing Byron network id`);
     }
@@ -69,7 +87,7 @@ test('Batched history pagination', async done => {
           index: i,
           amount: '1000000',
           assets: [],
-        },
+        }
       ],
       outputs: [
         {
@@ -85,7 +103,7 @@ test('Batched history pagination', async done => {
       block_hash: i.toString(),
       time: new Date(i).toString(),
       last_update: new Date(i).toString(),
-      tx_state: 'Successful',
+      tx_state: 'Successful'
     });
   }
 
@@ -95,19 +113,21 @@ test('Batched history pagination', async done => {
   const result = await getTransactionsHistoryForAddresses({
     network,
     addresses,
-    untilBlock: transactions[transactions.length - 1].block_hash || '',
+    untilBlock: transactions[transactions.length - 1].block_hash || ''
   });
 
   expect(result.length).toEqual(numIterations);
   done();
 });
 
-test('Batched history edge case: full response with a pending transaction', async done => {
+test('Batched history edge case: full response with a pending transaction', async (done) => {
   const chainKey = generateWallet();
 
   const addresses = [];
   for (let i = 0; i < config.wallets.TRANSACTION_REQUEST_SIZE; i++) {
-    const pubKey = chainKey.address_key(RustModule.WalletV2.AddressKeyIndex.new(i));
+    const pubKey = chainKey.address_key(
+      RustModule.WalletV2.AddressKeyIndex.new(i)
+    );
     if (network.BaseConfig[0].ByronNetworkId == null) {
       throw new Error(`missing Byron network id`);
     }
@@ -134,7 +154,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
           index: i,
           amount: '1000000',
           assets: [],
-        },
+        }
       ],
       outputs: [
         {
@@ -150,7 +170,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
       block_hash: i.toString(),
       time: new Date(i).toString(),
       last_update: new Date(i).toString(),
-      tx_state: 'Successful',
+      tx_state: 'Successful'
     });
   }
   // last tx in response is a pending transaction
@@ -166,7 +186,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
           index: i,
           amount: '1000000',
           assets: [],
-        },
+        }
       ],
       outputs: [
         {
@@ -182,7 +202,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
       block_hash: null,
       time: null,
       last_update: new Date(i).toString(),
-      tx_state: 'Pending',
+      tx_state: 'Pending'
     });
   }
 
@@ -192,7 +212,7 @@ test('Batched history edge case: full response with a pending transaction', asyn
   const result = await getTransactionsHistoryForAddresses({
     network,
     addresses,
-    untilBlock: transactions.filter(tx => tx.block_hash != null).slice(-1)[0].block_hash || '',
+    untilBlock: transactions.filter(tx => tx.block_hash != null).slice(-1)[0].block_hash || ''
   });
 
   expect(result.length).toEqual(config.wallets.TRANSACTION_REQUEST_SIZE);

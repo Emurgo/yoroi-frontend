@@ -1,8 +1,16 @@
 // @flow //
 import type { BIP32Path } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-import type { DeviceCodeType, TransportIdType, OperationNameType } from '../types/enum';
-import { DEVICE_CODE, TRANSPORT_ID, OPERATION_NAME } from '../types/enum';
+import type {
+  DeviceCodeType,
+  TransportIdType,
+  OperationNameType,
+} from '../types/enum';
+import {
+  DEVICE_CODE,
+  TRANSPORT_ID,
+  OPERATION_NAME,
+} from '../types/enum';
 import { TRANSPORT_EXCHANGE_TIMEOUT_MS } from '../const';
 
 const HARDENED = 0x80000000;
@@ -28,8 +36,10 @@ TUTORIAL_LINK[DEVICE_CODE.NANO_X + OPERATION_NAME.GET_SERIAL] = 'https://youtu.b
  * Converts hardened BIP32Path to it's string version
  * @param {*} hdPath hardened BIP32Path
  */
-export const pathToString: BIP32Path => string = hdPath => {
-  return `m/${hdPath.map(item => (item % HARDENED) + (item >= HARDENED ? "'" : '')).join('/')}`;
+export const pathToString: (BIP32Path) => string = (hdPath) => {
+  return `m/${hdPath
+    .map((item) => (item % HARDENED) + (item >= HARDENED ? "'" : ''))
+    .join('/')}`;
 };
 
 /**
@@ -37,12 +47,14 @@ export const pathToString: BIP32Path => string = hdPath => {
  * @param {*} err
  */
 export const ledgerErrToMessage = (err: any): any => {
-  const isU2FError = error => !!error && !!error.metaData;
-  const isStringError = error => typeof error === 'string';
+  const isU2FError = (error) => !!error && !!(error).metaData;
+  const isStringError = (error) => typeof error === 'string';
 
   // https://developers.yubico.com/U2F/Libraries/Client_error_codes.html
-  const isErrorWithId = error =>
-    Object.prototype.hasOwnProperty.call(error, 'id') && Object.prototype.hasOwnProperty.call(error, 'message');
+  const isErrorWithId = (error) => (
+    Object.prototype.hasOwnProperty.call(error, 'id') &&
+    Object.prototype.hasOwnProperty.call(error, 'message')
+  );
 
   if (isU2FError(err)) {
     // Timeout
@@ -133,7 +145,7 @@ export const formatError = (err: any): string => {
     return 'null';
   }
 
-  const ngFilter = keyName => {
+  const ngFilter = (keyName) => {
     if (keyName === 'stack') {
       return false;
     }
@@ -157,10 +169,12 @@ export const formatError = (err: any): string => {
  * @param {*} operationName OperationNameType
  * @returns string
  */
-export const getTutorialLink = (deviceCode: DeviceCodeType, operationName: OperationNameType): string => {
+export const getTutorialLink = (
+  deviceCode: DeviceCodeType,
+  operationName: OperationNameType
+): string => {
   if (deviceCode == null || deviceCode === DEVICE_CODE.NONE) throw new Error('No tutorial is available for un-known device type');
-  if (operationName == null || operationName === OPERATION_NAME.CLOSE_WINDOW)
-    throw new Error('No tutorial for CLOSE_WINDOW operation');
+  if (operationName == null || operationName === OPERATION_NAME.CLOSE_WINDOW) throw new Error('No tutorial for CLOSE_WINDOW operation');
 
   return TUTORIAL_LINK[deviceCode + operationName];
 };

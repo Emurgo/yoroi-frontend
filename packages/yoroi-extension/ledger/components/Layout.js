@@ -4,7 +4,10 @@ import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
 import type { TransportIdType } from '../types/enum';
-import type { setTransportFunc, setLocaleFunc } from '../types/func';
+import type {
+  setTransportFunc,
+  setLocaleFunc,
+} from '../types/func';
 import TestBlock from './manual-test/TestBlock';
 import Footer from './footer/Footer';
 
@@ -23,7 +26,15 @@ type Props = {|
 @observer
 export default class Layout extends React.Component<Props> {
   render(): Node {
-    const { setTransport, setLocale, isDevelopment, appVersion, transportId, currentLocale, children } = this.props;
+    const {
+      setTransport,
+      setLocale,
+      isDevelopment,
+      appVersion,
+      transportId,
+      currentLocale,
+      children,
+    } = this.props;
 
     return (
       <div className={styles.component}>
@@ -39,7 +50,10 @@ export default class Layout extends React.Component<Props> {
         {/* Development mode block end */}
 
         {children}
-        <Footer appVersion={appVersion} transportId={transportId} />
+        <Footer
+          appVersion={appVersion}
+          transportId={transportId}
+        />
       </div>
     );
   }

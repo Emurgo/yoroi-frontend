@@ -24,7 +24,7 @@ type Props = {|
 
 @observer
 export default class ResyncBlock extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { openDialog } = this.props;
@@ -38,10 +38,19 @@ export default class ResyncBlock extends Component<Props> {
           borderTop: false,
         }}
       >
-        <Typography variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
+        <Typography
+          variant="body1"
+          fontWeight={500}
+          mb="16px"
+          color="ds.text_gray_medium"
+        >
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" mb="16px">
+        <Typography
+          variant="body1"
+          color="ds.text_gray_medium"
+          mb="16px"
+        >
           {intl.formatMessage(messages.resyncExplanation)}
         </Typography>
 

@@ -10,7 +10,7 @@ import globalMessages from '../../../../../../i18n/global-messages';
 export const ConfirmPinStep = () => {
   const [pin, setPin] = useState('');
   const strings = useStrings();
-  const intl = useIntl();
+  const intl = useIntl()
   const { registrationState, votingNextStep } = useVoting();
   const { pin: registrationPin } = registrationState;
 

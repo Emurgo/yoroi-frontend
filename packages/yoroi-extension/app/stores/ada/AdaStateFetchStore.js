@@ -8,25 +8,29 @@ import { RemoteFetcher } from '../../api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/ada/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
 
-export default class AdaStateFetchStore<TStores: RequiredStores> extends BaseStateFetchStore<TStores, IFetcher> {
+export default class AdaStateFetchStore<
+  TStores: RequiredStores,
+> extends BaseStateFetchStore<
+  TStores,
+  IFetcher
+> {
+
   @observable fetcher: IFetcher;
 
   setup(): void {
     super.setup();
-    this.fetcher = new BatchedFetcher(
-      new RemoteFetcher(
-        () => environment.getVersion(),
-        () => this.stores.profile.currentLocale,
-        () => {
-          if (environment.isFirefox()) {
-            return 'firefox';
-          }
-          if (environment.isChrome()) {
-            return 'chrome';
-          }
-          return '-';
+    this.fetcher = new BatchedFetcher(new RemoteFetcher(
+      () => environment.getVersion(),
+      () => this.stores.profile.currentLocale,
+      () => {
+        if (environment.isFirefox()) {
+          return 'firefox';
         }
-      )
-    );
+        if (environment.isChrome()) {
+          return 'chrome';
+        }
+        return '-';
+      },
+    ));
   }
 }

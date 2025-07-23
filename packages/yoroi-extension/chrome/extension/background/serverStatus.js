@@ -8,20 +8,28 @@ import type { ConceptualWalletRow } from '../../../app/api/ada/lib/storage/datab
 import { getCommonStateFetcher } from './utils';
 import environment from '../../../app/environment';
 import type { ServerStatus } from './types';
-import { getSubscriptions, registerCallback, emitUpdateToSubscriptions } from './subscriptionManager';
+import {
+  getSubscriptions,
+  registerCallback,
+  emitUpdateToSubscriptions,
+} from './subscriptionManager';
+
 
 async function getUsedNetworks(): Promise<$ReadOnlyArray<NetworkRow>> {
   const db = await getDb();
   const allConceptualWallets = await raii<$ReadOnlyArray<ConceptualWalletRow>>(
     db,
     [db.getSchema().table(ConceptualWalletSchema.name)],
-    tx => getAll(db, tx, ConceptualWalletSchema.name)
+    tx => getAll(
+      db, tx,
+      ConceptualWalletSchema.name,
+    )
   );
 
   const allNetworkIdSet = new Set(allConceptualWallets.map(w => w.NetworkId));
-  return Object.keys(networks)
-    .map(n => networks[n])
-    .filter(({ NetworkId }) => allNetworkIdSet.has(NetworkId));
+  return Object.keys(networks).map(n => networks[n]).filter(
+    ({ NetworkId }) => allNetworkIdSet.has(NetworkId)
+  );
 }
 
 let lastUpdateTimestamp: number = 0;
@@ -51,14 +59,17 @@ async function updateServerStatus() {
       const endTime = Date.now();
       const roundtripTime = endTime - startTime;
 
-      serverStatusByNetworkId.set(network.NetworkId, {
-        networkId: network.NetworkId,
-        isServerOk: resp.isServerOk,
-        isMaintenance: resp.isMaintenance || false,
-        // server time = local time + clock skew
-        clockSkew: resp.serverTime + roundtripTime / 2 - endTime,
-        lastUpdateTimestamp: Math.floor(startTime + roundtripTime / 2),
-      });
+      serverStatusByNetworkId.set(
+        network.NetworkId,
+        {
+          networkId: network.NetworkId,
+          isServerOk: resp.isServerOk,
+          isMaintenance: resp.isMaintenance || false,
+          // server time = local time + clock skew
+          clockSkew: resp.serverTime + roundtripTime  / 2 - endTime,
+          lastUpdateTimestamp: Math.floor(startTime + roundtripTime / 2),
+        }
+      );
     }
 
     lastUpdateTimestamp = Date.now();
@@ -93,7 +104,7 @@ export function startMonitorServerStatus() {
   registerCallback(params => {
     if (params.type === 'subscriptionChange') {
       updateServerStatusThreadMain().catch(error => {
-        console.error('error when updating server status', error);
+        console.error('error when updating server status', error)
       });
     }
   });

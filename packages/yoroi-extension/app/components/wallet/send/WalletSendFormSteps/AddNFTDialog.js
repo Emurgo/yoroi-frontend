@@ -28,7 +28,11 @@ type Props = {|
   +spendableBalance: ?MultiToken,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
-  +onAddToken: ({| token: void | $ReadOnly<TokenRow>, shouldSendAll?: boolean, shouldReset?: boolean |}) => void,
+  +onAddToken: ({|
+    token: void | $ReadOnly<TokenRow>,
+    shouldSendAll?: boolean,
+    shouldReset?: boolean,
+  |}) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +shouldAddMoreTokens: (Array<{| token: $ReadOnly<TokenRow>, included: boolean |}>) => boolean,
@@ -82,7 +86,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddNFTDialog extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount(): void {
     const { spendableBalance, getTokenInfo, plannedTxInfoMap } = this.props;
     const nftsList = getNFTs(spendableBalance, getTokenInfo);

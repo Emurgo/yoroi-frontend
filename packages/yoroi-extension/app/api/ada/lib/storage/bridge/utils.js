@@ -23,7 +23,11 @@ export function tryAddressToKind(
   }
 }
 
-export function addressToKind(address: string, parseAs: 'bech32' | 'bytes', network: $ReadOnly<NetworkRow>): CoreAddressT {
+export function addressToKind(
+  address: string,
+  parseAs: 'bech32' | 'bytes',
+  network: $ReadOnly<NetworkRow>
+): CoreAddressT {
   try {
     return RustModule.WasmScope(Scope => {
       if (isCardanoHaskell(network)) {
@@ -33,7 +37,9 @@ export function addressToKind(address: string, parseAs: 'bech32' | 'bytes', netw
           return CoreAddressTypes.CARDANO_LEGACY;
         }
         const wasmAddr =
-          parseAs === 'bytes' ? Scope.WalletV4.Address.from_hex(address) : Scope.WalletV4.Address.from_bech32(address);
+          parseAs === 'bytes'
+            ? Scope.WalletV4.Address.from_hex(address)
+            : Scope.WalletV4.Address.from_bech32(address);
         {
           const byronAddr = Scope.WalletV4.ByronAddress.from_address(wasmAddr);
           if (byronAddr) return CoreAddressTypes.CARDANO_LEGACY;
@@ -75,7 +81,8 @@ export function isValidReceiveAddress(
     },
     cannotSendToLegacy: {
       id: 'wallet.send.form.cannotSendToLegacy',
-      defaultMessage: '!!!Unable to send funds to legacy addresses (any address created before July 29th, 2020).',
+      defaultMessage:
+        '!!!Unable to send funds to legacy addresses (any address created before July 29th, 2020).',
     },
     cannotSendToReward: {
       id: 'wallet.send.form.cannotSendToReward',
@@ -112,7 +119,9 @@ export function isValidReceiveAddress(
     return [false, messages.invalidAddress, 1];
   }
 
-  throw new Error(`${nameof(isValidReceiveAddress)} Unsupported network ${JSON.stringify(network)}`);
+  throw new Error(
+    `${nameof(isValidReceiveAddress)} Unsupported network ${JSON.stringify(network)}`
+  );
 }
 
 export function byronAddrToHex(base58Addr: string): string {
@@ -284,7 +293,9 @@ export function isCardanoHaskellAddress(kind: CoreAddressT): boolean {
   return false;
 }
 
-export function getCardanoSpendingKeyHash(addr: RustModule.WalletV4.Address): // null -> legacy address (no key hash)
+export function getCardanoSpendingKeyHash(
+  addr: RustModule.WalletV4.Address
+): // null -> legacy address (no key hash)
 // undefined -> script hash instead of key hash
 RustModule.WalletV4.Ed25519KeyHash | null | void {
   {
@@ -325,7 +336,9 @@ export function addressToDisplayString(address: string, network: $ReadOnly<Netwo
       }
       return byronAddr.to_base58();
     }
-    throw new Error(`${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`);
+    throw new Error(
+      `${nameof(addressToDisplayString)} not implemented for network ${network.NetworkId}`
+    );
   } catch (_e2) {
     throw new Error(`${nameof(addressToDisplayString)} failed to parse address type ` + address);
   }
@@ -344,29 +357,26 @@ export function getAddressPayload(address: string, network: $ReadOnly<NetworkRow
       if (RustModule.WalletV4.ByronAddress.is_valid(address)) {
         return address;
       }
-      return (
-        RustModule.WalletV4.ByronAddress.from_address(RustModule.WalletV4.Address.from_bech32(address))?.to_base58() ??
-        RustModule.WalletV4.Address.from_bech32(address).to_hex()
-      );
+      return RustModule.WalletV4.ByronAddress.from_address(RustModule.WalletV4.Address.from_bech32(address))?.to_base58()
+        ?? RustModule.WalletV4.Address.from_bech32(address).to_hex();
     }
-    throw new Error(`${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`);
+    throw new Error(
+      `${nameof(getAddressPayload)} not implemented for network ${network.NetworkId}`
+    );
   } catch (_e2) {
     throw new Error(`${nameof(getAddressPayload)} failed to parse address type ` + address);
   }
 }
 
 export function unwrapStakingKey(stakingAddress: string): RustModule.WalletV4.Credential {
-  return (
-    RustModule.WalletV4.RewardAddress.from_address(RustModule.WalletV4.Address.from_hex(stakingAddress))?.payment_cred() ??
-    fail(`${nameof(unwrapStakingKey)} staking key invalid`)
-  );
+  return RustModule.WalletV4.RewardAddress.from_address(
+    RustModule.WalletV4.Address.from_hex(stakingAddress)
+  )?.payment_cred() ?? fail(`${nameof(unwrapStakingKey)} staking key invalid`);
 }
 
 export function isCertificateKindDrepDelegation(kind: $Values<CertificateKind>): boolean {
-  return (
-    kind === RustModule.WalletV4.CertificateKind.VoteDelegation ||
-    kind === RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation ||
-    kind === RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation ||
-    kind === RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation
-  );
+  return kind === RustModule.WalletV4.CertificateKind.VoteDelegation
+    || kind === RustModule.WalletV4.CertificateKind.StakeAndVoteDelegation
+    || kind === RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation
+    || kind === RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation;
 }

@@ -27,5 +27,8 @@
     "types": ["chrome"]
   },
   "include": ["app/UI/**/*", ".d.ts"],
-  "exclude": ["**/*.js", "**/*.flow.js"]
+  "exclude": [
+    "**/*.js",
+    "**/*.flow.js"
+  ]
 }

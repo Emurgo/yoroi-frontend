@@ -9,19 +9,26 @@ import {
   asGetSigningKey,
   asGetStakingKey,
   asHasUtxoChains,
-} from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
+} from '../../../../app/api/ada/lib/storage/models/PublicDeriver/traits'
 import { getWalletChecksum } from '../../../../app/api/export/utils';
 import { getReceiveAddress } from '../../../../app/stores/stateless/addressStores';
 import { assuranceModes } from '../../../../app/config/transactionAssuranceConfig';
-import { getChainAddressesForDisplay } from '../../../../app/api/ada/lib/storage/models/utils';
+import { getChainAddressesForDisplay, } from '../../../../app/api/ada/lib/storage/models/utils';
 import { CoreAddressTypes } from '../../../../app/api/ada/lib/storage/database/primitives/enums';
 import { ChainDerivations } from '../../../../app/config/numbersConfig';
-import { getAllAddressesForDisplay, getAllAddressesForWallet } from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
+import {
+  getAllAddressesForDisplay,
+  getAllAddressesForWallet,
+} from '../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { getForeignAddresses } from '../../../../app/api/ada/lib/storage/bridge/updateTransactions';
 import { isLedgerNanoWallet, isAnyTrezorWallet } from '../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
-import { isCardanoHaskell, isTestnet, getNetworkById } from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
+import {
+  isCardanoHaskell,
+  isTestnet,
+  getNetworkById
+} from '../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import BigNumber from 'bignumber.js';
-import { asAddressedUtxo, cardanoValueFromRemoteFormat } from '../../../../app/api/ada/transactions/utils';
+import { asAddressedUtxo, cardanoValueFromRemoteFormat, } from '../../../../app/api/ada/transactions/utils';
 import { MultiToken } from '../../../../app/api/common/lib/MultiToken';
 import { RustModule } from '../../../../app/api/ada/lib/cardanoCrypto/rustLoader';
 import { loadSubmittedTransactions } from '../../../../app/api/localStorage';
@@ -47,7 +54,7 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId:
   if (publicDeriverId == null && targetNetworkId != null) {
     publicDeriversOfNetwork = [];
     // group wallets by staking key
-    const publicDeriversByPublicKey = new Map<string, Array<PublicDeriver<>>>();
+    const publicDeriversByPublicKey = new Map<string, Array<PublicDeriver<>>>;
     for (const publicDeriver of publicDerivers) {
       const withPublicKey = asGetPublicKey(publicDeriver);
       if (withPublicKey == null) {
@@ -83,16 +90,14 @@ export async function getWalletsState(publicDeriverId: ?number, targetNetworkId:
     publicDeriversOfNetwork = publicDerivers;
   }
 
-  const maybeWalletStates = await Promise.all(
-    publicDeriversOfNetwork.map(async publicDeriver => {
-      try {
-        return await getWalletState(publicDeriver);
-      } catch (err) {
-        console.error('failed to load wallet state for public deriver id ' + publicDeriver.publicDeriverId, err);
-        return null;
-      }
-    })
-  );
+  const maybeWalletStates = await Promise.all(publicDeriversOfNetwork.map(async publicDeriver => {
+    try {
+      return await getWalletState(publicDeriver);
+    } catch (err) {
+      console.error('failed to load wallet state for public deriver id ' + publicDeriver.publicDeriverId, err);
+      return null;
+    }
+  }));
   // $FlowIgnore
   const walletStates: Array<WalletState> = maybeWalletStates.filter(x => x != null);
   try {
@@ -115,7 +120,7 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   const isLedger = isLedgerNanoWallet(conceptualWallet);
   const isTrezor = isAnyTrezorWallet(conceptualWallet);
   const isHardware = isLedger || isTrezor;
-  const type = isLedger ? 'ledger' : isTrezor ? 'trezor' : 'mnemonic';
+  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
@@ -131,26 +136,27 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
         // to ensure safety but and not optimum.
         RustModule.WalletV4.Address.from_hex('0'.repeat(114)),
         // $FlowIgnore[prop-missing] property `addressing` is missing in  `RemoteUnspentOutput` [1] but exists in  `CardanoAddressedUtxo` [2]
-        cardanoValueFromRemoteFormat(u)
+        cardanoValueFromRemoteFormat(u),
       );
       // todo: set data hash here if necessary
-      return new BigNumber(
-        RustModule.WalletV4.min_ada_for_output(
-          output,
-          RustModule.WalletV4.DataCost.new_coins_per_byte(
-            RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte)
-          )
-        ).to_str()
-      );
+      return new BigNumber(RustModule.WalletV4.min_ada_for_output(
+        output,
+        RustModule.WalletV4.DataCost.new_coins_per_byte(
+          RustModule.WalletV4.BigNum.from_str(protocolParameters.coinsPerUtxoByte)
+        ),
+      ).to_str());
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error(`Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`, e);
+      console.error(
+        `Failed to calculate min-required ADA for utxo: ${JSON.stringify(u)}`,
+        e
+      );
       return new BigNumber('0');
     }
   });
   const sumDeposit = deposits.reduce((a, b) => a.plus(b), new BigNumber('0'));
   const defaultTokenId = conceptualWallet.getDefaultMultiToken().defaults.defaultIdentifier;
-  const assetDeposits = new MultiToken(
+  const assetDeposits =  new MultiToken(
     [
       {
         identifier: defaultTokenId,
@@ -177,7 +183,8 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
   }
 
   const signingKeyUpdateDate =
-    (await asGetSigningKey(publicDeriver)?.getSigningKey())?.row.PasswordLastUpdate?.toISOString() || null;
+      (await asGetSigningKey(publicDeriver)?.getSigningKey())?.row.PasswordLastUpdate?.toISOString()
+      || null;
 
   const withStakingKey = asGetStakingKey(publicDeriver);
   if (withStakingKey == null) {
@@ -198,17 +205,17 @@ async function getWalletState(publicDeriver: PublicDeriver<>): Promise<WalletSta
 
     allAddressesByType[addrType] = await getAllAddressesForDisplay({
       publicDeriver,
-      type: addrType,
+      type: addrType
     });
     externalAddressesByType[addrType] = await getChainAddressesForDisplay({
       publicDeriver: withUtxoChains,
       chainsRequest: { chainId: ChainDerivations.EXTERNAL },
-      type: addrType,
+      type: addrType
     });
     internalAddressesByType[addrType] = await getChainAddressesForDisplay({
       publicDeriver: withUtxoChains,
       chainsRequest: { chainId: ChainDerivations.INTERNAL },
-      type: addrType,
+      type: addrType
     });
   }
   const allAddresses = await getAllAddressesForWallet(publicDeriver);
@@ -276,6 +283,7 @@ async function batchLoadSubmittedTransactions(walletStates: Array<WalletState>) 
   }
 }
 
+
 export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>): Promise<WalletState> {
   const publicDeriverId = publicDeriver.getPublicDeriverId();
 
@@ -291,7 +299,7 @@ export async function getPlaceHolderWalletState(publicDeriver: PublicDeriver<>):
   const isLedger = isLedgerNanoWallet(publicDeriver.getParent());
   const isTrezor = isAnyTrezorWallet(publicDeriver.getParent());
   const isHardware = isLedger || isTrezor;
-  const type = isLedger ? 'ledger' : isTrezor ? 'trezor' : 'mnemonic';
+  const type = (isLedger ? 'ledger' : (isTrezor ? 'trezor' : ('mnemonic')));
 
   const zero = new MultiToken([], { defaultNetworkId: network.NetworkId, defaultIdentifier: '' });
 

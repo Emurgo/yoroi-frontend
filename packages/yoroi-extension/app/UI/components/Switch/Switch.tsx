@@ -39,7 +39,7 @@ export const Switch: any = styled((props: any) => (
   '& .MuiSwitch-thumb': {
     boxSizing: 'border-box',
     width: '25px',
-    height: '25px',
+    height: '25px'
   },
   '& .MuiSwitch-track': {
     borderRadius: height / 2,

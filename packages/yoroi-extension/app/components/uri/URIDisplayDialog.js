@@ -50,7 +50,7 @@ type Props = {|
 
 @observer
 export default class URIDisplayDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { onClose, onBack, notification, onCopyAddressTooltip, address, amount } = this.props;
 

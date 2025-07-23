@@ -4,29 +4,29 @@ import type { lf$schema$Builder } from 'lovefield';
 
 import type { DbTransaction, CertificatePart, DbTokenInfo } from '../../primitives/tables';
 import { TransactionType } from '../../primitives/tables';
-import type { DbUtxoInputs, DbUtxoOutputs } from '../utxo/tables';
-import type { DbAccountingInputs } from '../account/tables';
+import type {
+  DbUtxoInputs, DbUtxoOutputs,
+} from '../utxo/tables';
+import type { DbAccountingInputs, } from '../account/tables';
 
 export type CardanoByronTxIO = {|
-  +txType: $PropertyType<typeof TransactionType, 'CardanoByron'>,
+  +txType: $PropertyType<typeof TransactionType, "CardanoByron">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
-    +Type: $PropertyType<typeof TransactionType, 'CardanoByron'>,
+    +Type: $PropertyType<typeof TransactionType, "CardanoByron">,
   |}>,
-  ...DbTokenInfo,
-  ...DbUtxoInputs,
-  ...DbUtxoOutputs,
+   ...DbTokenInfo,
+  ...DbUtxoInputs, ...DbUtxoOutputs,
 |};
 export type CardanoShelleyTxIO = {|
-  +txType: $PropertyType<typeof TransactionType, 'CardanoShelley'>,
+  +txType: $PropertyType<typeof TransactionType, "CardanoShelley">,
   +transaction: $ReadOnly<{|
     ...$PropertyType<DbTransaction, 'transaction'>,
-    +Type: $PropertyType<typeof TransactionType, 'CardanoShelley'>,
+    +Type: $PropertyType<typeof TransactionType, "CardanoShelley">,
   |}>,
-  ...DbUtxoInputs,
-  ...DbUtxoOutputs,
+  ...DbUtxoInputs, ...DbUtxoOutputs,
   ...DbAccountingInputs,
-  ...DbTokenInfo,
+   ...DbTokenInfo,
   +certificates: Array<CertificatePart>,
 |};
 

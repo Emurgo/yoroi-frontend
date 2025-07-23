@@ -35,8 +35,7 @@ const messages: * = defineMessages({
   },
   restoreDesc: {
     id: 'wallet.restore.fourthStep.description',
-    defaultMessage:
-      '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
+    defaultMessage: '!!!<strong>Add</strong> your <strong>wallet name</strong> and <strong>password</strong> to complete the wallet restoration process.',
   },
   enterWalletName: {
     id: 'wallet.create.forthStep.enterWalletNameInputLabel',
@@ -68,7 +67,7 @@ type Props = {|
 
 @observer
 export default class AddWalletDetailsStep extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount(): void {
     if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
       this.props.openDialog(WalletNameAndPasswordTipsDialog);
@@ -150,7 +149,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
         <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="555px">
           <Stack mb="20px" flexDirection="row" alignItems="center" gap="6px">
             <Typography component="div" variant="body1" color="ds.text_gray_medium">
-              <FormattedMessage {...descriptionMessage} values={{ strong }} />
+              <FormattedMessage {...descriptionMessage} values={{ strong }}/>
             </Typography>
             <IconWrapper
               component="button"

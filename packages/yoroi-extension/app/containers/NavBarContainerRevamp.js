@@ -19,7 +19,7 @@ import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDia
 import type { StoresProps } from '../stores';
 import links from '../links';
 
-export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({
+export const NETWORK_BADGES: {| [number]: {| color: string, text: string |}|} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
     color: 'rgba(236, 186, 9, 1)',
     text: 'Preprod',
@@ -41,7 +41,7 @@ const localStorage = new LocalStorageApi();
 
 @observer
 export default class NavBarContainerRevamp extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| menu: void |} = {
     menu: undefined,
   };
@@ -78,7 +78,10 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
   checkAndResetGovRoutes: void => void = () => {
     const { stores } = this.props;
     const currentRoute = stores.routing.currentRoute;
-    if (currentRoute === ROUTES.Governance.FAIL || currentRoute === ROUTES.Governance.SUBMITTED) {
+    if (
+      currentRoute === ROUTES.Governance.FAIL ||
+      currentRoute === ROUTES.Governance.SUBMITTED
+    ) {
       stores.routing.goToRoute({ route: ROUTES.Governance.ROOT });
     }
   };
@@ -230,8 +233,12 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
       return (
         <BuySellDialog
           onCancel={this.props.stores.uiDialogs.closeActiveDialog}
-          onExchangeCallback={() => stores.routing.goToRoute({ route: ROUTES.EXCHANGE_END })}
-          currentBalanceAda={selected.balance.getDefault().shiftedBy(-numberOfDecimals)}
+          onExchangeCallback={() =>
+            stores.routing.goToRoute({ route: ROUTES.EXCHANGE_END })
+          }
+          currentBalanceAda={
+            selected.balance.getDefault().shiftedBy(-numberOfDecimals)
+          }
           receiveAdaAddress={receiveAdaAddress}
         />
       );
@@ -243,4 +250,5 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
 
     return null;
   };
+
 }

@@ -18,8 +18,8 @@ export const RegistrationStepper = () => {
               currentStep > ProgressStep.GENERATE
                 ? StepStates.COMPLETED_CURRENT
                 : currentStep === ProgressStep.GENERATE
-                  ? StepStates.CURRENT
-                  : StepStates.NEXT,
+                ? StepStates.CURRENT
+                : StepStates.NEXT,
           },
           {
             label: strings.step2Label,
@@ -29,8 +29,8 @@ export const RegistrationStepper = () => {
               currentStep > ProgressStep.CONFIRM
                 ? StepStates.COMPLETED_CURRENT
                 : currentStep === ProgressStep.CONFIRM
-                  ? StepStates.CURRENT
-                  : StepStates.NEXT,
+                ? StepStates.CURRENT
+                : StepStates.NEXT,
           },
           ...(walletType === 'mnemonic'
             ? [
@@ -42,8 +42,8 @@ export const RegistrationStepper = () => {
                     currentStep > ProgressStep.REGISTER
                       ? StepStates.COMPLETED_CURRENT
                       : currentStep === ProgressStep.REGISTER
-                        ? StepStates.CURRENT
-                        : StepStates.NEXT,
+                      ? StepStates.CURRENT
+                      : StepStates.NEXT,
                 },
               ]
             : []),
@@ -55,8 +55,8 @@ export const RegistrationStepper = () => {
               currentStep > ProgressStep.TRANSACTION
                 ? StepStates.COMPLETED_CURRENT
                 : currentStep === ProgressStep.TRANSACTION
-                  ? StepStates.CURRENT
-                  : StepStates.NEXT,
+                ? StepStates.CURRENT
+                : StepStates.NEXT,
           },
           {
             label: strings.step5Label,

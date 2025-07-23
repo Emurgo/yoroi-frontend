@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, {ReactNode} from 'react';
 import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -55,13 +55,13 @@ function getRandomNotification() {
 const Context = React.createContext(initialValue);
 
 type Props = {
-  children: ReactNode;
-  appLoadedSlots: { [networkId: number]: number };
-  walletsStore: any;
+  children: ReactNode,
+  appLoadedSlots: { [networkId: number]: number },
+  walletsStore: any,
   pushNotificationStore: {
-    duration: number;
-  };
-};
+    duration: number,
+  },
+}
 
 export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore, pushNotificationStore }: Props) {
   const lsApi = new LocalStorageApi();
@@ -71,7 +71,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getSelectedWalletId = () => walletsStore.selected?.publicDeriverId;
+  const getSelectedWalletId =
+    () => walletsStore.selected?.publicDeriverId;
 
   const notificationTexts = {
     [NotificationTypes.Intrawallet]: strings.intrawalletTxConfirmed,
@@ -158,6 +159,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   };
 
   const handleSubscription = async (topic, data) => {
+
     const selectedWalletId = getSelectedWalletId();
     if (data.walletId != null && data.walletId !== selectedWalletId) {
       // ignore notifications for non-selected wallets

@@ -50,7 +50,7 @@ export const SettingsModalContent = () => {
   );
 };
 
-const SButton = styled(Button)(({ theme }: any) => ({
+const SButton = styled(Button)(({ theme }:any) => ({
   ...theme.atoms.my_lg,
   position: 'sticky',
   bottom: 0,
@@ -58,10 +58,16 @@ const SButton = styled(Button)(({ theme }: any) => ({
   zIndex: 1,
 }));
 
-const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlippage, selectedSlippage, onManualSelect }) => {
+const SlipageOptions = ({
+  setIsManualSlippage,
+  setSelectedSlippage,
+  isManualSlippage,
+  selectedSlippage,
+  onManualSelect,
+}) => {
   const strings = useStrings();
 
-  const slippages = defaultSlippages.map(val => ({
+  const slippages = defaultSlippages.map((val) => ({
     value: val,
     label: `${val}%`,
     isActive: !isManualSlippage && val === selectedSlippage,
@@ -77,7 +83,11 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
         <SlippageTab key={value} label={label} isActive={isActive} onClick={onClick} />
       ))}
 
-      <SlippageTab label={strings.manualLabel} isActive={isManualSlippage} onClick={onManualSelect} />
+      <SlippageTab
+        label={strings.manualLabel}
+        isActive={isManualSlippage}
+        onClick={onManualSelect}
+      />
     </Box>
   );
 };
@@ -211,7 +221,16 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
   );
 };
 
-const SlippageTab = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => {
+
+const SlippageTab = ({
+  label,
+  isActive,
+  onClick,
+}: {
+  label: string;
+  isActive: boolean;
+  onClick: () => void;
+}) => {
   return (
     <Box
       onClick={onClick}

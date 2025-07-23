@@ -5,6 +5,7 @@ import { networks } from '../../../api/ada/lib/storage/database/prepackaged/netw
 import { ROUTES } from '../../routes-config';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
+
   setup(): void {
     super.setup();
     this.stores.loading.registerBlockingLoadingRequest(

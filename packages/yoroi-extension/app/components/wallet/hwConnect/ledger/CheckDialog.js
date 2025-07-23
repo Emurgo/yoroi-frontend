@@ -84,14 +84,21 @@ type Props = {|
 
 @observer
 export default class CheckDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      submit,
+      cancel,
+    } = this.props;
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        <AboutLedgerSVG />
+        <AboutLedgerSVG/>
 
         <div className={styles.prerequisiteBlock}>
           <Stack direction="row" alignItems="center">
@@ -141,8 +148,7 @@ export default class CheckDialog extends Component<Props> {
             </ListItem>
           </List>
         </div>
-      </div>
-    );
+      </div>);
 
     const dailogActions = [
       {
@@ -165,7 +171,9 @@ export default class CheckDialog extends Component<Props> {
       >
         <ProgressStepBlock progressInfo={progressInfo} />
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

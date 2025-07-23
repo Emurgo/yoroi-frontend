@@ -1,5 +1,7 @@
 // @flow
-import { MultiToken } from '../api/common/lib/MultiToken';
+import {
+  MultiToken,
+} from '../api/common/lib/MultiToken';
 
 export const TransferStatus = Object.freeze({
   UNINITIALIZED: 0,
@@ -31,4 +33,4 @@ export type TransferTx = {|
     +rewardAddress: string,
     +refund: MultiToken,
   |}>,
-|};
+|}

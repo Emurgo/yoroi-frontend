@@ -1,8 +1,13 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
 import { op } from 'lovefield';
-import { addOrReplaceRow, addNewRowToTable, removeFromTableBatch } from '../../utils';
+import {
+  addOrReplaceRow, addNewRowToTable, removeFromTableBatch,
+} from '../../utils';
 import * as Tables from '../tables';
 import type {
   UtxoAtSafePoint,
@@ -37,31 +42,32 @@ export class ModifyUtxoAtSafePoint {
         UtxoAtSafePoint: utxoAtSafePoint,
       };
       await addOrReplaceRow<UtxoAtSafePointRow, UtxoAtSafePointRow>(
-        db,
-        tx,
+        db, tx,
         newRow,
-        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name
+        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
       );
     } else {
       await addNewRowToTable<UtxoAtSafePointInsert, UtxoAtSafePointRow>(
-        db,
-        tx,
+        db, tx,
         {
           PublicDeriverId: publicDeriverId,
           UtxoAtSafePoint: utxoAtSafePoint,
         },
-        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name
+        ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
       );
     }
   }
 
-  static async remove(db: lf$Database, tx: lf$Transaction, publicDeriverId: number): Promise<void> {
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    publicDeriverId: number,
+  ): Promise<void> {
     await removeFromTableBatch(
-      db,
-      tx,
+      db, tx,
       ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].name,
       ModifyUtxoAtSafePoint.ownTables[Tables.UtxoAtSafePointSchema.name].properties.PublicDeriverId,
-      ([publicDeriverId]: Array<number>)
+      ([publicDeriverId]: Array<number>),
     );
   }
 }
@@ -75,25 +81,38 @@ export class ModifyUtxoDiffToBestBlock {
 
   static depTables: {||} = Object.freeze({});
 
-  static async removeAll(db: lf$Database, tx: lf$Transaction, publicDeriverId: number): Promise<void> {
-    const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
-    const tableName = schema.name;
-    const fieldNames = schema.properties;
-    const table = db.getSchema().table(tableName);
-    await tx.attach(db.delete().from(table).where(table[fieldNames.PublicDeriverId].eq(publicDeriverId)));
-  }
-
-  static async remove(db: lf$Database, tx: lf$Transaction, publicDeriverId: number, lastBestBlockHash: string): Promise<void> {
+  static async removeAll(
+    db: lf$Database,
+    tx: lf$Transaction,
+    publicDeriverId: number,
+  ): Promise<void> {
     const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
     const tableName = schema.name;
     const fieldNames = schema.properties;
     const table = db.getSchema().table(tableName);
     await tx.attach(
-      db
-        .delete()
-        .from(table)
+      db.delete().from(table)
+        .where(table[fieldNames.PublicDeriverId].eq(publicDeriverId))
+    );
+  }
+
+  static async remove(
+    db: lf$Database,
+    tx: lf$Transaction,
+    publicDeriverId: number,
+    lastBestBlockHash: string,
+  ): Promise<void> {
+    const schema = ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name];
+    const tableName = schema.name;
+    const fieldNames = schema.properties;
+    const table = db.getSchema().table(tableName);
+    await tx.attach(
+      db.delete().from(table)
         .where(
-          op.and(table[fieldNames.PublicDeriverId].eq(publicDeriverId), table[fieldNames.lastBestBlockHash].eq(lastBestBlockHash))
+          op.and(
+            table[fieldNames.PublicDeriverId].eq(publicDeriverId),
+            table[fieldNames.lastBestBlockHash].eq(lastBestBlockHash)
+          )
         )
     );
   }
@@ -102,30 +121,28 @@ export class ModifyUtxoDiffToBestBlock {
     db: lf$Database,
     tx: lf$Transaction,
     publicDeriverId: number,
-    utxoDiffToBestBlock: UtxoDiffToBestBlock
+    utxoDiffToBestBlock: UtxoDiffToBestBlock,
   ): Promise<void> {
     // Do nothing if a row with `utxoDiffToBestBlock.lastBestBlockHash` is already
     // present. But we can't rely on the unique index because the exception is
     // thrown when the tx is being committed and there is no way to catch it
     // only for this query.
     const existing = await GetUtxoDiffToBestBlock.findLastBestBlockHash(
-      db,
-      tx,
+      db, tx,
       publicDeriverId,
       utxoDiffToBestBlock.lastBestBlockHash
     );
 
     if (!existing) {
       await addNewRowToTable<UtxoDiffToBestBlockInsert, UtxoDiffToBestBlockRow>(
-        db,
-        tx,
+        db, tx,
         {
           PublicDeriverId: publicDeriverId,
           lastBestBlockHash: utxoDiffToBestBlock.lastBestBlockHash,
           spentUtxoIds: utxoDiffToBestBlock.spentUtxoIds,
           newUtxos: utxoDiffToBestBlock.newUtxos,
         },
-        ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].name
+        ModifyUtxoDiffToBestBlock.ownTables[Tables.UtxoDiffToBestBlockSchema.name].name,
       );
     }
   }

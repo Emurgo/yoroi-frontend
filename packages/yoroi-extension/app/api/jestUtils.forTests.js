@@ -2,10 +2,8 @@
 
 import stableStringify from 'json-stable-stringify';
 
-export const TX_TEST_MNEMONIC_1 =
-  'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
-export const ABANDON_SHARE =
-  'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share';
+export const TX_TEST_MNEMONIC_1 = 'prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed';
+export const ABANDON_SHARE = 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon share';
 
 export function mockDate(): void {
   const time = [0];
@@ -13,7 +11,10 @@ export function mockDate(): void {
   Date.now = jest.spyOn(Date, 'now').mockImplementation(() => time[0]++);
 }
 
-export function filterDbSnapshot(dump: any, keys: Array<string>): void {
+export function filterDbSnapshot(
+  dump: any,
+  keys: Array<string>
+): void {
   // 1) test all keys we care about are present
   keys.sort();
 
@@ -25,7 +26,7 @@ export function filterDbSnapshot(dump: any, keys: Array<string>): void {
 
   // 2) compare content of keys to snapshot
   const filteredDump = keys.map(filterKey => ({
-    [filterKey]: dump[filterKey],
+    [filterKey]: dump[filterKey]
   }));
 
   expect(filteredDump).toMatchSnapshot();
@@ -36,7 +37,11 @@ export function filterDbSnapshot(dump: any, keys: Array<string>): void {
  * However, the diff is too big to reasonably compare with your eyes
  * Therefore, we test each table separately
  */
-export function compareObject(obj1: { tables: any, ... }, obj2: { tables: any, ... }, filter: Set<string> = new Set()): void {
+export function compareObject(
+  obj1: { tables: any, ... },
+  obj2: { tables: any, ... },
+  filter: Set<string> = new Set(),
+): void {
   const obj1FilteredKeys = Object.keys(obj1).filter(key => filter.has(key));
   const obj2FilteredKeys = Object.keys(obj2).filter(key => filter.has(key));
   for (const prop of obj1FilteredKeys) {

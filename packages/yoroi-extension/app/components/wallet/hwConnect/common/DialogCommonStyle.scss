@@ -1,6 +1,7 @@
 $opacityCommon: 0.7;
 
 .component {
+
   .actions {
     display: flex;
     flex-shrink: 0;
@@ -39,6 +40,7 @@ $opacityCommon: 0.7;
   }
 }
 
+
 :global(.YoroiClassic) {
   .headerBlock {
     width: 725px;
@@ -60,8 +62,7 @@ $opacityCommon: 0.7;
   }
 }
 
-:global(.YoroiModern),
-:global(.YoroiRevamp) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .headerBlock {
     font-size: 12px;
     line-height: 18px;

@@ -61,51 +61,59 @@ function Autocomplete({
     },
   });
 
-  const { isOpen, getLabelProps, getMenuProps, getInputProps, getComboboxProps, highlightedIndex, getItemProps, closeMenu } =
-    useCombobox({
-      inputValue,
-      defaultHighlightedIndex: 0,
-      selectedItem: null,
-      items: filteredList,
-      stateReducer: (state, actionAndChanges) => {
-        const { changes, type: actionType } = actionAndChanges;
-        switch (actionType) {
-          case useCombobox.stateChangeTypes.InputKeyDownEnter:
-          case useCombobox.stateChangeTypes.ItemClick:
-          case useCombobox.stateChangeTypes.InputChange:
-            return {
-              ...changes,
-              isOpen: true,
-            };
-          default:
-            return changes;
-        }
-      },
-      // eslint-disable-next-line no-shadow
-      onStateChange: ({ inputValue, type, selectedItem }) => {
-        switch (type) {
-          case useCombobox.stateChangeTypes.InputChange:
-            if (inputValue.length === 0) {
-              closeMenu();
-            }
-            setInputValue(inputValue);
-            break;
-          case useCombobox.stateChangeTypes.InputKeyDownEnter:
-          case useCombobox.stateChangeTypes.ItemClick:
-          case useCombobox.stateChangeTypes.InputBlur:
-            // $FlowFixMe[invalid-compare]
-            if (selectedItem && value.length < maxSelections) {
-              setInputValue('');
-              addSelectedItem(selectedItem);
-              closeMenu();
-              inputRef.current?.focus();
-            }
-            break;
-          default:
-            break;
-        }
-      },
-    });
+  const {
+    isOpen,
+    getLabelProps,
+    getMenuProps,
+    getInputProps,
+    getComboboxProps,
+    highlightedIndex,
+    getItemProps,
+    closeMenu,
+  } = useCombobox({
+    inputValue,
+    defaultHighlightedIndex: 0,
+    selectedItem: null,
+    items: filteredList,
+    stateReducer: (state, actionAndChanges) => {
+      const { changes, type: actionType } = actionAndChanges;
+      switch (actionType) {
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.ItemClick:
+        case useCombobox.stateChangeTypes.InputChange:
+          return {
+            ...changes,
+            isOpen: true,
+          };
+        default:
+          return changes;
+      }
+    },
+    // eslint-disable-next-line no-shadow
+    onStateChange: ({ inputValue, type, selectedItem }) => {
+      switch (type) {
+        case useCombobox.stateChangeTypes.InputChange:
+          if (inputValue.length === 0) {
+            closeMenu();
+          }
+          setInputValue(inputValue);
+          break;
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.ItemClick:
+        case useCombobox.stateChangeTypes.InputBlur:
+          // $FlowFixMe[invalid-compare]
+          if (selectedItem && value.length < maxSelections) {
+            setInputValue('');
+            addSelectedItem(selectedItem);
+            closeMenu();
+            inputRef.current?.focus();
+          }
+          break;
+        default:
+          break;
+      }
+    },
+  });
   const theme = useTheme();
   return (
     <FormControl

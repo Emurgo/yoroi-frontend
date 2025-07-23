@@ -46,9 +46,8 @@
   }
 }
 
-:global(.YoroiModern),
-:global(.YoroiRevamp) {
-  .component {
+:global(.YoroiModern) , :global(.YoroiRevamp) {
+   .component {
     h1 {
       font-size: 18px;
     }

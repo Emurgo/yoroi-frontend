@@ -74,7 +74,7 @@ const GradientBox = styled(Box)(({ theme, isSelected }) => ({
   '&::before': {
     opacity: 0,
     transition: 'opacity 300ms linear',
-  },
+  }
 }));
 
 type Props = {|
@@ -89,7 +89,7 @@ export default class ComplexityLevel extends Component<Props> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { complexityLevel } = this.props;
@@ -111,11 +111,23 @@ export default class ComplexityLevel extends Component<Props> {
 
     return (
       <Box maxWidth="930px" margin="0 auto" mt="24px">
-        <Typography component="div" textAlign="center" color="ds.text_gray_medium" mb="16px" variant="h3" fontWeight={500}>
+        <Typography
+          component="div"
+          textAlign="center"
+          color="ds.text_gray_medium"
+          mb="16px"
+          variant="h3"
+          fontWeight={500}
+        >
           {intl.formatMessage(settingsMenuMessages.levelOfComplexity)}
         </Typography>
 
-        <Typography component="div" textAlign="center" variant="body1" color="ds.text_gray_low">
+        <Typography
+          component="div"
+          textAlign="center"
+          variant="body1"
+          color="ds.text_gray_low"
+        >
           {intl.formatMessage(messages.subtitle)}
         </Typography>
 
@@ -149,14 +161,16 @@ export default class ComplexityLevel extends Component<Props> {
 
         <Box display="flex" alignItems="center" justifyContent="center" mt="32px">
           <Box display="flex" flexDirection="row" justifyContent="center" gap="24px">
-            {levels.map(level => {
+          {levels.map(level => {
               const isSelected = level.key === complexityLevel;
               return (
-                <GradientBox key={level.key} isSelected={isSelected} onClick={() => this.props.onSubmit(level.key)}>
+                <GradientBox
+                  key={level.key}
+                  isSelected={isSelected}
+                  onClick={() => this.props.onSubmit(level.key)}
+                >
                   <Box display="flex" flexDirection="column" alignItems="center">
-                    <Box sx={{ mb: '16px' }} width="180px" height="116px">
-                      {level.image}
-                    </Box>
+                    <Box sx={{ mb: '16px' }} width="180px" height="116px">{level.image}</Box>
                     <Box>
                       <Typography component="div" mb="4px" variant="h3" fontWeight={500} color="ds.text_gray_medium">
                         {level.name}
@@ -168,7 +182,8 @@ export default class ComplexityLevel extends Component<Props> {
                   </Box>
                 </GradientBox>
               );
-            })}
+              })
+          }
           </Box>
         </Box>
       </Box>

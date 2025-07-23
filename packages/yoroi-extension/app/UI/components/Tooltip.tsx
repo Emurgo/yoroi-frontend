@@ -1,5 +1,9 @@
 import { useTheme } from '@mui/material';
-import { Tooltip as ReactTooltip, type TooltipRefProps as ReactTooltipProps, type PositionStrategy } from 'react-tooltip';
+import {
+  Tooltip as ReactTooltip,
+  type TooltipRefProps as ReactTooltipProps,
+  type PositionStrategy,
+} from 'react-tooltip';
 import { v4 as uuid } from 'uuid';
 
 interface Props
@@ -16,17 +20,26 @@ interface Props
   arrow?: boolean;
 }
 
-export const Tooltip = ({ children, title, place = 'bottom', ...props }: Props): React.ReactNode => {
+export const Tooltip = ({
+  children,
+  title,
+  place = 'bottom',
+  ...props
+}: Props): React.ReactNode => {
   const theme: any = useTheme();
   const id = uuid();
 
   return (
-    <span {...props} data-tooltip-id={id} style={{ display: 'inline-flex' }}>
+    <span
+      {...props}
+      data-tooltip-id={id}
+      style={{ display: 'inline-flex' }}
+    >
       {children}
 
       <ReactTooltip
         id={id}
-        opacity="1"
+        opacity='1'
         style={{
           color: theme.palette.ds.gray_min,
           backgroundColor: theme.palette.ds.gray_900,

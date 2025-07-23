@@ -49,7 +49,9 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
     const stepsList = [
       { step: ProgressStep.GENERATE, message: globalMessages.stepPin },
       { step: ProgressStep.CONFIRM, message: globalMessages.stepConfirm },
-      ...(walletType === 'mnemonic' ? [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }] : []),
+      ...(walletType === 'mnemonic'
+        ? [{ step: ProgressStep.REGISTER, message: globalMessages.registerLabel }]
+        : []),
       { step: ProgressStep.TRANSACTION, message: globalMessages.transactionLabel },
       { step: ProgressStep.QR_CODE, message: globalMessages.stepQrCode },
     ];
@@ -124,7 +126,11 @@ export default class VotingRegistrationDialogContainer extends Component<AllProp
         );
         break;
       default:
-        Logger.error(`${nameof(VotingRegistrationDialogContainer)}::${nameof(this.render)}: something unexpected happened`);
+        Logger.error(
+          `${nameof(VotingRegistrationDialogContainer)}::${nameof(
+            this.render
+          )}: something unexpected happened`
+        );
         break;
     }
 

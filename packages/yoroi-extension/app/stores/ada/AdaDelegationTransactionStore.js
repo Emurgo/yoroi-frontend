@@ -4,7 +4,11 @@ import { observable, action, reaction, runInAction } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import LocalizedRequest from '../lib/LocalizedRequest';
-import type { CreateDelegationTxFunc, CreateWithdrawalTxResponse, CreateDelegationTxResponse } from '../../api/ada';
+import type {
+  CreateDelegationTxFunc,
+  CreateWithdrawalTxResponse,
+  CreateDelegationTxResponse
+} from '../../api/ada';
 import { buildRoute } from '../../utils/routing';
 import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
@@ -13,7 +17,7 @@ import { getProtocolParameters } from '../../api/thunk';
 
 export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   @observable createWithdrawalTx: LocalizedRequest<DeferredCall<CreateWithdrawalTxResponse>> = new LocalizedRequest<
-    DeferredCall<CreateWithdrawalTxResponse>,
+    DeferredCall<CreateWithdrawalTxResponse>
   >(request => request());
 
   @observable
@@ -94,7 +98,9 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   };
 
   @action
-  createWithdrawalTxForWallet: ({| wallet: WalletState |}) => Promise<CreateWithdrawalTxResponse> = async request => {
+  createWithdrawalTxForWallet: ({|
+    wallet: WalletState,
+  |}) => Promise<CreateWithdrawalTxResponse> = async request => {
     this.createWithdrawalTx.reset();
 
     const { timeToSlot } = this.stores.substores.ada.time.getTimeCalcRequests(request.wallet).requests;
@@ -130,7 +136,11 @@ export default class AdaDelegationTransactionStore extends Store<StoresMap> {
   };
 
   @action
-  signTransaction: ({| wallet: WalletState, password?: string, dialog?: any |}) => Promise<void> = async request => {
+  signTransaction: ({|
+    wallet: WalletState,
+    password?: string,
+    dialog?: any,
+  |}) => Promise<void> = async request => {
     const signRequest = this.createDelegationTx.result?.signTxRequest;
     if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);

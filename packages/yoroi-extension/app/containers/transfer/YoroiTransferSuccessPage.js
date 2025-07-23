@@ -14,16 +14,21 @@ const messages = defineMessages({
     id: 'yoroiTransfer.successPage.text',
     defaultMessage: '!!!Your funds were successfully transferred.',
   },
+
 });
 
-type Props = {||};
+type Props = {|
+|};
 
 @observer
 export default class YoroiTransferSuccessPage extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 
-    return <SuccessPage title={intl.formatMessage(messages.title)} text={intl.formatMessage(messages.text)} />;
+    return (<SuccessPage
+      title={intl.formatMessage(messages.title)}
+      text={intl.formatMessage(messages.text)}
+    />);
   }
 }

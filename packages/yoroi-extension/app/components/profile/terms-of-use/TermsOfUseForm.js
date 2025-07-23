@@ -43,7 +43,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   state: State = {
     areTermsOfUseAccepted: false,
     showing: 'form',
@@ -111,21 +111,18 @@ export default class TermsOfUseForm extends Component<Props, State> {
                   <FormattedMessage
                     {...globalMessages.tosAgreement}
                     values={{
-                      tosLink: chunks => (
-                        <a href="." id="tosLink">
-                          {chunks}
-                        </a>
-                      ),
-                      privacyLink: chunks => (
-                        <a href="." id="privacyLink">
-                          {chunks}
-                        </a>
-                      ),
+                      tosLink: chunks => (<a href="." id="tosLink">{chunks}</a>),
+                      privacyLink: chunks => (<a href="." id="privacyLink">{chunks}</a>),
                     }}
                   />
                 </Box>
               }
-              control={<Checkbox checked={areTermsOfUseAccepted} onChange={this.toggleAcceptance.bind(this)} />}
+              control={
+                <Checkbox
+                  checked={areTermsOfUseAccepted}
+                  onChange={this.toggleAcceptance.bind(this)}
+                />
+              }
               sx={{ margin: '0px' }}
             />
           </div>
@@ -166,7 +163,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
           <div className={styles.tosBox}>
             <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false} />
+              <ReactMarkdown source={markdown} escapeHtml={false}/>
             </div>
           </div>
         </Box>
@@ -177,7 +174,7 @@ export default class TermsOfUseForm extends Component<Props, State> {
             top: '24px',
             left: '24px',
           }}
-          startIcon={<BackIcon />}
+          startIcon={<BackIcon/>}
           onClick={this.onClickBack}
         >
           {intl.formatMessage(globalMessages.backButtonLabel)}

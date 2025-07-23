@@ -1,22 +1,40 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database, lf$Transaction,
+} from 'lovefield';
 import type { HwWalletMetaRow } from '../../database/walletTypes/core/tables';
 
-import { DerivePublicDeriverFromKey, AddAdhocPublicDeriver } from '../../database/walletTypes/common/api/write';
-import type { AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse } from '../../database/walletTypes/common/api/write';
-import type { TreeInsert } from '../../database/walletTypes/common/utils.types';
+import {
+  DerivePublicDeriverFromKey, AddAdhocPublicDeriver,
+} from '../../database/walletTypes/common/api/write';
+import type {
+  AddAdhocPublicDeriverRequest, AddAdhocPublicDeriverResponse,
+} from '../../database/walletTypes/common/api/write';
+import type {
+  TreeInsert,
+} from '../../database/walletTypes/common/utils.types';
 import type { AddPublicDeriverResponse } from '../../database/walletTypes/core/api/write';
-import { ModifyKey } from '../../database/primitives/api/write';
-import { GetKeyForDerivation } from '../../database/primitives/api/read';
+import { ModifyKey, } from '../../database/primitives/api/write';
+import {
+  GetKeyForDerivation,
+} from '../../database/primitives/api/read';
 
-import type { KeyRow, KeyDerivationRow, NetworkRow, TokenRow } from '../../database/primitives/tables';
+import type {
+  KeyRow,
+  KeyDerivationRow,
+  NetworkRow,
+  TokenRow,
+} from '../../database/primitives/tables';
 
-import type { IChangePasswordRequest, IChangePasswordRequestFunc, RawVariation, RawTableVariation } from '../common/interfaces';
+import type {
+  IChangePasswordRequest, IChangePasswordRequestFunc,
+  RawVariation, RawTableVariation,
+} from '../common/interfaces';
 
 export const WalletTypeOption = Object.freeze({
   WEB_WALLET: 0,
-  HARDWARE_WALLET: 1,
+  HARDWARE_WALLET: 1
 });
 export type WalletType = $Values<typeof WalletTypeOption>;
 
@@ -35,7 +53,7 @@ export interface IConceptualWallet {
     publicDeriverLevel: number,
     signingLevel: number | null,
     privateDeriverLevel: number | null,
-    privateDeriverKeyDerivationId: number | null
+    privateDeriverKeyDerivationId: number | null,
   ): IConceptualWallet;
   getWalletType(): WalletType;
   getHwWalletMeta(): ?$ReadOnly<HwWalletMetaRow>;
@@ -54,17 +72,15 @@ export type IDerivePublicFromPrivateRequest = {|
   publicDeriverMeta: {|
     name: string,
   |},
-  decryptPrivateDeriver:
-    | {|
-        preDerived: false,
-        password: null | string,
-      |}
-    | {|
-        preDerived: true,
-        result: {|
-          pubKeyHex: string,
-        |},
-      |},
+  decryptPrivateDeriver: {|
+    preDerived: false,
+    password: null | string
+  |} | {|
+    preDerived: true,
+    result: {|
+      pubKeyHex: string,
+    |},
+  |},
   initialDerivations: TreeInsert<any>,
   path: Array<{|
     index: number,
@@ -81,7 +97,7 @@ export interface IDerivePublicFromPrivate {
     {|
       DerivePublicDeriverFromKey: Class<DerivePublicDeriverFromKey>,
     |},
-    IDerivePublicFromPrivateRequest,
+    IDerivePublicFromPrivateRequest
   >;
   +derivePublicDeriverFromPrivate: IDerivePublicFromPrivateFunc<mixed>;
 }
@@ -91,14 +107,16 @@ export type IGetPrivateDeriverKeyResponse = {|
   keyRow: $ReadOnly<KeyRow>,
   keyDerivation: $ReadOnly<KeyDerivationRow>,
 |};
-export type IGetPrivateDeriverKeyFunc = (body: IGetPrivateDeriverKeyRequest) => Promise<IGetPrivateDeriverKeyResponse>;
+export type IGetPrivateDeriverKeyFunc = (
+  body: IGetPrivateDeriverKeyRequest
+) => Promise<IGetPrivateDeriverKeyResponse>;
 export interface IGetPrivateDeriverKey {
   +rawGetPrivateDeriverKey: RawVariation<
     IGetPrivateDeriverKeyFunc,
     {|
       GetKeyForDerivation: Class<GetKeyForDerivation>,
     |},
-    IGetPrivateDeriverKeyRequest,
+    IGetPrivateDeriverKeyRequest
   >;
   +getPrivateDeriverKey: IGetPrivateDeriverKeyFunc;
 
@@ -108,9 +126,9 @@ export interface IGetPrivateDeriverKey {
       GetKeyForDerivation: Class<GetKeyForDerivation>,
       ModifyKey: Class<ModifyKey>,
     |},
-    IChangePasswordRequest,
+    IChangePasswordRequest
   >;
-  +changePrivateDeriverPassword: IChangePasswordRequestFunc;
+  +changePrivateDeriverPassword: IChangePasswordRequestFunc,
 }
 
 export type IAddAdhocPublicDeriverRequest<Insert> = AddAdhocPublicDeriverRequest<Insert>;

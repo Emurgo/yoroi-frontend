@@ -55,8 +55,7 @@
   }
 }
 
-:global(.YoroiModern),
-:global(.YoroiRevamp) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     .prerequisiteBlock {
       margin-top: 24px;

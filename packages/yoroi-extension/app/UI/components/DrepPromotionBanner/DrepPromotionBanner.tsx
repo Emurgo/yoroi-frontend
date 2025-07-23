@@ -61,10 +61,9 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
     return null;
   }
 
-  const balance = useMemo(
-    () => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6),
-    [selectedWallet]
-  );
+  const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
+    selectedWallet,
+  ]);
   const selectedWalletId = selectedWallet.publicDeriverId;
 
   const { isVisible, dismissBanner } = useDrepBannerVisibility(balance, selectedWalletId);
@@ -88,7 +87,11 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
     getGovStatus();
   }, [stores.delegation.governanceStatus]);
 
-  if (!isVisible || stores.delegation.governanceStatus === undefined || governanceInfo.isParticipatingToGovernance) {
+  if (
+    !isVisible ||
+    stores.delegation.governanceStatus === undefined ||
+    governanceInfo.isParticipatingToGovernance
+  ) {
     return null;
   }
 
@@ -98,7 +101,7 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
         <IconWrapper
           onClick={dismissBanner}
           icon={Icons.CloseCircleIcon}
-          iconProps={{ fill: theme.palette.ds.el_gray_max }}
+          iconProps={{fill: theme.palette.ds.el_gray_max}}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
           asButton

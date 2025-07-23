@@ -35,7 +35,7 @@ type Props = {|
 
 @observer
 export default class DangerousActionDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { isSubmitting, error, id } = this.props;
@@ -71,7 +71,7 @@ export default class DangerousActionDialog extends Component<Props> {
         closeButton={<DialogCloseButton onClose={this.props.onCancel} />}
         id={id}
       >
-        {
+        {(
           <Box maxWidth="600px">
             {this.props.children}
             <Box mb="24px" ml="3px">
@@ -85,7 +85,7 @@ export default class DangerousActionDialog extends Component<Props> {
                       marginRight: '8px',
                       width: '16px',
                       height: '16px',
-                      fontSize: '16px',
+                      fontSize: '16px'
                     }}
                   />
                 }
@@ -95,7 +95,7 @@ export default class DangerousActionDialog extends Component<Props> {
             </Box>
             {error ? <p className={styles.error}>{intl.formatMessage(error, error.values)}</p> : null}
           </Box>
-        }
+        )}
       </Dialog>
     );
   }

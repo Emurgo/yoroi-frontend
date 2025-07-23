@@ -1,7 +1,11 @@
 // @flow
 import type { UserAnnotation } from '../api/ada/transactions/types';
 import type { CardanoShelleyTxIO } from '../api/ada/lib/storage/database/transactionModels/multipart/tables';
-import type { DbBlock, CertificatePart, NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
+import type {
+  DbBlock,
+  CertificatePart,
+  NetworkRow,
+} from '../api/ada/lib/storage/database/primitives/tables';
 import type { WalletTransactionCtorData } from './WalletTransaction';
 import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
 import { action, observable } from 'mobx';
@@ -76,11 +80,19 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
   |}): CardanoShelleyTransaction {
     const { addressLookupMap, defaultToken, tx } = request;
     if (tx.transaction.Type !== TransactionType.CardanoShelley) {
-      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} tx type incorrect`);
+      throw new Error(
+        `${nameof(CardanoShelleyTransaction)}::${
+          this.constructor.fromAnnotatedTx
+        } tx type incorrect`
+      );
     }
     const { Extra } = tx.transaction;
     if (Extra == null) {
-      throw new Error(`${nameof(CardanoShelleyTransaction)}::${this.constructor.fromAnnotatedTx} missing extra data`);
+      throw new Error(
+        `${nameof(CardanoShelleyTransaction)}::${
+          this.constructor.fromAnnotatedTx
+        } missing extra data`
+      );
     }
     return new CardanoShelleyTransaction({
       txid: tx.transaction.Hash,
@@ -169,7 +181,9 @@ export default class CardanoShelleyTransaction extends WalletTransaction {
       if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.GenesisKeyDelegation) {
         features.push('GenesisKeyDelegation');
       }
-      if (cert.certificate.Kind === RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert) {
+      if (
+        cert.certificate.Kind === RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
+      ) {
         features.push('MoveInstantaneousRewards');
       }
     }
@@ -205,13 +219,15 @@ export function deserializeTransactionCtorData(
     state: serializedData.state,
     errorMsg: serializedData.errorMsg,
     certificates: serializedData.certificates,
-    ttl:
-      serializedData.ttl &&
-      new BigNumber(typeof serializedData.ttl === 'object' ? { ...serializedData.ttl, _isBigNumber: true } : serializedData.ttl),
+    ttl: serializedData.ttl && new BigNumber(
+      typeof serializedData.ttl === 'object'
+        ? { ...serializedData.ttl, _isBigNumber: true }
+        : serializedData.ttl
+    ),
     metadata: serializedData.metadata,
     withdrawals: serializedData.withdrawals.map(({ address, value }) => ({
       address,
-      value: MultiToken.from((value: any)),
+      value: MultiToken.from((value: any))
     })),
     isValid: serializedData.isValid,
   };

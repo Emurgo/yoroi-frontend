@@ -35,12 +35,7 @@ export const usePortfolioImage = ({
 
   const cacheKey = [`token-img`, `${policy}.${name}`, `${w}x${h}`, kind, contentFit];
 
-  const {
-    data: uri,
-    isError,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: uri, isError, isLoading, refetch } = useQuery({
     queryKey: cacheKey,
     staleTime: Infinity,
     cacheTime: Infinity,

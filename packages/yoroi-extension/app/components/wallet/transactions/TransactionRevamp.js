@@ -77,7 +77,7 @@ type State = {|
 
 @observer
 export default class TransactionRevamp extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   state: State = {
     isExpanded: false,
@@ -160,7 +160,10 @@ export default class TransactionRevamp extends Component<Props, State> {
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
   }
 
-  renderAmountDisplay: ({| entry: TokenEntry, getRawNumber?: boolean |}) => Node | string = request => {
+  renderAmountDisplay: ({|
+    entry: TokenEntry,
+    getRawNumber?: boolean,
+  |}) => Node | string = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
@@ -187,13 +190,16 @@ export default class TransactionRevamp extends Component<Props, State> {
     );
   };
 
-  renderAmountWithUnitOfAccount: ({| entry: TokenEntry, timestamp: number |}) => ?Node = request => {
+  renderAmountWithUnitOfAccount: ({|
+    entry: TokenEntry,
+    timestamp: number,
+  |}) => ?Node = request => {
     const { currency } = this.props.unitOfAccountSetting;
 
     if (this.props.unitOfAccountSetting.enabled) {
       const tokenInfo = this.props.getTokenInfo(request.entry);
       const numberOfDecimals = tokenInfo?.Metadata.numberOfDecimals ?? 0;
-      const shiftedAmount = request.entry.amount.shiftedBy(-numberOfDecimals);
+      const shiftedAmount = request.entry.amount.shiftedBy(- numberOfDecimals);
       const ticker = tokenInfo?.Metadata.ticker;
       if (ticker == null) {
         throw new Error('unexpected main token type');
@@ -260,7 +266,11 @@ export default class TransactionRevamp extends Component<Props, State> {
     );
   };
 
-  renderFeeDisplay: ({| amount: MultiToken, type: TransactionDirectionType, timestamp: number |}) => Node = request => {
+  renderFeeDisplay: ({|
+    amount: MultiToken,
+    type: TransactionDirectionType,
+    timestamp: number,
+  |}) => Node = request => {
     if (request.type === transactionTypes.INCOME) {
       return (
         <Typography as="span" fontSize="inherit">
@@ -334,7 +344,9 @@ export default class TransactionRevamp extends Component<Props, State> {
     return undefined;
   };
 
-  renderAssets: ({| assets: Array<TokenEntry> |}) => Node = request => {
+  renderAssets: ({|
+    assets: Array<TokenEntry>,
+  |}) => Node = request => {
     if (request.assets.length === 0) {
       return null;
     }

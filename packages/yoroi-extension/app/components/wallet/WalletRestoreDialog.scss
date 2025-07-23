@@ -60,8 +60,7 @@
   }
 }
 
-:global(.YoroiModern),
-:global(.YoroiRevamp) {
+:global(.YoroiModern), :global(.YoroiRevamp) {
   .component {
     .walletName {
       margin-bottom: 0;
@@ -86,6 +85,8 @@
     }
   }
 }
+
+
 
 :global(.YoroiRevamp) {
   .component {

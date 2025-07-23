@@ -23,7 +23,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class Transfer extends Component<AllProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
@@ -39,7 +39,12 @@ export default class Transfer extends Component<AllProps> {
     );
 
     return (
-      <TopBarLayout banner={<BannerContainer stores={stores} />} navbar={navbar} sidebar={sidebarContainer} showInContainer>
+      <TopBarLayout
+        banner={<BannerContainer stores={stores} />}
+        navbar={navbar}
+        sidebar={sidebarContainer}
+        showInContainer
+      >
         {this.getContent()}
       </TopBarLayout>
     );

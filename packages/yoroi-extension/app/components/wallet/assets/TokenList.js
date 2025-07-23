@@ -16,7 +16,17 @@ import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/
 import globalMessages from '../../../i18n/global-messages';
 import { hiddenAmount } from '../../../utils/strings';
 import { assetsMessage, compareNumbers, compareStrings } from './AssetsList';
-import { ButtonBase, Input, InputAdornment, List, ListItem, ListItemText, Stack, Typography, useMediaQuery } from '@mui/material';
+import {
+  ButtonBase,
+  Input,
+  InputAdornment,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+  useMediaQuery,
+} from '@mui/material';
 import { Box, styled } from '@mui/system';
 import { Link } from 'react-router';
 import { ROUTES } from '../../../routes-config';
@@ -76,7 +86,9 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
   useEffect(() => {
     const regExp = new RegExp(keyword, 'gi');
     const assetsListCopy = [...list];
-    const filteredAssetsList = assetsListCopy.filter(a => [a.name, a.id].some(field => field.match(regExp)));
+    const filteredAssetsList = assetsListCopy.filter(a =>
+      [a.name, a.id].some(field => field.match(regExp))
+    );
     setState(prev => ({ ...prev, assetsList: filteredAssetsList }));
   }, [keyword, list]);
 
@@ -126,7 +138,12 @@ function TokenList({ assetsList: list, shouldHideBalance, intl }: Props & Intl):
   return (
     <Stack sx={{ minHeight: '500px' }} id="tokens-list">
       <Box display="flex" justifyContent="space-between" alignItems="center" paddingBottom="8px">
-        <Typography component="div" variant="h5" color="var(--yoroi-palette-common-black)" fontWeight={500} fontSize="18px">
+        <Typography component="div"
+          variant="h5"
+          color="var(--yoroi-palette-common-black)"
+          fontWeight={500}
+          fontSize="18px"
+        >
           {intl.formatMessage(assetsMessage.assets, {
             number: list.length,
           })}
@@ -273,7 +290,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
     <ListItemLayout
       firstColumn={
         <Box display="flex" alignItems="center">
-          <Box sx={{ mr: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{avatar}</Box>
+          <Box sx={{ mr: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {avatar}
+          </Box>
           <Typography
             as={isTotalAmount !== false ? 'span' : Link}
             variant="body1"
@@ -285,7 +304,7 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
               width: '70%',
             }}
             color="primary.600"
-            to={id === '-' ? '#' : ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
+            to={id === '-' ? '#' :  ROUTES.ASSETS.DETAILS.replace(':tokenId', id)}
           >
             {name}
           </Typography>
@@ -294,7 +313,9 @@ function TokenItemRow({ avatar, name, id, amount, isTotalAmount }: TokenItemRowP
       secondColumn={
         <Typography component="div" variant="body1" color="grayscale.900">
           <Box sx={{ '> button': { px: '5px', py: '3px', borderRadius: '8px', ml: '-5px' } }}>
-            <CopyToClipboardLabel text={id}>{below1200px ? truncateAddressShort(id) : id}</CopyToClipboardLabel>
+            <CopyToClipboardLabel text={id}>
+              {below1200px ? truncateAddressShort(id) : id}
+            </CopyToClipboardLabel>
           </Box>
         </Typography>
       }

@@ -19,40 +19,43 @@ type Props = {|
 
 @observer
 export default class MnemonicInput extends Component<Props> {
-  static contextType: any = IntlContext;
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        recoveryPhrase: {
-          label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
-          placeholder: '',
-          value: [],
-          validators: [
-            ({ field }) => {
-              const value = join(field.value, ' ');
-              if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
-              if (this.props.mnemonicLength != null) {
-                const wordsLeft = this.props.mnemonicLength - field.value.length;
-                if (wordsLeft > 0) {
-                  return [false, this.context.formatMessage(globalMessages.shortRecoveryPhrase, { number: wordsLeft })];
-                }
-              }
-              return [this.props.mnemonicValidator(value), this.context.formatMessage(globalMessages.invalidRecoveryPhrase)];
-            },
-          ],
-        },
+
+  static contextType:any = IntlContext;
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
+    fields: {
+      recoveryPhrase: {
+        label: this.context.formatMessage(globalMessages.recoveryPhraseInputLabel),
+        placeholder: '',
+        value: [],
+        validators: [({ field }) => {
+          const value = join(field.value, ' ');
+          if (value === '') return [false, this.context.formatMessage(globalMessages.fieldIsRequired)];
+          if (this.props.mnemonicLength != null) {
+            const wordsLeft = this.props.mnemonicLength - field.value.length;
+            if (wordsLeft > 0) {
+              return [
+                false,
+                this.context.formatMessage(globalMessages.shortRecoveryPhrase,
+                  { number: wordsLeft })
+              ];
+            }
+          }
+          return [
+            this.props.mnemonicValidator(value),
+            this.context.formatMessage(globalMessages.invalidRecoveryPhrase)
+          ];
+        }],
       },
     },
-    {
-      options: {
-        validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-      },
-      plugins: {
-        vjf: vjf(),
-      },
-    }
-  );
+  }, {
+    options: {
+      validateOnChange: true,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
+    },
+  });
 
   componentDidMount(): void {
     this.props.setForm(this.form);
@@ -61,7 +64,10 @@ export default class MnemonicInput extends Component<Props> {
   render(): Node {
     const intl = this.context;
     const { form } = this;
-    const { validWords, mnemonicLength } = this.props;
+    const {
+      validWords,
+      mnemonicLength,
+    } = this.props;
 
     const recoveryPhraseField = form.$('recoveryPhrase');
 
@@ -81,8 +87,8 @@ export default class MnemonicInput extends Component<Props> {
             ':hover': {
               bgcolor: 'ds.primary_200',
               color: 'ds.text_primary_max',
-            },
-          },
+            }
+          }
         }}
       />
     );

@@ -14,13 +14,11 @@ export const messages: * = defineMessages({
   },
   subtitle: {
     id: 'wallet.insufficientFunds.subtitle',
-    defaultMessage:
-      '!!!Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount.',
+    defaultMessage: '!!!Participating requires at least {requiredBalance} {tokenName}, but you only have {currentBalance}. Unwithdrawn rewards are not included in this amount.'
   },
   subtitleHidden: {
     id: 'wallet.insufficientFunds.subtitleHidden',
-    defaultMessage:
-      '!!!Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.',
+    defaultMessage: '!!!Participating requires at least {requiredBalance} {tokenName}, unfortunately funds in your wallet are insufficient. Unwithdrawn rewards are not included in this amount.'
   },
 });
 
@@ -28,23 +26,26 @@ type Props = {|
   currentBalance: BigNumber,
   requiredBalance: BigNumber,
   tokenName: string,
-  shouldHideBalance: boolean,
+  shouldHideBalance: boolean
 |};
 
 @observer
 export default class InsufficientFundsPage extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
 
     return (
       <FullscreenMessage
         title={intl.formatMessage(messages.title)}
-        subtitle={intl.formatMessage(this.props.shouldHideBalance ? messages.subtitleHidden : messages.subtitle, {
-          currentBalance: this.props.currentBalance.toString(),
-          requiredBalance: this.props.requiredBalance.toString(),
-          tokenName: this.props.tokenName,
-        })}
+        subtitle={intl.formatMessage(
+          this.props.shouldHideBalance ? messages.subtitleHidden : messages.subtitle,
+          {
+            currentBalance: this.props.currentBalance.toString(),
+            requiredBalance: this.props.requiredBalance.toString(),
+            tokenName: this.props.tokenName,
+          }
+        )}
         image={<InsufficientFundsSvg />}
       />
     );

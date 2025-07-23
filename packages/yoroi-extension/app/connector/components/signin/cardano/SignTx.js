@@ -1,7 +1,7 @@
 // @flow
 import type { Node, ComponentType } from 'react';
 import type { ConnectorIntl, Cip95Info } from '../../../types';
-import type { SummaryAssetsData, AssetInfo } from '../CardanoSignTxPage';
+import type { SummaryAssetsData, AssetInfo, } from '../CardanoSignTxPage';
 import BigNumber from 'bignumber.js';
 import { defineMessages, injectIntl } from 'react-intl';
 import { Typography } from '@mui/material';
@@ -26,12 +26,17 @@ type AssetDisplayValueProps = {|
   renderExplorerHashLink: Function,
 |};
 
-export const getAssetDisplayValue = ({ amount, tokenInfo, renderExplorerHashLink }: AssetDisplayValueProps): Node => {
+
+export const getAssetDisplayValue = ({
+  amount,
+  tokenInfo,
+  renderExplorerHashLink,
+}: AssetDisplayValueProps): Node => {
   let amountDisplay;
   if (amount.eq('1') && tokenInfo.IsNFT) {
     amountDisplay = null;
   } else {
-    amountDisplay = <span>{amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).toString() + ' '}</span>;
+    amountDisplay = (<span>{amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals).toString() + ' '}</span>);
   }
   return (
     <>
@@ -39,7 +44,7 @@ export const getAssetDisplayValue = ({ amount, tokenInfo, renderExplorerHashLink
       {renderExplorerHashLink(tokenInfo)}
     </>
   );
-};
+}
 
 type Props = {|
   txAssetsData: SummaryAssetsData,
@@ -189,7 +194,7 @@ const Panel = ({ children }): Node => (
 const RenderCip95Info = ({ cip95Info }): Node => {
   function renderCoin(c) {
     try {
-      return new BigNumber(c).div(1_000_000).toString();
+      return (new BigNumber(c)).div(1_000_000).toString();
     } catch (e) {
       console.error(e);
       return String(c);

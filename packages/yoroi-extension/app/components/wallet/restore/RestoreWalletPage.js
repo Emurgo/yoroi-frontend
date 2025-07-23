@@ -58,7 +58,11 @@ type Intl = {|
 
 type Props = {|
   stores: StoresMap,
-  restoreWallet: ({| walletName: string, walletPassword: string, recoveryPhrase: string |}) => void,
+  restoreWallet: ({|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: string,
+  |}) => void,
   openDialog(dialog: any): void,
   closeDialog(): void,
   isDialogOpen(dialog: any): boolean,
@@ -66,7 +70,12 @@ type Props = {|
 
 function RestoreWalletPage(props: Props & Intl): Node {
   const { intl, stores, restoreWallet, isDialogOpen, openDialog, closeDialog } = props;
-  const { walletRestore, profile: profileData, wallets, tokenInfoStore } = stores;
+  const {
+    walletRestore,
+    profile: profileData,
+    wallets,
+    tokenInfoStore,
+  } = stores;
 
   const [currentStep, setCurrentStep] = useState(RESTORE_WALLET_STEPS.SELECT_WALLET_TYPE);
   const [selectedRestoreMode, setSelectedRestoreMode] = useState<?RestoreModeType>(null);
@@ -193,7 +202,8 @@ function RestoreWalletPage(props: Props & Intl): Node {
     },
   };
 
-  const stepperSteps = Object.keys(steps).map(key => ({ stepId: steps[key].stepId, message: steps[key].message }));
+  const stepperSteps = Object.keys(steps)
+    .map(key => ({ stepId: steps[key].stepId, message: steps[key].message }))
 
   const CurrentStep = steps[currentStep].component;
 

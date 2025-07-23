@@ -1,6 +1,6 @@
 // @flow
 import Store from '../base/Store';
-import { observable, runInAction } from 'mobx';
+import { observable, runInAction, } from 'mobx';
 import LocalStorageApi, { type PushNotificationMetadata } from '../../api/localStorage';
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken } from 'firebase/messaging';
@@ -24,18 +24,15 @@ export default class PushNotificationStore<
   @observable metadata: PushNotificationMetadata | null = null;
 
   setup(): void {
-    this.stores.loading.registerBlockingLoadingRequest(
-      (async () => {
-        const metadata = await localStorageApi.getPushNotificationMetadata();
-        runInAction(() => {
-          this.metadata = metadata;
-        });
-        if (this.metadata?.isEnabled === undefined) {
-          this._enableNotifications();
-        }
-      })(),
-      'load push notification metadata'
-    );
+    this.stores.loading.registerBlockingLoadingRequest((async () => {
+      const metadata = await localStorageApi.getPushNotificationMetadata();
+      runInAction(() => {
+        this.metadata = metadata;
+      });
+      if (this.metadata?.isEnabled === undefined) {
+        this._enableNotifications();
+      }
+    })(), 'load push notification metadata');
   }
 
   get duration(): number {
@@ -44,7 +41,7 @@ export default class PushNotificationStore<
     }
     return this.metadata.duration ?? CONFIG.notifications.defaultDuration;
   }
-  set duration(duration: number): void {
+  set duration(duration:number): void {
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');
@@ -71,6 +68,7 @@ export default class PushNotificationStore<
       this.metadata.isEnabled = !this.metadata.isEnabled;
     });
 
+
     let success;
     if (this.isEnabled) {
       success = await this._enableNotifications();
@@ -92,7 +90,7 @@ export default class PushNotificationStore<
       throw new Error('push notification metadata not loaded');
     }
     localStorageApi.savePushNotificationMetadata(this.metadata);
-  };
+  }
 
   async _enableNotifications(): Promise<boolean> {
     const app = initializeApp(CONFIG.fcm);
@@ -116,18 +114,18 @@ export default class PushNotificationStore<
   }
 
   async _disableNotifications(): Promise<boolean> {
-    const registrations = [...((await navigator.serviceWorker?.getRegistrations()) || [])];
-
+    const registrations = [...(await navigator.serviceWorker?.getRegistrations() || [])];
+    
     const registration = registrations.find(reg => reg.scope.endsWith(FIREBASE_SERVICE_WORKER_SCOPE));
 
     if (!registration) {
       throw new Error('unexpectedly missing service worker registration');
     }
-    let subscription = await registration.pushManager.getSubscription();
+    let subscription  = await registration.pushManager.getSubscription();
     if (!subscription) {
       throw new Error('unexpected missing subscription');
     }
-    return await subscription.unsubscribe();
+    return await subscription.unsubscribe()
   }
 
   get fcmToken(): ?string {

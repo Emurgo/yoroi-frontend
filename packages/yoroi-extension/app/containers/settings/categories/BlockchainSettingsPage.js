@@ -14,12 +14,13 @@ import type { StoresProps } from '../../../stores';
 
 @observer
 export default class BlockchainSettingsPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { selected } = stores.wallets;
     if (selected == null) {
       return <NoWalletMessage />;
+
     }
     const intl = this.context;
 
@@ -27,7 +28,10 @@ export default class BlockchainSettingsPage extends Component<StoresProps> {
 
     const uriSettings =
       selected.isCardanoHaskell && environment.canRegisterProtocol() ? (
-        <UriSettingsBlock registerUriScheme={() => registerProtocols()} isFirefox={environment.isFirefox()} />
+        <UriSettingsBlock
+          registerUriScheme={() => registerProtocols()}
+          isFirefox={environment.isFirefox()}
+        />
       ) : null;
 
     return (
@@ -37,7 +41,9 @@ export default class BlockchainSettingsPage extends Component<StoresProps> {
         </Typography>
         <ExplorerSettings
           onSelectExplorer={({ explorerId }) =>
-            stores.explorers.setSelectedExplorer({ explorerId, networkId: selected.networkId })
+            stores.explorers.setSelectedExplorer(
+              { explorerId, networkId: selected.networkId }
+            )
           }
           isSubmitting={isSubmittingExplorer}
           explorers={

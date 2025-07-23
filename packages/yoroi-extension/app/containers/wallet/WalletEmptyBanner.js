@@ -50,16 +50,17 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
         </Box>
         <Box>
           <Typography component="div" variant="h3" color="ds.gray_max" fontWeight={500} fontSize="18px" mb="8px">
-            {intl.formatMessage(isTestnet ? globalMessages.welcomeMessageTestnet : messages.welcomeMessage)}
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageTestnet : messages.welcomeMessage)}
           </Typography>
           <Typography component="div" variant="body1" color="ds.gray_max" mb="24px">
-            {intl.formatMessage(isTestnet ? globalMessages.welcomeMessageSubtitleTestnet : messages.welcomeMessageSubtitle)}
-            {isTestnet ? (
+            {intl.formatMessage(isTestnet? globalMessages.welcomeMessageSubtitleTestnet: messages.welcomeMessageSubtitle)}
+            {isTestnet ?
               <>
                 <br />
                 {intl.formatMessage(globalMessages.welcomeMessageSubtitleTestnetExtra)}
               </>
-            ) : null}
+              : null
+            }
           </Typography>
         </Box>
         <Stack direction="row" gap="16px">
@@ -90,7 +91,7 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
                 lineHeight: '19px',
               }}
             >
-              {intl.formatMessage(isTestnet ? globalMessages.goToFaucetButton : globalMessages.buyAda)}
+              {intl.formatMessage(isTestnet? globalMessages.goToFaucetButton: globalMessages.buyAda)}
             </Typography>
           </Button>
         </Stack>

@@ -17,8 +17,14 @@ import {
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import type { TransportIdType } from '../../types/enum';
-import { OPERATION_NAME, TRANSPORT_ID } from '../../types/enum';
-import type { setLocaleFunc, setTransportFunc } from '../../types/func';
+import {
+  OPERATION_NAME,
+  TRANSPORT_ID,
+} from '../../types/enum';
+import type {
+  setLocaleFunc,
+  setTransportFunc,
+} from '../../types/func';
 import { YOROI_LEDGER_CONNECT_TARGET_NAME } from '../../const';
 import { SUPPORTED_LOCALS } from '../../i18n/translations';
 import type {
@@ -27,7 +33,9 @@ import type {
   GetExtendedPublicKeyRequest,
   GetExtendedPublicKeysRequest,
 } from '@cardano-foundation/ledgerjs-hw-app-cardano';
-import type { ShowAddressRequestWrapper } from '../../types/cmn';
+import type {
+  ShowAddressRequestWrapper,
+} from '../../types/cmn';
 
 import styles from './TestBlock.scss';
 
@@ -40,7 +48,7 @@ type Props = {|
   setLocale: setLocaleFunc,
   setTransport: setTransportFunc,
   currentTransportId: TransportIdType,
-  currentLocale: string,
+  currentLocale: string
 |};
 
 type State = {|
@@ -51,7 +59,7 @@ type State = {|
 
 function strToPath(str: string): Array<number> {
   return str.split('/').map(s => {
-    if (s.endsWith("'")) {
+    if (s.endsWith('\'')) {
       return 0x80000000 + Number(s.slice(0, -1));
     }
     return Number(s);
@@ -70,45 +78,51 @@ export default class TestBlock extends React.Component<Props, State> {
 
   onCompClicked: () => void = () => {
     this.setState({ visible: `${styles.visible}` });
-  };
+  }
 
   onCompDoubleClicked: () => void = () => {
     this.setState({ visible: `${styles.hidden}` });
-  };
+  }
 
   setStartedQuery: () => void = () => {
     this.setState({ startedQuery: true });
-  };
+  }
 
-  onLangSelectionChange: string => void = locale => {
-    if (this.props.currentTransportId !== locale && this.state.visible === `${styles.visible}`) {
+  onLangSelectionChange: (string) => void = (locale) => {
+    if (this.props.currentTransportId !== locale &&
+      this.state.visible === `${styles.visible}`
+    ) {
       this.props.setLocale(locale);
       console.debug(`[YLC] Language Selection Changed to : ${locale}`);
     }
   };
 
-  onTransportSelectionChange: TransportIdType => void = transportId => {
-    if (this.props.currentLocale !== transportId && this.state.visible === `${styles.visible}`) {
+  onTransportSelectionChange: (TransportIdType) => void  = (transportId) => {
+    if (this.props.currentLocale !== transportId &&
+      this.state.visible === `${styles.visible}`
+    ) {
       this.props.setTransport(transportId);
       console.debug(`[YLC] Transport Selection Changed to : ${transportId}`);
     }
   };
 
   render(): Node {
-    const supportedLocals = SUPPORTED_LOCALS.map(locale => {
-      return (
-        <div key={locale}>
-          <input
-            type="radio"
-            name="language"
-            id={locale}
-            checked={this.props.currentLocale === locale}
-            onChange={this.onLangSelectionChange.bind(this, locale)}
-          />
-          <label htmlFor={locale}>{locale}</label>
-        </div>
-      );
-    });
+    const supportedLocals = (
+      SUPPORTED_LOCALS.map(locale => {
+        return (
+          <div key={locale}>
+            <input
+              type="radio"
+              name="language"
+              id={locale}
+              checked={this.props.currentLocale === locale}
+              onChange={this.onLangSelectionChange.bind(this, locale)}
+            />
+            <label htmlFor={locale}>{locale}</label>
+          </div>
+        );
+      })
+    );
 
     const transportSelection = (
       <div className={styles.transportSelection}>
@@ -125,9 +139,7 @@ export default class TestBlock extends React.Component<Props, State> {
                   checked={this.props.currentTransportId === transportId}
                   onChange={this.onTransportSelectionChange.bind(this, transportId)}
                 />
-                <label className={styles.tranportLabel} htmlFor={transportId}>
-                  {transportId}
-                </label>
+                <label className={styles.tranportLabel} htmlFor={transportId}>{transportId}</label>
               </span>
             );
           }
@@ -139,25 +151,15 @@ export default class TestBlock extends React.Component<Props, State> {
     const operationSelection = (
       <div className={styles.operationSelection}>
         <div>
-          <button type="button" onClick={this.onExtendedByronPublicKey}>
-            Extended Single Byron key
-          </button>
-          <button type="button" onClick={this.onExtendedShelleyPublicKey}>
-            Extended Single Shelley key
-          </button>
+          <button type="button" onClick={this.onExtendedByronPublicKey}>Extended Single Byron key</button>
+          <button type="button" onClick={this.onExtendedShelleyPublicKey}>Extended Single Shelley key</button>
         </div>
         <div>
-          <button type="button" onClick={this.onExtendedMultiByronPublicKey}>
-            Extended Many Byron key
-          </button>
-          <button type="button" onClick={this.onExtendedMultiShelleyPublicKey}>
-            Extended Many Shelley key
-          </button>
+          <button type="button" onClick={this.onExtendedMultiByronPublicKey}>Extended Many Byron key</button>
+          <button type="button" onClick={this.onExtendedMultiShelleyPublicKey}>Extended Many Shelley key</button>
         </div>
         <div>
-          <button type="button" onClick={this.onSignTransaction}>
-            Sign transaction
-          </button>
+          <button type="button" onClick={this.onSignTransaction}>Sign transaction</button>
           <button type="button" onClick={this.onCatalystRegistrationSignTransaction}>
             Sign CIP-15 transaction
           </button>
@@ -166,55 +168,31 @@ export default class TestBlock extends React.Component<Props, State> {
           </button>
         </div>
         <div>
-          <button type="button" onClick={this.onShowByronAddress}>
-            Verify Byron address
-          </button>
-          <button type="button" onClick={this.onShowBasePathAddress}>
-            Verify base path address
-          </button>
-          <button type="button" onClick={this.onShowBaseHexAddress}>
-            Verify base hex address
-          </button>
-          <button type="button" onClick={this.onShowPointerAddress}>
-            Verify pointer address
-          </button>
-          <button type="button" onClick={this.onShowEnterpriseAddress}>
-            Verify enterprise address
-          </button>
-          <button type="button" onClick={this.onShowRewardAddress}>
-            Verify reward address
-          </button>
+          <button type="button" onClick={this.onShowByronAddress}>Verify Byron address</button>
+          <button type="button" onClick={this.onShowBasePathAddress}>Verify base path address</button>
+          <button type="button" onClick={this.onShowBaseHexAddress}>Verify base hex address</button>
+          <button type="button" onClick={this.onShowPointerAddress}>Verify pointer address</button>
+          <button type="button" onClick={this.onShowEnterpriseAddress}>Verify enterprise address</button>
+          <button type="button" onClick={this.onShowRewardAddress}>Verify reward address</button>
         </div>
         <div>
-          <button type="button" onClick={this.onDeriveByronAddress}>
-            Derive Byron address
-          </button>
-          <button type="button" onClick={this.onDeriveBasePathAddress}>
-            Derive base path address
-          </button>
-          <button type="button" onClick={this.onDeriveBaseHexAddress}>
-            Derive base hex address
-          </button>
-          <button type="button" onClick={this.onDerivePointerAddress}>
-            Derive pointer address
-          </button>
-          <button type="button" onClick={this.onDeriveEnterpriseAddress}>
-            Derive enterprise address
-          </button>
-          <button type="button" onClick={this.onDeriveRewardAddress}>
-            Derive reward address
-          </button>
+          <button type="button" onClick={this.onDeriveByronAddress}>Derive Byron address</button>
+          <button type="button" onClick={this.onDeriveBasePathAddress}>Derive base path address</button>
+          <button type="button" onClick={this.onDeriveBaseHexAddress}>Derive base hex address</button>
+          <button type="button" onClick={this.onDerivePointerAddress}>Derive pointer address</button>
+          <button type="button" onClick={this.onDeriveEnterpriseAddress}>Derive enterprise address</button>
+          <button type="button" onClick={this.onDeriveRewardAddress}>Derive reward address</button>
         </div>
-        <button type="button" onClick={this.onLogVersion}>
-          Device version
-        </button>
-        <button type="button" onClick={this.onLogSerial}>
-          Serial number
-        </button>
+        <button type="button" onClick={this.onLogVersion}>Device version</button>
+        <button type="button" onClick={this.onLogSerial}>Serial number</button>
       </div>
     );
 
-    const visibilityInfo = <div className={styles.visibilityInfo}>*Double click=invisible | single click=visible again</div>;
+    const visibilityInfo = (
+      <div className={styles.visibilityInfo}>
+        *Double click=invisible | single click=visible again
+      </div>
+    );
 
     return (
       <div
@@ -222,7 +200,9 @@ export default class TestBlock extends React.Component<Props, State> {
         onClick={this.onCompClicked}
         onDoubleClick={this.onCompDoubleClicked}
       >
-        <div className={styles.column1}>{supportedLocals}</div>
+        <div className={styles.column1}>
+          {supportedLocals}
+        </div>
         {this.state.startedQuery === false && (
           <div className={styles.column2}>
             {transportSelection}
@@ -239,22 +219,28 @@ export default class TestBlock extends React.Component<Props, State> {
    */
   onLogVersion: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
-      const req = this.makeRequest(OPERATION_NAME.GET_LEDGER_VERSION, null);
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_LEDGER_VERSION,
+        null
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onLogVersion`);
-  };
+  }
 
   /**
    * Test getSerial
    */
   onLogSerial: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
-      const req = this.makeRequest(OPERATION_NAME.GET_SERIAL, null);
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_SERIAL,
+        null
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onLogSerial`);
-  };
+  }
 
   /**
    * Test getExtendedPublicKey
@@ -263,42 +249,60 @@ export default class TestBlock extends React.Component<Props, State> {
     if (this.state.visible === `${styles.visible}`) {
       const path = strToPath("44'/1815'/0'");
 
-      const req = this.makeRequest(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY, ({ path }: GetExtendedPublicKeyRequest));
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY,
+        ({ path }: GetExtendedPublicKeyRequest)
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onExtendedByronPublicKey`);
-  };
+  }
   onExtendedShelleyPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const path = strToPath("1852'/1815'/0'");
 
-      const req = this.makeRequest(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY, ({ path }: GetExtendedPublicKeyRequest));
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_EXTENDED_PUBLIC_KEY,
+        ({ path }: GetExtendedPublicKeyRequest)
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onExtendedByronPublicKey`);
-  };
+  }
 
   /**
    * Test getExtendedPublicKey
    */
   onExtendedMultiByronPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
-      const paths = [strToPath("44'/1815'/0'"), strToPath("44'/1815'/1'")];
+      const paths = [
+        strToPath("44'/1815'/0'"),
+        strToPath("44'/1815'/1'"),
+      ];
 
-      const req = this.makeRequest(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS, ({ paths }: GetExtendedPublicKeysRequest));
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS,
+        ({ paths }: GetExtendedPublicKeysRequest)
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onExtendedMultiByronPublicKey`);
-  };
+  }
   onExtendedMultiShelleyPublicKey: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
-      const paths = [strToPath("1852'/1815'/0'"), strToPath("1852'/1815'/1'")];
+      const paths = [
+        strToPath("1852'/1815'/0'"),
+        strToPath("1852'/1815'/1'"),
+      ];
 
-      const req = this.makeRequest(OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS, ({ paths }: GetExtendedPublicKeysRequest));
+      const req = this.makeRequest(
+        OPERATION_NAME.GET_EXTENDED_PUBLIC_KEYS,
+        ({ paths }: GetExtendedPublicKeysRequest)
+      );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onExtendedMultiShelleyPublicKey`);
-  };
+  }
 
   /**
    * Test signTransaction
@@ -309,8 +313,8 @@ export default class TestBlock extends React.Component<Props, State> {
         {
           txHashHex: 'e3a768c5b3109fa3268d875316063809a298602a272d7933c2b4443b69058d7a',
           outputIndex: 0,
-          path: strToPath("1852'/1815'/0'/0/0"),
-        },
+          path: strToPath("1852'/1815'/0'/0/0")
+        }
       ];
 
       const outputs = [
@@ -349,7 +353,7 @@ export default class TestBlock extends React.Component<Props, State> {
             },
           },
           amount: '100000',
-        },
+        }
       ];
 
       const req = this.makeRequest(
@@ -365,51 +369,47 @@ export default class TestBlock extends React.Component<Props, State> {
             outputs,
             fee: '500',
             ttl: '20',
-            certificates: [
-              {
-                type: CertificateType.STAKE_REGISTRATION,
-                params: {
-                  stakeCredential: {
-                    type: CredentialParamsType.KEY_PATH,
-                    keyPath: strToPath("1852'/1815'/0'/2/0"),
-                  },
-                },
-              },
-              {
-                type: CertificateType.STAKE_DELEGATION,
-                params: {
-                  stakeCredential: {
-                    type: CredentialParamsType.KEY_PATH,
-                    keyPath: strToPath("1852'/1815'/0'/2/0"),
-                  },
-                  poolKeyHashHex: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
-                },
-              },
-              {
-                type: CertificateType.STAKE_DEREGISTRATION,
-                params: {
-                  stakeCredential: {
-                    type: CredentialParamsType.KEY_PATH,
-                    keyPath: strToPath("1852'/1815'/0'/2/0"),
-                  },
-                },
-              },
-            ],
-            withdrawals: [
-              {
+            certificates: [{
+              type: CertificateType.STAKE_REGISTRATION,
+              params: {
                 stakeCredential: {
                   type: CredentialParamsType.KEY_PATH,
                   keyPath: strToPath("1852'/1815'/0'/2/0"),
                 },
-                amount: '1000000',
+              }
+            },
+            {
+              type: CertificateType.STAKE_DELEGATION,
+              params: {
+                stakeCredential: {
+                  type: CredentialParamsType.KEY_PATH,
+                  keyPath: strToPath("1852'/1815'/0'/2/0"),
+                },
+                poolKeyHashHex: 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207',
+              }
+            },
+            {
+              type: CertificateType.STAKE_DEREGISTRATION,
+              params: {
+                stakeCredential: {
+                  type: CredentialParamsType.KEY_PATH,
+                  keyPath: strToPath("1852'/1815'/0'/2/0"),
+                },
               },
-            ],
+            }],
+            withdrawals: [{
+              stakeCredential: {
+                type: CredentialParamsType.KEY_PATH,
+                keyPath: strToPath("1852'/1815'/0'/2/0"),
+              },
+              amount: '1000000',
+            }],
             auxiliaryData: {
               type: TxAuxiliaryDataType.ARBITRARY_HASH,
               params: {
                 hashHex: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
-              },
-            },
+              }
+            }
           },
           additionalWitnessPaths: [],
         }: SignTransactionRequest)
@@ -417,7 +417,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onSignTransaction`);
-  };
+  }
 
   onSignMultiAssetTransaction: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
@@ -425,8 +425,8 @@ export default class TestBlock extends React.Component<Props, State> {
         {
           txHashHex: 'e3a768c5b3109fa3268d875316063809a298602a272d7933c2b4443b69058d7a',
           outputIndex: 0,
-          path: strToPath("1852'/1815'/0'/0/0"),
-        },
+          path: strToPath("1852'/1815'/0'/0/0")
+        }
       ];
 
       const outputs = [
@@ -445,28 +445,28 @@ export default class TestBlock extends React.Component<Props, State> {
               tokens: [
                 {
                   amount: '1',
-                  assetNameHex: '74426967546f6b656e4e616d653132',
-                },
-              ],
+                  assetNameHex: '74426967546f6b656e4e616d653132'
+                }
+              ]
             },
             {
               policyIdHex: '2c9d0ecfc2ee1288056df15be4196d8ded73db345ea5b4cd5c7fac3f',
               tokens: [
                 {
                   amount: '1',
-                  assetNameHex: '76737562737465737435',
-                },
-              ],
+                  assetNameHex: '76737562737465737435'
+                }
+              ]
             },
             {
               policyIdHex: '6b8d07d69639e9413dd637a1a815a7323c69c86abbafb66dbfdb1aa7',
               tokens: [
                 {
                   amount: '2',
-                  assetNameHex: '',
-                },
-              ],
-            },
+                  assetNameHex: ''
+                }
+              ]
+            }
           ],
         },
         {
@@ -504,7 +504,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onSignMultiAssetTransaction`);
-  };
+  }
 
   onCatalystRegistrationSignTransaction: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
@@ -512,8 +512,8 @@ export default class TestBlock extends React.Component<Props, State> {
         {
           txHashHex: 'e3a768c5b3109fa3268d875316063809a298602a272d7933c2b4443b69058d7a',
           outputIndex: 0,
-          path: strToPath("1852'/1815'/0'/0/0"),
-        },
+          path: strToPath("1852'/1815'/0'/0/0")
+        }
       ];
 
       const outputs = [
@@ -552,7 +552,7 @@ export default class TestBlock extends React.Component<Props, State> {
             },
           },
           amount: '100000',
-        },
+        }
       ];
 
       const req = this.makeRequest(
@@ -584,8 +584,8 @@ export default class TestBlock extends React.Component<Props, State> {
                   },
                 },
                 nonce: 0,
-              },
-            },
+              }
+            }
           },
           additionalWitnessPaths: [],
         }: SignTransactionRequest)
@@ -593,7 +593,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onSignCatalystRegistrationTransaction`);
-  };
+  }
 
   /**
    * Test showAddress = Verify Address
@@ -620,7 +620,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onShowAddress`);
-  };
+  }
   onShowBasePathAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -643,7 +643,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onShowBaseHexAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -666,7 +666,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onShowPointerAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -681,7 +681,7 @@ export default class TestBlock extends React.Component<Props, State> {
                 blockIndex: 0,
                 txIndex: 1,
                 certificateIndex: 2,
-              },
+              }
             },
           },
           network: {
@@ -693,7 +693,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onShowEnterpriseAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -715,7 +715,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onShowRewardAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -731,13 +731,13 @@ export default class TestBlock extends React.Component<Props, State> {
             params: {
               stakingPath: strToPath("1852'/1815'/0'/2/0"),
             },
-          },
+          }
         }: ShowAddressRequestWrapper)
       );
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
 
   /**
    * Test deriveAddress
@@ -762,7 +762,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onDeriveBasePathAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -784,7 +784,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onDeriveBaseHexAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -806,7 +806,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onDerivePointerAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -820,7 +820,7 @@ export default class TestBlock extends React.Component<Props, State> {
                 blockIndex: 0,
                 txIndex: 1,
                 certificateIndex: 2,
-              },
+              }
             },
           },
           network: {
@@ -832,7 +832,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onDeriveEnterpriseAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -853,7 +853,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
   onDeriveRewardAddress: () => void = () => {
     if (this.state.visible === `${styles.visible}`) {
       const req = this.makeRequest(
@@ -874,7 +874,7 @@ export default class TestBlock extends React.Component<Props, State> {
       window.postMessage(req);
     }
     console.debug(`[YLC] TEST:onDeriveAddress`);
-  };
+  }
 
   /**
    * Makes Request object
@@ -886,5 +886,5 @@ export default class TestBlock extends React.Component<Props, State> {
       params,
       target: YOROI_LEDGER_CONNECT_TARGET_NAME,
     };
-  };
+  }
 }

@@ -1,7 +1,9 @@
 // @flow
 
 import type { TokenInfoMap } from '../toplevel/TokenInfoStore';
-import type { TokenLookupKey, TokenEntry } from '../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey, TokenEntry,
+} from '../../api/common/lib/MultiToken';
 import type { TokenRow, TokenMetadata } from '../../api/ada/lib/storage/database/primitives/tables';
 import AssetFingerprint from '@emurgo/cip14-js';
 import { AssetNameUtils } from '@emurgo/yoroi-lib/dist/internals/utils/assets';
@@ -15,8 +17,8 @@ export function getTokenName(
     IsDefault: boolean,
     IsNFT?: boolean,
     Metadata: TokenMetadata,
-    ...
-  }>
+    ...,
+  }>,
 ): string {
   const strictName = getTokenStrictName(tokenRow).name;
   if (strictName != null) return strictName;
@@ -29,15 +31,16 @@ function resolveNameProperties(name: ?string): {| name: string, cip67Tag: ?strin
   if (name == null || name.length === 0 || !isHex(name)) {
     return { name: '', cip67Tag: null };
   }
-  const { asciiName, hexName, cip67Tag } = AssetNameUtils.resolveProperties(name);
+  const { asciiName, hexName, cip67Tag } =
+    AssetNameUtils.resolveProperties(name);
   return {
     name: asciiName ?? hexName,
     cip67Tag: cip67Tag?.toString(10),
-  };
+  }
 }
 
 export function assetNameFromIdentifier(identifier: string): string {
-  const [, name] = identifier.split('.');
+  const [, name ] = identifier.split('.');
   return resolveNameProperties(name).name;
 }
 
@@ -45,8 +48,8 @@ export function getTokenStrictName(
   tokenRow: $ReadOnly<{
     Identifier: string,
     Metadata: TokenMetadata,
-    ...
-  }>
+    ...,
+  }>,
 ): {| name: ?string, cip67Tag: ?string |} {
   if (tokenRow.Metadata.ticker != null) {
     return { name: tokenRow.Metadata.ticker, cip67Tag: null };
@@ -68,13 +71,14 @@ export function getTokenIdentifierIfExists(
     IsDefault: boolean,
     IsNFT?: boolean,
     Metadata: TokenMetadata,
-    ...
+    ...,
   }>
 ): void | string {
   if (tokenRow.IsDefault) return undefined;
   if (tokenRow.Metadata.type === 'Cardano') {
     const { policyId, assetName } = tokenRow.Metadata;
-    const assetFingerprint = AssetFingerprint.fromParts(hexToBytes(policyId), hexToBytes(assetName));
+    const assetFingerprint = AssetFingerprint
+      .fromParts(hexToBytes(policyId), hexToBytes(assetName));
     return assetFingerprint.fingerprint();
   }
 
@@ -92,7 +96,9 @@ export function createTokenRowSummary(tokenRow: $ReadOnly<TokenRow>): RemoteToke
   };
 }
 
-export function genLookupOrFail(map: TokenInfoMap): ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> {
+export function genLookupOrFail(
+  map: TokenInfoMap,
+): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>) {
   return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> => {
     const tokenRow = map.get(lookup.networkId.toString())?.get(lookup.identifier);
     if (tokenRow == null) throw new Error(`${nameof(genLookupOrFail)} no token info for ${JSON.stringify(lookup)}`);
@@ -100,7 +106,9 @@ export function genLookupOrFail(map: TokenInfoMap): ($ReadOnly<Inexact<TokenLook
   };
 }
 
-export function genLookupOrNull(map: TokenInfoMap): ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> | null {
+export function genLookupOrNull(
+  map: TokenInfoMap,
+): ($ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow> | null) {
   return (lookup: $ReadOnly<Inexact<TokenLookupKey>>): $ReadOnly<TokenRow> | null => {
     const tokenRow = map.get(lookup.networkId.toString())?.get(lookup.identifier);
     if (tokenRow == null) return null;
@@ -108,9 +116,9 @@ export function genLookupOrNull(map: TokenInfoMap): ($ReadOnly<Inexact<TokenLook
   };
 }
 export function genFormatTokenAmount(
-  getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>
-): TokenEntry => string {
-  return tokenEntry => {
+  getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>
+): (TokenEntry => string) {
+  return (tokenEntry) => {
     const tokenInfo = getTokenInfo(tokenEntry);
 
     return tokenEntry.amount

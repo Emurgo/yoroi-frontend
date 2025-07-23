@@ -3,8 +3,8 @@
     overflow: hidden;
     display: inline-block;
     vertical-align: bottom;
-    animation: ellipsis steps(4, end) #{$duration}ms infinite;
-    content: '\2026'; /* ascii code for the ellipsis character */
+    animation: ellipsis steps(4,end) #{$duration}ms infinite;
+    content: "\2026"; /* ascii code for the ellipsis character */
     width: 0;
     margin-right: 0;
     text-align: left;

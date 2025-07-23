@@ -26,7 +26,7 @@ const messages = defineMessages({
 });
 
 export default class PagePreparation extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     return (
       <Box

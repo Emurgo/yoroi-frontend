@@ -273,7 +273,7 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
-  const handleSubmitTransaction = async password => {
+  const handleSubmitTransaction = async (password) => {
     if (signRequest == null) return;
     validateSignRequestAndUserPassword(password);
 

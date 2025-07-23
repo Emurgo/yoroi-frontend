@@ -25,7 +25,7 @@ export default class Settings extends Component<AllProps> {
     children: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   isActivePage: string => boolean = route => {
     const { currentRoute } = this.props.stores.routing;
     if (route && currentRoute) {
@@ -39,16 +39,25 @@ export default class Settings extends Component<AllProps> {
     const { children } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
 
-    const menu = <SettingsMenu onItemClick={route => stores.routing.goToRoute({ route })} isActiveItem={this.isActivePage} />;
+    const menu = (
+      <SettingsMenu
+        onItemClick={route => stores.routing.goToRoute({ route })}
+        isActiveItem={this.isActivePage}
+      />
+    );
 
     return (
       <TopBarLayout
-        banner={<BannerContainer stores={stores} />}
+        banner={<BannerContainer stores={stores}/>}
         sidebar={sidebarContainer}
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={this.context.formatMessage(globalMessages.sidebarSettings)} />}
+            title={
+              <NavBarTitle
+                title={this.context.formatMessage(globalMessages.sidebarSettings)}
+              />
+            }
             menu={menu}
           />
         }

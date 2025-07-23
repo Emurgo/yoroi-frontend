@@ -11,6 +11,7 @@ import type { StoresProps } from '../stores';
 
 @observer
 export default class LoadingPage extends Component<ConnectorStoresProps | StoresProps> {
+
   render(): Node {
     return (
       <CenteredLayout>

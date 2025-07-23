@@ -18,24 +18,23 @@ type Props = {|
 @observer
 // <TODO:PENDING_REMOVAL> paper
 export default class PaperPasswordInput extends Component<Props> {
-  static defaultProps: {| initValues: void |} = {
+
+  static defaultProps: {|initValues: void|} = {
     initValues: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
-    return (
-      <PasswordInput
-        setForm={this.props.setForm}
-        disabled={false}
-        passwordMatches={this.props.passwordMatches}
-        fieldName="paperPassword"
-        validCheck={password => !this.props.includeLengthCheck || isValidPaperPassword(password)}
-        placeholder={this.context.formatMessage(globalMessages.paperPasswordLabel)}
-        allowEmptyInput={false}
-        initValues={this.props.initValues}
-        disclaimer={this.context.formatMessage(globalMessages.passwordDisclaimer)}
-      />
-    );
+    return (<PasswordInput
+      setForm={this.props.setForm}
+      disabled={false}
+      passwordMatches={this.props.passwordMatches}
+      fieldName="paperPassword"
+      validCheck={password => !this.props.includeLengthCheck || isValidPaperPassword(password)}
+      placeholder={this.context.formatMessage(globalMessages.paperPasswordLabel)}
+      allowEmptyInput={false}
+      initValues={this.props.initValues}
+      disclaimer={this.context.formatMessage(globalMessages.passwordDisclaimer)}
+    />);
   }
 }

@@ -43,10 +43,7 @@ import type {
   FilterUsedRequest,
   FilterUsedResponse,
   FilterFunc,
-  GetSwapFeeTiersFunc,
-  GetTransactionSlotsByHashesResponse,
-  GetTransactionSlotsByHashesFunc,
-  SignedBatchRequest,
+  GetSwapFeeTiersFunc, GetTransactionSlotsByHashesResponse, GetTransactionSlotsByHashesFunc, SignedBatchRequest,
 } from './types';
 import LocalizableError from '../../../../i18n/LocalizableError';
 
@@ -62,7 +59,10 @@ import {
   GetPoolInfoApiError,
   GetTokenInfoApiError,
 } from '../../../common/errors';
-import { Logger, stringifyError } from '../../../../utils/logging';
+import {
+  Logger,
+  stringifyError
+} from '../../../../utils/logging';
 
 import type { ConfigType } from '../../../../../config/config-types';
 import config from '../../../../config';
@@ -78,111 +78,154 @@ const RECENT_TRANSACTION_HASH_PAGE_SIZE = 100;
  * https://github.com/Emurgo/yoroi-graphql-migration-backend
  */
 export class BatchedFetcher implements IFetcher {
+
   baseFetcher: IFetcher;
 
   constructor(baseFetcher: IFetcher) {
     this.baseFetcher = baseFetcher;
   }
 
-  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = body =>
-    batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body);
+  getUTXOsForAddresses: AddressUtxoRequest => Promise<AddressUtxoResponse> = (body) => (
+    batchUTXOsForAddresses(this.baseFetcher.getUTXOsForAddresses)(body)
+  )
 
-  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = body =>
-    batchGetTransactionsHistoryForAddresses(this.baseFetcher.getTransactionsHistoryForAddresses)(body);
+  getTransactionsHistoryForAddresses: HistoryRequest => Promise<HistoryResponse> = (body) => (
+    batchGetTransactionsHistoryForAddresses(
+      this.baseFetcher.getTransactionsHistoryForAddresses
+    )(body)
+  )
 
-  getRecentTransactionHashes: GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse> = body =>
-    batchGetRecentTransactionHashes(this.baseFetcher.getRecentTransactionHashes)(body);
-
-  getTransactionsByHashes: GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse> = body =>
-    batchGetTransactionsByHashes(this.baseFetcher.getTransactionsByHashes)(body);
-
-  getTransactionSlotsByHashes: GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse> = body =>
-    batchGetTransactionSlotsByHashes(this.baseFetcher.getTransactionSlotsByHashes)(body);
-
-  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = body =>
-    batchGetRewardHistory(this.baseFetcher.getRewardHistory)(body);
-
-  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = body =>
-    // We don't batch transaction sending (it's just a single request)
-    this.baseFetcher.getBestBlock(body);
-
-  sendTx: (SignedRequest | SignedBatchRequest) => Promise<SignedResponse> = body =>
-    // We don't batch transaction sending (it's just a single request)
-    this.baseFetcher.sendTx(body);
-
-  getMultiAssetMintMetadata: MultiAssetRequest => Promise<MultiAssetMintMetadataResponse> = async body => {
-    const { network, assets } = body;
-    const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
-    const responses = await Promise.all(
-      assetChunks.map(batch => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: batch }))
+  getRecentTransactionHashes
+  : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>
+    = (body) => (
+      batchGetRecentTransactionHashes(
+        this.baseFetcher.getRecentTransactionHashes
+      )(body)
     );
-    const result = {};
-    for (const response of responses) {
-      for (const [key, value] of Object.entries(response)) {
-        result[key] = value;
-      }
-    }
-    return result;
-  };
 
-  getMultiAssetSupply: MultiAssetRequest => Promise<MultiAssetSupplyResponse> = async body => {
-    const { network, assets } = body;
-    const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
-    const responses = await Promise.all(
-      assetChunks.map(batch => this.baseFetcher.getMultiAssetSupply({ network, assets: batch }))
+  getTransactionsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>
+    = (body) => (
+      batchGetTransactionsByHashes(
+        this.baseFetcher.getTransactionsByHashes
+      )(body)
     );
-    const result = {};
-    for (const response of responses) {
-      for (const [key, value] of Object.entries(response)) {
-        result[key] = value;
+
+  getTransactionSlotsByHashes
+  : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>
+    = (body) => (
+      batchGetTransactionSlotsByHashes(
+        this.baseFetcher.getTransactionSlotsByHashes
+      )(body)
+    );
+
+  getRewardHistory: RewardHistoryRequest => Promise<RewardHistoryResponse> = (body) => (
+    batchGetRewardHistory(
+      this.baseFetcher.getRewardHistory
+    )(body)
+  )
+
+  getBestBlock: BestBlockRequest => Promise<BestBlockResponse> = (body) => (
+    // We don't batch transaction sending (it's just a single request)
+    this.baseFetcher.getBestBlock(body)
+  )
+
+  sendTx: (SignedRequest | SignedBatchRequest) => Promise<SignedResponse> = (body) => (
+    // We don't batch transaction sending (it's just a single request)
+    this.baseFetcher.sendTx(body)
+  )
+
+  getMultiAssetMintMetadata
+  : MultiAssetRequest => Promise<MultiAssetMintMetadataResponse>
+    = async (body) => {
+      const { network, assets } = body;
+      const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
+      const responses = await Promise.all(assetChunks.map(
+        batch => this.baseFetcher.getMultiAssetMintMetadata({ network, assets: batch })
+      ));
+      const result = {};
+      for (const response of responses) {
+        for (const [key, value] of Object.entries(response)) {
+          result[key] = value;
+        }
       }
+      return result;
     }
-    return result;
-  };
 
-  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = body =>
-    batchGetAccountState(this.baseFetcher.getAccountState)(body);
+  getMultiAssetSupply
+  : MultiAssetRequest => Promise<MultiAssetSupplyResponse>
+    = async (body) => {
+      const { network, assets } = body;
+      const assetChunks = chunk(assets, MINT_METADATA_REQUEST_PAGE_SIZE);
+      const responses = await Promise.all(assetChunks.map(
+        batch => this.baseFetcher.getMultiAssetSupply({ network, assets: batch })
+      ));
+      const result = {};
+      for (const response of responses) {
+        for (const [key, value] of Object.entries(response)) {
+          result[key] = value;
+        }
+      }
+      return result;
+    }
 
-  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = body =>
-    batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body);
+  getAccountState: AccountStateRequest => Promise<AccountStateResponse> = (body) => (
+    batchGetAccountState(this.baseFetcher.getAccountState)(body)
+  )
 
-  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = body => batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body);
+  checkAddressesInUse: FilterUsedRequest => Promise<FilterUsedResponse> = (body) => (
+    batchCheckAddressesInUse(this.baseFetcher.checkAddressesInUse)(body)
+  )
 
-  getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = body => batchGetTokenInfo(this.baseFetcher.getTokenInfo)(body);
+  getPoolInfo: PoolInfoRequest => Promise<PoolInfoResponse> = (body) => (
+    batchGetPoolInfo(this.baseFetcher.getPoolInfo)(body)
+  )
 
-  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = body =>
-    batchGetCatalystRoundInfo(this.baseFetcher.getCatalystRoundInfo)(body);
+  getTokenInfo: TokenInfoRequest => Promise<TokenInfoResponse> = (body) => (
+    batchGetTokenInfo(this.baseFetcher.getTokenInfo)(body)
+  )
 
-  getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = body => batchGetUtxoData(this.baseFetcher.getUtxoData)(body);
+  getCatalystRoundInfo: CatalystRoundInfoRequest => Promise<CatalystRoundInfoResponse> = (body) => (
+    batchGetCatalystRoundInfo(this.baseFetcher.getCatalystRoundInfo)(body)
+  )
 
-  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async body =>
+  getUtxoData: GetUtxoDataRequest => Promise<GetUtxoDataResponse> = (body) => (
+    batchGetUtxoData(this.baseFetcher.getUtxoData)(body)
+  )
+
+  getLatestBlockBySlot: GetLatestBlockBySlotFunc = async (body) => (
     // Todo: Implement batching as the max slots per request is 50
-    this.baseFetcher.getLatestBlockBySlot(body);
+    this.baseFetcher.getLatestBlockBySlot(body)
+  )
 
-  getSwapFeeTiers: GetSwapFeeTiersFunc = async body =>
+  getSwapFeeTiers: GetSwapFeeTiersFunc = async (body) => (
     // No batching for fee tiers
-    this.baseFetcher.getSwapFeeTiers(body);
+    this.baseFetcher.getSwapFeeTiers(body)
+  )
 }
 
 /** Sum up the UTXO for a list of addresses by batching backend requests */
-function batchUTXOsForAddresses(getUTXOsForAddresses: AddressUtxoFunc): AddressUtxoFunc {
+function batchUTXOsForAddresses(
+  getUTXOsForAddresses: AddressUtxoFunc,
+): AddressUtxoFunc {
   return async function (body: AddressUtxoRequest): Promise<AddressUtxoResponse> {
     try {
       // split up all addresses into chunks of equal size
-      const groupsOfAddresses: Array<Array<string>> = chunk(body.addresses, CONFIG.app.addressRequestSize);
+      const groupsOfAddresses: Array<Array<string>>
+        = chunk(body.addresses, CONFIG.app.addressRequestSize);
 
       // convert chunks into list of Promises that call the backend-service
-      const promises = groupsOfAddresses.map(groupOfAddresses =>
-        getUTXOsForAddresses({
+      const promises = groupsOfAddresses
+        .map(groupOfAddresses => getUTXOsForAddresses({
           addresses: groupOfAddresses,
           network: body.network,
-        })
-      );
+        }));
 
       // Sum up all the utxo
-      return Promise.all(promises).then(groupsOfUTXOs =>
-        groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
-      );
+      return Promise.all(promises)
+        .then(groupsOfUTXOs => (
+          groupsOfUTXOs.reduce((acc, groupOfUTXOs) => acc.concat(groupOfUTXOs), [])
+        ));
     } catch (error) {
       Logger.error(`batchedFetcher:::${nameof(batchUTXOsForAddresses)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
@@ -191,12 +234,14 @@ function batchUTXOsForAddresses(getUTXOsForAddresses: AddressUtxoFunc): AddressU
   };
 }
 
-export function batchGetRewardHistory(getRewardHistory: RewardHistoryFunc): RewardHistoryFunc {
+export function batchGetRewardHistory(
+  getRewardHistory: RewardHistoryFunc,
+): RewardHistoryFunc {
   return async function (body: RewardHistoryRequest): Promise<RewardHistoryResponse> {
     try {
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(addr =>
-        getRewardHistory({
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getRewardHistory({
           network: body.network,
           addresses: addr,
         })
@@ -211,21 +256,24 @@ export function batchGetRewardHistory(getRewardHistory: RewardHistoryFunc): Rewa
   };
 }
 
-export function batchGetTransactionsHistoryForAddresses(getTransactionsHistoryForAddresses: HistoryFunc): HistoryFunc {
+export function batchGetTransactionsHistoryForAddresses(
+  getTransactionsHistoryForAddresses: HistoryFunc,
+): HistoryFunc {
   return async function (body: HistoryRequest): Promise<HistoryResponse> {
     try {
       // we need two levels of batching: addresses and then transactions
       const transactions = await _batchHistoryByAddresses(
         body.addresses,
-        async addresses =>
+        async (addresses) => (
           await _batchHistoryByTransaction(
             [],
             {
               ...body,
               addresses,
             },
-            getTransactionsHistoryForAddresses
+            getTransactionsHistoryForAddresses,
           )
+        )
       );
       const seenTxIds = new Set();
       const deduplicated = [];
@@ -246,24 +294,26 @@ export function batchGetTransactionsHistoryForAddresses(getTransactionsHistoryFo
 }
 
 function batchGetRecentTransactionHashes(
-  getRecentTransactionHashes: GetRecentTransactionHashesFunc
+  getRecentTransactionHashes: GetRecentTransactionHashesFunc,
 ): GetRecentTransactionHashesFunc {
-  return async function (body: GetRecentTransactionHashesRequest): Promise<GetRecentTransactionHashesResponse> {
-    const responses = await Promise.all(
-      chunk(body.addresses, RECENT_TRANSACTION_HASH_PAGE_SIZE).map(batch =>
-        getRecentTransactionHashes({ ...body, addresses: batch })
-      )
-    );
+  return async function(body: GetRecentTransactionHashesRequest): Promise<GetRecentTransactionHashesResponse> {
+    const responses = await Promise.all(chunk(body.addresses, RECENT_TRANSACTION_HASH_PAGE_SIZE).map(
+      batch => getRecentTransactionHashes({ ...body, addresses: batch })
+    ));
     const result = {};
     for (const response of responses) {
       Object.assign(result, response);
     }
     return result;
-  };
+  }
 }
 
-function batchGetTransactionsByHashes(getTransactionsByHashes: GetTransactionsByHashesFunc): GetTransactionsByHashesFunc {
-  return async function (body: GetTransactionsByHashesRequest): Promise<GetTransactionsByHashesResponse> {
+function batchGetTransactionsByHashes(
+  getTransactionsByHashes: GetTransactionsByHashesFunc,
+): GetTransactionsByHashesFunc {
+  return async function(
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionsByHashesResponse> {
     const promises = chunk(body.txHashes, 100).map(txHashes => {
       return getTransactionsByHashes({
         txHashes,
@@ -271,14 +321,16 @@ function batchGetTransactionsByHashes(getTransactionsByHashes: GetTransactionsBy
       });
     });
     const resultChunks = await Promise.all(promises);
-    return resultChunks.reduce((res, entry) => [...res, ...entry], ([]: GetTransactionsByHashesResponse));
+    return resultChunks.reduce((res, entry) => ([ ...res, ...entry ]), ([]: GetTransactionsByHashesResponse));
   };
 }
 
 function batchGetTransactionSlotsByHashes(
-  getTransactionSlotsByHashes: GetTransactionSlotsByHashesFunc
+  getTransactionSlotsByHashes: GetTransactionSlotsByHashesFunc,
 ): GetTransactionSlotsByHashesFunc {
-  return async function (body: GetTransactionsByHashesRequest): Promise<GetTransactionSlotsByHashesResponse> {
+  return async function(
+    body: GetTransactionsByHashesRequest
+  ): Promise<GetTransactionSlotsByHashesResponse> {
     const promises = chunk(body.txHashes, 100).map(txHashes => {
       return getTransactionSlotsByHashes({
         txHashes,
@@ -292,7 +344,7 @@ function batchGetTransactionSlotsByHashes(
 
 async function _batchHistoryByAddresses(
   addresses: Array<string>,
-  apiCall: (Array<string>) => Promise<HistoryResponse>
+  apiCall: (Array<string>) => Promise<HistoryResponse>,
 ): Promise<Array<RemoteTransaction>> {
   const groupsOfAddresses = chunk(addresses, addressesLimit);
   const groupedTxsPromises = groupsOfAddresses.map(apiCall);
@@ -304,7 +356,7 @@ async function _batchHistoryByAddresses(
 async function _batchHistoryByTransaction(
   previousTxs: Array<RemoteTransaction>,
   request: HistoryRequest,
-  getTransactionsHistoryForAddresses: HistoryFunc
+  getTransactionsHistoryForAddresses: HistoryFunc,
 ): Promise<HistoryResponse> {
   // Get historic transactions from backend API
   const history = await getTransactionsHistoryForAddresses(request);
@@ -331,21 +383,23 @@ async function _batchHistoryByTransaction(
         after: {
           block: newBest.blockHash,
           tx: newBest.txHash,
-        },
+        }
       },
-      getTransactionsHistoryForAddresses
+      getTransactionsHistoryForAddresses,
     );
   }
 
   return transactions;
 }
 
-export function batchCheckAddressesInUse(checkAddressesInUse: FilterFunc): FilterFunc {
+export function batchCheckAddressesInUse(
+  checkAddressesInUse: FilterFunc,
+): FilterFunc {
   return async function (body: FilterUsedRequest): Promise<FilterUsedResponse> {
     try {
       const groupsOfAddresses = chunk(body.addresses, addressesLimit);
-      const groupedAddrPromises = groupsOfAddresses.map(addr =>
-        checkAddressesInUse({
+      const groupedAddrPromises = groupsOfAddresses.map(
+        addr => checkAddressesInUse({
           network: body.network,
           addresses: addr,
         })
@@ -364,10 +418,12 @@ export type TimeForTx = {|
   blockHash: string,
   height: number,
   txHash: string,
-  txOrdinal: number,
+  txOrdinal: number
 |};
-function getLatestTransaction(txs: Array<RemoteTransaction>): void | TimeForTx {
-  const blockInfo: Array<TimeForTx> = [];
+function getLatestTransaction(
+  txs: Array<RemoteTransaction>,
+): void | TimeForTx {
+  const blockInfo : Array<TimeForTx> = [];
   for (const tx of txs) {
     if (tx.block_hash != null && tx.tx_ordinal != null && tx.height != null) {
       blockInfo.push({
@@ -397,12 +453,14 @@ function getLatestTransaction(txs: Array<RemoteTransaction>): void | TimeForTx {
   return best;
 }
 
-export function batchGetAccountState(getAccountState: AccountStateFunc): AccountStateFunc {
+export function batchGetAccountState(
+  getAccountState: AccountStateFunc,
+): AccountStateFunc {
   return async function (body: AccountStateRequest): Promise<AccountStateResponse> {
     try {
       const chimericAccountAddresses = chunk(body.addresses, addressesLimit);
-      const chimericAccountPromises = chimericAccountAddresses.map(addr =>
-        getAccountState({
+      const chimericAccountPromises = chimericAccountAddresses.map(
+        addr => getAccountState({
           network: body.network,
           addresses: addr,
         })
@@ -416,10 +474,12 @@ export function batchGetAccountState(getAccountState: AccountStateFunc): Account
     }
   };
 }
-export function batchGetCatalystRoundInfo(getCatalystRoundInfo: CatalystRoundInfoFunc): CatalystRoundInfoFunc {
+export function batchGetCatalystRoundInfo(
+  getCatalystRoundInfo: CatalystRoundInfoFunc,
+): CatalystRoundInfoFunc {
   return async function (body: CatalystRoundInfoRequest): any {
     try {
-      return getCatalystRoundInfo(body);
+      return getCatalystRoundInfo(body)
     } catch (error) {
       Logger.error(`batchedFetcher::${nameof(batchGetAccountState)} error: ` + stringifyError(error));
       if (error instanceof LocalizableError) throw error;
@@ -428,12 +488,14 @@ export function batchGetCatalystRoundInfo(getCatalystRoundInfo: CatalystRoundInf
   };
 }
 
-export function batchGetPoolInfo(getPoolInfo: PoolInfoFunc): PoolInfoFunc {
+export function batchGetPoolInfo(
+  getPoolInfo: PoolInfoFunc,
+): PoolInfoFunc {
   return async function (body: PoolInfoRequest): Promise<PoolInfoResponse> {
     try {
       const poolIds = chunk(body.poolIds, addressesLimit);
-      const poolInfoPromises = poolIds.map(poolId =>
-        getPoolInfo({
+      const poolInfoPromises = poolIds.map(
+        poolId => getPoolInfo({
           network: body.network,
           poolIds: poolId,
         })
@@ -448,12 +510,14 @@ export function batchGetPoolInfo(getPoolInfo: PoolInfoFunc): PoolInfoFunc {
   };
 }
 
-export function batchGetTokenInfo(getTokenInfo: TokenInfoFunc): TokenInfoFunc {
+export function batchGetTokenInfo(
+  getTokenInfo: TokenInfoFunc,
+): TokenInfoFunc {
   return async function (body: TokenInfoRequest): Promise<TokenInfoResponse> {
     try {
       const tokenIds = chunk(body.tokenIds, addressesLimit);
-      const tokenInfoPromises = tokenIds.map(tokenId =>
-        getTokenInfo({
+      const tokenInfoPromises = tokenIds.map(
+        tokenId => getTokenInfo({
           network: body.network,
           tokenIds: tokenId,
         })
@@ -468,17 +532,19 @@ export function batchGetTokenInfo(getTokenInfo: TokenInfoFunc): TokenInfoFunc {
   };
 }
 
-function batchGetUtxoData(getUtxoData: GetUtxoDataFunc): GetUtxoDataFunc {
+function batchGetUtxoData(
+  getUtxoData: GetUtxoDataFunc,
+): GetUtxoDataFunc {
   return async function (body: GetUtxoDataRequest): Promise<GetUtxoDataResponse> {
-    return (
-      await Promise.all(
-        body.utxos.map(({ txHash, txIndex }) =>
-          getUtxoData({
+    return (await Promise.all(
+      body.utxos.map(
+        ({ txHash, txIndex }) => getUtxoData(
+          {
             network: body.network,
-            utxos: [{ txHash, txIndex }],
-          })
+            utxos: [ { txHash, txIndex } ],
+          }
         )
       )
-    ).flat();
+    )).flat();
   };
 }

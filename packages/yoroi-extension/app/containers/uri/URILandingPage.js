@@ -36,9 +36,11 @@ export default class URILandingPage extends Component<StoresProps> {
   firstSelectedWalletId: void => null | number = () => {
     const { wallets } = this.props.stores.wallets;
     const firstCardanoWallet = wallets.find(wallet => {
-      if (
-        this.props.stores.loading.uriParams?.address &&
-        isValidReceiveAddress(this.props.stores.loading.uriParams.address, getNetworkById(wallet.networkId)) === true
+      if ( this.props.stores.loading.uriParams?.address &&
+        isValidReceiveAddress(
+          this.props.stores.loading.uriParams.address,
+          getNetworkById(wallet.networkId),
+        ) === true
       ) {
         return true;
       }
@@ -46,5 +48,5 @@ export default class URILandingPage extends Component<StoresProps> {
     });
 
     return firstCardanoWallet !== undefined ? firstCardanoWallet.publicDeriverId : null;
-  };
+  }
 }

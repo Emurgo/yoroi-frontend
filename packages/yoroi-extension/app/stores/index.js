@@ -22,7 +22,7 @@ import CoinPriceStore from './toplevel/CoinPriceStore';
 import TokenInfoStore from './toplevel/TokenInfoStore';
 import ExplorerStore from './toplevel/ExplorerStore';
 import ServerConnectionStore from './toplevel/ServerConnectionStore';
-import ConnectorStore from './toplevel/DappConnectorStore';
+import ConnectorStore from './toplevel/DappConnectorStore'
 import ProtocolParametersStore from './toplevel/ProtocolParametersStore';
 import PushNotificationStore from './toplevel/PushNotificationStore';
 import TransactionProcessingStore from './toplevel/TransactionProcessingStore';
@@ -121,8 +121,11 @@ const stores: StoresMap = (observable({
   routingStore: null,
 }): any);
 
-function initializeSubstore<T: { ... }>(substore: T): void {
-  Object.keys(substore)
+function initializeSubstore<T: {...}>(
+  substore: T,
+): void {
+  Object
+    .keys(substore)
     .map(key => substore[key])
     .forEach(store => store.initialize());
 }
@@ -142,17 +145,13 @@ export default (action(
 
     // All other stores have our lifecycle
     const storeNames = Object.keys(storeClasses);
-    storeNames.forEach(name => {
-      if (stores[name]) stores[name].teardown();
-    });
+    storeNames.forEach(name => { if (stores[name]) stores[name].teardown(); });
     storeNames.forEach(name => {
       // Careful: we pass incomplete `store` down to child components
       // Any toplevel store that accesses `store` in its constructor may crash
-      stores[name] = (new storeClasses[name](stores, api): any);
+      stores[name] = ((new storeClasses[name](stores, api)): any);
     });
-    storeNames.forEach(name => {
-      if (stores[name]) stores[name].initialize();
-    });
+    storeNames.forEach(name => { if (stores[name]) stores[name].initialize(); });
 
     /** Add currency specific stores
      * Note: we have to split up th setup and the initialization
@@ -166,15 +165,14 @@ export default (action(
     initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
     // Perform load after all setup is done to ensure migration can modify store state
-    await loadedStores.loading
-      .load()
+    await loadedStores.loading.load()
       .then(() => console.debug('extension / loading store loaded'))
       .catch(e => console.error('extension / loading store load failed', e));
 
     return loadedStores;
   }
   // $FlowFixMe[value-as-type]
-): Api => StoresMap);
+): (Api) => StoresMap);
 
 export type StoresProps = {|
   +stores: StoresMap,

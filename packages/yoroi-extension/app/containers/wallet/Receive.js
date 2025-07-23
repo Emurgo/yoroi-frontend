@@ -19,7 +19,7 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
   static defaultProps: {| children: void |} = {
     children: undefined,
   };
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount() {
     const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;
@@ -33,7 +33,9 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
       // we redirect otherwise it would break the back button
       stores.routing.replaceRoute({ route: firstRoute });
     } else {
-      const currentSelectedStore = storesForWallet.find(store => routeForStore(store.name) === stores.routing.currentRoute);
+      const currentSelectedStore = storesForWallet.find(
+        store => routeForStore(store.name) === stores.routing.currentRoute
+      );
       // if user switched to a different wallet that doesn't support the store type selected
       if (currentSelectedStore == null) {
         // just send user to the first store supported by this wallet
@@ -64,7 +66,9 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
       })
       .filter(storeInfo => !storeInfo.meta.isHidden({ result: storeInfo.request.all }))
       .map(storeInfo => ({
-        isActiveStore: stores.routing.currentRoute.startsWith(routeForStore(storeInfo.meta.name)),
+        isActiveStore: stores.routing.currentRoute.startsWith(
+          routeForStore(storeInfo.meta.name)
+        ),
         setAsActiveStore: () =>
           stores.routing.goToRoute({
             route: routeForStore(storeInfo.meta.name),

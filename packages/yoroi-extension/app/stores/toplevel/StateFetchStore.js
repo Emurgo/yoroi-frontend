@@ -1,5 +1,5 @@
 // @flow
-import { observable } from 'mobx';
+import { observable, } from 'mobx';
 import Store from '../base/Store';
 
 import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
@@ -14,26 +14,25 @@ export default class StateFetchStore<
       ...
     },
     ...
-  },
+  }
 > extends Store<StoresMapType> {
+
   @observable fetcher: IFetcher;
 
   setup(): void {
     super.setup();
-    this.fetcher = new BatchedFetcher(
-      new RemoteFetcher(
-        () => environment.getVersion(),
-        () => this.stores.profile.currentLocale,
-        () => {
-          if (environment.isFirefox()) {
-            return 'firefox';
-          }
-          if (environment.isChrome()) {
-            return 'chrome';
-          }
-          return '-';
+    this.fetcher = new BatchedFetcher(new RemoteFetcher(
+      () => environment.getVersion(),
+      () => this.stores.profile.currentLocale,
+      () => {
+        if (environment.isFirefox()) {
+          return 'firefox';
         }
-      )
-    );
+        if (environment.isChrome()) {
+          return 'chrome';
+        }
+        return '-';
+      },
+    ));
   }
 }

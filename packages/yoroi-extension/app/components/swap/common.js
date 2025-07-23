@@ -1,2 +1,3 @@
 // @flow
-export const PRICE_PRECISION = 10;
+export const PRICE_PRECISION = 10
+

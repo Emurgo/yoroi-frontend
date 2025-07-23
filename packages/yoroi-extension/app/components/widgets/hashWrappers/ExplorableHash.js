@@ -52,7 +52,10 @@ export default class ExplorableHash extends Component<Props> {
         placement={this.props.placementTooltip}
       >
         {this.props.primary ? (
-          <Link href={this.props.url} onClick={event => onExternalLinkClick(event)}>
+          <Link
+            href={this.props.url}
+            onClick={event => onExternalLinkClick(event)}
+          >
             {this.props.children}
           </Link>
         ) : (

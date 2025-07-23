@@ -4,13 +4,13 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
 import LocalStorageApi from '../../../../../api/localStorage';
 import { ampli } from '../../../../../../ampli';
-import { noop } from '../../../../../coreUtils';
+import { noop } from '../../../../../coreUtils'
 
 type Props = {
   selectedWalletId: number;
   openDurationDialog: () => void;
   duration: number;
-};
+}
 
 const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration }: Props) => {
   const strings = useStrings();
@@ -38,31 +38,32 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
     }
     // eslint-disable-next-line
     noop(initialNotifStatus());
-  }, []);
+  }, [])
 
   // handle checkbox change event
-  const handleNotificationsChange = async event => {
+  const handleNotificationsChange = async (event) => {
     const enabled = event.target.checked;
     setNotificationsEnabled(enabled);
     await setNotificationsSetting(enabled);
     // noinspection TypeScriptUnresolvedFunction
     ampli.settingsInAppNotificationsStatusUpdated({
-      status: event.target.checked ? 'enabled' : 'disabled',
-    });
-  };
+      status: event.target.checked ? 'enabled' : 'disabled'
+    })
+  }
 
   return (
     <Box mb="40px">
       <Box>
-        <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-          {strings.notifSettingsTitle}
-        </Typography>
+        <Typography variant='body1' fontWeight={500} color="ds.text_gray_medium">{strings.notifSettingsTitle}</Typography>
       </Box>
       <FormControlLabel
         label={strings.notifSettingsDesc}
         control={
           <Box sx={{ alignSelf: 'flex-start' }}>
-            <Switch checked={notificationsEnabled} onChange={handleNotificationsChange} />
+            <Switch
+              checked={notificationsEnabled}
+              onChange={handleNotificationsChange}
+            />
           </Box>
         }
         labelPlacement="top"
@@ -70,7 +71,7 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
           mt: '16px',
           marginLeft: '0px',
           color: 'ds.text_gray_medium',
-          gap: '16px',
+          gap: '16px'
         }}
       />
 
@@ -89,7 +90,7 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
           columnGap: '6px',
           rowGap: '8px',
           maxHeight: '56px',
-          width: '506px' /* to be consistent with components/wallet/settings/WalletNameSetting.js */,
+          width: '506px', /* to be consistent with components/wallet/settings/WalletNameSetting.js */
           mt: '24px',
         }}
       >
@@ -121,12 +122,13 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
           placeholder="0"
           bgcolor="ds.bg_color_max"
           value={strings.durationDescription(duration)}
-          onClick={event => {
+          onClick={(event) => {
             event.currentTarget.blur();
             openDurationDialog();
           }}
         />
       </Box>
+
     </Box>
   );
 };

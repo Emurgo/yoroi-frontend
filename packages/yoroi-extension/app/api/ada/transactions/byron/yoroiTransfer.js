@@ -1,21 +1,35 @@
 // @flow
 
 import BigNumber from 'bignumber.js';
-import { Logger, stringifyError } from '../../../../utils/logging';
-import { GenerateTransferTxError } from '../../../common/errors';
+import {
+  Logger,
+  stringifyError,
+} from '../../../../utils/logging';
+import {
+  GenerateTransferTxError
+} from '../../../common/errors';
 import LocalizableError from '../../../../i18n/LocalizableError';
-import { sendAllUnsignedTx, signTransaction } from '../shelley/transactions';
+import {
+  sendAllUnsignedTx,
+  signTransaction,
+} from '../shelley/transactions';
 import type { CardanoAddressedUtxo } from '../types';
-import type { TransferTx } from '../../../../types/TransferTypes';
+import type {
+  TransferTx
+} from '../../../../types/TransferTypes';
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
-import type { Address, Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
-import { MultiToken } from '../../../common/lib/MultiToken';
+import type {
+  Address, Addressing,
+} from '../../lib/storage/models/PublicDeriver/interfaces';
+import {
+  MultiToken,
+} from '../../../common/lib/MultiToken';
 import { PRIMARY_ASSET_CONSTANTS } from '../../lib/storage/database/primitives/enums';
 import { multiTokenFromRemote } from '../utils';
 
 /**
  * Generate transaction including all addresses with no change.
- */
+*/
 export async function buildYoroiTransferTx(payload: {|
   senderUtxos: Array<CardanoAddressedUtxo>,
   outputAddr: {|
@@ -35,7 +49,7 @@ export async function buildYoroiTransferTx(payload: {|
   networkId: number,
 |}): Promise<TransferTx> {
   try {
-    const { senderUtxos } = payload;
+    const { senderUtxos, } = payload;
 
     const defaultEntryInfo = {
       defaultNetworkId: payload.protocolParams.networkId,
@@ -43,8 +57,14 @@ export async function buildYoroiTransferTx(payload: {|
     };
 
     const totalBalance = senderUtxos
-      .map(utxo => multiTokenFromRemote(utxo, payload.protocolParams.networkId))
-      .reduce((acc, next) => acc.joinAddMutable(next), new MultiToken([], defaultEntryInfo));
+      .map(utxo => multiTokenFromRemote(
+        utxo,
+        payload.protocolParams.networkId
+      ))
+      .reduce(
+        (acc, next) => acc.joinAddMutable(next),
+        new MultiToken([], defaultEntryInfo)
+      );
 
     // first build a transaction to see what the fee will be
     const unsignedTxResponse = sendAllUnsignedTx(
@@ -53,19 +73,17 @@ export async function buildYoroiTransferTx(payload: {|
       payload.absSlotNumber,
       payload.protocolParams,
       undefined,
-      payload.networkId
+      payload.networkId,
     );
 
     const fee = new MultiToken(
-      [
-        {
-          identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
-          amount: new BigNumber(unsignedTxResponse.txBuilder.get_fee_if_set()?.to_str() || '0').plus(
-            unsignedTxResponse.txBuilder.get_deposit().to_str()
-          ),
-          networkId: payload.protocolParams.networkId,
-        },
-      ],
+      [{
+        identifier: PRIMARY_ASSET_CONSTANTS.Cardano,
+        amount: new BigNumber(
+          unsignedTxResponse.txBuilder.get_fee_if_set()?.to_str() || '0'
+        ).plus(unsignedTxResponse.txBuilder.get_deposit().to_str()),
+        networkId: payload.protocolParams.networkId,
+      }],
       defaultEntryInfo
     );
 
@@ -76,7 +94,7 @@ export async function buildYoroiTransferTx(payload: {|
       payload.keyLevel,
       payload.signingKey,
       null,
-      undefined
+      undefined,
     );
 
     // return summary of transaction

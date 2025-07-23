@@ -15,7 +15,12 @@ type Props = {|
   currentPoolId?: string,
 |};
 
-export const PoolTransitionDialog = ({ onClose, poolTransition, onUpdatePool, currentPoolId }: Props): React$Node => {
+export const PoolTransitionDialog = ({
+  onClose,
+  poolTransition,
+  onUpdatePool,
+  currentPoolId,
+}: Props): React$Node => {
   const intl = useIntl();
   const { currentPool, suggestedPool, deadlinePassed } = poolTransition || {};
 

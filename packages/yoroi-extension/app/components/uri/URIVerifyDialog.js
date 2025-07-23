@@ -16,9 +16,11 @@ import RawHash from '../widgets/hashWrappers/RawHash';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { calculateAndFormatValue } from '../../utils/unit-of-account';
 import { SelectedExplorer } from '../../domain/SelectedExplorer';
-import type { TokenLookupKey } from '../../api/common/lib/MultiToken';
+import type {
+  TokenLookupKey,
+} from '../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import { getTokenName, genFormatTokenAmount } from '../../stores/stateless/tokenHelpers';
+import { getTokenName, genFormatTokenAmount, } from '../../stores/stateless/tokenHelpers';
 
 import styles from './URIVerifyDialog.scss';
 
@@ -45,22 +47,26 @@ type Props = {|
   +selectedExplorer: SelectedExplorer,
   +unitOfAccountSetting: UnitOfAccountSettingType,
   +getCurrentPrice: (from: string, to: string) => ?string,
-  +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
+  +getTokenInfo: $ReadOnly<Inexact<TokenLookupKey>> => $ReadOnly<TokenRow>,
 |};
 
 @observer
 export default class URIVerifyDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   render(): Node {
-    const { onCancel, onSubmit, unitOfAccountSetting } = this.props;
+    const { onCancel, onSubmit, unitOfAccountSetting, } = this.props;
     const intl = this.context;
 
-    const dialogClasses = classnames([styles.dialog, 'URIVerifyDialog']);
+    const dialogClasses = classnames([
+      styles.dialog,
+      'URIVerifyDialog'
+    ]);
 
     const actions = [
       {
         label: intl.formatMessage(globalMessages.cancel),
-        onClick: onCancel,
+        onClick: onCancel
       },
       {
         label: intl.formatMessage(globalMessages.continue),
@@ -74,13 +80,20 @@ export default class URIVerifyDialog extends Component<Props> {
       const defaultEntry = tokens.getDefaultEntry();
       const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
-      const shiftedAmount = defaultEntry.amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
+      const shiftedAmount = defaultEntry.amount
+        .shiftedBy(-tokenInfo.Metadata.numberOfDecimals);
 
-      const coinPrice = this.props.getCurrentPrice(getTokenName(tokenInfo), toCurrency);
+      const coinPrice = this.props.getCurrentPrice(
+        getTokenName(tokenInfo),
+        toCurrency
+      );
 
       if (coinPrice == null) return '-';
 
-      return calculateAndFormatValue(shiftedAmount, coinPrice);
+      return calculateAndFormatValue(
+        shiftedAmount,
+        coinPrice
+      );
     };
 
     const amount = this.props.uriParams.amount;
@@ -96,7 +109,9 @@ export default class URIVerifyDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
       >
         <div>
-          <h2 className={styles.label}>{intl.formatMessage(messages.uriVerifyDialogAddressLabel)}:</h2>
+          <h2 className={styles.label}>
+            {intl.formatMessage(messages.uriVerifyDialogAddressLabel)}:
+          </h2>
           <ExplorableHashContainer
             selectedExplorer={this.props.selectedExplorer}
             hash={this.props.uriParams.address}
@@ -104,12 +119,16 @@ export default class URIVerifyDialog extends Component<Props> {
             linkType="address"
           >
             <RawHash light>
-              <span className={styles.address}>{truncateAddress(this.props.uriParams.address)}</span>
+              <span className={styles.address}>
+                {truncateAddress(this.props.uriParams.address)}
+              </span>
             </RawHash>
           </ExplorableHashContainer>
         </div>
         <div>
-          <h2 className={styles.label}>{intl.formatMessage(globalMessages.amountLabel)}:</h2>
+          <h2 className={styles.label}>
+            {intl.formatMessage(globalMessages.amountLabel)}:
+          </h2>
           {unitOfAccountSetting.enabled ? (
             <>
               <div className={styles.amount}>
@@ -120,19 +139,30 @@ export default class URIVerifyDialog extends Component<Props> {
               <div className={styles.amountSmall}>
                 {formatValue(amount.getDefaultEntry())}
                 &nbsp;
-                {truncateToken(getTokenName(this.props.getTokenInfo(amount.getDefaultEntry())))}
+                {truncateToken(getTokenName(
+                  this.props.getTokenInfo(
+                    amount.getDefaultEntry()
+                  )))
+                }
               </div>
             </>
           ) : (
             <div className={styles.amount}>
               {formatValue(amount.getDefaultEntry())}
               &nbsp;
-              {truncateToken(getTokenName(this.props.getTokenInfo(amount.getDefaultEntry())))}
+              {truncateToken(getTokenName(
+                this.props.getTokenInfo(
+                  amount.getDefaultEntry()
+                )))
+              }
             </div>
           )}
         </div>
-        <div className={styles.textBlock}>{intl.formatMessage(messages.uriVerifyDialogText)}</div>
+        <div className={styles.textBlock}>
+          {intl.formatMessage(messages.uriVerifyDialogText)}
+        </div>
       </Dialog>
     );
   }
+
 }

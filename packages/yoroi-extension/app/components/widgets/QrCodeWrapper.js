@@ -10,7 +10,7 @@ type Props = {|
   +includeMargin?: boolean,
 |};
 
-const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false }: Props): Node => {
+const QrCodeWrapper = ({ value, size, id = 'qr-code', includeMargin = false}: Props): Node => {
   const theme = useTheme();
 
   return (

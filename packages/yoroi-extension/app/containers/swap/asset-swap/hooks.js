@@ -4,11 +4,9 @@ import { useMemo } from 'react';
 import { comparatorByGetter } from '../../../coreUtils';
 import { useQueryClient } from 'react-query';
 
-export function useSellVerifiedSwapTokens(assets: Array<AssetAmount>): {|
-  walletVerifiedAssets: Array<any>,
-  isLoading: boolean,
-  errored: boolean,
-|} {
+export function useSellVerifiedSwapTokens(
+  assets: Array<AssetAmount>
+): {| walletVerifiedAssets: Array<any>, isLoading: boolean, errored: boolean |} {
   const queryClient = useQueryClient();
 
   // <TODO:ERROR_HANDLING> maybe check `error` field from query and make it available for UI to do something

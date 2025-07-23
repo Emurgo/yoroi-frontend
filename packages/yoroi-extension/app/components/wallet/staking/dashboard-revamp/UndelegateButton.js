@@ -8,8 +8,14 @@ import { StyledLink } from './StakePool/StakePool.styles';
 import { asQuantity } from '../../../../UI/utils/createCurrentWalletInfo';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores, socialMediaInfo }) => {
-  const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, stakingRewards } =
-    useTxReviewModal();
+  const {
+    openTxReviewModal,
+    startLoadingTxReview,
+    stakeKeyDeposit,
+    primaryTokenInfo,
+    showTxResultModal,
+    stakingRewards,
+  } = useTxReviewModal();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 

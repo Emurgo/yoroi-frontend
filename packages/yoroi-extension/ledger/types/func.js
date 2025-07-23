@@ -1,5 +1,8 @@
 // @flow //
-import type { TransportIdType, DeviceCodeType } from './enum';
+import type {
+  TransportIdType,
+  DeviceCodeType
+} from './enum';
 
 export type setTransportFunc = TransportIdType => void;
 export type setLocaleFunc = string => void;

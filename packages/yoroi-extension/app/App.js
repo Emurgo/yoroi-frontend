@@ -28,6 +28,7 @@ import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
 import { filterByValues } from './coreUtils';
 
+
 type Props = {|
   +stores: StoresMap,
 |};
@@ -98,10 +99,8 @@ class App extends Component<Props, State> {
 
       // clean wrong format strings from locale messages
       // to be removed after all locale messages get updated
-      const fixedLocaleMessages = filterByValues(
-        localeMessages,
-        v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target=')
-      );
+      const fixedLocaleMessages = filterByValues(localeMessages,
+          v => !v.includes('<span') && !v.includes('<br>') && !v.includes('<a target='));
 
       runInAction(() => {
         this.mergedMessages = { ...englishMessages, ...fixedLocaleMessages };
@@ -170,18 +169,18 @@ class App extends Component<Props, State> {
       return <MaintenancePage stores={stores} />;
     }
     return (
-      <NotificationsProvider
-        walletsStore={stores.wallets}
-        appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
-        pushNotificationStore={stores.pushNotificationStore}
-      >
-        <NotificationsManager />
-        <div style={{ height: '100%' }}>
-          <Support />
-          {YoroiRoutes(stores)}
-          <RoutingHelper stores={stores} />
-        </div>
-      </NotificationsProvider>
+          <NotificationsProvider
+            walletsStore={stores.wallets}
+            appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
+            pushNotificationStore={stores.pushNotificationStore}
+          >
+            <NotificationsManager />
+            <div style={{ height: '100%' }}>
+              <Support />
+              {YoroiRoutes(stores)}
+              <RoutingHelper stores={stores}/>
+            </div>
+          </NotificationsProvider>
     );
   };
 }

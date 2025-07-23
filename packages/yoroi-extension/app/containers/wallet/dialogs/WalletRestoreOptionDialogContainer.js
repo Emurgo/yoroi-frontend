@@ -12,6 +12,7 @@ type Props = {|
 
 @observer
 export default class WalletRestoreOptionDialogContainer extends Component<Props> {
+
   render(): Node {
     return (
       <WalletRestoreOptionDialog

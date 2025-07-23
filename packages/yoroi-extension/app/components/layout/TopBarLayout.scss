@@ -9,10 +9,10 @@
       background-repeat: no-repeat;
       background-position-y: bottom;
       background-position-x: right;
-    }
+    } 
   }
 
-  :global(.YoroiModern):not(:global(.YoroiShelley)),
+  :global(.YoroiModern):not(:global(.YoroiShelley)), 
   :global(.YoroiRevamp):not(:global(.YoroiShelley)) {
     .languageSelectionBackground {
       background-image: url(../../assets/images/select-language.svg);
@@ -20,6 +20,6 @@
       background-repeat: no-repeat;
       background-position-y: bottom;
       background-position-x: right;
-    }
+    } 
   }
 }

@@ -33,7 +33,7 @@ type Props = {|
 
 @observer
 class CardanoUtxoDetails extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   getTicker: ($ReadOnly<TokenRow>) => Node = tokenInfo => {
     const fingerprint = this.getFingerprint(tokenInfo);
@@ -58,7 +58,9 @@ class CardanoUtxoDetails extends Component<Props> {
     return this.props.getTokenInfo(tokenEntry);
   };
 
-  renderAmountDisplay: ({| entry: TokenEntry |}) => Node = request => {
+  renderAmountDisplay: ({|
+    entry: TokenEntry,
+  |}) => Node = request => {
     const nameFromIdentifier = assetNameFromIdentifier(request.entry.identifier);
     const tokenInfo: ?$ReadOnly<TokenRow> = this._resolveTokenInfo(request.entry);
 

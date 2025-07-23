@@ -1,4 +1,4 @@
-@mixin loading-spinner($iconPath, $size: 30) {
+@mixin loading-spinner($iconPath, $size:30) {
   text-indent: -9999px;
   &:after {
     content: '';

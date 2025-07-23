@@ -11,13 +11,7 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { GovernanceVoteingCard } from '../../common/GovernanceVoteingCard';
 import { VotingSkeletonCard } from '../../common/VotingSkeletonCard';
-import {
-  DREP_ALWAYS_ABSTAIN,
-  DREP_ALWAYS_NO_CONFIDENCE,
-  LEARN_MORE_LINK,
-  YOROI_DREP_ID,
-  YOROI_VOTING_RECORD_LINK,
-} from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, LEARN_MORE_LINK, YOROI_DREP_ID, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
@@ -35,10 +29,10 @@ const Container = styled(Box)(() => ({
 }));
 
 const Divider = styled(Box)(({ theme }: any) => ({
-  backgroundColor: theme.palette.ds.gray_200,
+  backgroundColor:  theme.palette.ds.gray_200,
   height: 2,
   width: '100%',
-  marginBottom: '16px',
+  marginBottom: '16px'
 }));
 
 export const mapStatus = {
@@ -198,13 +192,7 @@ export const GovernanceStatusSelection = () => {
         <Stack direction="column" pt="16px" width="100%">
           <Divider />
           <Box>
-            <Link
-              onClick={event => event.stopPropagation()}
-              href={YOROI_VOTING_RECORD_LINK}
-              target="_blank"
-              rel="noopener"
-              lineHeight="22px"
-            >
+            <Link onClick={(event) => event.stopPropagation()} href={YOROI_VOTING_RECORD_LINK} target="_blank" rel="noopener" lineHeight="22px">
               {strings.yoroiVotingRecordLink}
             </Link>
           </Box>

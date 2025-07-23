@@ -4,7 +4,9 @@ import { Quantities } from '../../utils/quantities';
 import { useSwapForm } from './context/swap-form';
 import type { RemoteTokenInfo } from '../../api/ada/lib/state-fetch/types';
 
-export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
+export function useSwapFeeDisplay(
+  defaultTokenInfo: RemoteTokenInfo
+): {|
   formattedFee: string,
   formattedFeeQuantity: string,
   ptAmount: string,
@@ -36,7 +38,10 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
   const sellTicker = sellTokenInfo?.ticker ?? '';
 
   const sellAmount = amounts.sell.quantity;
-  const totalFeesPtToken = Quantities.sum([cost.batcherFee.quantity, cost.frontendFeeInfo.fee.quantity]);
+  const totalFeesPtToken = Quantities.sum([
+    cost.batcherFee.quantity,
+    cost.frontendFeeInfo.fee.quantity,
+  ]);
 
   const formattedFeeQuantity = Quantities.format(totalFeesPtToken, ptDecimals, ptDecimals);
   const formattedFee = formattedFeeQuantity + ` ${ptTicker}`;
@@ -56,7 +61,8 @@ export function useSwapFeeDisplay(defaultTokenInfo: RemoteTokenInfo): {|
     };
   }
 
-  const formattedSell = Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
+  const formattedSell =
+    Quantities.format(sellAmount, sellDecimals, sellDecimals) + ` ${sellTicker}`;
   return {
     ptAmount: totalFeesPtToken,
     formattedPtAmount: formattedFee,

@@ -14,7 +14,7 @@ type Props = {|
 
 @observer
 export default class DeprecatedCurrencyBanner extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { onSubmit } = this.props;
@@ -25,8 +25,12 @@ export default class DeprecatedCurrencyBanner extends Component<Props> {
           <div className={styles.background} />
           <div className={styles.content}>
             <div className={styles.textPart}>
-              <div className={styles.title}>{intl.formatMessage(globalMessages.noteLabel)}</div>
-              <div className={styles.explanation}>{this.props.children}</div>
+              <div className={styles.title}>
+                {intl.formatMessage(globalMessages.noteLabel)}
+              </div>
+              <div className={styles.explanation}>
+                {this.props.children}
+              </div>
             </div>
             {onSubmit != null && (
               <div className={styles.action}>

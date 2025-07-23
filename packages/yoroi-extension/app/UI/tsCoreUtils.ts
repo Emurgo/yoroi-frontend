@@ -1,3 +1,4 @@
+
 export function bytesToHex(bytes: any): string {
   return Buffer.from(bytes).toString('hex');
 }

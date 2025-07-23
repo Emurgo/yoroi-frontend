@@ -7,4 +7,4 @@ export type Notification = {|
   duration: ?number,
   secondsTimerInterval?: ?IntervalID,
   values?: $npm$ReactIntl$IntlFormat => Object,
-|};
+|}

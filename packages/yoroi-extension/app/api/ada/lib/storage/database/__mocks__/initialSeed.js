@@ -5,7 +5,7 @@ export function getInitialSeeds(): {|
   TransactionSeed: number,
   BlockSeed: number,
   TokenSeed: number,
-|} {
+  |} {
   return {
     AddressSeed: 1690513609,
     TransactionSeed: 769388545,

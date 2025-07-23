@@ -86,7 +86,7 @@ type Props = {|
 
 @observer
 export default class WalletReceiveRevamp extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   locationId: string = 'wallet:receive:infoPanel:footer';
 
@@ -266,9 +266,7 @@ export default class WalletReceiveRevamp extends Component<Props> {
             <Typography variant="h4" color="ds.text_gray_medium" fontWeight={500}>
               {intl.formatMessage(messages.noResultsFoundLabel)}
             </Typography>
-            <Typography variant="body1" color="ds.text_gray_low">
-              {intl.formatMessage(messages.notFoundAnyAddresses)}
-            </Typography>
+            <Typography variant="body1" color="ds.text_gray_low">{intl.formatMessage(messages.notFoundAnyAddresses)}</Typography>
           </div>
         </div>
       );

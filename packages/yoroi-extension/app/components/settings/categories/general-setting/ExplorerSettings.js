@@ -17,7 +17,9 @@ import { MenuItemStyled } from '../../../common/commonStyles/MenuItemStyled';
 type Props = {|
   +explorers: $ReadOnlyArray<$ReadOnly<ExplorerRow>>,
   +selectedExplorer: SelectedExplorer,
-  +onSelectExplorer: ({| explorerId: string |}) => PossiblyAsync<void>,
+  +onSelectExplorer: ({|
+    explorerId: string,
+  |}) => PossiblyAsync<void>,
   +isSubmitting: boolean,
   +error?: ?LocalizableError,
 |};
@@ -35,8 +37,8 @@ export default class ExplorerSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
-  selectExplorer: string => Promise<void> = async explorerId => {
+  static contextType:any = IntlContext;
+  selectExplorer: (string) => Promise<void> = async explorerId => {
     await this.props.onSelectExplorer({ explorerId });
   };
 

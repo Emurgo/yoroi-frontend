@@ -63,7 +63,7 @@ const canUseSandbox = environment.isDev() || environment.isNightly();
 
 @observer
 export default class GeneralSettingsPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   componentDidMount() {
     const request = this.props.stores.wallets.getCashbackWalletRequest;
     request.reset();
@@ -139,9 +139,9 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             onSetUseSandbox={
               canUseSandbox
                 ? async useSandbox => {
-                    await profileStore.setBringSandboxRequest.execute(useSandbox);
-                    await profileStore.getBringSandboxRequest.execute();
-                  }
+                  await profileStore.setBringSandboxRequest.execute(useSandbox);
+                  await profileStore.getBringSandboxRequest.execute();
+                }
                 : null
             }
             error={null}
@@ -173,5 +173,5 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
         </Box>
       </ModalProvider>
     );
-  }
+}
 }

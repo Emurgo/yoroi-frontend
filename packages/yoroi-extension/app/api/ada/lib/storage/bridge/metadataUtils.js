@@ -4,10 +4,12 @@ import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 
 export type TransactionMetadata = {|
   label: string,
-  data: { ... },
+  data: {...},
 |};
 
-export function createMetadata(metadata: Array<TransactionMetadata>): RustModule.WalletV4.AuxiliaryData {
+export function createMetadata(
+  metadata: Array<TransactionMetadata>
+): RustModule.WalletV4.AuxiliaryData {
   const transactionMetadata = RustModule.WalletV4.GeneralTransactionMetadata.new();
 
   metadata.forEach((meta: TransactionMetadata) => {
@@ -28,8 +30,7 @@ export function parseMetadata(s: any): string {
     return RustModule.WasmScope(Scope => {
       const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(s);
       const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
-        metadatum,
-        Scope.WalletV4.MetadataJsonSchema.BasicConversions
+        metadatum, Scope.WalletV4.MetadataJsonSchema.BasicConversions
       );
       return metadataString;
     });
@@ -42,8 +43,7 @@ export function parseMetadataDetailed(s: any): string {
     return RustModule.WasmScope(Scope => {
       const metadatum = Scope.WalletV4.TransactionMetadatum.from_hex(s);
       const metadataString = Scope.WalletV4.decode_metadatum_to_json_str(
-        metadatum,
-        Scope.WalletV4.MetadataJsonSchema.DetailedSchema
+        metadatum, Scope.WalletV4.MetadataJsonSchema.DetailedSchema
       );
       return metadataString;
     });

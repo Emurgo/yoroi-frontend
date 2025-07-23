@@ -475,19 +475,21 @@ export default class LocalStorageApi {
     await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
   };
 
+
   getPushNotificationMetadata: () => Promise<PushNotificationMetadata> = async () => {
     const raw = await getLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA);
     if (!raw) {
-      return { ...undefined /* just to please flow */ };
+      return {...undefined/* just to please flow */};
     }
     return JSON.parse(raw);
-  };
+  }
 
-  savePushNotificationMetadata: PushNotificationMetadata => Promise<void> = async metadata => {
+  savePushNotificationMetadata: (PushNotificationMetadata) => Promise<void> = async (metadata) => {
     await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
-  };
+  }
 
   async reset(): Promise<void> {
+
     await this.unsetUserLocale();
     await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();

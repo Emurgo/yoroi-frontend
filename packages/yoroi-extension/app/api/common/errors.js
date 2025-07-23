@@ -7,8 +7,7 @@ import globalMessages from '../../i18n/global-messages';
 const messages = defineMessages({
   serverStatusError: {
     id: 'api.errors.serverStatusError',
-    defaultMessage:
-      '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
+    defaultMessage: '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
   },
   currentCoinPriceError: {
     id: 'api.errors.currentCoinPriceError',
@@ -197,6 +196,7 @@ export class GenericApiError extends LocalizableError {
 }
 
 export class IncorrectWalletPasswordError extends LocalizableError {
+
   static get errorId(): string {
     return messages.incorrectWalletPasswordError.id;
   }
@@ -512,7 +512,7 @@ export class OversizedTransactionError extends LocalizableError {
   constructor() {
     super({
       id: messages.oversizedTransactionError.id,
-      defaultMessage: messages.oversizedTransactionError.defaultMessage,
+      defaultMessage: messages.oversizedTransactionError.defaultMessage
     });
   }
 }

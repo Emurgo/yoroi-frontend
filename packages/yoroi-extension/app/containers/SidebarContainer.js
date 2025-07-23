@@ -15,6 +15,7 @@ type State = {|
 
 @observer
 export default class SidebarContainer extends Component<StoresProps, State> {
+
   state: State = {
     featureFlags: {},
   };
@@ -27,8 +28,7 @@ export default class SidebarContainer extends Component<StoresProps, State> {
     allCategoriesRevamp.forEach(c => {
       const feature = c.featureFlagName;
       if (feature != null) {
-        this.props.stores.wallets
-          .getRemoteFeatureFlag(feature)
+        this.props.stores.wallets.getRemoteFeatureFlag(feature)
           .then((flag: ?boolean) => {
             if (flag) {
               runInAction(() => {
@@ -43,7 +43,7 @@ export default class SidebarContainer extends Component<StoresProps, State> {
             console.error('Failed to resolve remote flag for feature: ' + feature, e);
           });
       }
-    });
+    })
   }
 
   categoryFeatureFlagEnabled(category: SidebarCategoryRevamp): boolean {
@@ -65,14 +65,15 @@ export default class SidebarContainer extends Component<StoresProps, State> {
           });
         }}
         isActiveCategory={category => stores.routing.currentRoute.startsWith(category.route)}
-        categories={allCategoriesRevamp.filter(
-          category =>
-            category.isVisible({
-              hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
-              selected: this.props.stores.wallets.selected,
-              currentRoute: this.props.stores.routing.currentRoute,
-              isRewardWallet: wallet => stores.delegation.isRewardWallet(wallet.publicDeriverId),
-            }) && this.categoryFeatureFlagEnabled(category)
+        categories={allCategoriesRevamp.filter(category =>
+          category.isVisible({
+            hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
+            selected: this.props.stores.wallets.selected,
+            currentRoute: this.props.stores.routing.currentRoute,
+            isRewardWallet: (wallet) =>
+              stores.delegation.isRewardWallet(wallet.publicDeriverId),
+          })
+          && this.categoryFeatureFlagEnabled(category)
         )}
       />
     );

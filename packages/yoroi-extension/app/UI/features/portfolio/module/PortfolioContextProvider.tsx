@@ -15,14 +15,14 @@ export const PortfolioDetailsTab = {
   Overview: 'Overview',
   Transactions: 'Transactions',
 } as const;
-export type PortfolioDetailsTab = (typeof PortfolioDetailsTab)[keyof typeof PortfolioDetailsTab];
+export type PortfolioDetailsTab = typeof PortfolioDetailsTab[keyof typeof PortfolioDetailsTab];
 
 export const PortfolioListTab = {
   Wallet: 'Wallet',
   Dapps: 'Dapps',
 } as const;
 
-export type PortfolioListTab = (typeof PortfolioListTab)[keyof typeof PortfolioListTab];
+export type PortfolioListTab = typeof PortfolioListTab[keyof typeof PortfolioListTab];
 
 import BuySellDialog from '../../../../components/buySell/BuySellDialog';
 import { DEFAULT_FIAT_PAIR } from '../common/helpers/constants';

@@ -1,5 +1,5 @@
 // @flow
-import type { CardanoAddressedUtxo } from '../types';
+import type { CardanoAddressedUtxo, } from '../types';
 import { verifyFromDerivationRoot } from '../../lib/storage/models/utils';
 import type {
   AnchorParams,
@@ -36,32 +36,43 @@ import type { LedgerNanoCatalystRegistrationTxSignData } from './HaskellShelleyT
 import { RustModule } from '../../lib/cardanoCrypto/rustLoader';
 import { WalletTypePurpose, HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { derivePublicByAddressing } from '../../lib/cardanoCrypto/deriveByAddressing';
-import { bytesToHex, fail, forceNonNull, hexToBytes, iterateLenGet, iterateLenGetMap, maybe } from '../../../../coreUtils';
+import {
+  bytesToHex,
+  fail,
+  forceNonNull,
+  hexToBytes,
+  iterateLenGet,
+  iterateLenGetMap,
+  maybe
+} from '../../../../coreUtils';
 import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
 
 // ==================== LEDGER ==================== //
-function toLedgerTokenBundle(assets: ?RustModule.WalletV4.MultiAsset): Array<AssetGroup> | null {
+function toLedgerTokenBundle(
+  assets: ?RustModule.WalletV4.MultiAsset
+): Array<AssetGroup> | null {
+
   if (assets == null) return null;
 
-  const assetGroup: Array<AssetGroup> = iterateLenGetMap(assets)
-    .map(([policyId, assetsForPolicy]) => {
-      const tokens: Array<Token> = iterateLenGetMap(assetsForPolicy)
-        .nonNullValue()
-        .map(([assetName, amount]) => ({
-          assetNameHex: bytesToHex(assetName.name()),
-          amount: amount.to_str(),
-        }))
-        .toArray();
+  const assetGroup: Array<AssetGroup> = iterateLenGetMap(assets).map(([policyId, assetsForPolicy]) => {
 
-      // sort by asset name to the order specified by rfc7049
-      tokens.sort((token1, token2) => compareCborKey(token1.assetNameHex, token2.assetNameHex));
+    const tokens: Array<Token> = iterateLenGetMap(assetsForPolicy).nonNullValue().map(([assetName, amount]) => ({
+      assetNameHex: bytesToHex(assetName.name()),
+      amount: amount.to_str(),
+    })).toArray();
 
-      return { policyIdHex: policyId.to_hex(), tokens };
-    })
-    .toArray();
+    // sort by asset name to the order specified by rfc7049
+    tokens.sort(
+      (token1, token2) => compareCborKey(token1.assetNameHex, token2.assetNameHex)
+    );
+
+    return { policyIdHex: policyId.to_hex(), tokens };
+  }).toArray();
 
   // sort by policy id to the order specified by rfc7049
-  assetGroup.sort((asset1, asset2) => compareCborKey(asset1.policyIdHex, asset2.policyIdHex));
+  assetGroup.sort(
+    (asset1, asset2) => compareCborKey(asset1.policyIdHex, asset2.policyIdHex)
+  );
 
   return assetGroup;
 }
@@ -92,7 +103,7 @@ function compareCborKey(hex1: string, hex2: string): number {
 
 function formatLedgerWithdrawals(
   withdrawals: RustModule.WalletV4.Withdrawals,
-  addressingMap: string => void | { +path: Array<number>, ... }
+  addressingMap: string => (void | { +path: Array<number>, ... }),
 ): Array<Withdrawal> {
   const result = [];
 
@@ -133,20 +144,20 @@ function formatLedgerWithdrawals(
   return result;
 }
 
-type WasmCertWithAnchor = RustModule.WalletV4.DRepRegistration | RustModule.WalletV4.DRepUpdate;
+type WasmCertWithAnchor =
+  RustModule.WalletV4.DRepRegistration
+  | RustModule.WalletV4.DRepUpdate;
 
 function wasmCertToAnchor(wasmCert: WasmCertWithAnchor): ?AnchorParams {
   const wasmAnchor = wasmCert.anchor();
-  return wasmAnchor == null
-    ? undefined
-    : {
-        url: wasmAnchor.url().url(),
-        hashHex: wasmAnchor.anchor_data_hash().to_hex(),
-      };
+  return wasmAnchor == null ? undefined : {
+    url: wasmAnchor.url().url(),
+    hashHex: wasmAnchor.anchor_data_hash().to_hex(),
+  };
 }
 
 type WasmCertWithStakeCredential =
-  | RustModule.WalletV4.StakeRegistration
+  RustModule.WalletV4.StakeRegistration
   | RustModule.WalletV4.StakeDeregistration
   | RustModule.WalletV4.StakeDelegation
   | RustModule.WalletV4.VoteDelegation
@@ -155,10 +166,7 @@ type WasmCertWithStakeCredential =
   | RustModule.WalletV4.VoteRegistrationAndDelegation
   | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
 
-function wasmCertToStakeCredential(
-  wasmCert: WasmCertWithStakeCredential,
-  getPath: RustModule.WalletV4.Credential => number[]
-): CredentialParams {
+function wasmCertToStakeCredential(wasmCert: WasmCertWithStakeCredential, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
   return {
     type: CredentialParamsType.KEY_PATH,
     keyPath: getPath(wasmCert.stake_credential()),
@@ -166,14 +174,11 @@ function wasmCertToStakeCredential(
 }
 
 type WasmCertWithDrepCredential =
-  | RustModule.WalletV4.DRepRegistration
+  RustModule.WalletV4.DRepRegistration
   | RustModule.WalletV4.DRepUpdate
   | RustModule.WalletV4.DRepDeregistration;
 
-function wasmCertToDRepCredential(
-  wasmCert: WasmCertWithDrepCredential,
-  getPath: RustModule.WalletV4.Credential => number[]
-): CredentialParams {
+function wasmCertToDRepCredential(wasmCert: WasmCertWithDrepCredential, getPath: RustModule.WalletV4.Credential => number[]): CredentialParams {
   return {
     type: CredentialParamsType.KEY_PATH,
     keyPath: getPath(wasmCert.voting_credential()),
@@ -181,7 +186,7 @@ function wasmCertToDRepCredential(
 }
 
 type WasmCertWithDrepDelegation =
-  | RustModule.WalletV4.VoteDelegation
+  RustModule.WalletV4.VoteDelegation
   | RustModule.WalletV4.StakeAndVoteDelegation
   | RustModule.WalletV4.VoteRegistrationAndDelegation
   | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
@@ -209,46 +214,38 @@ function wasmCertToDrep(wasmCert: WasmCertWithDrepDelegation): DRepParams {
 }
 
 type WasmCertWithStakeRegistration =
-  | RustModule.WalletV4.StakeRegistration
+  RustModule.WalletV4.StakeRegistration
   | RustModule.WalletV4.StakeRegistrationAndDelegation
   | RustModule.WalletV4.VoteRegistrationAndDelegation
   | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
 
-function wasmCertToStakeRegistration(
-  wasmCert: WasmCertWithStakeRegistration,
-  getPath: RustModule.WalletV4.Credential => number[]
-): Certificate {
+function wasmCertToStakeRegistration(wasmCert: WasmCertWithStakeRegistration, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   const stakeCredential = wasmCertToStakeCredential(wasmCert, getPath);
   const coin = wasmCert.coin();
-  return coin == null
-    ? {
-        type: CertificateType.STAKE_REGISTRATION,
-        params: { stakeCredential },
-      }
-    : {
-        type: CertificateType.STAKE_REGISTRATION_CONWAY,
-        params: { stakeCredential, deposit: coin.to_str() },
-      };
+  return coin == null ? {
+    type: CertificateType.STAKE_REGISTRATION,
+    params: { stakeCredential },
+  } : {
+    type: CertificateType.STAKE_REGISTRATION_CONWAY,
+    params: { stakeCredential, deposit: coin.to_str() },
+  };
 }
 
-type WasmCertWithStakeDeregistration = RustModule.WalletV4.StakeDeregistration;
+type WasmCertWithStakeDeregistration =
+  | RustModule.WalletV4.StakeDeregistration;
 
-function wasmCertToStakeDeregistration(
-  wasmCert: WasmCertWithStakeDeregistration,
-  getPath: RustModule.WalletV4.Credential => number[]
-): Certificate {
+function wasmCertToStakeDeregistration(wasmCert: WasmCertWithStakeDeregistration, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   const stakeCredential = wasmCertToStakeCredential(wasmCert, getPath);
   const coin = wasmCert.coin();
-  return coin == null
-    ? {
-        type: CertificateType.STAKE_DEREGISTRATION,
-        params: { stakeCredential },
-      }
-    : {
-        type: CertificateType.STAKE_DEREGISTRATION_CONWAY,
-        params: { stakeCredential, deposit: coin.to_str() },
-      };
+  return coin == null ? {
+    type: CertificateType.STAKE_DEREGISTRATION,
+    params: { stakeCredential },
+  } : {
+    type: CertificateType.STAKE_DEREGISTRATION_CONWAY,
+    params: { stakeCredential, deposit: coin.to_str() },
+  };
 }
+
 
 type WasmCertWithStakeDelegation =
   | RustModule.WalletV4.StakeDelegation
@@ -256,10 +253,7 @@ type WasmCertWithStakeDelegation =
   | RustModule.WalletV4.StakeRegistrationAndDelegation
   | RustModule.WalletV4.StakeVoteRegistrationAndDelegation;
 
-function wasmCertToStakeDelegation(
-  wasmCert: WasmCertWithStakeDelegation,
-  getPath: RustModule.WalletV4.Credential => number[]
-): Certificate {
+function wasmCertToStakeDelegation(wasmCert: WasmCertWithStakeDelegation, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   return {
     type: CertificateType.STAKE_DELEGATION,
     params: {
@@ -269,10 +263,7 @@ function wasmCertToStakeDelegation(
   };
 }
 
-function wasmCertToVoteDelegation(
-  wasmCert: WasmCertWithDrepDelegation,
-  getPath: RustModule.WalletV4.Credential => number[]
-): Certificate {
+function wasmCertToVoteDelegation(wasmCert: WasmCertWithDrepDelegation, getPath: RustModule.WalletV4.Credential => number[]): Certificate {
   return {
     type: CertificateType.VOTE_DELEGATION,
     params: {
@@ -339,24 +330,24 @@ function convertCertificate(
     case RustModule.WalletV4.CertificateKind.StakeRegistrationAndDelegation:
     case RustModule.WalletV4.CertificateKind.VoteRegistrationAndDelegation:
     case RustModule.WalletV4.CertificateKind.StakeVoteRegistrationAndDelegation:
-      throw new Error(
-        `${nameof(formatLedgerCertificates)} Ledger doesn't support combinatory certificate types (${kind}), use multiple simple certificates instead! ` +
-          wasmCertificateWrap.to_hex()
-      );
+      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support combinatory certificate types (${kind}), use multiple simple certificates instead! ` + wasmCertificateWrap.to_hex());
     default:
-      throw new Error(
-        `${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + wasmCertificateWrap.to_hex()
-      );
+      throw new Error(`${nameof(formatLedgerCertificates)} Ledger doesn't support this certificate type! ` + wasmCertificateWrap.to_hex());
   }
 }
 
 function formatLedgerCertificates(
   networkId: number,
   certificates: RustModule.WalletV4.Certificates,
-  addressingMap: string => void | { +path: Array<number>, ... }
+  addressingMap: string => (void | { +path: Array<number>, ... }),
 ): Array<Certificate> {
-  const getPath = (stakeCredential: RustModule.WalletV4.Credential): Array<number> => {
-    const rewardAddr = RustModule.WalletV4.RewardAddress.new(networkId, stakeCredential);
+  const getPath = (
+    stakeCredential: RustModule.WalletV4.Credential
+  ): Array<number> => {
+    const rewardAddr = RustModule.WalletV4.RewardAddress.new(
+      networkId,
+      stakeCredential
+    );
     const addressPayload = rewardAddr.to_address().to_hex();
     const addressing = addressingMap(addressPayload);
     if (addressing == null) {
@@ -373,7 +364,7 @@ export function toLedgerAddressParameters(request: {|
   networkId: number,
   address: RustModule.WalletV4.Address,
   path: Array<number>,
-  addressingMap: string => void | $PropertyType<Addressing, 'addressing'>,
+  addressingMap: string => (void | $PropertyType<Addressing, 'addressing'>),
 |}): DeviceOwnedAddress {
   {
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(request.address);
@@ -389,14 +380,18 @@ export function toLedgerAddressParameters(request: {|
   {
     const baseAddr = RustModule.WalletV4.BaseAddress.from_address(request.address);
     if (baseAddr) {
-      const rewardAddr = RustModule.WalletV4.RewardAddress.new(request.networkId, baseAddr.stake_cred());
+      const rewardAddr = RustModule.WalletV4.RewardAddress.new(
+        request.networkId,
+        baseAddr.stake_cred()
+      );
       const addressPayload = rewardAddr.to_address().to_hex();
       const addressing = request.addressingMap(addressPayload);
 
       if (addressing == null) {
         const stakeCred = baseAddr.stake_cred();
         const wasmHash = stakeCred.to_keyhash() ?? stakeCred.to_scripthash();
-        const hashInAddress = wasmHash?.to_hex() ?? fail(`${nameof(toLedgerAddressParameters)} unknown hash type`);
+        const hashInAddress = wasmHash?.to_hex()
+          ?? fail(`${nameof(toLedgerAddressParameters)} unknown hash type`);
 
         return {
           // can't always know staking key path since address may not belong to the wallet
@@ -476,13 +471,12 @@ export function toLedgerSignRequest(
   senderUtxos: Array<CardanoAddressedUtxo>,
   additionalRequiredSigners: Array<string> = [],
   ledgerSupportsCip36?: boolean,
-  catalystData?: LedgerNanoCatalystRegistrationTxSignData
+  catalystData?: LedgerNanoCatalystRegistrationTxSignData,
 ): SignTransactionRequest {
-  const tagsState = RustModule.WasmScope(Module =>
-    Module.WalletV4.has_transaction_set_tag(
-      Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
-    )
-  );
+
+  const tagsState = RustModule.WasmScope(Module => Module.WalletV4.has_transaction_set_tag(
+    Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
+  ));
 
   if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
     throw new Error('Transaction with mixed sets cannot be signed by Ledger');
@@ -493,18 +487,19 @@ export function toLedgerSignRequest(
   const txBody = RustModule.WalletV4.TransactionBody.from_hex(txBodyHex);
 
   function formatInputs(inputs: RustModule.WalletV4.TransactionInputs): Array<TxInput> {
-    return iterateLenGet(inputs)
-      .map(input => {
-        const txHashHex = input.transaction_id().to_hex();
-        const outputIndex = input.index();
-        const ownUtxo = senderUtxos.find(utxo => utxo.tx_hash === txHashHex && utxo.tx_index === outputIndex);
-        const path = ownUtxo?.addressing.path ?? null;
-        return { txHashHex, outputIndex, path };
-      })
-      .toArray();
+    return iterateLenGet(inputs).map(input => {
+      const txHashHex = input.transaction_id().to_hex();
+      const outputIndex = input.index();
+      const ownUtxo = senderUtxos.find(utxo =>
+        utxo.tx_hash === txHashHex && utxo.tx_index === outputIndex
+      );
+      const path = ownUtxo?.addressing.path ?? null;
+      return { txHashHex, outputIndex, path };
+    }).toArray();
   }
 
   function formatOutput(output: RustModule.WalletV4.TransactionOutput): TxOutput {
+
     const isPostAlonzoTransactionOutput = output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
 
     const addr = output.address();
@@ -548,12 +543,18 @@ export function toLedgerSignRequest(
 
     const baseAddr = RustModule.WalletV4.BaseAddress.from_address(addr);
     if (baseAddr) {
-      const paymentAddress = RustModule.WalletV4.EnterpriseAddress.new(networkId, baseAddr.payment_cred()).to_address().to_hex();
-      const ownPaymentPath =
-        ownAddressMap(paymentAddress) || changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
+      const paymentAddress = RustModule.WalletV4.EnterpriseAddress.new(
+        networkId,
+        baseAddr.payment_cred()
+      ).to_address().to_hex();
+      const ownPaymentPath = ownAddressMap(paymentAddress) ||
+        changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
-        const stakeAddr = RustModule.WalletV4.RewardAddress.new(networkId, stake).to_address().to_hex();
+        const stakeAddr = RustModule.WalletV4.RewardAddress.new(
+          networkId,
+          stake,
+        ).to_address().to_hex();
         const ownStakePath = ownAddressMap(stakeAddr);
         if (ownStakePath) {
           // stake address is ours
@@ -565,7 +566,7 @@ export function toLedgerSignRequest(
                 spendingPath: ownPaymentPath,
                 stakingPath: ownStakePath,
               },
-            },
+            }
           };
         } else {
           const keyHash = stake.to_keyhash();
@@ -580,7 +581,7 @@ export function toLedgerSignRequest(
                   spendingPath: ownPaymentPath,
                   stakingKeyHashHex: keyHash.to_hex(),
                 },
-              },
+              }
             };
           } else if (scriptHash) {
             // stake address is script hash
@@ -592,7 +593,7 @@ export function toLedgerSignRequest(
                   spendingPath: ownPaymentPath,
                   stakingScriptHashHex: scriptHash.to_hex(),
                 },
-              },
+              }
             };
           } else {
             throw new Error('unexpected stake credential type in base address');
@@ -600,8 +601,7 @@ export function toLedgerSignRequest(
         }
         // not having BASE_PAYMENT_SCRIPT_ because payment script is
         // treated as third party address
-      } else {
-        // payment address is not ours
+      } else { // payment address is not ours
         destination = {
           type: TxOutputDestinationType.THIRD_PARTY,
           params: {
@@ -661,13 +661,16 @@ export function toLedgerSignRequest(
   RustModule.WasmScope(Module => {
     function hashHexToOwnAddressPath(hashHex: string): ?Array<number> {
       const hash = Module.WalletV4.Ed25519KeyHash.from_hex(hashHex);
-      const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(networkId, Module.WalletV4.Credential.from_keyhash(hash))
-        .to_address()
-        .to_hex();
-      const stakeAddress = Module.WalletV4.RewardAddress.new(networkId, Module.WalletV4.Credential.from_keyhash(hash))
-        .to_address()
-        .to_hex();
-      return ownAddressMap(enterpriseAddress) || ownAddressMap(stakeAddress);
+      const enterpriseAddress = Module.WalletV4.EnterpriseAddress.new(
+        networkId,
+        Module.WalletV4.Credential.from_keyhash(hash),
+      ).to_address().to_hex();
+      const stakeAddress = Module.WalletV4.RewardAddress.new(
+        networkId,
+        Module.WalletV4.Credential.from_keyhash(hash),
+      ).to_address().to_hex();
+      return ownAddressMap(enterpriseAddress)
+        || ownAddressMap(stakeAddress);
     }
 
     iterateLenGet(txBody.required_signers())
@@ -689,7 +692,7 @@ export function toLedgerSignRequest(
         }
       });
 
-    for (const additionalHashHex of additionalRequiredSigners || []) {
+    for (const additionalHashHex of (additionalRequiredSigners || [])) {
       const ownAddressPath = hashHexToOwnAddressPath(additionalHashHex);
       if (ownAddressPath != null) {
         additionalWitnessPaths.push(ownAddressPath);
@@ -708,13 +711,20 @@ export function toLedgerSignRequest(
   let formattedCertificates = null;
   const certificates = txBody.certs();
   if (certificates) {
-    formattedCertificates = formatLedgerCertificates(networkId, certificates, addressingMap);
+    formattedCertificates = formatLedgerCertificates(
+      networkId,
+      certificates,
+      addressingMap,
+    );
   }
 
   let formattedWithdrawals = null;
   const withdrawals = txBody.withdrawals();
   if (withdrawals) {
-    formattedWithdrawals = formatLedgerWithdrawals(withdrawals, addressingMap);
+    formattedWithdrawals = formatLedgerWithdrawals(
+      withdrawals,
+      addressingMap,
+    );
   }
 
   let formattedAuxiliaryData = null;
@@ -724,17 +734,17 @@ export function toLedgerSignRequest(
       type: TxAuxiliaryDataType.ARBITRARY_HASH,
       params: {
         hashHex: auxiliaryDataHash.to_hex(),
-      },
+      }
     };
   }
 
   // note: we know that `catelystData` is only used for voting in the extension and there
   // should be no other auxiliary data in this scenario so we just overwrite the auxiliary data
   if (catalystData) {
-    const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath } = catalystData;
+    const { votingPublicKey, stakingKeyPath, nonce, paymentKeyPath, } = catalystData;
 
     if (ledgerSupportsCip36) {
-      formattedAuxiliaryData = {
+     formattedAuxiliaryData = {
         type: TxAuxiliaryDataType.CIP36_REGISTRATION,
         params: {
           format: CIP36VoteRegistrationFormat.CIP_36,
@@ -758,7 +768,7 @@ export function toLedgerSignRequest(
           },
           nonce,
           votingPurpose: 0,
-        },
+        }
       };
     } else {
       formattedAuxiliaryData = {
@@ -778,7 +788,7 @@ export function toLedgerSignRequest(
             },
           },
           nonce,
-        },
+        }
       };
     }
   }
@@ -816,7 +826,13 @@ export function toLedgerSignRequest(
           formattedVoter = {
             type: VoterType.DREP_KEY_PATH,
             // fixme
-            keyPath: [1852 + HARD_DERIVATION_START, 1815 + HARD_DERIVATION_START, 0 + HARD_DERIVATION_START, 3, 0],
+            keyPath: [
+              1852 + HARD_DERIVATION_START,
+              1815 + HARD_DERIVATION_START,
+              0 + HARD_DERIVATION_START,
+              3,
+              0
+            ],
           };
         }
         // else
@@ -838,7 +854,7 @@ export function toLedgerSignRequest(
         };
       }
       // don't support cc hot credential for now
-
+      
       if (!formattedVoter) {
         throw new Error('unexpected voter');
       }
@@ -850,11 +866,11 @@ export function toLedgerSignRequest(
       for (let j = 0; j < govActionIds.len(); j++) {
         const govActionId = govActionIds.get(j);
         if (!govActionId) {
-          throw new Error('unexpectedly missing gov action id');
+          throw new Error('unexpectedly missing gov action id')
         }
         const votingProcedure = votingProcedures.get(voter, govActionId);
         if (!votingProcedure) {
-          throw new Error('unexpectedly missing voting procedure');
+          throw new Error('unexpectedly missing voting procedure')
         }
         const voteKind = votingProcedure.vote_kind();
         let formattedVoteKind;
@@ -876,12 +892,10 @@ export function toLedgerSignRequest(
           },
           votingProcedure: {
             vote: formattedVoteKind,
-            anchor: anchor
-              ? {
-                  url: anchor.url().url(),
-                  hashHex: anchor.anchor_data_hash().to_hex(),
-                }
-              : null,
+            anchor: anchor ? {
+              url: anchor.url().url(),
+              hashHex: anchor.anchor_data_hash().to_hex(),
+            } : null,
           },
         });
       }
@@ -908,12 +922,14 @@ export function toLedgerSignRequest(
       certificates: formattedCertificates,
       withdrawals: formattedWithdrawals,
       auxiliaryData: formattedAuxiliaryData,
-      mint:
-        JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyIdHex, assets]) => ({
+      mint: JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(
+        ([policyIdHex, assets]) => ({
           policyIdHex,
-          tokens: Object.keys(assets).map(assetNameHex => ({ assetNameHex, amount: assets[assetNameHex] })),
+          tokens: Object.keys(assets).map(assetNameHex => (
+            { assetNameHex, amount: assets[assetNameHex] }
+          )),
         })) ?? null,
-      scriptDataHashHex: txBody.script_data_hash()?.to_hex() ?? null,
+      scriptDataHashHex: txBody.script_data_hash()?.to_hex() ??  null,
       collateralInputs: formattedCollateral,
       requiredSigners: formattedRequiredSigners.length > 0 ? formattedRequiredSigners : null,
       includeNetworkId: txBody.network_id() != null,
@@ -938,8 +954,9 @@ export function buildConnectorSignedTransaction(
   |},
   metadata: ?RustModule.WalletV4.AuxiliaryData,
   // to support transfering from Byron address when initializing Ledger wallets
-  pathToReceiverMapping: Map<string, string> = new Map()
+  pathToReceiverMapping: Map<string, string> = new Map(),
 ): {| txHex: string, txId: string |} {
+
   const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
   if (metadata) {
     fixedTx.set_auxiliary_data(metadata.to_bytes());
@@ -961,7 +978,7 @@ export function buildConnectorSignedTransaction(
       startingFrom: {
         level: keyLevel,
         key: publicKey.key,
-      },
+      }
     });
     if (witness.path[0] === WalletTypePurpose.BIP44) {
       const receiver = pathToReceiverMapping.get(witness.path.join('/'));
@@ -972,14 +989,14 @@ export function buildConnectorSignedTransaction(
         RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
         RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
         witnessKey.chaincode(),
-        RustModule.WalletV4.ByronAddress.from_base58(receiver).attributes()
+        RustModule.WalletV4.ByronAddress.from_base58(receiver).attributes(),
       );
 
       fixedTx.add_bootstrap_witness(bootstrapWit);
     } else if (witness.path[0] === WalletTypePurpose.CIP1852) {
       const vkeyWit = RustModule.WalletV4.Vkeywitness.new(
         RustModule.WalletV4.Vkey.new(witnessKey.to_raw_key()),
-        RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex)
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.witnessSignatureHex),
       );
 
       fixedTx.add_vkey_witness(vkeyWit);
@@ -988,5 +1005,5 @@ export function buildConnectorSignedTransaction(
     }
   }
   const txHex = fixedTx.to_hex();
-  return { txHex, txId: transactionHexToHash(txHex) };
+  return { txHex, txId: transactionHexToHash(txHex)};
 }

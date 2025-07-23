@@ -13,24 +13,16 @@ type Props = {|
 
 @observer
 export default class OpenInExplorer extends Component<Props> {
-  static defaultProps: {| children: void |} = {
-    children: undefined,
+  static defaultProps: {|children: void|} = {
+    children: undefined
   };
 
   render(): Node {
     const { children, network, address } = this.props;
     if (isCardanoHaskell(network) && !isTestnet(network)) {
-      return (
-        <a href={`https://cardanoscan.io/token/${address}`} rel="noreferrer" target="_blank">
-          {children}
-        </a>
-      );
+        return <a href={`https://cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
     }
     // Cardano testnet
-    return (
-      <a href={`https://preprod.cardanoscan.io/token/${address}`} rel="noreferrer" target="_blank">
-        {children}
-      </a>
-    );
+    return <a href={`https://preprod.cardanoscan.io/token/${address}`} rel="noreferrer" target='_blank'>{children}</a>
   }
 }

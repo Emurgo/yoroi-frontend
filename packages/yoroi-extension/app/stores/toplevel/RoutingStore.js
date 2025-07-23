@@ -7,13 +7,20 @@ import { observable } from 'mobx';
 export default class RoutingStore extends Store<StoresMap> {
   @observable currentRoute: string = '';
   navigate: Function;
-
-  replaceRoute: ({| route: string, params?: Object |}) => void = options => {
+  
+  replaceRoute: ({|
+    route: string,
+    params?: Object,
+  |}) => void = options => {
     const routePath = buildRoute(options.route, options.params);
     this.navigate(routePath, { replace: true });
   };
 
-  goToRoute: ({| route: string, params?: Object, query?: {| [string]: string |} |}) => void = options => {
+  goToRoute: ({|
+    route: string,
+    params?: Object,
+    query?: {| [string]: string |},
+  |}) => void = options => {
     let routePath = buildRoute(options.route, options.params);
     if (options.query) {
       const query = new URLSearchParams();
@@ -28,5 +35,5 @@ export default class RoutingStore extends Store<StoresMap> {
     } else {
       window.history.pushState({}, '', '#' + routePath);
     }
-  };
+  }
 }

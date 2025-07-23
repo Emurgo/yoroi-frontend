@@ -50,7 +50,7 @@ const messages = defineMessages({
   },
 });
 export default class SingleTokenRow extends Component<Props, State> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   constructor(props: Props) {
     super(props);
     // eslint-disable-next-line react/state-in-constructor
@@ -86,7 +86,7 @@ export default class SingleTokenRow extends Component<Props, State> {
     const includedBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_min';
     const activeInputErrorBorderColor = isNotValid ? 'ds.sys_magenta_500' : 'ds.el_gray_max';
     const tokenRowBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'transparent';
-    const activeInputBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor : tokenRowBorderColor;
+    const activeInputBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor: tokenRowBorderColor;
 
     const hoverNotActiveInputBorderColor = this.props.isTokenIncluded(token.info) ? includedBorderColor : 'ds.gray_200';
     const hoverBorderColor = this.state.isInputFocused ? activeInputErrorBorderColor : hoverNotActiveInputBorderColor;

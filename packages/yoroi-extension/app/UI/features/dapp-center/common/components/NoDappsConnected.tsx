@@ -1,4 +1,4 @@
-import { Typography, Box } from '@mui/material';
+import { Typography , Box } from '@mui/material';
 import { connectorMessages } from '../../../../../i18n/global-messages';
 import { defineMessages, useIntl } from 'react-intl';
 import { NoDappsConnected as NoDappsConnectedIllustration } from '../../../../components/ilustrations';

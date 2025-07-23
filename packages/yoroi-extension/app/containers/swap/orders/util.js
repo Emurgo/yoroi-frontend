@@ -25,7 +25,7 @@ export function createFormattedTokenValues({
   const tokenAmountMap = entries.reduce(
     (map, v) => ({
       ...map,
-      [v.id]: Quantities.sum([map[v.id] ?? '0', v.amount]),
+      [v.id]: Quantities.sum([map[v.id] ?? '0', v.amount])
     }),
     {}
   );

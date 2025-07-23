@@ -87,7 +87,7 @@ function VerifyRecoveryPhraseStep(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="verifyRecoveryPhraseStepComponent">
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="648px">
         <Typography component="div" mb="16px" color="ds.text_gray_medium">
-          <FormattedMessage {...messages.description} values={{ strong }} />
+          <FormattedMessage {...messages.description} values={{ strong }}/>
         </Typography>
 
         <Box

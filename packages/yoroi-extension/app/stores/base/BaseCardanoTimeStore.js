@@ -1,12 +1,15 @@
 // @flow
 
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, computed, observable, runInAction, } from 'mobx';
 import { find } from 'lodash';
 import Store from './Store';
 import type { StoresMap } from '../index';
 import type { RelativeSlot } from '../../api/ada/lib/storage/bridge/timeUtils';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import { getCardanoHaskellBaseConfig, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
+import {
+  getCardanoHaskellBaseConfig,
+  getNetworkById,
+} from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { fail, maybe } from '../../coreUtils';
 
 export type TimeCalcRequests = {|
@@ -15,12 +18,12 @@ export type TimeCalcRequests = {|
   // so it depends how much the blockchain has synced for a given wallet
   publicDeriverId: number,
   requests: {|
-    toAbsoluteSlot: RelativeSlot => number,
-    toRelativeSlotNumber: number => RelativeSlot,
-    timeToSlot: ({| time: Date |}) => {| slot: number |},
-    currentEpochLength: () => number,
-    currentSlotLength: () => number,
-    toRealTime: ({| absoluteSlotNum: number |}) => Date,
+    toAbsoluteSlot: RelativeSlot => number;
+    toRelativeSlotNumber: number => RelativeSlot;
+    timeToSlot: {| time: Date |} => {| slot: number |};
+    currentEpochLength: () => number;
+    currentSlotLength: () => number;
+    toRealTime: {| absoluteSlotNum: number |} => Date;
   |},
 |};
 
@@ -35,8 +38,9 @@ export type CurrentTimeRequests = {|
 
 /**
  * Different wallets can be on different networks and therefore have different measures of time
- */
+*/
 export default class BaseCardanoTimeStore extends Store<StoresMap> {
+
   @observable time: Date = new Date();
 
   /**
@@ -61,7 +65,9 @@ export default class BaseCardanoTimeStore extends Store<StoresMap> {
     if (this._intervalId) clearInterval(this._intervalId);
   }
 
-  @action addObservedTime: ({ publicDeriverId: number, networkId: number, ... }) => void = wallet => {
+  @action addObservedTime: { publicDeriverId: number, networkId: number, ... }  => void = (
+    wallet
+  ) => {
     const baseConfig = getCardanoHaskellBaseConfig(getNetworkById(wallet.networkId));
     this.timeCalcRequests.push({
       publicDeriverId: wallet.publicDeriverId,
@@ -80,20 +86,17 @@ export default class BaseCardanoTimeStore extends Store<StoresMap> {
       currentEpoch: 0,
       currentSlot: 0,
     });
-  };
+  }
 
-  getTimeCalcRequests: ({ publicDeriverId: number, ... }) => TimeCalcRequests = ({ publicDeriverId }) => {
-    return (
-      find(this.timeCalcRequests, { publicDeriverId }) ?? fail(`${nameof(this.getTimeCalcRequests)} missing for public deriver`)
-    );
-  };
+  getTimeCalcRequests: ({ publicDeriverId: number, ... })=> TimeCalcRequests = ({ publicDeriverId }) => {
+    return find(this.timeCalcRequests, { publicDeriverId })
+      ?? fail(`${nameof(this.getTimeCalcRequests)} missing for public deriver`);
+  }
 
   getCurrentTimeRequests: ({ publicDeriverId: number, ... }) => CurrentTimeRequests = ({ publicDeriverId }) => {
-    return (
-      find(this.currentTimeRequests, { publicDeriverId }) ??
-      fail(`${nameof(this.getCurrentTimeRequests)} missing for public deriver`)
-    );
-  };
+    return find(this.currentTimeRequests, { publicDeriverId })
+      ?? fail(`${nameof(this.getCurrentTimeRequests)} missing for public deriver`)
+  }
 
   @computed get currentTime(): ?CurrentTimeRequests {
     return maybe(this.stores.wallets.selected, w => this.getCurrentTimeRequests(w));
@@ -101,9 +104,7 @@ export default class BaseCardanoTimeStore extends Store<StoresMap> {
 
   @action _updateTime: void => Promise<void> = async () => {
     const currTime = new Date();
-    runInAction(() => {
-      this.time = currTime;
-    });
+    runInAction(() => { this.time = currTime; });
 
     const selected = this.stores.wallets.selected;
     if (selected == null) return;
@@ -124,5 +125,5 @@ export default class BaseCardanoTimeStore extends Store<StoresMap> {
       }
       currTimeRequests.currentSlot = currentRelativeTime.slot;
     });
-  };
+  }
 }

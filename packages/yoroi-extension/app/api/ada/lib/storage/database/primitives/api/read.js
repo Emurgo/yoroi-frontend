@@ -1,14 +1,19 @@
 // @flow
 
-import type { lf$Database, lf$Transaction, lf$Predicate } from 'lovefield';
-import lf, { op } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+  lf$Predicate,
+} from 'lovefield';
+import lf, {
+  op,
+} from 'lovefield';
 
 import type {
   AddressRow,
   KeyDerivationRow,
   BlockRow,
-  EncryptionMetaInsert,
-  EncryptionMetaRow,
+  EncryptionMetaInsert, EncryptionMetaRow,
   KeyRow,
   TransactionRow,
   AddressMappingRow,
@@ -19,12 +24,17 @@ import type {
   TokenRow,
   TokenListRow,
 } from '../tables';
-import type { TxStatusCodesType, CoreAddressT } from '../enums';
+import type {
+  TxStatusCodesType,
+  CoreAddressT,
+} from '../enums';
 import { TxStatusCodes } from '../enums';
 
 import * as Tables from '../tables';
-import { digestForHash } from './utils';
-import { getAll, getRowFromKey, getRowIn, StaleStateError } from '../../utils';
+import {
+  digestForHash,
+} from './utils';
+import { getAll, getRowFromKey, getRowIn, StaleStateError, } from '../../utils';
 
 export class GetEncryptionMeta {
   static ownTables: {|
@@ -34,13 +44,16 @@ export class GetEncryptionMeta {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async getOrInitial(db: lf$Database, tx: lf$Transaction, initial: EncryptionMetaInsert): Promise<EncryptionMetaRow> {
+  static async getOrInitial(
+    db: lf$Database,
+    tx: lf$Transaction,
+    initial: EncryptionMetaInsert,
+  ): Promise<EncryptionMetaRow> {
     const row = await getRowFromKey<EncryptionMetaRow>(
-      db,
-      tx,
+      db, tx,
       0,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
     if (row == null) return initial;
 
@@ -53,13 +66,15 @@ export class GetEncryptionMeta {
     return rowCopy;
   }
 
-  static async get(db: lf$Database, tx: lf$Transaction): Promise<$ReadOnly<EncryptionMetaRow>> {
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnly<EncryptionMetaRow>> {
     const row = await getRowFromKey<EncryptionMetaRow>(
-      db,
-      tx,
+      db, tx,
       0,
       GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].name,
-      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId
+      GetEncryptionMeta.ownTables[Tables.EncryptionMetaSchema.name].properties.EncryptionMetaId,
     );
     if (row === undefined) {
       throw new Error(`${nameof(GetEncryptionMeta)}::${nameof(GetEncryptionMeta.get)} no encryption meta found`);
@@ -70,19 +85,22 @@ export class GetEncryptionMeta {
 
 export class GetKey {
   static ownTables: {|
-    Key: typeof Tables.KeySchema,
+    Key: typeof Tables.KeySchema
   |} = Object.freeze({
     [Tables.KeySchema.name]: Tables.KeySchema,
   });
   static depTables: {||} = Object.freeze({});
 
-  static async get(db: lf$Database, tx: lf$Transaction, key: number): Promise<$ReadOnly<KeyRow> | void> {
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<$ReadOnly<KeyRow> | void> {
     return await getRowFromKey<KeyRow>(
-      db,
-      tx,
+      db, tx,
       key,
       GetKey.ownTables[Tables.KeySchema.name].name,
-      GetKey.ownTables[Tables.KeySchema.name].properties.KeyId
+      GetKey.ownTables[Tables.KeySchema.name].properties.KeyId,
     );
   }
 }
@@ -95,27 +113,29 @@ export class GetBlock {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async byIds(db: lf$Database, tx: lf$Transaction, blockId: Array<number>): Promise<$ReadOnlyArray<$ReadOnly<BlockRow>>> {
+  static async byIds(
+    db: lf$Database,
+    tx: lf$Transaction,
+    blockId: Array<number>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<BlockRow>>> {
     return await getRowIn<BlockRow>(
-      db,
-      tx,
+      db, tx,
       GetBlock.ownTables[Tables.BlockSchema.name].name,
       GetBlock.ownTables[Tables.BlockSchema.name].properties.BlockId,
-      blockId
+      blockId,
     );
   }
 
   static async byDigests(
     db: lf$Database,
     tx: lf$Transaction,
-    digests: Array<number>
+    digests: Array<number>,
   ): Promise<$ReadOnlyArray<$ReadOnly<BlockRow>>> {
     return await getRowIn<BlockRow>(
-      db,
-      tx,
+      db, tx,
       GetBlock.ownTables[Tables.BlockSchema.name].name,
       GetBlock.ownTables[Tables.BlockSchema.name].properties.Digest,
-      digests
+      digests,
     );
   }
 }
@@ -128,14 +148,17 @@ export class GetAddress {
     [Tables.AddressSchema.name]: Tables.AddressSchema,
     [Tables.AddressMappingSchema.name]: Tables.AddressMappingSchema,
   });
-  static depTables: {| GetEncryptionMeta: typeof GetEncryptionMeta |} = Object.freeze({
-    GetEncryptionMeta,
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
+    GetEncryptionMeta
   });
 
-  static async getById(db: lf$Database, tx: lf$Transaction, ids: Array<number>): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
+  static async getById(
+    db: lf$Database,
+    tx: lf$Transaction,
+    ids: Array<number>,
+  ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     return await getRowIn<AddressRow>(
-      db,
-      tx,
+      db, tx,
       GetAddress.ownTables[Tables.AddressSchema.name].name,
       GetAddress.ownTables[Tables.AddressSchema.name].properties.AddressId,
       ids
@@ -145,14 +168,13 @@ export class GetAddress {
   static async getByHash(
     db: lf$Database,
     tx: lf$Transaction,
-    addressHash: Array<string>
+    addressHash: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<AddressRow>>> {
     const { AddressSeed } = await GetAddress.depTables.GetEncryptionMeta.get(db, tx);
     const digests = addressHash.map<number>(hash => digestForHash(hash, AddressSeed));
 
     const addressRows = await getRowIn<AddressRow>(
-      db,
-      tx,
+      db, tx,
       GetAddress.ownTables[Tables.AddressSchema.name].name,
       GetAddress.ownTables[Tables.AddressSchema.name].properties.Digest,
       digests
@@ -168,7 +190,7 @@ export class GetAddress {
     /**
      * void -> do not filter by type
      */
-    types: void | Array<CoreAddressT>
+    types: void | Array<CoreAddressT>,
   ): Promise<Map<number, Array<$ReadOnly<AddressRow>>>> {
     const mappingSchema = GetAddress.ownTables[Tables.AddressMappingSchema.name];
     const mappingTable = db.getSchema().table(mappingSchema.name);
@@ -180,33 +202,55 @@ export class GetAddress {
       .innerJoin(
         addressTable,
         op.and(
-          mappingTable[mappingSchema.properties.AddressId].eq(addressTable[addressSchema.properties.AddressId]),
-          ...(types != null ? [addressTable[addressSchema.properties.Type].in(types)] : [])
+          mappingTable[mappingSchema.properties.AddressId].eq(
+            addressTable[addressSchema.properties.AddressId]
+          ),
+          ...(types != null
+            ? [addressTable[addressSchema.properties.Type].in(
+              types
+            )]
+            : []
+          )
         )
       )
-      .where(mappingTable[mappingSchema.properties.KeyDerivationId].in(keyDerivationId));
+      .where(
+        mappingTable[mappingSchema.properties.KeyDerivationId].in(
+          keyDerivationId
+        )
+      );
     const result: $ReadOnlyArray<{|
       AddressMapping: $ReadOnly<AddressMappingRow>,
       Address: $ReadOnly<AddressRow>,
     |}> = await tx.attach(query);
 
-    const addressRowMap: Map<number, Array<$ReadOnly<AddressRow>>> = result.reduce((map, nextElement) => {
-      const array = map.get(nextElement.AddressMapping.KeyDerivationId) || [];
-      map.set(nextElement.AddressMapping.KeyDerivationId, [...array, nextElement.Address]);
-      return map;
-    }, new Map());
+    const addressRowMap: Map<number, Array<$ReadOnly<AddressRow>>> = result.reduce(
+      (map, nextElement) => {
+        const array = map.get(nextElement.AddressMapping.KeyDerivationId) || [];
+        map.set(
+          nextElement.AddressMapping.KeyDerivationId,
+          [...array, nextElement.Address]
+        );
+        return map;
+      },
+      new Map()
+    );
     return addressRowMap;
   }
 
-  static async getKeyForFamily(db: lf$Database, tx: lf$Transaction, addressId: number): Promise<number | void> {
+  static async getKeyForFamily(
+    db: lf$Database,
+    tx: lf$Transaction,
+    addressId: number,
+  ): Promise<number | void> {
     const row = await getRowFromKey<AddressMappingRow>(
-      db,
-      tx,
+      db, tx,
       addressId,
       GetAddress.ownTables[Tables.AddressMappingSchema.name].name,
-      GetAddress.ownTables[Tables.AddressMappingSchema.name].properties.AddressId
+      GetAddress.ownTables[Tables.AddressMappingSchema.name].properties.AddressId,
     );
-    return row === undefined ? row : row.KeyDerivationId;
+    return row === undefined
+      ? row
+      : row.KeyDerivationId;
   }
 }
 
@@ -226,7 +270,7 @@ export class GetChildIfExists {
     db: lf$Database,
     tx: lf$Transaction,
     parentId: number,
-    childIndex: number
+    childIndex: number,
   ): Promise<void | $ReadOnly<KeyDerivationRow>> {
     const derivationSchema = GetChildIfExists.ownTables[Tables.KeyDerivationSchema.name];
 
@@ -243,13 +287,15 @@ export class GetChildIfExists {
 
     const queryResult: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>> = await tx.attach(query);
 
-    return queryResult.length === 1 ? queryResult[0] : undefined;
+    return queryResult.length === 1
+      ? queryResult[0]
+      : undefined;
   }
 }
 
 export class GetChildWithSpecific {
   static ownTables: {||} = Object.freeze({});
-  static depTables: {| GetChildIfExists: typeof GetChildIfExists |} = Object.freeze({
+  static depTables: {|GetChildIfExists: typeof GetChildIfExists|} = Object.freeze({
     GetChildIfExists,
   });
 
@@ -258,12 +304,16 @@ export class GetChildWithSpecific {
     tx: lf$Transaction,
     getSpecific: (derivationId: number) => Promise<$ReadOnly<Row>>,
     parentId: number,
-    childIndex: number
+    childIndex: number,
   ): Promise<void | {|
-    derivation: $ReadOnly<KeyDerivationRow>,
+    derivation:  $ReadOnly<KeyDerivationRow>,
     levelSpecific: $ReadOnly<Row>,
   |}> {
-    const derivation = await GetChildWithSpecific.depTables.GetChildIfExists.get(db, tx, parentId, childIndex);
+    const derivation = await GetChildWithSpecific.depTables.GetChildIfExists.get(
+      db, tx,
+      parentId,
+      childIndex,
+    );
     if (derivation === undefined) {
       return undefined;
     }
@@ -284,13 +334,16 @@ export class GetKeyDerivation {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async get(db: lf$Database, tx: lf$Transaction, key: number): Promise<$ReadOnly<KeyDerivationRow> | void> {
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+    key: number,
+  ): Promise<$ReadOnly<KeyDerivationRow> | void> {
     return await getRowFromKey<KeyDerivationRow>(
-      db,
-      tx,
+      db, tx,
       key,
       GetKeyDerivation.ownTables[Tables.KeyDerivationSchema.name].name,
-      GetKeyDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId
+      GetKeyDerivation.ownTables[Tables.KeyDerivationSchema.name].properties.KeyDerivationId,
     );
   }
 }
@@ -328,7 +381,7 @@ export class GetDerivationsByPath {
     request: {|
       startingKey: $ReadOnly<KeyDerivationRow>,
       numLevels: number,
-    |}
+    |},
   ): Promise<Array<$ReadOnly<KeyDerivationRow>>> {
     const path = [request.startingKey];
     for (let i = 0; i < request.numLevels; i++) {
@@ -336,7 +389,10 @@ export class GetDerivationsByPath {
       if (parentId === null) {
         throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getParentPath)} unexpected end`);
       }
-      const parent = await GetDerivationsByPath.depTables.GetKeyDerivation.get(db, tx, parentId);
+      const parent = await GetDerivationsByPath.depTables.GetKeyDerivation.get(
+        db, tx,
+        parentId
+      );
       if (parent === undefined) {
         throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getParentPath)} parent not found`);
       }
@@ -350,7 +406,7 @@ export class GetDerivationsByPath {
     db: lf$Database,
     tx: lf$Transaction,
     startingDerivationId: number,
-    queryPath: Array<number>
+    queryPath: Array<number>,
   ): Promise<Array<$ReadOnly<KeyDerivationRow>>> {
     if (queryPath.length === 0) {
       throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getSinglePath)} empty path`);
@@ -360,15 +416,12 @@ export class GetDerivationsByPath {
     const derivations = [];
     for (const index of queryPath) {
       const nextDerivation = await GetDerivationsByPath.depTables.GetChildIfExists.get(
-        db,
-        tx,
+        db, tx,
         currDerivationId,
-        queryPath[index]
+        queryPath[index],
       );
       if (nextDerivation === undefined) {
-        throw new Error(
-          `${nameof(GetDerivationsByPath)}::${nameof(this.getSinglePath)} no path from` + currDerivationId + ' to ' + index
-        );
+        throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(this.getSinglePath)} no path from` + currDerivationId + ' to ' + index);
       }
       derivations.push(nextDerivation);
       currDerivationId = nextDerivation.KeyDerivationId;
@@ -382,19 +435,28 @@ export class GetDerivationsByPath {
     tx: lf$Transaction,
     derivationId: number,
     commonPrefix: Array<number>,
-    queryPath: void | BIP32QueryPath
+    queryPath: void | BIP32QueryPath,
   ): Promise<PathMapType> {
     const pathMap = new Map([[derivationId, commonPrefix]]);
-    const result = await _getTree(db, tx, pathMap, queryPath ? commonPrefix.concat(queryPath) : undefined, commonPrefix.length);
+    const result = await _getTree(
+      db,
+      tx,
+      pathMap,
+      queryPath ? commonPrefix.concat(queryPath) : undefined,
+      commonPrefix.length,
+    );
     return result;
   }
 
   static async allFromRoot(
     db: lf$Database,
     tx: lf$Transaction,
-    rootId: number
+    rootId: number,
   ): Promise<$ReadOnlyArray<$ReadOnly<KeyDerivationRow>>> {
-    const root = await GetDerivationsByPath.depTables.GetKeyDerivation.get(db, tx, rootId);
+    const root = await GetDerivationsByPath.depTables.GetKeyDerivation.get(
+      db, tx,
+      rootId
+    );
     if (root === undefined) {
       throw new Error(`${nameof(GetDerivationsByPath)}::${nameof(GetDerivationsByPath.getParentPath)} root not found`);
     }
@@ -408,7 +470,9 @@ export class GetDerivationsByPath {
       const query = db
         .select()
         .from(derivationTable)
-        .where(derivationTable[derivationSchema.properties.Parent].in(keysForLevel.map(row => row.KeyDerivationId)));
+        .where(derivationTable[derivationSchema.properties.Parent].in(
+          keysForLevel.map(row => row.KeyDerivationId)
+        ));
 
       const queryResult: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>> = await tx.attach(query);
       keysForLevel = queryResult;
@@ -422,7 +486,7 @@ const _getTree = async (
   tx: lf$Transaction,
   pathMap: PathMapType,
   queryPath: void | BIP32QueryPath,
-  currPathIndex: number
+  currPathIndex: number,
 ): Promise<PathMapType> => {
   // base case
   if (queryPath && currPathIndex === queryPath.length) {
@@ -431,10 +495,18 @@ const _getTree = async (
   const derivationSchema = GetDerivationsByPath.ownTables[Tables.KeyDerivationSchema.name];
 
   const derivationTable = db.getSchema().table(derivationSchema.name);
-  const conditions = [derivationTable[derivationSchema.properties.Parent].in(Array.from<number>(pathMap.keys()))];
+  const conditions = [
+    derivationTable[derivationSchema.properties.Parent].in(
+      Array.from<number>(pathMap.keys())
+    ),
+  ];
   // if the query is for a specific index, we need to add the condition to the SQL query
   if (queryPath && queryPath[currPathIndex] !== null) {
-    conditions.push(derivationTable[derivationSchema.properties.Index].eq(queryPath[currPathIndex]));
+    conditions.push(
+      derivationTable[derivationSchema.properties.Index].eq(
+        queryPath[currPathIndex]
+      ),
+    );
   }
 
   const query = db
@@ -443,21 +515,28 @@ const _getTree = async (
     .where(op.and(...conditions));
 
   const queryResult: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>> = await tx.attach(query);
-  const nextPathMap = new Map(
-    queryResult.map(row => {
-      if (row.Parent == null) throw new Error('bip44::_getDerivationsByPath Should never happen');
-      const path = pathMap.get(row.Parent);
-      if (path == null) throw new Error('bip44::_getDerivationsByPath Should never happen');
-      if (row.Index === null) throw new Error('bip44::_getDerivationsByPath null child index');
-      return [row.KeyDerivationId, path.concat([row.Index])];
-    })
-  );
+  const nextPathMap = new Map(queryResult.map(row => {
+    if (row.Parent == null) throw new Error('bip44::_getDerivationsByPath Should never happen');
+    const path = pathMap.get(row.Parent);
+    if (path == null) throw new Error('bip44::_getDerivationsByPath Should never happen');
+    if (row.Index === null) throw new Error('bip44::_getDerivationsByPath null child index');
+    return [
+      row.KeyDerivationId,
+      path.concat([row.Index])
+    ];
+  }));
   if (nextPathMap.size === 0) {
     if (queryPath == null) return pathMap;
     throw new Error('bip44::_getDerivationsByPath no result');
   }
 
-  const result = _getTree(db, tx, nextPathMap, queryPath, currPathIndex + 1);
+  const result = _getTree(
+    db,
+    tx,
+    nextPathMap,
+    queryPath,
+    currPathIndex + 1,
+  );
   return result;
 };
 
@@ -475,7 +554,7 @@ type GetPathWithSpecificRequest = {|
 |};
 export class GetPathWithSpecific {
   static ownTables: {||} = Object.freeze({});
-  static depTables: {| GetDerivationsByPath: typeof GetDerivationsByPath |} = Object.freeze({
+  static depTables: {|GetDerivationsByPath: typeof GetDerivationsByPath|} = Object.freeze({
     GetDerivationsByPath,
   });
 
@@ -483,16 +562,15 @@ export class GetPathWithSpecific {
     db: lf$Database,
     tx: lf$Transaction,
     request: GetPathWithSpecificRequest,
-    getSpecific: (derivationId: number) => Promise<$ReadOnly<Row>>
+    getSpecific: (derivationId: number) => Promise<$ReadOnly<Row>>,
   ): Promise<{|
     path: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>>,
     levelSpecific: Row,
   |}> {
     const path = await GetPathWithSpecific.depTables.GetDerivationsByPath.getSinglePath(
-      db,
-      tx,
+      db, tx,
       request.pubDeriverKeyDerivationId,
-      request.pathToLevel
+      request.pathToLevel,
     );
     const chainDerivation = path[path.length - 1];
     const levelSpecific = await getSpecific(chainDerivation.KeyDerivationId);
@@ -506,14 +584,13 @@ export class GetPathWithSpecific {
     db: lf$Database,
     tx: lf$Transaction,
     request: GetPathWithSpecificByTreeRequest,
-    getSpecific: (derivationIds: Array<number>) => Promise<$ReadOnlyArray<$ReadOnly<Row>>>
+    getSpecific: (derivationIds: Array<number>) => Promise<$ReadOnlyArray<$ReadOnly<Row>>>,
   ): Promise<{|
     pathMap: PathMapType,
     rows: $ReadOnlyArray<$ReadOnly<Row>>,
   |}> {
     const pathMap = await GetDerivationsByPath.getTree(
-      db,
-      tx,
+      db, tx,
       request.startingDerivation,
       request.commonPrefix,
       request.queryPath
@@ -542,13 +619,16 @@ export class GetKeyForDerivation {
     tx: lf$Transaction,
     derivationId: number,
     getPublic: boolean,
-    getPrivate: boolean
+    getPrivate: boolean,
   ): Promise<{|
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
     publicKey: $ReadOnly<KeyRow> | null | void,
     privateKey: $ReadOnly<KeyRow> | null | void,
   |}> {
-    const keyDerivationRow = await GetKeyForDerivation.depTables.GetKeyDerivation.get(db, tx, derivationId);
+    const keyDerivationRow = await GetKeyForDerivation.depTables.GetKeyDerivation.get(
+      db, tx,
+      derivationId,
+    );
     if (keyDerivationRow === undefined) {
       throw new StaleStateError('GetKeyForDerivation::get keyDerivationRow');
     }
@@ -558,7 +638,10 @@ export class GetKeyForDerivation {
       if (keyDerivationRow.PublicKeyId === null) {
         publicKey = null;
       } else {
-        publicKey = await GetKeyForDerivation.depTables.GetKey.get(db, tx, keyDerivationRow.PublicKeyId);
+        publicKey = await GetKeyForDerivation.depTables.GetKey.get(
+          db, tx,
+          keyDerivationRow.PublicKeyId,
+        );
       }
     }
     let privateKey;
@@ -566,7 +649,10 @@ export class GetKeyForDerivation {
       if (keyDerivationRow.PrivateKeyId === null) {
         privateKey = null;
       } else {
-        privateKey = await GetKeyForDerivation.depTables.GetKey.get(db, tx, keyDerivationRow.PrivateKeyId);
+        privateKey = await GetKeyForDerivation.depTables.GetKey.get(
+          db, tx,
+          keyDerivationRow.PrivateKeyId,
+        );
       }
     }
 
@@ -589,14 +675,13 @@ export class GetTransaction {
   static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| ids: Array<number> |}
+    request: {| ids: Array<number>, |},
   ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
     return await getRowIn<TransactionRow>(
-      db,
-      tx,
+      db, tx,
       GetTransaction.ownTables[Tables.TransactionSchema.name].name,
       GetTransaction.ownTables[Tables.TransactionSchema.name].properties.TransactionId,
-      request.ids
+      request.ids,
     );
   }
 
@@ -606,19 +691,19 @@ export class GetTransaction {
     request: {|
       txIds: Array<number>,
       status: Array<TxStatusCodesType>,
-    |}
+    |},
   ): Promise<$ReadOnlyArray<$ReadOnly<TransactionRow>>> {
     const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
-    const txTable = db.getSchema().table(txTableMeta.name);
+    const txTable = db.getSchema().table(
+      txTableMeta.name
+    );
     const query = db
       .select()
       .from(txTable)
-      .where(
-        op.and(
-          txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-          txTable[txTableMeta.properties.Status].in(request.status)
-        )
-      );
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Status].in(request.status),
+      ));
     return await tx.attach(query);
   }
 
@@ -628,19 +713,19 @@ export class GetTransaction {
     request: {|
       txIds: Array<number>,
       digests: Array<number>,
-    |}
+    |},
   ): Promise<Map<string, $ReadOnly<TransactionRow>>> {
     const txTableMeta = GetTransaction.ownTables[Tables.TransactionSchema.name];
-    const txTable = db.getSchema().table(txTableMeta.name);
+    const txTable = db.getSchema().table(
+      txTableMeta.name
+    );
     const query = db
       .select()
       .from(txTable)
-      .where(
-        op.and(
-          txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-          txTable[txTableMeta.properties.Digest].in(request.digests)
-        )
-      );
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Digest].in(request.digests),
+      ));
     const rows: $ReadOnlyArray<$ReadOnly<TransactionRow>> = await tx.attach(query);
 
     const mapToTx = new Map();
@@ -652,7 +737,7 @@ export class GetTransaction {
 }
 
 export class GetTxAndBlock {
-  static ownTables: {|
+    static ownTables: {|
     Block: typeof Tables.BlockSchema,
     Transaction: typeof Tables.TransactionSchema,
   |} = Object.freeze({
@@ -667,28 +752,29 @@ export class GetTxAndBlock {
     request: {|
       txIds: Array<number>,
       height: number,
-    |}
-  ): Promise<
-    $ReadOnlyArray<{|
-      Block: $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>,
-    |}>,
-  > {
-    const txTable = db.getSchema().table(GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name);
-    const blockTable = db.getSchema().table(GetTxAndBlock.ownTables[Tables.BlockSchema.name].name);
-    const query = db
-      .select()
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    Block: $ReadOnly<BlockRow>,
+    Transaction: $ReadOnly<TransactionRow>,
+  |}>> {
+    const txTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
+    );
+    const blockTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.BlockSchema.name].name
+    );
+    const query = db.select()
       .from(txTable)
       .innerJoin(
         blockTable,
-        txTable[Tables.TransactionSchema.properties.BlockId].eq(blockTable[Tables.BlockSchema.properties.BlockId])
-      )
-      .where(
-        op.and(
-          blockTable[Tables.BlockSchema.properties.Height].gte(request.height),
-          txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
+        txTable[Tables.TransactionSchema.properties.BlockId].eq(
+          blockTable[Tables.BlockSchema.properties.BlockId]
         )
-      );
+      )
+      .where(op.and(
+        blockTable[Tables.BlockSchema.properties.Height].gte(request.height),
+        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds)
+      ));
 
     const queryResult: $ReadOnlyArray<{|
       Block: $ReadOnly<BlockRow>,
@@ -704,29 +790,32 @@ export class GetTxAndBlock {
     request: {|
       txIds: Array<number>,
       height: number,
-    |}
+    |},
   ): Promise<void | {|
     Block: $ReadOnly<BlockRow>,
     Transaction: $ReadOnly<TransactionRow>,
   |}> {
-    const txTable = db.getSchema().table(GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name);
-    const blockTable = db.getSchema().table(GetTxAndBlock.ownTables[Tables.BlockSchema.name].name);
-    const query = db
-      .select()
+    const txTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.TransactionSchema.name].name
+    );
+    const blockTable = db.getSchema().table(
+      GetTxAndBlock.ownTables[Tables.BlockSchema.name].name
+    );
+    const query = db.select()
       .from(txTable)
       .innerJoin(
         blockTable,
-        txTable[Tables.TransactionSchema.properties.BlockId].eq(blockTable[Tables.BlockSchema.properties.BlockId])
+        txTable[Tables.TransactionSchema.properties.BlockId].eq(
+          blockTable[Tables.BlockSchema.properties.BlockId]
+        )
       )
       .orderBy(blockTable[Tables.BlockSchema.properties.Height], lf.Order.DESC)
       .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
-      .where(
-        op.and(
-          blockTable[Tables.BlockSchema.properties.Height].lt(request.height),
-          txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds),
-          txTable[Tables.TransactionSchema.properties.Status].eq(TxStatusCodes.IN_BLOCK)
-        )
-      )
+      .where(op.and(
+        blockTable[Tables.BlockSchema.properties.Height].lt(request.height),
+        txTable[Tables.TransactionSchema.properties.TransactionId].in(request.txIds),
+        txTable[Tables.TransactionSchema.properties.Status].eq(TxStatusCodes.IN_BLOCK),
+      ))
       .limit(1);
 
     const queryResult: $ReadOnlyArray<{|
@@ -747,13 +836,11 @@ export class GetTxAndBlock {
       txIds: Array<number>,
       skip?: number,
       limit?: number,
-    |}
-  ): Promise<
-    $ReadOnlyArray<{|
-      Transaction: $ReadOnly<TransactionRow>,
-      Block: null | $ReadOnly<BlockRow>,
-    |}>,
-  > {
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    Transaction: $ReadOnly<TransactionRow>,
+    Block: null | $ReadOnly<BlockRow>,
+  |}>> {
     const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
     const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
     const txTable = db.getSchema().table(txTableMeta.name);
@@ -761,10 +848,17 @@ export class GetTxAndBlock {
     const query = db
       .select()
       .from(txTable)
-      .leftOuterJoin(blockTable, txTable[txTableMeta.properties.BlockId].eq(blockTable[blockTableMeta.properties.BlockId]))
+      .leftOuterJoin(
+        blockTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
+        )
+      )
       .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
       .orderBy(txTable[txTableMeta.properties.Ordinal], lf.Order.DESC)
-      .where(op.and(txTable[txTableMeta.properties.TransactionId].in(request.txIds)));
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+      ));
     if (request.limit != null) {
       query.limit(request.limit);
     }
@@ -778,7 +872,7 @@ export class GetTxAndBlock {
       if (entry.Block.BlockId === null) {
         return {
           Transaction: entry.Transaction,
-          Block: null,
+          Block: null
         };
       }
       return entry;
@@ -791,13 +885,11 @@ export class GetTxAndBlock {
     request: {|
       txIds: Array<number>,
       status: Array<TxStatusCodesType>,
-    |}
-  ): Promise<
-    $ReadOnlyArray<{|
-      Transaction: $ReadOnly<TransactionRow>,
-      Block: null | $ReadOnly<BlockRow>,
-    |}>,
-  > {
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    Transaction: $ReadOnly<TransactionRow>,
+    Block: null | $ReadOnly<BlockRow>,
+  |}>>  {
     const txTableMeta = GetTxAndBlock.ownTables[Tables.TransactionSchema.name];
     const blockTableMeta = GetTxAndBlock.ownTables[Tables.BlockSchema.name];
     const txTable = db.getSchema().table(txTableMeta.name);
@@ -805,14 +897,17 @@ export class GetTxAndBlock {
     const query = db
       .select()
       .from(txTable)
-      .leftOuterJoin(blockTable, txTable[txTableMeta.properties.BlockId].eq(blockTable[blockTableMeta.properties.BlockId]))
-      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
-      .where(
-        op.and(
-          txTable[txTableMeta.properties.TransactionId].in(request.txIds),
-          txTable[txTableMeta.properties.Status].in(request.status)
+      .leftOuterJoin(
+        blockTable,
+        txTable[txTableMeta.properties.BlockId].eq(
+          blockTable[blockTableMeta.properties.BlockId]
         )
-      );
+      )
+      .orderBy(txTable[txTableMeta.properties.LastUpdateTime], lf.Order.DESC)
+      .where(op.and(
+        txTable[txTableMeta.properties.TransactionId].in(request.txIds),
+        txTable[txTableMeta.properties.Status].in(request.status),
+      ));
     const result = await tx.attach(query);
 
     // convert leftOuterJoin notation
@@ -820,7 +915,7 @@ export class GetTxAndBlock {
       if (entry.Block.BlockId === null) {
         return {
           Transaction: entry.Transaction,
-          Block: null,
+          Block: null
         };
       }
       return entry;
@@ -852,7 +947,7 @@ export class GetCertificates {
   static async forAddress(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| addressIds: Array<number> |}
+    request: {| addressIds: Array<number>, |},
   ): Promise<Array<CertificateForKey>> {
     const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
     const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];
@@ -867,11 +962,25 @@ export class GetCertificates {
       .from(certAddrTable)
       .innerJoin(
         certTable,
-        certTable[certSchema.properties.CertificateId].eq(certAddrTable[certAddrSchema.properties.CertificateId])
+        certTable[certSchema.properties.CertificateId].eq(
+          certAddrTable[certAddrSchema.properties.CertificateId]
+        )
       )
-      .innerJoin(txTable, certTable[certSchema.properties.TransactionId].eq(txTable[txSchema.properties.TransactionId]))
-      .leftOuterJoin(blockTable, txTable[txSchema.properties.BlockId].eq(blockTable[txSchema.properties.BlockId]))
-      .where(certAddrTable[certAddrSchema.properties.AddressId].in(request.addressIds))
+      .innerJoin(
+        txTable,
+        certTable[certSchema.properties.TransactionId].eq(
+          txTable[txSchema.properties.TransactionId]
+        )
+      )
+      .leftOuterJoin(
+        blockTable,
+        txTable[txSchema.properties.BlockId].eq(
+          blockTable[txSchema.properties.BlockId]
+        )
+      )
+      .where(certAddrTable[certAddrSchema.properties.AddressId].in(
+        request.addressIds
+      ))
       .orderBy(blockTable[Tables.BlockSchema.properties.Height], lf.Order.DESC)
       .orderBy(txTable[Tables.TransactionSchema.properties.Ordinal], lf.Order.DESC)
       .orderBy(txTable[Tables.CertificateSchema.properties.Ordinal], lf.Order.DESC);
@@ -883,30 +992,33 @@ export class GetCertificates {
       Block: $ReadOnly<WithNullableFields<BlockRow>>,
     |}> = await tx.attach(query);
 
-    const tempMap = new Map<
-      number,
-      {|
-        transaction: $ReadOnly<TransactionRow>,
-        block: null | $ReadOnly<BlockRow>,
-        certificate: $ReadOnly<CertificateRow>,
-        relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
-      |},
-    >();
+    const tempMap = new Map<number, {|
+      transaction: $ReadOnly<TransactionRow>,
+      block: null | $ReadOnly<BlockRow>,
+      certificate: $ReadOnly<CertificateRow>,
+      relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
+    |}>();
     for (const result of queryResult) {
       const entry = tempMap.get(result.Certificate.CertificateId);
       if (entry == null) {
-        tempMap.set(result.Certificate.CertificateId, {
-          relatedAddresses: [result.CertificateAddress],
-          certificate: result.Certificate,
-          transaction: result.Transaction,
-          block: result.Block.BlockId == null ? null : ((result.Block: any): $ReadOnly<BlockRow>),
-        });
+        tempMap.set(
+          result.Certificate.CertificateId,
+          {
+            relatedAddresses: [result.CertificateAddress],
+            certificate: result.Certificate,
+            transaction: result.Transaction,
+            block: result.Block.BlockId == null
+              ? null
+              : ((result.Block: any): $ReadOnly<BlockRow>),
+          }
+        );
       } else {
         entry.relatedAddresses.push(result.CertificateAddress);
       }
     }
 
-    return Array.from(tempMap.values()).map(result => ({ ...result })); // turn to read-only through shallow-copy
+    return Array.from(tempMap.values())
+      .map(result => ({ ...result })); // turn to read-only through shallow-copy
   }
 
   static async forTransactions(
@@ -914,7 +1026,7 @@ export class GetCertificates {
     dbTx: lf$Transaction,
     request: {|
       txIds: Array<number>,
-    |}
+    |},
   ): Promise<Map<number, Array<CertificatePart>>> {
     const certAddrSchema = GetCertificates.ownTables[Tables.CertificateAddressSchema.name];
     const certSchema = GetCertificates.ownTables[Tables.CertificateSchema.name];
@@ -925,9 +1037,13 @@ export class GetCertificates {
       .from(certTable)
       .leftOuterJoin(
         certAddrTable,
-        certTable[certSchema.properties.CertificateId].eq(certAddrTable[certAddrSchema.properties.CertificateId])
+        certTable[certSchema.properties.CertificateId].eq(
+          certAddrTable[certAddrSchema.properties.CertificateId]
+        )
       )
-      .where(certTable[certSchema.properties.TransactionId].in(request.txIds));
+      .where(certTable[certSchema.properties.TransactionId].in(
+        request.txIds
+      ));
 
     const queryResult: $ReadOnlyArray<{|
       CertificateAddress: null | $ReadOnly<CertificateAddressRow>,
@@ -935,20 +1051,22 @@ export class GetCertificates {
     |}> = await dbTx.attach(query);
 
     // group by relation
-    const relationsForCert = new Map<
-      number /* cert id */,
-      {|
-        relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
-        certificate: $ReadOnly<CertificateRow>,
-      |},
-    >();
+    const relationsForCert = new Map<number /* cert id */, {|
+      relatedAddresses: Array<$ReadOnly<CertificateAddressRow>>,
+      certificate: $ReadOnly<CertificateRow>,
+    |}>();
     for (const result of queryResult) {
       const entry = relationsForCert.get(result.Certificate.CertificateId);
       if (entry == null) {
-        relationsForCert.set(result.Certificate.CertificateId, {
-          relatedAddresses: result.CertificateAddress == null ? [] : [result.CertificateAddress],
-          certificate: result.Certificate,
-        });
+        relationsForCert.set(
+          result.Certificate.CertificateId,
+          {
+            relatedAddresses: result.CertificateAddress == null
+              ? []
+              : [result.CertificateAddress],
+            certificate: result.Certificate,
+          }
+        );
       } else if (result.CertificateAddress != null) {
         entry.relatedAddresses.push(result.CertificateAddress);
       }
@@ -958,7 +1076,10 @@ export class GetCertificates {
     for (const groupedCert of relationsForCert.values()) {
       const groupforTx = groupByTxId.get(groupedCert.certificate.TransactionId);
       if (groupforTx == null) {
-        groupByTxId.set(groupedCert.certificate.TransactionId, [{ ...groupedCert }]);
+        groupByTxId.set(
+          groupedCert.certificate.TransactionId,
+          [{ ...groupedCert }]
+        );
       } else {
         groupforTx.push({ ...groupedCert });
       }
@@ -975,8 +1096,14 @@ export class GetNetworks {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async get(db: lf$Database, tx: lf$Transaction): Promise<$ReadOnlyArray<$ReadOnly<NetworkRow>>> {
-    const rows = await getAll<NetworkRow>(db, tx, GetNetworks.ownTables[Tables.NetworkSchema.name].name);
+  static async get(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnlyArray<$ReadOnly<NetworkRow>>> {
+    const rows = await getAll<NetworkRow>(
+      db, tx,
+      GetNetworks.ownTables[Tables.NetworkSchema.name].name,
+    );
     return rows;
   }
 }
@@ -987,22 +1114,27 @@ export class GetToken {
   |} = Object.freeze({
     [Tables.TokenSchema.name]: Tables.TokenSchema,
   });
-  static depTables: {| GetEncryptionMeta: typeof GetEncryptionMeta |} = Object.freeze({
+  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
     GetEncryptionMeta,
   });
 
-  static async all(db: lf$Database, tx: lf$Transaction): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
-    return getAll(db, tx, GetToken.ownTables[Tables.TokenSchema.name].name);
+  static async all(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
+    return getAll(
+      db, tx,
+      GetToken.ownTables[Tables.TokenSchema.name].name,
+    );
   }
 
   static async fromIds(
     db: lf$Database,
     tx: lf$Transaction,
-    tokenIds: Array<number>
+    tokenIds: Array<number>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     return getRowIn(
-      db,
-      tx,
+      db, tx,
       GetToken.ownTables[Tables.TokenSchema.name].name,
       GetToken.ownTables[Tables.TokenSchema.name].properties.TokenId,
       tokenIds
@@ -1011,7 +1143,7 @@ export class GetToken {
   static async fromIdentifier(
     db: lf$Database,
     tx: lf$Transaction,
-    tokenIds: Array<string>
+    tokenIds: Array<string>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const { TokenSeed } = await GetToken.depTables.GetEncryptionMeta.get(db, tx);
     const digests = tokenIds.map<number>(hash => digestForHash(hash, TokenSeed));
@@ -1020,11 +1152,10 @@ export class GetToken {
   static async fromDigest(
     db: lf$Database,
     tx: lf$Transaction,
-    digests: Array<number>
+    digests: Array<number>,
   ): Promise<$ReadOnlyArray<$ReadOnly<TokenRow>>> {
     const tokenRows = await getRowIn<TokenRow>(
-      db,
-      tx,
+      db, tx,
       GetToken.ownTables[Tables.TokenSchema.name].name,
       GetToken.ownTables[Tables.TokenSchema.name].properties.Digest,
       digests
@@ -1044,7 +1175,10 @@ export class AssociateToken {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async nextTokenListId(db: lf$Database, tx: lf$Transaction): Promise<number> {
+  static async nextTokenListId(
+    db: lf$Database,
+    tx: lf$Transaction,
+  ): Promise<number> {
     const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
 
     const tokenListTable = db.getSchema().table(tokenListTableMeta.name);
@@ -1063,14 +1197,13 @@ export class AssociateToken {
   static async forListId(
     db: lf$Database,
     tx: lf$Transaction,
-    request: {| listIds: Array<number> |}
+    request: {| listIds: Array<number>, |},
   ): Promise<Map<number, Array<$ReadOnly<TokenListRow>>>> {
     const rows = await getRowIn<TokenListRow>(
-      db,
-      tx,
+      db, tx,
       AssociateToken.ownTables[Tables.TokenListSchema.name].name,
       AssociateToken.ownTables[Tables.TokenListSchema.name].properties.ListId,
-      request.listIds
+      request.listIds,
     );
 
     const result = new Map<number, Array<$ReadOnly<TokenListRow>>>();
@@ -1079,7 +1212,7 @@ export class AssociateToken {
       if (ListId == null) continue;
       const entries = result.get(ListId) ?? [];
       entries.push(row);
-      entries.sort((a, b) => a.TokenListItemId - b.TokenListItemId);
+      entries.sort((a,b) => a.TokenListItemId - b.TokenListItemId);
       result.set(ListId, entries);
     }
 
@@ -1092,13 +1225,11 @@ export class AssociateToken {
     request: {|
       listIds: Array<number>,
       networkId: number,
-    |}
-  ): Promise<
-    $ReadOnlyArray<{|
-      TokenList: $ReadOnly<TokenListRow>,
-      Token: $ReadOnly<TokenRow>,
-    |}>,
-  > {
+    |},
+  ): Promise<$ReadOnlyArray<{|
+    TokenList: $ReadOnly<TokenListRow>,
+    Token: $ReadOnly<TokenRow>,
+  |}>> {
     const tokenListTableMeta = AssociateToken.ownTables[Tables.TokenListSchema.name];
     const tokenTableMeta = AssociateToken.ownTables[Tables.TokenSchema.name];
 
@@ -1109,19 +1240,21 @@ export class AssociateToken {
       .from(tokenListTable)
       .innerJoin(
         tokenTable,
-        tokenListTable[tokenListTableMeta.properties.TokenId].eq(tokenTable[tokenTableMeta.properties.TokenId])
-      )
-      .where(
-        op.and(
-          tokenListTable[tokenListTableMeta.properties.ListId].in(request.listIds),
-          tokenTable[tokenTableMeta.properties.NetworkId].eq(request.networkId)
+        tokenListTable[tokenListTableMeta.properties.TokenId].eq(
+          tokenTable[tokenTableMeta.properties.TokenId]
         )
-      );
+      )
+      .where(op.and(
+        tokenListTable[tokenListTableMeta.properties.ListId].in(
+          request.listIds
+        ),
+        tokenTable[tokenTableMeta.properties.NetworkId].eq(request.networkId)
+      ));
     const result: $ReadOnlyArray<{|
       TokenList: $ReadOnly<TokenListRow>,
       Token: $ReadOnly<TokenRow>,
     |}> = await tx.attach(query);
 
-    return [...result].sort((a, b) => a.TokenList.TokenListItemId - b.TokenList.TokenListItemId);
+    return [...result].sort((a,b) => a.TokenList.TokenListItemId - b.TokenList.TokenListItemId);
   }
 }

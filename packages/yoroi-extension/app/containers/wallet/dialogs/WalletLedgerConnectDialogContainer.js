@@ -29,9 +29,9 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
       throw new Error(`${nameof(WalletLedgerConnectDialogContainer)} no API selected`);
     }
     return selectedNetwork;
-  };
+  }
 
-  cancel: () => void = () => {
+  cancel: (() => void) = () => {
     this.props.onClose();
     this.props.stores.substores.ada.ledgerConnect.cancel();
   };
@@ -56,8 +56,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             }}
             cancel={this.cancel}
             onBack={this.props.onBack}
-          />
-        );
+          />);
         break;
       case ProgressStep.CONNECT:
         component = (
@@ -66,14 +65,13 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             isActionProcessing={ledgerConnectStore.isActionProcessing}
             error={ledgerConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={() => {
+            goBack={()=> {
               ledgerConnectStore.goBackToCheck();
               ampli.connectWalletCheckPageViewed();
             }}
             submit={ledgerConnectStore.submitConnect}
             cancel={this.cancel}
-          />
-        );
+          />);
         break;
       case ProgressStep.TRANSFER:
         component = (
@@ -81,8 +79,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             stores={stores}
             onClose={ledgerConnectStore.finishTransfer}
             onSubmit={ledgerConnectStore.finishTransfer}
-          />
-        );
+          />);
         break;
       case ProgressStep.SAVE:
         component = (
@@ -94,11 +91,12 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             submit={ledgerConnectStore.submitSave}
             cancel={this.cancel}
-          />
-        );
+          />);
         break;
       default:
-        Logger.error(`${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)}: something unexpected happened`);
+        Logger.error(
+          `${nameof(WalletLedgerConnectDialogContainer)}::${nameof(this.render)}: something unexpected happened`
+        );
         break;
     }
 

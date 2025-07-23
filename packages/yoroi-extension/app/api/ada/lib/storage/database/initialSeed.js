@@ -7,7 +7,7 @@ export function getInitialSeeds(): {|
   TransactionSeed: number,
   BlockSeed: number,
   TokenSeed: number,
-|} {
+  |} {
   return {
     AddressSeed: crypto.randomBytes(4).readUInt32BE(0),
     TransactionSeed: crypto.randomBytes(4).readUInt32BE(0),

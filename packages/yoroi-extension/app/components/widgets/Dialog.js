@@ -283,7 +283,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
 
 const Title = styled(Typography)(({ theme, forceTopDivider }) => ({
   borderBottom: forceTopDivider ? '1px solid' : '',
-  borderBottomColor: theme.palette.grayscale['200'],
+  borderBottomColor: theme.palette.grayscale['200']
 }));
 
 const ModalContent = styled(Box)(({ theme }) => ({
@@ -318,7 +318,7 @@ const ModalFooter = styled(StyledBox)(({ theme, hasDivider }) => ({
 
 function getBtnVariant(
   danger?: boolean,
-  primary?: boolean
+  primary?: boolean,
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',

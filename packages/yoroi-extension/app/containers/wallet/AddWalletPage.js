@@ -26,7 +26,7 @@ import { ampli } from '../../../ampli/index';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   onClose: void => void = () => {
     if (!this.props.stores.wallets.hasAnyWallets) {
       this.props.stores.routing.goToRoute({ route: ROUTES.WALLETS.ADD });
@@ -68,9 +68,19 @@ export default class AddWalletPage extends Component<StoresProps> {
 
     let activeDialog = null;
     if (uiDialogs.isOpen(WalletCreateDialog)) {
-      activeDialog = <WalletCreateDialogContainer stores={stores} onClose={this.onClose} />;
+      activeDialog = (
+        <WalletCreateDialogContainer
+          stores={stores}
+          onClose={this.onClose}
+        />
+      );
     } else if (uiDialogs.isOpen(WalletBackupDialog)) {
-      activeDialog = <WalletBackupDialogContainer stores={stores} onClose={this.onClose} />;
+      activeDialog = (
+        <WalletBackupDialogContainer
+          stores={stores}
+          onClose={this.onClose}
+        />
+      );
     } else if (uiDialogs.isOpen(WalletRestoreOptionDialog)) {
       if (selectedNetwork === undefined) {
         throw new Error(`${nameof(AddWalletPage)} no API selected`);
@@ -94,9 +104,15 @@ export default class AddWalletPage extends Component<StoresProps> {
       );
     } else if (uiDialogs.isOpen(WalletRestoreDialogContainer)) {
       const mode = uiDialogs.getParam<RestoreModeType>('restoreType');
-      if (mode == null) throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
+      if (mode == null)
+        throw new Error(`${nameof(AddWalletPage)} no mode for restoration selected`);
       activeDialog = (
-        <WalletRestoreDialogContainer stores={stores} onClose={this.onClose} onBack={() => stores.uiDialogs.pop()} mode={mode} />
+        <WalletRestoreDialogContainer
+          stores={stores}
+          onClose={this.onClose}
+          onBack={() => stores.uiDialogs.pop()}
+          mode={mode}
+        />
       );
     } else if (uiDialogs.isOpen(WalletConnectHWOptionDialog)) {
       activeDialog = (
@@ -108,11 +124,19 @@ export default class AddWalletPage extends Component<StoresProps> {
       );
     } else if (uiDialogs.isOpen(WalletTrezorConnectDialogContainer)) {
       activeDialog = (
-        <WalletTrezorConnectDialogContainer stores={stores} onClose={this.onClose} onBack={() => stores.uiDialogs.pop()} />
+        <WalletTrezorConnectDialogContainer
+          stores={stores}
+          onClose={this.onClose}
+          onBack={() => stores.uiDialogs.pop()}
+        />
       );
     } else if (uiDialogs.isOpen(WalletLedgerConnectDialogContainer)) {
       activeDialog = (
-        <WalletLedgerConnectDialogContainer stores={stores} onClose={this.onClose} onBack={() => stores.uiDialogs.pop()} />
+        <WalletLedgerConnectDialogContainer
+          stores={stores}
+          onClose={this.onClose}
+          onBack={() => stores.uiDialogs.pop()}
+        />
       );
     }
 
@@ -138,7 +162,10 @@ export default class AddWalletPage extends Component<StoresProps> {
         {addWalletPageComponent}
       </Box>
     ) : (
-      <TopBarLayout banner={<BannerContainer stores={stores} />} sidebar={<SidebarContainer stores={stores} />}>
+      <TopBarLayout
+        banner={<BannerContainer stores={stores}/>}
+        sidebar={<SidebarContainer stores={stores}/>}
+      >
         {addWalletPageComponent}
       </TopBarLayout>
     );

@@ -26,11 +26,7 @@ manageTranslations({
   singleMessagesFile: true,
   languages: ['en-US'],
   overrideCoreMethods: {
-    provideWhitelistFile: langResults => {
-      disableWhitelistFile(langResults);
-    },
-    outputSingleFile: _combinedFiles => {
-      /* do nothing to suppress defaultMessages.json */
-    },
-  },
+    provideWhitelistFile: (langResults) => { disableWhitelistFile(langResults); },
+    outputSingleFile: (_combinedFiles) => { /* do nothing to suppress defaultMessages.json */ }
+  }
 });

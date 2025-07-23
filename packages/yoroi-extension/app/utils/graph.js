@@ -23,7 +23,7 @@ const generateRewardGraphData: ({|
 |} = request => {
   const defaultToken = {
     defaultNetworkId: request.networkId,
-    defaultIdentifier: request.defaultTokenId,
+    defaultIdentifier: request.defaultTokenId
   };
   const network = getNetworkById(request.networkId);
 
@@ -41,7 +41,9 @@ const generateRewardGraphData: ({|
 
   const startEpoch = (() => {
     if (isCardanoHaskell(network)) {
-      const shelleyConfig = getCardanoHaskellBaseConfig(network)[1];
+      const shelleyConfig = getCardanoHaskellBaseConfig(
+        network
+      )[1];
       return shelleyConfig.StartAt;
     }
     return 0;
@@ -55,7 +57,10 @@ const generateRewardGraphData: ({|
   })();
 
   const getMiniPoolInfo = (poolHash: string) => {
-    const meta = request.getLocalPoolInfo(request.networkId, poolHash);
+    const meta = request.getLocalPoolInfo(
+      request.networkId,
+      poolHash
+    );
     if (meta == null || meta.info == null || meta.info.ticker == null || meta.info.name == null) {
       return poolHash;
     }
@@ -63,8 +68,13 @@ const generateRewardGraphData: ({|
   };
 
   const getNormalized = tokenEntry => {
-    const tokenRow = request.tokenInfo.get(tokenEntry.networkId.toString())?.get(tokenEntry.identifier);
-    if (tokenRow == null) throw new Error(`${nameof(generateRewardGraphData)} no token info for ${JSON.stringify(tokenEntry)}`);
+    const tokenRow = request.tokenInfo
+      .get(tokenEntry.networkId.toString())
+      ?.get(tokenEntry.identifier);
+    if (tokenRow == null)
+      throw new Error(
+        `${nameof(generateRewardGraphData)} no token info for ${JSON.stringify(tokenEntry)}`
+      );
     return tokenEntry.amount.shiftedBy(-tokenRow.Metadata.numberOfDecimals);
   };
   for (let i = startEpoch; i < endEpoch; i++) {

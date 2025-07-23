@@ -13,10 +13,10 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
-  static defaultProps: {| filled: void, phraseDoesNotMatch: string |} = {
+  static defaultProps: {|filled: void, phraseDoesNotMatch: string |} = {
     filled: undefined,
-    phraseDoesNotMatch: '',
-  };
+    phraseDoesNotMatch: ''
+  }
 
   render(): Node {
     const { phrase, filled, phraseDoesNotMatch } = this.props;
@@ -32,4 +32,5 @@ export default class WalletRecoveryPhraseMnemonic extends Component<Props> {
       </div>
     );
   }
+
 }

@@ -20,12 +20,13 @@ type Props = {|
 
 @observer
 export default class URILandingDialogContainer extends Component<Props> {
+
   @observable showDisclaimer: boolean = true;
 
   @action
   toggleShowDisclaimer: void => void = () => {
     this.showDisclaimer = !this.showDisclaimer;
-  };
+  }
 
   onSubmit: void => void = () => {
     this.toggleShowDisclaimer();
@@ -37,7 +38,7 @@ export default class URILandingDialogContainer extends Component<Props> {
 
   onCancel: void => void = () => {
     this.props.onClose();
-  };
+  }
 
   render(): Node {
     if (!this.props.stores.loading.uriParams || !this.props.hasFirstSelectedWallet) {
@@ -61,11 +62,8 @@ export default class URILandingDialogContainer extends Component<Props> {
           onBack={this.toggleShowDisclaimer}
           onCancel={this.onCancel}
           uriParams={uriParams}
-          selectedExplorer={
-            this.props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
-            (() => {
-              throw new Error('No explorer for wallet network');
-            })()
+          selectedExplorer={this.props.stores.explorers.selectedExplorer
+            .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
           }
           unitOfAccountSetting={this.props.stores.profile.unitOfAccount}
           getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -74,6 +72,11 @@ export default class URILandingDialogContainer extends Component<Props> {
       );
     }
 
-    return <URILandingDialog onSubmit={this.toggleShowDisclaimer} onClose={this.onCancel} />;
+    return (
+      <URILandingDialog
+        onSubmit={this.toggleShowDisclaimer}
+        onClose={this.onCancel}
+      />
+    );
   }
 }

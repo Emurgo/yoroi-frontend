@@ -2,7 +2,11 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
 import type { Node } from 'react';
-import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
+import {
+  genLookupOrFail,
+  getTokenIdentifierIfExists,
+  getTokenStrictName,
+} from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import NfTsList from '../../components/wallet/assets/NFTsList';
 import { getImageFromTokenMetadata } from '../../utils/nftMetadata';
@@ -12,7 +16,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class NFTsPageRevamp extends Component<StoresProps> {
-  trackPageViewed: number => void = once(nftCount => {
+  trackPageViewed: (number) => void = once((nftCount) => {
     setTimeout(() => {
       ampli.nftGalleryPageViewed({
         nft_count: nftCount,

@@ -10,6 +10,7 @@ import NotificationsManager from '../features/notifications/common/Notifications
 import { ReviewTxManager } from '../features/transaction-review/module/ReviewTxManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 
+
 @observer
 export default class GeneralPageLayout extends React.Component {
   static defaultProps = {
@@ -22,7 +23,7 @@ export default class GeneralPageLayout extends React.Component {
 
     return (
       <ModalProvider>
-        <ReviewTxProvider stores={stores}>
+        <ReviewTxProvider stores={stores} >
           <ModalManager />
           <NotificationsManager />
           <ReviewTxManager />

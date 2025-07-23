@@ -1,6 +1,8 @@
 // @flow
 
-export const matchRoute = (pattern: string, path: string): boolean => path.toLowerCase().startsWith(pattern.toLowerCase());
+export const matchRoute = (
+  pattern: string, path: string
+): boolean => path.toLowerCase().startsWith(pattern.toLowerCase());
 
 /**
  * Build a route from a pattern like `/wallets/:id` to `/wallets/123`
@@ -14,13 +16,13 @@ export const matchRoute = (pattern: string, path: string): boolean => path.toLow
  * @param pattern
  * @param params
  */
-type ParamsT = ?{ [key: string]: $ReadOnlyArray<number | string> | number | string, ... };
+type ParamsT = ?{ [key: string]: $ReadOnlyArray<number|string> | number | string, ... };
 export const buildRoute = (pattern: string, params: ParamsT): string => {
   function toArray(val): $ReadOnlyArray<number | string> {
     return Array.isArray(val) ? val : [val];
   }
   const reRepeatingSlashes = /\/+/g; // '/some//path'
-  const reSplatParams = /\*{1,2}/g; // '/some/*/complex/**/path'
+  const reSplatParams = /\*{1,2}/g;  // '/some/*/complex/**/path'
   const reResolvedOptionalParams = /\(([^:*?#]+?)\)/g; // '/path/with/(resolved/params)'
   // '/path/with/(groups/containing/:unresolved/optional/:params)'
   const reUnresolvedOptionalParams = /\([^:?#]*:[^?#]*?\)/g;
@@ -33,7 +35,7 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
   if (params) {
     // assert not null
     const paramsArgs = params;
-    Object.keys(params).forEach(paramName => {
+    Object.keys(params).forEach((paramName) => {
       const paramValue = paramsArgs[paramName];
 
       // special param name in RR, used for '*' and '**' placeholders
@@ -41,7 +43,7 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
         // when there are multiple globs, RR defines 'splat' param as array.
         const paramValueArray = toArray(paramValue);
         let i = 0;
-        routePath = routePath.replace(reSplatParams, match => {
+        routePath = routePath.replace(reSplatParams, (match) => {
           const val = paramValueArray[i++];
           if (val === undefined) {
             return '';
@@ -51,7 +53,9 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
             tokens[tokenName] = encodeURIComponent(String(val));
           } else {
             // don't escape slashes for double star, as '**' considered greedy by RR spec
-            tokens[tokenName] = encodeURIComponent(val.toString().replace(/\//g, '_!slash!_')).replace(reSlashTokens, '/');
+            tokens[tokenName] = encodeURIComponent(
+              val.toString().replace(/\//g, '_!slash!_')
+            ).replace(reSlashTokens, '/');
           }
           return `<${tokenName}>`;
         });
@@ -74,21 +78,19 @@ export const buildRoute = (pattern: string, params: ParamsT): string => {
     });
   }
 
-  return (
-    routePath
-      // Remove braces around resolved optional params (i.e. '/path/(value)')
-      .replace(reResolvedOptionalParams, '$1')
-      // Remove all sequences containing at least one unresolved optional param
-      .replace(reUnresolvedOptionalParams, '')
-      // After everything related to RR syntax is removed, insert actual values
-      .replace(reTokens, (match, token) => tokens[token])
-      // Remove repeating slashes
-      .replace(reRepeatingSlashes, '/')
-      // Always remove ending slash for consistency
-      .replace(/\/+$/, '')
-      // If there was a single slash only, keep it
-      .replace(/^$/, '/')
-  );
+  return routePath
+  // Remove braces around resolved optional params (i.e. '/path/(value)')
+    .replace(reResolvedOptionalParams, '$1')
+    // Remove all sequences containing at least one unresolved optional param
+    .replace(reUnresolvedOptionalParams, '')
+    // After everything related to RR syntax is removed, insert actual values
+    .replace(reTokens, (match, token) => tokens[token])
+    // Remove repeating slashes
+    .replace(reRepeatingSlashes, '/')
+    // Always remove ending slash for consistency
+    .replace(/\/+$/, '')
+    // If there was a single slash only, keep it
+    .replace(/^$/, '/');
 };
 
 /** pre-req: either the target is an anchor or is the child of an anchor */
@@ -107,6 +109,6 @@ export const handleExternalLinkClick = (event: MouseEvent) => {
 };
 
 /** open a link from an element other than an anchor */
-export const handleExternalClick: string => void = link => {
+export const handleExternalClick: string => void = (link) => {
   window.open(link);
 };

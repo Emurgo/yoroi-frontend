@@ -5,9 +5,9 @@ import { isEqual } from 'lodash';
 import { Logger, stringifyError } from '../../utils/logging';
 import Store from '../base/Store';
 import LocalizableError, { localizedError } from '../../i18n/LocalizableError';
-import type { TransferStatusT, TransferTx } from '../../types/TransferTypes';
-import { TransferStatus } from '../../types/TransferTypes';
-import { unscramblePaperAdaMnemonic } from '../../api/ada/lib/cardanoCrypto/paperWallet';
+import type { TransferStatusT, TransferTx, } from '../../types/TransferTypes';
+import { TransferStatus, } from '../../types/TransferTypes';
+import { unscramblePaperAdaMnemonic, } from '../../api/ada/lib/cardanoCrypto/paperWallet';
 import config from '../../config';
 import { SendTransactionApiError } from '../../api/common/errors';
 import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
@@ -16,12 +16,17 @@ import type { StoresMap } from '../index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export default class YoroiTransferStore extends Store<StoresMap> {
+
   @observable status: TransferStatusT = TransferStatus.UNINITIALIZED;
   @observable error: ?LocalizableError = null;
   @observable transferTx: ?TransferTx = null;
   @observable recoveryPhrase: string = '';
 
-  _wrapError: <R>(func: () => R) => R = <R>(func: () => R): R => {
+  _wrapError: (<R>(
+    func: () => R
+  ) => R) = <R>(
+    func: () => R
+  ): R => {
     const handleError = (error: Error) => {
       Logger.error(`${nameof(YoroiTransferStore)} ${stringifyError(error)}`);
       runInAction(() => {
@@ -38,7 +43,7 @@ export default class YoroiTransferStore extends Store<StoresMap> {
       }
       return r;
     } catch (error) {
-      handleError(error);
+      handleError(error)
       throw error;
     }
   };
@@ -50,9 +55,13 @@ export default class YoroiTransferStore extends Store<StoresMap> {
 
   startTransferFunds: void => void = () => {
     this._updateStatus(TransferStatus.GETTING_PAPER_MNEMONICS);
-  };
+  }
 
-  nextInternalAddress: WalletState => void => Promise<{| ...Address, ...InexactSubset<Addressing> |}> = publicDeriver => {
+  nextInternalAddress: (
+    WalletState
+  ) => (void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>) = (
+    publicDeriver
+  ) => {
     return async () => {
       const nextInternal = publicDeriver.receiveAddress;
       if (nextInternal == null) {
@@ -63,10 +72,13 @@ export default class YoroiTransferStore extends Store<StoresMap> {
         addressing: nextInternal.addressing,
       };
     };
-  };
+  }
 
   // <TODO:PENDING_REMOVAL> paper
-  setupTransferFundsWithPaperMnemonic: ({| recoveryPhrase: string, paperPassword: string |}) => void = payload => {
+  setupTransferFundsWithPaperMnemonic: {|
+    recoveryPhrase: string,
+    paperPassword: string,
+  |} => void = (payload) => {
     this._wrapError<void>(() => {
       const result = unscramblePaperAdaMnemonic(
         payload.recoveryPhrase,
@@ -80,21 +92,25 @@ export default class YoroiTransferStore extends Store<StoresMap> {
       this.setupTransferFundsWithMnemonic({
         recoveryPhrase,
       });
-    });
-  };
+    })
+  }
 
-  setupTransferFundsWithMnemonic: ({| recoveryPhrase: string |}) => void = payload => {
+  setupTransferFundsWithMnemonic: {|
+    recoveryPhrase: string,
+  |} => void = (
+    payload
+  ) => {
     runInAction(() => {
       this.recoveryPhrase = payload.recoveryPhrase;
     });
     this._updateStatus(TransferStatus.DISPLAY_CHECKSUM);
-  };
+  }
 
-  generateTransferTx: ({|
+  generateTransferTx: {|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
-  |}) => Promise<TransferTx> = async request => {
+  |} => Promise<TransferTx> = async (request) => {
     if (this.stores.profile.selectedNetwork == null) {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.generateTransferTx)} no network selected`);
     }
@@ -102,12 +118,16 @@ export default class YoroiTransferStore extends Store<StoresMap> {
       throw new Error(`${nameof(YoroiTransferStore)}::${nameof(this.checkAddresses)} currency doesn't support Yoroi transfer`);
     }
     const { yoroiTransfer } = this.stores.substores.ada;
-    return await yoroiTransfer.generateTransferTxForByron(request);
-  };
+    return await yoroiTransfer.generateTransferTxForByron(
+      request,
+    );
+  }
 
-  checkAddresses: ({|
+  checkAddresses: {|
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
-  |}) => Promise<void> = async (payload): Promise<void> => {
+  |} => Promise<void> = async (
+    payload
+  ): Promise<void> => {
     return this._wrapError<Promise<void>>(async () => {
       this._updateStatus(TransferStatus.CHECKING_ADDRESSES);
       const transferTx = await this.generateTransferTx({
@@ -121,11 +141,11 @@ export default class YoroiTransferStore extends Store<StoresMap> {
 
       this._updateStatus(TransferStatus.READY_TO_TRANSFER);
     });
-  };
+  }
 
   backToUninitialized: void => void = () => {
     this._updateStatus(TransferStatus.UNINITIALIZED);
-  };
+  }
 
   /** Updates the status that we show to the user as transfer progresses */
   @action.bound
@@ -134,7 +154,7 @@ export default class YoroiTransferStore extends Store<StoresMap> {
   }
 
   /** Broadcast the transfer transaction if one exists and proceed to continuation */
-  transferFunds: ({|
+  transferFunds: {|
     next: void => Promise<void>,
     network: $ReadOnly<NetworkRow>,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
@@ -143,7 +163,7 @@ export default class YoroiTransferStore extends Store<StoresMap> {
      changes before the tx is submit (we can't really eliminate it).
      */
     rebuildTx: boolean,
-  |}) => Promise<void> = async payload => {
+  |} => Promise<void> = async (payload) => {
     runInAction(() => {
       this.error = null;
     });
@@ -205,26 +225,23 @@ export default class YoroiTransferStore extends Store<StoresMap> {
             const selected = this.stores.wallets.selected;
             if (selected == null) return;
             await this.stores.wallets.refreshWalletFromRemote(selected.publicDeriverId);
-          },
+          }
         });
       } catch (e) {
         Logger.error(`${nameof(YoroiTransferStore)}::${nameof(this.transferFunds)} ${stringifyError(e)}`);
-        runInAction(() => {
-          this.error = e;
-        });
+        runInAction(() => { this.error = e; });
       }
       if (this.error == null) {
         this._updateStatus(TransferStatus.SUCCESS);
         await next();
         this.reset();
       }
-    });
-  };
+    })
+  }
 
   _isWalletChanged(transferTx1: TransferTx, transferTx2: TransferTx): boolean {
-    return (
-      !transferTx1.recoveredBalance.isEqualTo(transferTx2.recoveredBalance) || !isEqual(transferTx1.senders, transferTx2.senders)
-    );
+    return !transferTx1.recoveredBalance.isEqualTo(transferTx2.recoveredBalance) ||
+      !isEqual(transferTx1.senders, transferTx2.senders);
   }
 
   _handleWalletChanged(newTransferTx: TransferTx): void {
@@ -262,7 +279,7 @@ const messages = defineMessages({
   walletChangedError: {
     id: 'yoroiTransfer.error.walletChangedError',
     defaultMessage: '!!!The wallet has changed. Please re-confirm your transaction.',
-  },
+  }
 });
 
 export class TransferFundsError extends LocalizableError {

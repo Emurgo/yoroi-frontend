@@ -1,13 +1,25 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database, lf$Transaction,
+} from 'lovefield';
 
-import { groupBy, mapValues, uniqBy } from 'lodash';
+import {
+  groupBy,
+  mapValues,
+  uniqBy
+} from 'lodash';
 
-import { BigNumber } from 'bignumber.js';
+import {
+  BigNumber
+} from 'bignumber.js';
 
 import type { UtxoStorage } from '@emurgo/yoroi-lib/dist/utxo';
-import type { Utxo, UtxoAtSafePoint, UtxoDiffToBestBlock } from '@emurgo/yoroi-lib/dist/utxo/models';
+import type {
+  Utxo,
+  UtxoAtSafePoint,
+  UtxoDiffToBestBlock
+} from '@emurgo/yoroi-lib/dist/utxo/models';
 import type { Utxo as StorageUtxo } from '../database/utxo/tables';
 
 import type {
@@ -18,39 +30,64 @@ import type {
   IHasUtxoChains,
   IDisplayCutoff,
   BaseAddressPath,
-  Address,
-  AddressType,
-  Value,
-  Addressing,
-  UsedStatus,
+  Address, AddressType, Value, Addressing, UsedStatus,
 } from './PublicDeriver/interfaces';
 
 import { ConceptualWallet } from './ConceptualWallet/index';
-import type { CanonicalAddressRow } from '../database/primitives/tables';
-import type { CoreAddressT } from '../database/primitives/enums';
-import { ModifyDisplayCutoff } from '../database/walletTypes/bip44/api/write';
-import type { TreeInsert } from '../database/walletTypes/common/utils.types';
-import { GetAddress, GetPathWithSpecific, GetDerivationsByPath, GetKeyDerivation } from '../database/primitives/api/read';
-import { getAllSchemaTables, raii, mapToTables } from '../database/utils';
-import { GetDerivationSpecific } from '../database/walletTypes/common/api/read';
+import type {
+  CanonicalAddressRow,
+} from '../database/primitives/tables';
+import type {
+  CoreAddressT
+} from '../database/primitives/enums';
+import {
+  ModifyDisplayCutoff,
+} from '../database/walletTypes/bip44/api/write';
+import type {
+  TreeInsert
+} from '../database/walletTypes/common/utils.types';
+import {
+  GetAddress,
+  GetPathWithSpecific,
+  GetDerivationsByPath,
+  GetKeyDerivation,
+} from '../database/primitives/api/read';
+import {
+  getAllSchemaTables,
+  raii,
+  mapToTables,
+} from '../database/utils';
+import {
+  GetDerivationSpecific,
+} from '../database/walletTypes/common/api/read';
 import type { UtxoTxOutput } from '../database/transactionModels/utxo/api/read';
 import { Bip44DerivationLevels } from '../database/walletTypes/bip44/api/utils';
-import type { GetPathWithSpecificByTreeRequest } from '../database/primitives/api/read';
-import { GetUtxoTxOutputsWithTx } from '../database/transactionModels/utxo/api/read';
-import { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from '../database/utxo/api/read';
-import { ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock } from '../database/utxo/api/write';
-import { TxStatusCodes } from '../database/primitives/enums';
+import type {
+  GetPathWithSpecificByTreeRequest,
+} from '../database/primitives/api/read';
+import {
+  GetUtxoTxOutputsWithTx,
+} from '../database/transactionModels/utxo/api/read';
+import {
+  GetUtxoAtSafePoint, GetUtxoDiffToBestBlock,
+} from '../database/utxo/api/read';
+import {
+  ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock,
+} from '../database/utxo/api/write';
+import { TxStatusCodes, } from '../database/primitives/enums';
 import { MultiToken } from '../../../../common/lib/MultiToken';
 import type { DefaultTokenEntry } from '../../../../common/lib/MultiToken';
 
-import { ChainDerivations, BIP44_SCAN_SIZE } from '../../../../../config/numbersConfig';
+import { ChainDerivations, BIP44_SCAN_SIZE, } from  '../../../../../config/numbersConfig';
 
 type TokenCount = {|
   tokenTypes: number,
-  nftTypes: number,
-|};
+  nftTypes: number
+|}
 
-export async function rawGetDerivationsByPath<Row: { +KeyDerivationId: number, ... }>(
+export async function rawGetDerivationsByPath<
+  Row: { +KeyDerivationId: number, ... }
+>(
   db: lf$Database,
   tx: lf$Transaction,
   deps: {|
@@ -59,17 +96,24 @@ export async function rawGetDerivationsByPath<Row: { +KeyDerivationId: number, .
   |},
   request: GetPathWithSpecificByTreeRequest,
   finalLevel: number,
-  derivationTables: Map<number, string>
-): Promise<
-  Array<{|
-    row: $ReadOnly<Row>,
-    ...Addressing,
-  |}>,
-> {
-  const pathWithSpecific = await deps.GetPathWithSpecific.getTree<Row>(db, tx, request, async derivationIds => {
-    const result = await deps.GetDerivationSpecific.get<Row>(db, tx, derivationIds, finalLevel, derivationTables);
-    return result;
-  });
+  derivationTables: Map<number, string>,
+): Promise<Array<{|
+  row: $ReadOnly<Row>,
+  ...Addressing,
+|}>> {
+  const pathWithSpecific = await deps.GetPathWithSpecific.getTree<Row>(
+    db, tx,
+    request,
+    async (derivationIds) => {
+      const result = await deps.GetDerivationSpecific.get<Row>(
+        db, tx,
+        derivationIds,
+        finalLevel,
+        derivationTables,
+      );
+      return result;
+    }
+  );
   const result = pathWithSpecific.rows.map(row => {
     const path = pathWithSpecific.pathMap.get(row.KeyDerivationId);
     if (path == null) {
@@ -95,24 +139,22 @@ export async function rawGetAddressesByDerivationPath(
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
   request: GetPathWithSpecificByTreeRequest,
-  derivationTables: Map<number, string>
+  derivationTables: Map<number, string>,
 ): Promise<Array<BaseAddressPath>> {
   const canonicalAddresses = await rawGetDerivationsByPath<CanonicalAddressRow>(
-    db,
-    tx,
+    db, tx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     request,
     Bip44DerivationLevels.ADDRESS.level,
-    derivationTables
+    derivationTables,
   );
   const family = await deps.GetAddress.fromCanonical(
-    db,
-    tx,
+    db, tx,
     canonicalAddresses.map(addr => addr.row.KeyDerivationId),
-    undefined
+    undefined,
   );
   return canonicalAddresses.map(canonical => {
     const addrs = family.get(canonical.row.KeyDerivationId);
@@ -126,7 +168,10 @@ export async function rawGetAddressesByDerivationPath(
   });
 }
 
-export function getLastUsedIndex(request: {| singleChainAddresses: Array<UtxoAddressPath>, usedStatus: Set<number> |}): number {
+export function getLastUsedIndex(request: {|
+  singleChainAddresses: Array<UtxoAddressPath>,
+  usedStatus: Set<number>,
+|}): number {
   request.singleChainAddresses.sort((a1, a2) => {
     const index1 = a1.addressing.path[a1.addressing.path.length - 1];
     const index2 = a2.addressing.path[a2.addressing.path.length - 1];
@@ -147,15 +192,14 @@ export function getLastUsedIndex(request: {| singleChainAddresses: Array<UtxoAdd
 export async function rawGetUtxoUsedStatus(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx> |},
+  deps: {| GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>, |},
   request: {|
     addressIds: Array<number>,
     networkId: number,
-  |}
+  |},
 ): Promise<Set<number>> {
   const outputs = await deps.GetUtxoTxOutputsWithTx.getOutputsForAddresses(
-    db,
-    tx,
+    db, tx,
     request.addressIds,
     [TxStatusCodes.IN_BLOCK],
     request.networkId
@@ -174,37 +218,38 @@ export async function rawGetAddressesForDisplay(
     type: CoreAddressT,
     networkId: number,
     defaultToken: DefaultTokenEntry,
-  |}
+  |},
 ): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addressIds = request.addresses
     .flatMap(family => family.addrs)
     .filter(addr => addr.Type === request.type)
     .map(addr => addr.AddressId);
   const utxosForAddresses = await rawGetUtxoUsedStatus(
-    db,
-    tx,
+    db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     {
       addressIds,
       networkId: request.networkId,
-    }
+    },
   );
-  const utxoForAddresses = await deps.GetUtxoTxOutputsWithTx.getUtxo(db, tx, addressIds, request.networkId);
+  const utxoForAddresses = await deps.GetUtxoTxOutputsWithTx.getUtxo(
+    db, tx,
+    addressIds,
+    request.networkId
+  );
   const balanceForAddresses = getUtxoBalanceForAddresses(utxoForAddresses, request.defaultToken);
 
-  return request.addresses.flatMap(family =>
-    family.addrs
-      .filter(addr => addr.Type === request.type)
-      .map(addr => {
-        return {
-          address: addr.Hash,
-          values: balanceForAddresses[addr.AddressId],
-          addressing: family.addressing,
-          isUsed: utxosForAddresses.has(addr.AddressId),
-          type: request.type,
-        };
-      })
-  );
+  return request.addresses.flatMap(family => family.addrs
+    .filter(addr => addr.Type === request.type)
+    .map(addr => {
+      return {
+        address: addr.Hash,
+        values: balanceForAddresses[addr.AddressId],
+        addressing: family.addressing,
+        isUsed: utxosForAddresses.has(addr.AddressId),
+        type: request.type,
+      };
+    }));
 }
 
 export async function rawGetChainAddressesForDisplay(
@@ -220,7 +265,7 @@ export async function rawGetChainAddressesForDisplay(
     chainsRequest: IHasUtxoChainsRequest,
     type: CoreAddressT,
   |},
-  derivationTables: Map<number, string>
+  derivationTables: Map<number, string>,
 ): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const addresses = await request.publicDeriver.rawGetAddressesForChain(
     tx,
@@ -230,7 +275,7 @@ export async function rawGetChainAddressesForDisplay(
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     request.chainsRequest,
-    derivationTables
+    derivationTables,
   );
   let belowCutoff = addresses;
   if (request.chainsRequest.chainId === ChainDerivations.EXTERNAL) {
@@ -241,20 +286,21 @@ export async function rawGetChainAddressesForDisplay(
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
-      derivationTables
+      derivationTables,
     );
-    belowCutoff = addresses.filter(address => address.addressing.path[address.addressing.path.length - 1] <= cutoff);
+    belowCutoff = addresses.filter(address => (
+      address.addressing.path[address.addressing.path.length - 1] <= cutoff
+    ));
   }
   let addressResponse = await rawGetAddressesForDisplay(
-    request.publicDeriver.getDb(),
-    tx,
+    request.publicDeriver.getDb(), tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     {
       addresses: belowCutoff,
       type: request.type,
       networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
       defaultToken: request.publicDeriver.getParent().getDefaultToken(),
-    }
+    },
   );
   if (request.chainsRequest.chainId === ChainDerivations.INTERNAL) {
     let bestUsed = -1;
@@ -266,17 +312,19 @@ export async function rawGetChainAddressesForDisplay(
         }
       }
     }
-    addressResponse = addressResponse.filter(
-      address => address.addressing.path[address.addressing.path.length - 1] <= bestUsed + 1
-    );
+    addressResponse = addressResponse.filter(address => (
+      address.addressing.path[address.addressing.path.length - 1] <= bestUsed + 1
+    ));
   }
   return addressResponse;
 }
-export async function getChainAddressesForDisplay(request: {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IHasUtxoChains & IDisplayCutoff,
-  chainsRequest: IHasUtxoChainsRequest,
-  type: CoreAddressT,
-|}): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
+export async function getChainAddressesForDisplay(
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IHasUtxoChains & IDisplayCutoff,
+    chainsRequest: IHasUtxoChainsRequest,
+    type: CoreAddressT,
+  |},
+): Promise<Array<{| ...Address, ...AddressType, ...Value, ...Addressing, ...UsedStatus |}>> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetUtxoTxOutputsWithTx,
@@ -284,47 +332,45 @@ export async function getChainAddressesForDisplay(request: {|
     GetPathWithSpecific,
     GetDerivationSpecific,
   });
-  const depTables = Object.keys(deps)
+  const depTables = Object
+    .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
   return await raii<PromisslessReturnType<typeof getChainAddressesForDisplay>>(
     request.publicDeriver.getDb(),
-    [...depTables, ...mapToTables(request.publicDeriver.getDb(), derivationTables)],
-    async tx =>
-      await rawGetChainAddressesForDisplay(
-        tx,
-        deps,
-        {
-          publicDeriver: request.publicDeriver,
-          chainsRequest: request.chainsRequest,
-          type: request.type,
-        },
-        derivationTables
-      )
+    [
+      ...depTables,
+      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
+    ],
+    async tx => await rawGetChainAddressesForDisplay(tx, deps, {
+      publicDeriver: request.publicDeriver,
+      chainsRequest: request.chainsRequest,
+      type: request.type,
+    }, derivationTables)
   );
 }
 
 export type NextUnusedResponse = {|
   addressInfo: void | UtxoAddressPath,
   index: number,
-|};
+|}
 export async function rawGetNextUnusedIndex(
   db: lf$Database,
   tx: lf$Transaction,
   deps: {|
     GetUtxoTxOutputsWithTx: Class<GetUtxoTxOutputsWithTx>,
   |},
-  request: {|
+  request:  {|
     addressesForChain: Array<UtxoAddressPath>,
     networkId: number,
   |}
 ): Promise<NextUnusedResponse> {
   const usedStatus = await rawGetUtxoUsedStatus(
-    db,
-    tx,
+    db, tx,
     { GetUtxoTxOutputsWithTx: deps.GetUtxoTxOutputsWithTx },
     {
-      addressIds: request.addressesForChain.flatMap(address => address.addrs.map(addr => addr.AddressId)),
+      addressIds: request.addressesForChain
+        .flatMap(address => address.addrs.map(addr => addr.AddressId)),
       networkId: request.networkId,
     }
   );
@@ -342,7 +388,7 @@ export async function rawGetNextUnusedIndex(
   }
   return {
     addressInfo: {
-      ...nextInternalAddress,
+      ...nextInternalAddress
     },
     index: lastUsedIndex + 1,
   };
@@ -350,52 +396,70 @@ export async function rawGetNextUnusedIndex(
 
 export function getUtxoBalanceForAddresses(
   utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>,
-  defaultToken: DefaultTokenEntry
+  defaultToken: DefaultTokenEntry,
 ): { [key: number]: IGetUtxoBalanceResponse, ... } {
-  const groupByAddress = groupBy(utxos, utxo => utxo.UtxoTransactionOutput.AddressId);
-  const mapping = mapValues(groupByAddress, (utxoList: Array<$ReadOnly<UtxoTxOutput>>) =>
-    getBalanceForUtxos(utxoList, defaultToken)
+  const groupByAddress = groupBy(
+    utxos,
+    utxo => utxo.UtxoTransactionOutput.AddressId
+  );
+  const mapping = mapValues(
+    groupByAddress,
+    (utxoList: Array<$ReadOnly<UtxoTxOutput>>) => getBalanceForUtxos(
+      utxoList,
+      defaultToken
+    )
   );
   return mapping;
 }
 
-export function getTokenCountForAddresses(utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>): { [key: number]: TokenCount } {
-  const groupByAddress = groupBy(utxos, utxo => utxo.UtxoTransactionOutput.AddressId);
+export function getTokenCountForAddresses(
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>
+): { [key: number]: TokenCount } {
+  const groupByAddress = groupBy(
+    utxos,
+    utxo => utxo.UtxoTransactionOutput.AddressId
+  );
 
   const mapping: { [key: number]: TokenCount } = {};
 
   for (const k of Object.keys(groupByAddress)) {
     const group = groupByAddress[k];
-    mapping[k] = getTokenCountForUtxos(group);
+    mapping[k] = getTokenCountForUtxos(group)
   }
 
   return mapping;
 }
 
-export function getTokenCountForUtxos(utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>): TokenCount {
-  const allTokens = utxos.reduce((prev, curr) => prev.concat(curr.tokens), []).filter(t => t.Token.Identifier !== '');
+export function getTokenCountForUtxos(
+  utxos: $ReadOnlyArray<$ReadOnly<UtxoTxOutput>>
+): TokenCount {
 
-  const uniqueTokens = uniqBy(allTokens, t => t.Token.Identifier);
+  const allTokens = utxos
+    .reduce((prev, curr) => prev.concat(curr.tokens), [])
+    .filter(t => t.Token.Identifier !== '');
+
+  const uniqueTokens = uniqBy(
+    allTokens,
+    t => t.Token.Identifier
+  );
 
   return {
     nftTypes: uniqueTokens.filter(t => t.Token.IsNFT).length,
-    tokenTypes: uniqueTokens.filter(t => !t.Token.IsNFT).length,
+    tokenTypes: uniqueTokens.filter(t => !t.Token.IsNFT).length
   };
 }
 
 type UtxoTokenInfo = {
-  tokens: $ReadOnlyArray<
-    $ReadOnly<{
-      TokenList: $ReadOnly<{ Amount: string, ... }>,
-      Token: $ReadOnly<{ Identifier: string, NetworkId: number, ... }>,
-      ...
-    }>,
-  >,
+  tokens: $ReadOnlyArray<$ReadOnly<{
+    TokenList: $ReadOnly<{ Amount: string, ... }>,
+    Token: $ReadOnly<{ Identifier: string, NetworkId: number, ... }>,
+    ...
+  }>>,
   ...
 };
 export function getBalanceForUtxos(
   utxos: $ReadOnlyArray<$ReadOnly<UtxoTokenInfo>>,
-  defaultToken: DefaultTokenEntry
+  defaultToken: DefaultTokenEntry,
 ): IGetUtxoBalanceResponse {
   const tokens = new MultiToken([], defaultToken);
 
@@ -425,7 +489,7 @@ export async function updateCutoffFromInsert(
     displayCutoffInstance: IDisplayCutoff,
     tree: TreeInsert<any>,
   |},
-  derivationTables: Map<number, string>
+  derivationTables: Map<number, string>,
 ): Promise<void> {
   if (request.displayCutoffInstance != null) {
     const newEntries = (() => {
@@ -455,7 +519,7 @@ export async function updateCutoffFromInsert(
         GetDerivationSpecific: deps.GetDerivationSpecific,
       },
       undefined,
-      derivationTables
+      derivationTables,
     );
     if (bestNewCutoff - BIP44_SCAN_SIZE > currentCutoff) {
       await request.displayCutoffInstance.rawSetCutoff(
@@ -465,17 +529,15 @@ export async function updateCutoffFromInsert(
           GetDerivationsByPath: deps.GetDerivationsByPath,
           GetKeyDerivation: deps.GetKeyDerivation,
         },
-        { newIndex: bestNewCutoff - BIP44_SCAN_SIZE }
+        { newIndex: bestNewCutoff - BIP44_SCAN_SIZE },
       );
     }
   }
 }
 
-export function verifyFromDerivationRoot(
-  request: $ReadOnly<{|
-    ...$PropertyType<Addressing, 'addressing'>,
-  |}>
-): void {
+export function verifyFromDerivationRoot(request: $ReadOnly<{|
+  ...$PropertyType<Addressing, 'addressing'>,
+|}>): void {
   const accountPosition = request.startLevel;
   if (accountPosition !== Bip44DerivationLevels.PURPOSE.level) {
     throw new Error(`${nameof(verifyFromDerivationRoot)} addressing does not start from root`);
@@ -490,12 +552,16 @@ export function verifyFromDerivationRoot(
 function storageUtxoToYoroiLib(utxo: StorageUtxo): Utxo {
   return {
     ...utxo,
-    assets: utxo.assets.map(asset => ({
-      assetId: asset.assetId,
-      policyId: asset.policyId,
-      name: asset.name,
-      amount: asset.amount,
-    })),
+    assets: utxo.assets.map(
+      asset => (
+        {
+          assetId: asset.assetId,
+          policyId: asset.policyId,
+          name: asset.name,
+          amount: asset.amount,
+        }
+      )
+    ),
     amount: new BigNumber(utxo.amount),
   };
 }
@@ -508,15 +574,20 @@ function yoroiLibUtxoToStorage(utxo: Utxo): StorageUtxo {
     receiver: utxo.receiver,
     blockNum: utxo.blockNum,
 
-    assets: utxo.assets.map(asset => ({
-      assetId: asset.assetId,
-      policyId: asset.policyId,
-      name: asset.name,
-      amount: asset.amount,
-    })),
+    assets: utxo.assets.map(
+      asset => (
+        {
+          assetId: asset.assetId,
+          policyId: asset.policyId,
+          name: asset.name,
+          amount: asset.amount,
+        }
+      )
+    ),
     amount: utxo.amount.toString(),
   };
 }
+
 
 export class UtxoStorageApi implements UtxoStorage {
   static depsTables: {|
@@ -525,10 +596,8 @@ export class UtxoStorageApi implements UtxoStorage {
     GetUtxoAtSafePoint: Class<GetUtxoAtSafePoint>,
     GetUtxoDiffToBestBlock: Class<GetUtxoDiffToBestBlock>,
   |} = Object.freeze({
-    ModifyUtxoAtSafePoint,
-    ModifyUtxoDiffToBestBlock,
-    GetUtxoAtSafePoint,
-    GetUtxoDiffToBestBlock,
+    ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock,
+    GetUtxoAtSafePoint, GetUtxoDiffToBestBlock,
   });
 
   conceptualWalletId: number;
@@ -548,7 +617,11 @@ export class UtxoStorageApi implements UtxoStorage {
   }
 
   async getUtxoAtSafePoint(): Promise<UtxoAtSafePoint | void> {
-    const result = await GetUtxoAtSafePoint.forWallet(this.db, this.dbTx, this.conceptualWalletId);
+    const result = await GetUtxoAtSafePoint.forWallet(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
     if (result) {
       // convert from storage UtxoAtSafePoint type to Yoroi-lib UtxoAtSafePoint type
       return {
@@ -560,33 +633,65 @@ export class UtxoStorageApi implements UtxoStorage {
   }
 
   async getUtxoDiffToBestBlock(): Promise<UtxoDiffToBestBlock[]> {
-    return (await GetUtxoDiffToBestBlock.forWallet(this.db, this.dbTx, this.conceptualWalletId)).map(utxoDiffToBestBlock => ({
-      ...utxoDiffToBestBlock,
-      newUtxos: utxoDiffToBestBlock.newUtxos.map(storageUtxoToYoroiLib),
-    }));
+    return (
+      await GetUtxoDiffToBestBlock.forWallet(
+        this.db,
+        this.dbTx,
+        this.conceptualWalletId,
+      )
+    ).map(utxoDiffToBestBlock => (
+      {
+        ...utxoDiffToBestBlock,
+        newUtxos: utxoDiffToBestBlock.newUtxos.map(storageUtxoToYoroiLib),
+      }
+    ));
   }
 
   async replaceUtxoAtSafePoint(utxos: Utxo[], lastSafeBlockHash: string): Promise<void> {
-    await ModifyUtxoAtSafePoint.addOrReplace(this.db, this.dbTx, this.conceptualWalletId, {
-      lastSafeBlockHash,
-      utxos: utxos.map(yoroiLibUtxoToStorage),
-    });
+    await ModifyUtxoAtSafePoint.addOrReplace(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      {
+        lastSafeBlockHash,
+        utxos: utxos.map(yoroiLibUtxoToStorage),
+      },
+    );
   }
 
+
   async clearUtxoState(): Promise<void> {
-    await ModifyUtxoAtSafePoint.remove(this.db, this.dbTx, this.conceptualWalletId);
-    await ModifyUtxoDiffToBestBlock.removeAll(this.db, this.dbTx, this.conceptualWalletId);
+    await ModifyUtxoAtSafePoint.remove(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
+    await ModifyUtxoDiffToBestBlock.removeAll(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+    );
   }
 
   async appendUtxoDiffToBestBlock(diff: UtxoDiffToBestBlock): Promise<void> {
-    await ModifyUtxoDiffToBestBlock.add(this.db, this.dbTx, this.conceptualWalletId, {
-      lastBestBlockHash: diff.lastBestBlockHash,
-      spentUtxoIds: diff.spentUtxoIds,
-      newUtxos: diff.newUtxos.map(yoroiLibUtxoToStorage),
-    });
+    await ModifyUtxoDiffToBestBlock.add(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      {
+        lastBestBlockHash: diff.lastBestBlockHash,
+        spentUtxoIds: diff.spentUtxoIds,
+        newUtxos: diff.newUtxos.map(yoroiLibUtxoToStorage),
+      },
+    );
   }
 
   async removeDiffWithBestBlock(blockHash: string): Promise<void> {
-    await ModifyUtxoDiffToBestBlock.remove(this.db, this.dbTx, this.conceptualWalletId, blockHash);
+    await ModifyUtxoDiffToBestBlock.remove(
+      this.db,
+      this.dbTx,
+      this.conceptualWalletId,
+      blockHash,
+    );
   }
 }

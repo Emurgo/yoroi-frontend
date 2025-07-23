@@ -14,22 +14,24 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class TermsOfUsePage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;
     const { selected } = stores.wallets;
     const isWalletTestnet = Boolean(selected?.isTestnet);
 
-    const displayedBanner =
-      checkAdaServerStatus === ServerStatusErrors.Healthy ? (
-        <TestnetWarningBanner isTestnet={isWalletTestnet} />
-      ) : (
-        <ServerErrorBanner errorType={checkAdaServerStatus} />
-      );
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
     return (
-      <TopBarLayout topbar={undefined} banner={displayedBanner}>
-        <IntroBanner isNightly={environment.isNightly()} />
+      <TopBarLayout
+        topbar={undefined}
+        banner={displayedBanner}
+      >
+        <IntroBanner
+          isNightly={environment.isNightly()}
+        />
 
         <TermsOfUseForm
           localizedTermsOfUse={stores.profile.termsOfUse}

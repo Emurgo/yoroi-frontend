@@ -1,6 +1,12 @@
 // @flow
 
-import type { lf$Database, lf$Row, lf$Transaction, lf$schema$Table, lf$ValueLiteralArray } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Row,
+  lf$Transaction,
+  lf$schema$Table,
+  lf$ValueLiteralArray,
+} from 'lovefield';
 import { size } from 'lodash';
 import ExtendableError from 'es6-error';
 
@@ -14,27 +20,29 @@ export async function promisifyDbCall<T>(request: IDBRequest): Promise<T> {
 export async function getAll<Row>(
   db: lf$Database,
   tx: lf$Transaction,
-  tableName: string
+  tableName: string,
 ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
-  const query = db.select().from(table);
+  const query = db
+    .select()
+    .from(table);
   return await tx.attach(query);
 }
 export async function addBatchToTable<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: $ReadOnlyArray<Insert>,
-  tableName: string
+  tableName: string,
 ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
   const newRows = request.map(insert => table.createRow(insert));
 
-  const results: $ReadOnlyArray<$ReadOnly<Row>> = await tx.attach(
+  const results: $ReadOnlyArray<$ReadOnly<Row>> = (await tx.attach(
     db
       .insert()
       .into(table)
       .values((newRows: Array<lf$Row>))
-  );
+  ));
 
   return results;
 }
@@ -42,9 +50,11 @@ export async function addNewRowToTable<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: Insert,
-  tableName: string
+  tableName: string,
 ): Promise<$ReadOnly<Row>> {
-  const results = await addBatchToTable<Insert, Row>(db, tx, [request], tableName);
+  const results = await addBatchToTable<Insert, Row>(
+    db, tx, [request], tableName
+  );
   return results[0];
 }
 
@@ -52,12 +62,17 @@ export async function addOrReplaceRows<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: $ReadOnlyArray<$ReadOnly<Insert>>,
-  tableName: string
+  tableName: string,
 ): Promise<$ReadOnlyArray<Row>> {
   const table = db.getSchema().table(tableName);
   const newRows = request.map(row => table.createRow(row));
 
-  const result: $ReadOnlyArray<Row> = await tx.attach(db.insertOrReplace().into(table).values(newRows));
+  const result: $ReadOnlyArray<Row> = (await tx.attach(
+    db
+      .insertOrReplace()
+      .into(table)
+      .values(newRows)
+  ));
 
   return result;
 }
@@ -65,9 +80,13 @@ export async function addOrReplaceRow<Insert, Row>(
   db: lf$Database,
   tx: lf$Transaction,
   request: $ReadOnly<Insert>,
-  tableName: string
+  tableName: string,
 ): Promise<$ReadOnly<Row>> {
-  return (await addOrReplaceRows(db, tx, [request], tableName))[0];
+  return (await addOrReplaceRows(
+    db, tx,
+    [request],
+    tableName
+  ))[0];
 }
 
 export const getRowFromKey = async <T>(
@@ -75,10 +94,13 @@ export const getRowFromKey = async <T>(
   tx: lf$Transaction,
   key: any,
   tableName: string,
-  keyRowName: string
+  keyRowName: string,
 ): Promise<$ReadOnly<T> | void> => {
   const table = db.getSchema().table(tableName);
-  const query = db.select().from(table).where(table[keyRowName].eq(key));
+  const query = db
+    .select()
+    .from(table)
+    .where(table[keyRowName].eq(key));
   const result = await tx.attach(query);
   if (result.length === 0) {
     return undefined;
@@ -91,10 +113,13 @@ export async function getRowIn<Row>(
   tx: lf$Transaction,
   tableName: string,
   keyRowName: string,
-  list: lf$ValueLiteralArray
+  list: lf$ValueLiteralArray,
 ): Promise<$ReadOnlyArray<$ReadOnly<Row>>> {
   const table = db.getSchema().table(tableName);
-  const query = db.select().from(table).where(table[keyRowName].in(list));
+  const query = db
+    .select()
+    .from(table)
+    .where(table[keyRowName].in(list));
   return await tx.attach(query);
 }
 
@@ -103,11 +128,16 @@ export async function removeFromTableBatch(
   tx: lf$Transaction,
   tableName: string,
   rowName: string,
-  keys: lf$ValueLiteralArray
+  keys: lf$ValueLiteralArray,
 ): Promise<void> {
   const table = db.getSchema().table(tableName);
 
-  await tx.attach(db.delete().from(table).where(table[rowName].in(keys)));
+  await tx.attach(
+    db
+      .delete()
+      .from(table)
+      .where(table[rowName].in(keys))
+  );
 }
 
 export class StaleStateError extends ExtendableError {
@@ -139,13 +169,17 @@ export type TableClassType = {
    */
   +depTables: any,
   ...
-};
+}
 
 /**
  * Poor man's version of RAII in Javascript
  * https://en.wikipedia.org/wiki/Resource_acquisition_is_initialization
  */
-export async function raii<T>(db: lf$Database, tables: Array<lf$schema$Table>, scope: lf$Transaction => Promise<T>): Promise<T> {
+export async function raii<T>(
+  db: lf$Database,
+  tables: Array<lf$schema$Table>,
+  scope: lf$Transaction => Promise<T>,
+): Promise<T> {
   const tx = db.createTransaction();
   await tx.begin(tables);
   try {
@@ -153,7 +187,11 @@ export async function raii<T>(db: lf$Database, tables: Array<lf$schema$Table>, s
     await tx.commit();
     return result;
   } catch (e) {
-    const uniqueTableNames = Array.from(new Set(tables.map(table => table.getName()))).join('\n');
+    const uniqueTableNames = Array.from(
+      new Set(
+        tables.map(table => table.getName())
+      )
+    ).join('\n');
     // eslint-disable-next-line no-console
     console.error('rolling back Lovefield query for\n' + uniqueTableNames + ' with error ' + e.message);
     await tx.rollback();
@@ -161,12 +199,20 @@ export async function raii<T>(db: lf$Database, tables: Array<lf$schema$Table>, s
   }
 }
 
-export function mapToTables(db: lf$Database, map: Map<number, string>): Array<lf$schema$Table> {
-  return Array.from(map.values()).map(table => db.getSchema().table(table));
+export function mapToTables(
+  db: lf$Database,
+  map: Map<number, string>
+): Array<lf$schema$Table> {
+  return Array.from(map.values())
+    .map(table => db.getSchema().table(table));
 }
 
-export function getAllSchemaTables(db: lf$Database, tableClass: TableClassType): Array<lf$schema$Table> {
-  return _getAllTables(tableClass).map(table => db.getSchema().table(table));
+export function getAllSchemaTables(
+  db: lf$Database,
+  tableClass: TableClassType,
+): Array<lf$schema$Table> {
+  return _getAllTables(tableClass)
+    .map(table => db.getSchema().table(table));
 }
 
 /** recursively get all tables required for a database query */

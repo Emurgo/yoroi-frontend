@@ -12,12 +12,13 @@ export type LegacyAddressingInfo = {|
   change: number,
   index: number,
 |};
-export type LegacyAdaAmount = {| getCCoin: string |};
+export type LegacyAdaAmount = {| getCCoin: string, |};
 export type LegacyAdaAddress = {|
   cadAmount: LegacyAdaAmount,
   cadId: string,
   cadIsUsed: boolean,
   ...LegacyAddressingInfo,
+
 |};
 
 export type LegacyAdaWallet = {|
@@ -37,7 +38,7 @@ export type LegacyAdaWalletMetaParams = {|
 export type LegacyAdaAssurance = 'CWANormal' | 'CWAStrict';
 export type LegacyAdaWalletType = 'CWTWeb' | 'CWTHardware';
 export type LegacyAdaWalletHardwareInfo = {|
-  vendor: string,
+  vendor : string,
   model: string,
   deviceId: string,
   label: string,

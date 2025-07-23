@@ -10,8 +10,12 @@ import {
   addressSubgroupName,
 } from '../../types/AddressFilterTypes';
 import { IntlContext } from 'react-intl';
-import type { AddressSubgroupMeta, IAddressTypeStore, IAddressTypeUiSubset } from '../../stores/stateless/addressStores';
-import { allAddressSubgroups, applyAddressFilter, routeForStore } from '../../stores/stateless/addressStores';
+import type {
+  AddressSubgroupMeta,
+  IAddressTypeStore,
+  IAddressTypeUiSubset,
+} from '../../stores/stateless/addressStores';
+import { allAddressSubgroups, applyAddressFilter, routeForStore, } from '../../stores/stateless/addressStores';
 import { observer } from 'mobx-react';
 import { observable, runInAction } from 'mobx';
 import { validateAmount } from '../../utils/validations';
@@ -40,7 +44,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletReceivePage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   @observable notificationElementId: string = '';
 
@@ -122,7 +126,9 @@ export default class WalletReceivePage extends Component<StoresProps> {
     const notification = uiNotifications.getTooltipActiveNotification(this.notificationElementId);
 
     const selectedExplorerForNetwork =
-      stores.explorers.selectedExplorer.get(publicDeriver.networkId) ??
+      stores.explorers.selectedExplorer.get(
+        publicDeriver.networkId
+      ) ??
       (() => {
         throw new Error('No explorer for wallet network');
       })();
@@ -137,6 +143,7 @@ export default class WalletReceivePage extends Component<StoresProps> {
     });
 
     const header = (() => {
+
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.external) {
         return (
           <StandardHeaderRevamp
@@ -159,8 +166,9 @@ export default class WalletReceivePage extends Component<StoresProps> {
         return <RewardHeader ticker={truncateToken(getTokenName(defaultTokenInfo))} />;
       }
       if (addressTypeStore.meta.name.subgroup === AddressSubgroup.mangled) {
-        const canUnmangle =
-          maybe(stores.wallets.selected, w => stores.delegation.canUnmangleSomeUtxo(w.publicDeriverId)) ?? false;
+
+        const canUnmangle = maybe(stores.wallets.selected,
+          w => stores.delegation.canUnmangleSomeUtxo(w.publicDeriverId)) ?? false;
 
         return (
           <MangledHeader
@@ -246,7 +254,10 @@ export default class WalletReceivePage extends Component<StoresProps> {
         />
 
         {uiDialogs.isOpen(LoadingSpinner) ? (
-          <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
+          <Dialog
+            title={intl.formatMessage(globalMessages.processingLabel)}
+            closeOnOverlayClick={false}
+          >
             <VerticalFlexContainer>
               <LoadingSpinner />
             </VerticalFlexContainer>
@@ -301,7 +312,10 @@ export default class WalletReceivePage extends Component<StoresProps> {
         ) : null}
 
         {uiDialogs.isOpen(UnmangleTxDialogContainer) && (
-          <UnmangleTxDialogContainer stores={stores} onClose={() => this.props.stores.uiDialogs.closeActiveDialog()} />
+          <UnmangleTxDialogContainer
+            stores={stores}
+            onClose={() => this.props.stores.uiDialogs.closeActiveDialog()}
+          />
         )}
 
         {uiDialogs.isOpen(VerifyAddressDialog) && hwVerifyAddress.selectedAddress ? (
@@ -334,7 +348,9 @@ export default class WalletReceivePage extends Component<StoresProps> {
     );
   }
 
-  getTypeStore: any => void | {| // unused for now
+  getTypeStore: (
+    any // unused for now
+  ) => void | {|
     +request: IAddressTypeUiSubset,
     +meta: AddressSubgroupMeta<IAddressTypeStore>,
   |} = _publicDeriver => {

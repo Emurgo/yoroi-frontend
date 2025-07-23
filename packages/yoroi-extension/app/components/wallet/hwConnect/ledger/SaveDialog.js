@@ -4,7 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import classnames from 'classnames';
-import TextField from '../../../common/TextField';
+import TextField from '../../../common/TextField'
 
 import globalMessages from '../../../../i18n/global-messages';
 import LocalizableError from '../../../../i18n/LocalizableError';
@@ -16,13 +16,13 @@ import ProgressStepBlock from '../common/ProgressStepBlock';
 import HelpLinkBlock from './HelpLinkBlock';
 import HWErrorBlock from '../common/HWErrorBlock';
 
-import { ReactComponent as InfoIconSVG } from '../../../../assets/images/info-icon.inline.svg';
+import { ReactComponent as InfoIconSVG }  from '../../../../assets/images/info-icon.inline.svg';
 
-import { ReactComponent as SaveLoadImage } from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
-import { ReactComponent as SaveErrorImage } from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
+import { ReactComponent as SaveLoadImage }  from '../../../../assets/images/hardware-wallet/ledger/save-load-modern.inline.svg';
+import { ReactComponent as SaveErrorImage }  from '../../../../assets/images/hardware-wallet/ledger/save-error-modern.inline.svg';
 
-import { ReactComponent as SaveLoadSVG } from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
-import { ReactComponent as SaveErrorSVG } from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
+import { ReactComponent as SaveLoadSVG }  from '../../../../assets/images/hardware-wallet/ledger/save-load.inline.svg';
+import { ReactComponent as SaveErrorSVG }  from '../../../../assets/images/hardware-wallet/ledger/save-error.inline.svg';
 
 import ReactToolboxMobxForm from '../../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
@@ -58,7 +58,8 @@ type Props = {|
 
 @observer
 export default class SaveDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm;
 
   // eslint-disable-next-line camelcase
@@ -66,27 +67,29 @@ export default class SaveDialog extends Component<Props> {
     const intl = this.context;
     const { defaultWalletName } = this.props;
 
-    this.form = new ReactToolboxMobxForm(
-      {
-        fields: {
-          walletName: {
-            label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
-            placeholder: '',
-            value: defaultWalletName,
-            validators: [({ field }) => [isValidWalletName(field.value), intl.formatMessage(globalMessages.invalidWalletName)]],
-          },
+    this.form = new ReactToolboxMobxForm({
+      fields: {
+        walletName: {
+          label: intl.formatMessage(globalMessages.hwConnectDialogSaveWalletNameInputLabel),
+          placeholder: '',
+          value: defaultWalletName,
+          validators: [({ field }) => (
+            [
+              isValidWalletName(field.value),
+              intl.formatMessage(globalMessages.invalidWalletName)
+            ]
+          )],
         },
       },
-      {
-        options: {
-          validateOnChange: true,
-          validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-        },
-        plugins: {
-          vjf: vjf(),
-        },
-      }
-    );
+    }, {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf()
+      },
+    });
   }
 
   render(): Node {
@@ -94,9 +97,18 @@ export default class SaveDialog extends Component<Props> {
     const intl = this.context;
 
     const { walletName } = form.values();
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, cancel } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      cancel,
+    } = this.props;
 
-    const walletNameFieldClasses = classnames(['walletName', styles.walletName]);
+    const walletNameFieldClasses = classnames([
+      'walletName',
+      styles.walletName,
+    ]);
     const walletNameField = this.form.$('walletName');
 
     const walletNameBlock = (
@@ -105,7 +117,9 @@ export default class SaveDialog extends Component<Props> {
           <div className={styles.walletNameInfoIcon}>
             <InfoIconSVG width="20" height="20" />
           </div>
-          <div className={styles.walletNameInfo}>{intl.formatMessage(messages.saveWalletNameInputBottomInfo)}</div>
+          <div className={styles.walletNameInfo}>
+            {intl.formatMessage(messages.saveWalletNameInputBottomInfo)}
+          </div>
         </div>
         <TextField
           className={walletNameFieldClasses}
@@ -113,8 +127,7 @@ export default class SaveDialog extends Component<Props> {
           error={walletNameField.error}
           done={walletNameField.isValid}
         />
-      </div>
-    );
+      </div>);
 
     let middleBlock = null;
 
@@ -122,40 +135,38 @@ export default class SaveDialog extends Component<Props> {
       case StepState.LOAD:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveLoadBlock])}>
-            <SaveLoadImage />
-          </div>
-        );
+            <SaveLoadImage/>
+          </div>);
         break;
       case StepState.PROCESS:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveStartProcessBlock])}>
-            <SaveLoadImage />
-          </div>
-        );
+            <SaveLoadImage/>
+          </div>);
         break;
       case StepState.ERROR:
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleSaveErrorBlock])}>
-            <SaveErrorImage />
-          </div>
-        );
+            <SaveErrorImage/>
+          </div>);
         break;
       default:
         Logger.error('ledger::ConnectDialog::render: something unexpected happened');
         break;
     }
 
-    const disabledCondition = isActionProcessing || !isValidWalletName(walletName);
+    const disabledCondition = (
+      isActionProcessing
+      || !isValidWalletName(walletName)
+    );
 
-    const dialogActions = [
-      {
-        label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
-        primary: true,
-        disabled: disabledCondition,
-        isSubmitting: isActionProcessing,
-        onClick: this.save,
-      },
-    ];
+    const dialogActions = [{
+      label: intl.formatMessage(globalMessages.hwConnectDialogSaveButtonLabel),
+      primary: true,
+      disabled: disabledCondition,
+      isSubmitting: isActionProcessing,
+      onClick: this.save
+    }];
 
     return (
       <Dialog
@@ -169,18 +180,19 @@ export default class SaveDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {walletNameBlock}
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
-      </Dialog>
-    );
+      </Dialog>);
   }
 
   save: void => void = () => {
     this.form.submit({
-      onSuccess: async form => {
+      onSuccess: async (form) => {
         const { walletName } = form.values();
         await this.props.submit(walletName);
-      },
+      }
     });
-  };
+  }
 }

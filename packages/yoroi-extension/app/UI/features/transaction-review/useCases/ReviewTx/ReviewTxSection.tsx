@@ -86,7 +86,13 @@ export const ReviewTxSection = () => {
 
   return (
     <Box sx={{ position: 'relative', height: '100vh' }}>
-      <Tabs initialTabId={tabSearchParam} tabs={getTabs()} pathId={pathId} headerSx={{ mx: '24px' }} contentSx={{ padding: 0 }} />
+      <Tabs
+        initialTabId={tabSearchParam}
+        tabs={getTabs()}
+        pathId={pathId}
+        headerSx={{ mx: '24px' }}
+        contentSx={{ padding: 0 }}
+      />
     </Box>
   );
 };

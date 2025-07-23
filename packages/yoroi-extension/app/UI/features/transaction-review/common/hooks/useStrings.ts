@@ -14,8 +14,7 @@ export const messages = Object.freeze(
     },
     takeHardwareWallet: {
       id: 'transaction.review.takeHardwareWallet',
-      defaultMessage:
-        '!!!Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.',
+      defaultMessage: '!!!Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.',
     },
     enterPassword: {
       id: 'transaction.review.enterPassword',
@@ -67,8 +66,7 @@ export const messages = Object.freeze(
     },
     interactWithOperations: {
       id: 'transaction.review.interactWithOperations',
-      defaultMessage:
-        '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
+      defaultMessage: '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
     },
     learnMore: {
       id: 'global.labels.LearnMore',
@@ -76,8 +74,7 @@ export const messages = Object.freeze(
     },
     collateralInfo: {
       id: 'transaction.review.collateralInfo',
-      defaultMessage:
-        '!!!Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.',
+      defaultMessage: '!!!Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.',
     },
     addCollateral: {
       id: 'connector.signin.reorg.title',
@@ -141,8 +138,7 @@ export const messages = Object.freeze(
     },
     rewardsWithdraw: {
       id: 'transaction.review.rewardsWithdraw',
-      defaultMessage:
-        '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
+      defaultMessage: '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
     },
     associatedAddress: {
       id: 'transaction.review.associatedAddress',

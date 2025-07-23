@@ -13,9 +13,7 @@ declare var CONFIG: ConfigType;
 
 export function startPoll(): void {
   refreshCurrentCoinPrice('poll');
-  setInterval(() => {
-    refreshCurrentCoinPrice('poll');
-  }, CONFIG.app.coinPriceRefreshInterval);
+  setInterval(() => { refreshCurrentCoinPrice('poll'); }, CONFIG.app.coinPriceRefreshInterval);
 }
 
 const SOURCE_CURRENCY = 'ADA';
@@ -62,7 +60,9 @@ export function refreshCurrentCoinPrice(why: 'UI' | 'poll'): void {
   });
 }
 
-export async function getHistoricalCoinPrices(request: HistoricalCoinPricesRequest): Promise<HistoricalCoinPricesResponse> {
+export async function getHistoricalCoinPrices(
+  request: HistoricalCoinPricesRequest
+): Promise<HistoricalCoinPricesResponse> {
   const priceMap: Map<number, Array<$ReadOnly<PriceDataRow>>> = new Map();
 
   const db = await getDb();
@@ -81,11 +81,15 @@ export async function getHistoricalCoinPrices(request: HistoricalCoinPricesReque
 
   const from = request.from === 'TADA' ? 'ADA' : request.from;
 
-  const missingTimestamps = request.timestamps.filter(timestamp => priceMap.get(timestamp) == null);
+  const missingTimestamps = request.timestamps.filter(
+    timestamp => priceMap.get(timestamp) == null
+  );
   if (missingTimestamps.length) {
     const stateFetcher = await getCommonStateFetcher();
 
-    const response = await stateFetcher.getHistoricalCoinPrice({ from, timestamps: missingTimestamps });
+    const response = await stateFetcher.getHistoricalCoinPrice(
+      { from, timestamps: missingTimestamps }
+    );
     if (response.error != null) {
       throw new Error('historical coin price query error: ' + response.error);
     }
@@ -96,13 +100,13 @@ export async function getHistoricalCoinPrices(request: HistoricalCoinPricesReque
     for (let i = 0; i < missingTimestamps.length; i++) {
       const ticker = response.tickers[i];
       if (ticker == null) {
-        continue;
+        continue
       }
-      const tickers: Array<Ticker> = Object.entries(ticker.prices).map(([To, Price]) => ({
-        From: response.tickers[i].from,
-        To,
-        Price: ((Price: any): number),
-      }));
+      const tickers: Array<Ticker> = Object.entries(
+        ticker.prices
+      ).map(([To, Price]) => (
+        { From: response.tickers[i].from, To, Price: ((Price: any): number) }
+      ));
 
       const rowsInDb = await upsertPrices({
         db,

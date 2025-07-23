@@ -30,7 +30,7 @@ type Props = {|
   +nfts: FormattedNFTDisplay[],
 |};
 export default class IncludedTokens extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   renderItems(items: FormattedNFTDisplay[] | FormattedTokenDisplay[]): Node {
     return items.map(item => {
       const numberOfDecimals = item.info?.Metadata.numberOfDecimals || 0;

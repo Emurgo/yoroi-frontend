@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import type { WalletState } from '../../../../chrome/extension/background/types';
 
+
 type RestoreWalletDataReturnValue = {|
   recoveryPhrase: string,
   walletName: string,

@@ -41,7 +41,10 @@ export default class Accordion extends Component<Props, State> {
       this.props.activeHeader && styles.activeHead,
     ]);
 
-    const toggleShowContent = classnames([styles.accordionContent, isToggle && styles.showActiveContent]);
+    const toggleShowContent = classnames([
+      styles.accordionContent,
+      isToggle && styles.showActiveContent,
+    ]);
 
     return (
       <div style={style} className={styles.accordionSection}>

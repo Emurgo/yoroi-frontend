@@ -26,6 +26,7 @@ type Props = {|
 
 @observer
 export default class PasswordInput extends Component<Props> {
+
   static defaultProps: {|
     initValues: void,
     disclaimer: void,
@@ -40,39 +41,41 @@ export default class PasswordInput extends Component<Props> {
     done: undefined,
   };
 
-  static contextType: any = IntlContext;
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
-    {
-      fields: {
-        [this.props.fieldName]: {
-          type: 'password',
-          onChange: this.props.onChange,
-          label: this.props.placeholder,
-          placeholder: '',
-          value: this.props.initValues || '',
-          validators: [
-            ({ field }) => {
-              return [this.props.passwordMatches(field.value), this.context.formatMessage(globalMessages.invalidRepeatPassword)];
-            },
-            ({ field }) => [
-              this.props.allowEmptyInput || field.value.length >= 0,
-              this.context.formatMessage(globalMessages.fieldIsRequired),
-            ],
-            ({ field }) => [this.props.validCheck(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)],
-          ],
+  static contextType:any = IntlContext;
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
+    fields: {
+      [this.props.fieldName]: {
+        type: 'password',
+        onChange: this.props.onChange,
+        label: this.props.placeholder,
+        placeholder: '',
+        value: (this.props.initValues) || '',
+        validators: [({ field }) => {
+          return [
+            this.props.passwordMatches(field.value),
+            this.context.formatMessage(globalMessages.invalidRepeatPassword)
+          ];
         },
+        ({ field }) => ([
+          this.props.allowEmptyInput || field.value.length >= 0,
+          this.context.formatMessage(globalMessages.fieldIsRequired)
+        ]),
+        ({ field }) => ([
+          this.props.validCheck(field.value),
+          this.context.formatMessage(globalMessages.invalidWalletPassword)
+        ]),
+        ],
       },
     },
-    {
-      options: {
-        validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-      },
-      plugins: {
-        vjf: vjf(),
-      },
-    }
-  );
+  }, {
+    options: {
+      validateOnChange: true,
+      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+    },
+    plugins: {
+      vjf: vjf()
+    },
+  });
 
   componentDidMount() {
     this.props.setForm(this.form);

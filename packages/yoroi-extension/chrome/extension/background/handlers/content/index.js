@@ -10,13 +10,16 @@ export async function handleInjectorMessage(message: Object, sender: Object) {
 
   if (message.type === 'yoroi_connect_request/cardano') {
     try {
-      await handleConnect(tabId, message.connectParameters, message.imgBase64Url);
+      await handleConnect(tabId, message.connectParameters, message.imgBase64Url)
     } catch (e) {
-      sendToInjector(tabId, {
-        type: 'yoroi_connect_response/cardano',
-        success: false,
-        err: stringifyError(e),
-      });
+      sendToInjector(
+        tabId,
+        {
+          type: 'yoroi_connect_response/cardano',
+          success: false,
+          err: stringifyError(e),
+        }
+      );
     }
   } else if (message.type === 'connector_rpc_request') {
     await handleRpc(message, sender);
@@ -24,3 +27,4 @@ export async function handleInjectorMessage(message: Object, sender: Object) {
     await handleBringRpc(message, sender);
   }
 }
+

@@ -3,17 +3,30 @@ import React from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 
-import type { ShowAddressRequestWrapper, MessageType } from '../../types/cmn';
-import type { DeviceCodeType, ProgressStateType, OperationNameType } from '../../types/enum';
+import type {
+  ShowAddressRequestWrapper,
+  MessageType,
+} from '../../types/cmn';
+import type {
+  DeviceCodeType,
+  ProgressStateType,
+  OperationNameType,
+} from '../../types/enum';
 import { PROGRESS_STATE } from '../../types/enum';
-import type { executeActionFunc, setDeviceCodeFunc } from '../../types/func';
+import type {
+  executeActionFunc,
+  setDeviceCodeFunc,
+} from '../../types/func';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 import WebAuthnTopBlock from './webauthn-top/WebAuthnTopBlock';
 import TitleBlock from './title/TitleBlock';
 import DeviceSelectionBlock from './device-selection/DeviceSelectionBlock';
 import OperationBlock from './operation/OperationBlock';
 import ResponseBlock from './response/ResponseBlock';
-import type { DeriveAddressRequest, SignTransactionRequest } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type {
+  DeriveAddressRequest,
+  SignTransactionRequest,
+} from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
 import styles from './ConnectBlock.scss';
 
@@ -62,9 +75,7 @@ export default class ConnectBlock extends React.Component<Props> {
       case PROGRESS_STATE.LOADING:
         content = (
           <LoadingSpinner
-            ref={component => {
-              this.loadingSpinner = component;
-            }}
+            ref={(component) => { this.loadingSpinner = component; }}
             showText
           />
         );
@@ -81,7 +92,11 @@ export default class ConnectBlock extends React.Component<Props> {
         break;
       case PROGRESS_STATE.DEVICE_RESPONSE:
         if (response == null) throw new Error(`Missing response`);
-        content = <ResponseBlock response={response} />;
+        content = (
+          <ResponseBlock
+            response={response}
+          />
+        );
         break;
       default:
         showWebAuthnTop = isWebAuthn;
@@ -101,7 +116,10 @@ export default class ConnectBlock extends React.Component<Props> {
 
     return (
       <div className={styles.component}>
-        <WebAuthnTopBlock showWebAuthnTop={showWebAuthnTop} isFirefox={isFirefox} />
+        <WebAuthnTopBlock
+          showWebAuthnTop={showWebAuthnTop}
+          isFirefox={isFirefox}
+        />
         <TitleBlock currentOperationName={currentOperationName} />
         {content}
       </div>

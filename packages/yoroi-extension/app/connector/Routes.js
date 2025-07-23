@@ -19,34 +19,43 @@ type Props = {| stores: StoresMap |};
 
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-export const YoroiRoutes: React$ComponentType<Props> = injectIntl(
-  observer((props: Props & Intl) => {
-    const { stores, intl } = props;
-    const title = intl.formatMessage(
-      useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ? messages.yoroiConnector : messages.yoroiDappConnector
-    );
+export const YoroiRoutes: React$ComponentType<Props>  = injectIntl(observer((props: Props & Intl) => {
+  const { stores, intl } = props;
+  const title = intl.formatMessage(
+    useLocation().pathname === ROUTES.SELECT_CASHBACK_WALLET ?
+      messages.yoroiConnector : messages.yoroiDappConnector
+  );
 
-    return (
-      <>
-        <Helmet>
-          <title>{title}</title>
-        </Helmet>
-        {stores.loading.isLoading ? (
-          <LoadingPage stores={(stores: StoresMap)} />
-        ) : (
-          <ConnectorLayout networkId={stores.profile.getCurrentNetworkId()} intl={intl}>
-            {getContent(stores)}
-          </ConnectorLayout>
-        )}
-      </>
-    );
-  })
-);
+  return (
+    <>
+      <Helmet><title>{title}</title></Helmet>
+      {stores.loading.isLoading ? (
+        <LoadingPage stores={(stores: StoresMap)} />
+      ) : (
+        <ConnectorLayout
+          networkId={stores.profile.getCurrentNetworkId()}
+          intl={intl}
+        >
+          {getContent(stores)}
+        </ConnectorLayout>
+      )}
+    </>
+  );
+}));
 
-const getContent = stores => (
+const getContent = (stores) => (
   <Routes>
-    <Route path={ROUTES.ROOT} element={<ConnectContainer stores={stores} />} />
-    <Route path={ROUTES.SIGNIN_TRANSACTION} element={<SignTxContainer stores={stores} />} />
-    <Route path={ROUTES.SELECT_CASHBACK_WALLET} element={<SelectCashbackWalletContainer stores={stores} />} />
+    <Route
+      path={ROUTES.ROOT}
+      element={<ConnectContainer stores={stores} />}
+    />
+    <Route
+      path={ROUTES.SIGNIN_TRANSACTION}
+      element={<SignTxContainer stores={stores} />}
+    />
+    <Route
+      path={ROUTES.SELECT_CASHBACK_WALLET}
+      element={<SelectCashbackWalletContainer stores={stores} />}
+    />
   </Routes>
 );

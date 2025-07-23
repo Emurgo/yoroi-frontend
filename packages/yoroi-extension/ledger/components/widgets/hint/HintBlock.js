@@ -15,25 +15,40 @@ type Props = {|
 
 @observer
 export default class HintBlock extends React.Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   render(): Node {
-    const { number, text, secondaryText, imagePath } = this.props;
+    const {
+      number,
+      text,
+      secondaryText,
+      imagePath,
+    } = this.props;
 
     return (
       <div className={styles.component}>
         <div className={styles.imageBlock}>
-          <img className={styles.image} src={imagePath} alt="HintImage" />
+          <img
+            className={styles.image}
+            src={imagePath}
+            alt="HintImage"
+          />
         </div>
         <div className={styles.infoBlock}>
           <div className={styles.counterBlock}>
-            <div className={styles.counter}>{number}</div>
+            <div className={styles.counter}>
+              {number}
+            </div>
           </div>
           <div className={styles.textBlock}>
             <div className={styles.primaryText}>
-              <FormattedMessage {...text} values={{ strong }} />
+              <FormattedMessage {...text}  values={{ strong }}/>
             </div>
-            {secondaryText != null && <div className={styles.secondaryText}>{secondaryText}</div>}
+            {secondaryText != null && (
+              <div className={styles.secondaryText}>
+                {secondaryText}
+              </div>
+            )}
           </div>
         </div>
       </div>

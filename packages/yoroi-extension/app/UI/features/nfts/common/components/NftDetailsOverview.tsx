@@ -73,14 +73,7 @@ function LabelWithValue({ label, value, pathId }: LabelWithValueProps): React.Re
       <Typography component="div" color="ds.el_gray_low">
         {label}
       </Typography>
-      <Typography
-        component="div"
-        color="ds.el_gray_medium"
-        display="flex"
-        alignItems="center"
-        justifyContent="flex-start"
-        id={pathId}
-      >
+      <Typography component="div" color="ds.el_gray_medium" display="flex" alignItems="center" justifyContent="flex-start" id={pathId}>
         {value}
       </Typography>
     </Box>

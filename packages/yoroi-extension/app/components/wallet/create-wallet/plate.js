@@ -8,7 +8,10 @@ import { useMemo } from 'react';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { WalletChecksum } from '@emurgo/cip4-js';
 
-export function usePlate(recoveryPhrase: Array<string>, selectedNetwork: $ReadOnly<NetworkRow>): WalletChecksum {
+export function usePlate(
+  recoveryPhrase: Array<string>,
+  selectedNetwork: $ReadOnly<NetworkRow>
+): WalletChecksum {
   return useMemo(() => {
     const network = selectedNetwork || networks.CardanoMainnet;
     const { plate } = generateShelleyPlate(

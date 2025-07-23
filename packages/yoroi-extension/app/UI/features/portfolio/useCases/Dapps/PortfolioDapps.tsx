@@ -134,10 +134,10 @@ const PortfolioDapps = ({ data, stores }: Props) => {
               {button.id === TableTabs.LIQUIDITY
                 ? liquidityList.length
                 : button.id === TableTabs.ORDER
-                  ? orderList.length
-                  : button.id === TableTabs.LENDBORROW
-                    ? 0
-                    : null}
+                ? orderList.length
+                : button.id === TableTabs.LENDBORROW
+                ? 0
+                : null}
               )
             </Typography>
           </Box>

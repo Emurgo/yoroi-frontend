@@ -1,20 +1,29 @@
 // @flow
 
 import { isEmpty } from 'lodash';
-import { Logger, stringifyError } from '../../../../utils/logging';
-import { NoInputsError } from '../../../common/errors';
+import {
+  Logger,
+  stringifyError,
+} from '../../../../utils/logging';
+import {
+  NoInputsError,
+} from '../../../common/errors';
 import type { CardanoAddressedUtxo } from '../types';
-import type { AddressUtxoFunc } from '../../lib/state-fetch/types';
-import type { Address, Addressing } from '../../lib/storage/models/PublicDeriver/interfaces';
+import type {
+  AddressUtxoFunc,
+} from '../../lib/state-fetch/types';
+import type {
+  Address, Addressing
+} from '../../lib/storage/models/PublicDeriver/interfaces';
 import type { NetworkRow } from '../../lib/storage/database/primitives/tables';
 
 /**
  * merge in remote UTXO information into an address list
- */
+*/
 export async function toSenderUtxos(payload: {|
   addresses: Array<{| ...Address, ...Addressing |}>,
   getUTXOsForAddresses: AddressUtxoFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 |}): Promise<Array<CardanoAddressedUtxo>> {
   // fetch UTXO
   const utxos = await payload.getUTXOsForAddresses({
@@ -24,7 +33,10 @@ export async function toSenderUtxos(payload: {|
 
   // add addressing info to the UTXO
   const addressingMap = new Map<string, Addressing>(
-    payload.addresses.map(entry => [entry.address, { addressing: entry.addressing }])
+    payload.addresses.map(entry => [
+      entry.address,
+      { addressing: entry.addressing }
+    ])
   );
   const senderUtxos = utxos.map(utxo => {
     const addressing = addressingMap.get(utxo.receiver);
@@ -33,7 +45,7 @@ export async function toSenderUtxos(payload: {|
     }
     return {
       ...utxo,
-      addressing: addressing.addressing,
+      addressing: addressing.addressing
     };
   });
 

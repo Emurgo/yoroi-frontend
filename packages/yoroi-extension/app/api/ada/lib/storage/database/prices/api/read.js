@@ -1,9 +1,12 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
 import * as Tables from '../tables';
 import type { PriceDataRow } from '../tables';
-import { getAll } from '../../utils';
+import { getAll, } from '../../utils';
 
 export class GetPriceData {
   static ownTables: {|
@@ -13,7 +16,13 @@ export class GetPriceData {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async getAllPrices(db: lf$Database, dbTx: lf$Transaction): Promise<$ReadOnlyArray<$ReadOnly<PriceDataRow>>> {
-    return await getAll<PriceDataRow>(db, dbTx, GetPriceData.ownTables[Tables.PriceDataSchema.name].name);
+  static async getAllPrices(
+    db: lf$Database,
+    dbTx: lf$Transaction,
+  ): Promise<$ReadOnlyArray<$ReadOnly<PriceDataRow>>> {
+    return await getAll<PriceDataRow>(
+      db, dbTx,
+      GetPriceData.ownTables[Tables.PriceDataSchema.name].name,
+    );
   }
 }

@@ -34,7 +34,7 @@
   }
   .button:active {
     background-color: var(--button-active-background-color);
-  }
+  }  
   .deviceSelection {
     display: flex;
     flex: 1;
@@ -43,7 +43,7 @@
     align-items: center;
     .title {
       text-align: center;
-      margin-bottom: 34px;
+      margin-bottom: 34px
     }
   }
   .deviceKnown {
@@ -89,7 +89,7 @@
       font-size: 14px;
       height: 22px;
       line-height: 22px;
-      color: var(--text-color-3);
+      color: var(--text-color-3)
     }
     .link {
       @include underline(var(--text-color-3));

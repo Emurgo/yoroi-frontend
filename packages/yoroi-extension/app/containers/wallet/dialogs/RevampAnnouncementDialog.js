@@ -23,8 +23,7 @@ const messages = defineMessages({
   },
   updatesSectionTitle: {
     id: 'wallet.revampAnnouncement.updatesSectionTitleNew',
-    defaultMessage:
-      '!!!Yoroi wallet just got more powerful new features. Start exploring the updates and take your crypto experience to the next level!',
+    defaultMessage: '!!!Yoroi wallet just got more powerful new features. Start exploring the updates and take your crypto experience to the next level!',
   },
   update1: {
     id: 'wallet.revampAnnouncement.updates.1new',
@@ -85,11 +84,12 @@ const ANNOUNCEMENT_MESSAGES: Array<[string, Object]> = [
   ['5.8.0', messages.update9],
 ];
 
-export const TOP_RECENT_ANNOUNCEMENT_VERSION: string = ANNOUNCEMENT_MESSAGES[ANNOUNCEMENT_MESSAGES.length - 1][0];
+export const TOP_RECENT_ANNOUNCEMENT_VERSION: string =
+  ANNOUNCEMENT_MESSAGES[ANNOUNCEMENT_MESSAGES.length-1][0];
 
 @observer
 export class RevampAnnouncementDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { onClose, lastAnnouncedFeatureVersion } = this.props;
@@ -104,9 +104,9 @@ export class RevampAnnouncementDialog extends Component<Props> {
     /*
      * Take only announcement messages not announced yet
      */
-    const updates = ANNOUNCEMENT_MESSAGES.filter(
-      ([v]) => lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, v)
-    ).map(([, msg]) => msg);
+    const updates = ANNOUNCEMENT_MESSAGES
+      .filter(([v]) => lastAnnouncedFeatureVersion === '' || semver.lt(lastAnnouncedFeatureVersion, v))
+      .map(([,msg]) => msg);
 
     return (
       <Dialog

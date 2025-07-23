@@ -70,7 +70,7 @@ export type SwapFormActions = {|
   sellAmountErrorChanged: (error: string | null) => void,
 |};
 
-export type State<S> = {| value: S, update: ((S => S) | S) => void |};
+export type State<S> = {| value: S, update: ((S => S) | S) => void |}
 
 export function StateWrap<S>([value, update]: [S, ((S => S) | S) => void]): State<S> {
   return { value, update };

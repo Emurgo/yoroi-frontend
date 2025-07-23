@@ -1,10 +1,6 @@
 @keyframes loading-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .component {
@@ -16,7 +12,7 @@
   .wrapper {
     width: 60px;
     height: 60px;
-    background: url('../../assets/img/spinner-dark.svg') no-repeat center;
+    background: url("../../assets/img/spinner-dark.svg") no-repeat center;
     background-size: 60px;
     animation: loading-spin 1.5s linear;
     animation-iteration-count: infinite;

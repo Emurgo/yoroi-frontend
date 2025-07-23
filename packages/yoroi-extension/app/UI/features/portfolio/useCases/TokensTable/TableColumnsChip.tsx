@@ -90,8 +90,8 @@ export const TokenPriceChangeChip = ({
       ? deltaPtTokenDataInterval < 0
         ? 'danger'
         : deltaPtTokenDataInterval > 0
-          ? 'success'
-          : 'neutral'
+        ? 'success'
+        : 'neutral'
       : variantPnl;
 
   if (noDataToDisplay || changePercent === undefined) {
@@ -113,7 +113,7 @@ export const TokenPriceChangeChip = ({
   }
 
   const priceChangeProcent = formatPriceChange(
-    isPrimaryToken && timeInterval !== undefined ? (deltaPtTokenDataInterval ?? 0) : (changePercent ?? 0)
+    isPrimaryToken && timeInterval !== undefined ? deltaPtTokenDataInterval ?? 0 : changePercent ?? 0
   );
   return (
     <Box sx={{ display: 'flex' }}>

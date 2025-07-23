@@ -1,6 +1,6 @@
 // @flow
 
-import { Type, ConstraintAction } from 'lovefield';
+import { Type, ConstraintAction, } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
 
@@ -21,7 +21,7 @@ export const ConceptualWalletSchema: {|
     ConceptualWalletId: 'ConceptualWalletId',
     Name: 'Name',
     NetworkId: 'NetworkId',
-  },
+  }
 };
 
 export type PublicDeriverInsert = {|
@@ -49,7 +49,7 @@ export const PublicDeriverSchema: {|
     Name: 'Name',
     Index: 'Index',
     LastSyncInfoId: 'LastSyncInfoId',
-  },
+  }
 };
 
 export type LastSyncInfoInsert = {|
@@ -81,7 +81,7 @@ export const LastSyncInfoSchema: {|
     SlotNum: 'SlotNum',
     BlockHash: 'BlockHash',
     Height: 'Height',
-  },
+  }
 };
 
 export type HWFeatures = {|
@@ -106,31 +106,35 @@ export const HwWalletMetaSchema: {|
     Vendor: 'Vendor',
     Model: 'Model',
     DeviceId: 'DeviceId',
-  },
+  }
 };
 
 export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
   // ConceptualWallet Table
-  schemaBuilder
-    .createTable(ConceptualWalletSchema.name)
+  schemaBuilder.createTable(ConceptualWalletSchema.name)
     .addColumn(ConceptualWalletSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(ConceptualWalletSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(ConceptualWalletSchema.properties.Name, Type.STRING)
-    .addPrimaryKey(([ConceptualWalletSchema.properties.ConceptualWalletId]: Array<string>), true);
+    .addPrimaryKey(
+      ([ConceptualWalletSchema.properties.ConceptualWalletId]: Array<string>),
+      true,
+    );
 
   // PublicDeriver
-  schemaBuilder
-    .createTable(PublicDeriverSchema.name)
+  schemaBuilder.createTable(PublicDeriverSchema.name)
     .addColumn(PublicDeriverSchema.properties.PublicDeriverId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.Name, Type.STRING)
     .addColumn(PublicDeriverSchema.properties.Index, Type.INTEGER)
     .addColumn(PublicDeriverSchema.properties.LastSyncInfoId, Type.INTEGER)
-    .addPrimaryKey(([PublicDeriverSchema.properties.PublicDeriverId]: Array<string>), true)
+    .addPrimaryKey(
+      ([PublicDeriverSchema.properties.PublicDeriverId]: Array<string>),
+      true
+    )
     .addForeignKey('PublicDeriver_ConceptualWallet', {
       local: PublicDeriverSchema.properties.ConceptualWalletId,
-      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
+      ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`
     })
     .addForeignKey('PublicDeriver_KeyDerivation', {
       local: PublicDeriverSchema.properties.KeyDerivationId,
@@ -139,7 +143,7 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     })
     .addForeignKey('PublicDeriver_LastSyncInfo', {
       local: PublicDeriverSchema.properties.LastSyncInfoId,
-      ref: `${LastSyncInfoSchema.name}.${LastSyncInfoSchema.properties.LastSyncInfoId}`,
+      ref: `${LastSyncInfoSchema.name}.${LastSyncInfoSchema.properties.LastSyncInfoId}`
     })
     .addIndex(
       'Bip44ToPublicDeriver_ConceptualWallet_Index',
@@ -148,14 +152,16 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     );
 
   // LastSyncInfoSchema Table
-  schemaBuilder
-    .createTable(LastSyncInfoSchema.name)
+  schemaBuilder.createTable(LastSyncInfoSchema.name)
     .addColumn(LastSyncInfoSchema.properties.LastSyncInfoId, Type.INTEGER)
     .addColumn(LastSyncInfoSchema.properties.Time, Type.DATE_TIME)
     .addColumn(LastSyncInfoSchema.properties.SlotNum, Type.NUMBER)
     .addColumn(LastSyncInfoSchema.properties.BlockHash, Type.STRING)
     .addColumn(LastSyncInfoSchema.properties.Height, Type.NUMBER)
-    .addPrimaryKey(([LastSyncInfoSchema.properties.LastSyncInfoId]: Array<string>), true)
+    .addPrimaryKey(
+      ([LastSyncInfoSchema.properties.LastSyncInfoId]: Array<string>),
+      true,
+    )
     .addNullable([
       LastSyncInfoSchema.properties.Time,
       LastSyncInfoSchema.properties.SlotNum,
@@ -163,8 +169,7 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
     ]);
 
   // HwWalletMeta Table
-  schemaBuilder
-    .createTable(HwWalletMetaSchema.name)
+  schemaBuilder.createTable(HwWalletMetaSchema.name)
     .addColumn(HwWalletMetaSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(HwWalletMetaSchema.properties.Vendor, Type.STRING)
     .addColumn(HwWalletMetaSchema.properties.Model, Type.STRING)
@@ -174,5 +179,7 @@ export const populateWalletDb = (schemaBuilder: lf$schema$Builder) => {
       ref: `${ConceptualWalletSchema.name}.${ConceptualWalletSchema.properties.ConceptualWalletId}`,
       action: ConstraintAction.CASCADE,
     })
-    .addUnique('HwWalletMetaSchema_ConceptualWallet_Unique', [HwWalletMetaSchema.properties.ConceptualWalletId]);
+    .addUnique('HwWalletMetaSchema_ConceptualWallet_Unique', [
+      HwWalletMetaSchema.properties.ConceptualWalletId,
+    ]);
 };

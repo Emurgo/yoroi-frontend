@@ -2,14 +2,22 @@
 
 // Handle restoring wallets that follow the bip44
 
-import { discoverAllAddressesFrom } from './bip44AddressScan';
-import type { GenerateAddressFunc } from './bip44AddressScan';
+import {
+  discoverAllAddressesFrom,
+} from './bip44AddressScan';
+import type {
+  GenerateAddressFunc,
+} from './bip44AddressScan';
 import type { ConfigType } from '../../../../../config/config-types';
 
-import { ChainDerivations, BIP44_SCAN_SIZE } from '../../../../config/numbersConfig';
+import {
+  ChainDerivations, BIP44_SCAN_SIZE,
+} from '../../../../config/numbersConfig';
 
-import type { TreeInsert, InsertRequest } from '../../../ada/lib/storage/database/walletTypes/common/utils.types';
-import type { AddByHashFunc } from '../storage/bridge/hashMapper';
+import type {
+  TreeInsert, InsertRequest,
+} from '../../../ada/lib/storage/database/walletTypes/common/utils.types';
+import type { AddByHashFunc, } from '../storage/bridge/hashMapper';
 import type { NetworkRow, CanonicalAddressInsert } from '../../../ada/lib/storage/database/primitives/tables';
 import type { CoreAddressT } from '../../../ada/lib/storage/database/primitives/enums';
 import type { Bip44ChainInsert } from '../../../ada/lib/storage/database/walletTypes/common/tables';
@@ -25,7 +33,7 @@ export async function addAddrForType(
   addByHash: AddByHashFunc,
   insertRequest: InsertRequest,
   address: string,
-  type: CoreAddressT
+  type: CoreAddressT,
 ): Promise<{|
   KeyDerivationId: number,
 |}> {
@@ -55,17 +63,23 @@ export async function scanBip44Chain(request: {|
     BIP44_SCAN_SIZE,
     addressRequestSize,
     request.checkAddressesInUse,
-    request.network
+    request.network,
   );
 
-  return addresses.map(({ address }, i) => {
-    return {
-      index: i + request.lastUsedIndex + 1,
-      insert: async insertRequest => {
-        return await addAddrForType(request.addByHash, insertRequest, address, request.type);
-      },
-    };
-  });
+  return addresses
+    .map(({ address }, i) => {
+      return {
+        index: i + request.lastUsedIndex + 1,
+        insert: async insertRequest => {
+          return await addAddrForType(
+            request.addByHash,
+            insertRequest,
+            address,
+            request.type,
+          );
+        },
+      };
+    });
 }
 
 // <TODO:PENDING_REMOVAL> bip44
@@ -100,21 +114,19 @@ export async function scanBip44Account(request: {|
     {
       index: ChainDerivations.EXTERNAL,
       // initial value. Doesn't override existing entry
-      insert: insertRequest =>
-        Promise.resolve({
-          KeyDerivationId: insertRequest.keyDerivationId,
-          DisplayCutoff: 0,
-        }),
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
+        DisplayCutoff: 0,
+      }),
       children: externalAddresses,
     },
     {
       index: ChainDerivations.INTERNAL,
-      insert: insertRequest =>
-        Promise.resolve({
-          KeyDerivationId: insertRequest.keyDerivationId,
-          DisplayCutoff: null,
-        }),
+      insert: insertRequest => Promise.resolve({
+        KeyDerivationId: insertRequest.keyDerivationId,
+        DisplayCutoff: null,
+      }),
       children: internalAddresses,
-    },
+    }
   ];
 }

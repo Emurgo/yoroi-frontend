@@ -56,10 +56,18 @@ type Props = {|
 
 @observer
 export default class ConnectDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const { progressInfo, isActionProcessing, error, onExternalLinkClick, goBack, submit, cancel } = this.props;
+    const {
+      progressInfo,
+      isActionProcessing,
+      error,
+      onExternalLinkClick,
+      goBack,
+      submit,
+      cancel,
+    } = this.props;
 
     const introBlock = (
       <Typography className={classnames([headerMixin.headerBlock, styles.headerBlock])}>
@@ -80,22 +88,22 @@ export default class ConnectDialog extends Component<Props> {
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectLoadBlock])}>
             <img src={connectLoadLedgerGIF} alt="" />
-          </div>
-        );
+          </div>);
         break;
       case StepState.PROCESS:
         backButton = null;
         middleBlock = (
           <div className={classnames([styles.middleBlock, styles.middleConnectProcessBlock])}>
             <img src={connectLoadLedgerGIF} alt="" />
-          </div>
-        );
+          </div>);
         break;
       case StepState.ERROR:
         backButton = <DialogBackButton onBack={goBack} />;
         middleBlock = (
-          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>{<ConnectErrorLedgerSVG />}</div>
-        );
+          <div className={classnames([styles.middleBlock, styles.middleConnectErrorBlock])}>
+            {<ConnectErrorLedgerSVG/>
+            }
+          </div>);
         break;
       default:
         Logger.error('ledger::ConnectDialog::render: something unexpected happened');
@@ -124,7 +132,9 @@ export default class ConnectDialog extends Component<Props> {
         <ProgressStepBlock progressInfo={progressInfo} />
         {introBlock}
         {middleBlock}
-        {error && <HWErrorBlock progressInfo={progressInfo} error={error} />}
+        {error &&
+          <HWErrorBlock progressInfo={progressInfo} error={error} />
+        }
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

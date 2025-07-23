@@ -44,7 +44,7 @@ type Props = {|
 
 @observer
 export default class CopyableAddress extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {|
     darkVariant: boolean,
     elementId: void,

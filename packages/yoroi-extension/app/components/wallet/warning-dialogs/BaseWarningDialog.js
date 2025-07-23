@@ -27,7 +27,7 @@ type Props = {|
 
 @observer
 export default class BaseWarningDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   render(): Node {
     const intl = this.context;
@@ -35,7 +35,7 @@ export default class BaseWarningDialog extends Component<Props> {
     const contactSupportLink = (
       <a
         className={styles.link}
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
+        href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'
         onClick={event => this.props.onExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.contactSupport)}
@@ -52,7 +52,7 @@ export default class BaseWarningDialog extends Component<Props> {
         <div className={styles.component}>
           <div className={styles.header}>
             {this.props.explanationHeader}
-            <FormattedMessage {...messages.explanation2} values={{ newLine: <br /> }} />
+            <FormattedMessage {...messages.explanation2} values={{ newLine: (<br/>) }}/>
           </div>
           <FormattedMessage {...messages.explanation3} values={{ contactSupportLink }} />
         </div>

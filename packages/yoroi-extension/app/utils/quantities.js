@@ -22,7 +22,9 @@ const asQuantity = (value: BigNumber | number | string): string => {
 
 export const Quantities = {
   sum: (quantities: Array<number | string>): string => {
-    return quantities.reduce((result, current) => result.plus(current), new BigNumber(0)).toString(10);
+    return quantities
+      .reduce((result, current) => result.plus(current), new BigNumber(0))
+      .toString(10);
   },
   max: (...quantities: Array<number | string>): string => {
     return BigNumber.max(...quantities).toString(10);
@@ -89,7 +91,9 @@ export const Quantities = {
 
     if (parts.length <= 1) {
       const quantity = asQuantity(
-        new BigNumber(value.replace(decimalSeparator, '.')).decimalPlaces(precision).shiftedBy(denomination)
+        new BigNumber(value.replace(decimalSeparator, '.'))
+          .decimalPlaces(precision)
+          .shiftedBy(denomination)
       );
 
       return [input, quantity];
@@ -104,13 +108,18 @@ export const Quantities = {
     input = fullDecFormat.slice(0, -1);
 
     const quantity = asQuantity(
-      new BigNumber(value.replace(decimalSeparator, '.')).decimalPlaces(precision).shiftedBy(denomination)
+      new BigNumber(value.replace(decimalSeparator, '.'))
+        .decimalPlaces(precision)
+        .shiftedBy(denomination)
     );
 
     return [input, quantity];
   },
   format: (quantity: string, denomination: number, precision?: number): string => {
-    if (precision === undefined) return new BigNumber(Quantities.denominated(quantity, denomination)).toFormat();
-    return new BigNumber(Quantities.denominated(quantity, denomination)).decimalPlaces(precision).toFormat();
+    if (precision === undefined)
+      return new BigNumber(Quantities.denominated(quantity, denomination)).toFormat();
+    return new BigNumber(Quantities.denominated(quantity, denomination))
+      .decimalPlaces(precision)
+      .toFormat();
   },
 };

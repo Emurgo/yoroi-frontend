@@ -1,21 +1,18 @@
 import {
   bytesToBase64,
   bytesToHex,
-  delay,
-  ensureArray,
-  hexToBytes,
-  hexToUtf,
+  delay, ensureArray,
+  hexToBytes, hexToUtf,
   iterateLenGet,
-  iterateLenGetMap,
-  sanitizeForLog,
-  timeCached,
-  utfToBytes,
-  zipGenerators,
+  iterateLenGetMap, sanitizeForLog,
+  timeCached, utfToBytes,
+  zipGenerators
 } from './coreUtils';
 import type { LenGet, LenGetMap } from './coreUtils';
 import { RustModule } from './api/ada/lib/cardanoCrypto/rustLoader';
 
 describe('utils', () => {
+
   test('encoders', () => {
     expect(hexToBytes('cafebabe')).toEqual(Buffer.from('cafebabe', 'hex'));
     expect(bytesToHex(Buffer.from('cafebabe', 'hex'))).toEqual('cafebabe');
@@ -46,16 +43,15 @@ describe('utils', () => {
     expect(sanitizeForLog({ a: 12, b: 22 })).toEqual({ a: 12, b: 22 });
     expect(sanitizeForLog({ a: 12, b: 22, password: 'qwe' })).toEqual({ a: 12, b: 22, password: '[sanitized]' });
     expect(sanitizeForLog({ a: 12, b: 22, c: { password: 'qwe' } })).toEqual({ a: 12, b: 22, c: { password: '[sanitized]' } });
-    expect(sanitizeForLog({ a: 12, b: 22, c: { x: false, y: 5.5, z: { password: 'qwe' } } })).toEqual({
-      a: 12,
-      b: 22,
-      c: { x: false, y: 5.5, z: { password: '[sanitized]' } },
-    });
+    expect(sanitizeForLog({ a: 12, b: 22, c: { x: false, y: 5.5, z: { password: 'qwe' } } })).toEqual({ a: 12, b: 22, c: { x: false, y: 5.5, z: { password: '[sanitized]' } } });
   });
+
 });
 
 describe('timeCached', () => {
+
   test('ttl = 0 | no caching', () => {
+
     const callCounter = [0];
 
     const cachedIncrement = timeCached(() => {
@@ -70,6 +66,7 @@ describe('timeCached', () => {
   });
 
   test('ttl < 0 | infinite caching', async () => {
+
     const callCounter = [0];
 
     const cachedIncrement = timeCached(() => {
@@ -86,6 +83,7 @@ describe('timeCached', () => {
   });
 
   test('ttl > 0 | temporary caching', async () => {
+
     const callCounter = [0];
 
     const cachedIncrement = timeCached(() => {
@@ -101,7 +99,8 @@ describe('timeCached', () => {
     expect(cachedIncrement()).toEqual(2);
   });
 
-  test('async ttl > 0 | temporary async caching', async done => {
+  test('async ttl > 0 | temporary async caching', async (done) => {
+
     const callCounter = [0];
 
     const cachedIncrement = timeCached(async () => {
@@ -119,17 +118,19 @@ describe('timeCached', () => {
 
     done();
   });
+
 });
 
 function createLenget<T>(...items: Array<T>): LenGet<T> {
   return { len: () => items.length, get: i => items[i] };
 }
 
-function createLengetMap<K, V>(items: { [K]: V }): LenGetMap<K, V> {
+function createLengetMap<K,V>(items: { [K]: V }): LenGetMap<K,V> {
   return { keys: () => createLenget(...Object.keys(items)), get: k => items[k] };
 }
 
 describe('generators', () => {
+
   function createAssetNames(...hexes: Array<string>): RustModule.WalletV4.AssetNames {
     const names = RustModule.WalletV4.AssetNames.new();
     for (const hex of hexes) {
@@ -141,7 +142,10 @@ describe('generators', () => {
   function createAssets(items: { [string]: number }): RustModule.WalletV4.Assets {
     const assets = RustModule.WalletV4.Assets.new();
     for (const [hex, amount] of Object.entries(items)) {
-      assets.insert(RustModule.WalletV4.AssetName.new(hexToBytes(hex)), RustModule.WalletV4.BigNum.from_str(String(amount)));
+      assets.insert(
+        RustModule.WalletV4.AssetName.new(hexToBytes(hex)),
+        RustModule.WalletV4.BigNum.from_str(String(amount)),
+      );
     }
     return assets;
   }
@@ -171,10 +175,11 @@ describe('generators', () => {
     }
   });
 
-  test('iterateLenGet wasm', async done => {
+  test('iterateLenGet wasm', async (done) => {
     await RustModule.load();
 
-    const names: RustModule.WalletV4.AssetNames = createAssetNames('cafebabe', '1234567890', 'aabbccddeeff');
+    const names: RustModule.WalletV4.AssetNames =
+      createAssetNames('cafebabe', '1234567890', 'aabbccddeeff');
 
     const iter = iterateLenGet(names)[Symbol.iterator]();
     expect(iter.next().value.to_hex()).toEqual(names.get(0).to_hex());
@@ -202,14 +207,20 @@ describe('generators', () => {
     expect(iter.next().value).toEqual(undefined);
   });
 
-  test('iterateLenGetMap wasm', async done => {
+  test('iterateLenGetMap wasm', async (done) => {
+
     await RustModule.load();
 
-    const assets: RustModule.WalletV4.Assets = createAssets({ cafebabe: 123, '1234567890': 456, aabbccddeeff: 789 });
+    const assets: RustModule.WalletV4.Assets =
+      createAssets({ 'cafebabe': 123, '1234567890': 456, 'aabbccddeeff': 789 });
 
     const iter = iterateLenGetMap(assets)[Symbol.iterator]();
 
-    function checkEntry(entry: [RustModule.WalletV4.AssetName, RustModule.WalletV4.BigNum], hex: string, amount: number) {
+    function checkEntry(
+      entry: [RustModule.WalletV4.AssetName, RustModule.WalletV4.BigNum],
+      hex: string,
+      amount: number,
+    ) {
       expect(bytesToHex(entry[0].name())).toEqual(hex);
       expect(Number(entry[1]?.to_str())).toEqual(amount);
     }
@@ -263,7 +274,10 @@ describe('generators', () => {
   test('zipGenerators with generators', () => {
     const someLenGetCollection1 = createLenget(11, 22, 33, 44);
     const someLenGetCollection2 = createLenget(55, 66, 77, 88);
-    const iter = zipGenerators(iterateLenGet(someLenGetCollection1), iterateLenGet(someLenGetCollection2))[Symbol.iterator]();
+    const iter = zipGenerators(
+      iterateLenGet(someLenGetCollection1),
+      iterateLenGet(someLenGetCollection2),
+    )[Symbol.iterator]();
     expect(iter.next().value).toEqual([11, 55]);
     expect(iter.next().value).toEqual([22, 66]);
     expect(iter.next().value).toEqual([33, 77]);
@@ -277,13 +291,7 @@ describe('ExtendedIterable', () => {
   test('zip', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
     const zipped = it.zip([10, 20, 30, 40, 50, 60]);
-    expect(zipped.toArray()).toEqual([
-      [1, 10],
-      [2, 20],
-      [3, 30],
-      [4, 40],
-      [5, 50],
-    ]);
+    expect(zipped.toArray()).toEqual([[1, 10], [2, 20], [3, 30], [4, 40], [5, 50]]);
   });
   test('join', () => {
     const it = iterateLenGet(createLenget(1, 2, 3, 4, 5));
@@ -319,7 +327,7 @@ describe('ExtendedIterable', () => {
   test('unique', () => {
     const it = iterateLenGet(createLenget(1, 1, null, 2, 2, 3, 3, 3, 'a', 'b', 'a', true, null, false, true, 'b', 2));
     const unique = it.unique();
-    expect(unique.toArray()).toEqual([1, null, 2, 3, 'a', 'b', true, false]);
+    expect(unique.toArray()).toEqual([1, null, 2, 3, 'a', 'b', true, false])
   });
   test('nonNull', () => {
     const it = iterateLenGet(createLenget(1, null, 2, undefined, 'a', null, 'b', undefined, false));
@@ -329,7 +337,7 @@ describe('ExtendedIterable', () => {
   test('filter', () => {
     const it = iterateLenGet(createLenget(1, null, 2, undefined, 'a', null, 'b', undefined, false));
     const unique = it.filter(t => t == null);
-    expect(unique.toArray()).toEqual([null, undefined, null, undefined]);
+    expect(unique.toArray()).toEqual([null, undefined, null, undefined])
   });
   test('keys', () => {
     const it = iterateLenGetMap(createLengetMap({ a: 1, b: 2, c: 3 }));
@@ -341,12 +349,7 @@ describe('ExtendedIterable', () => {
   });
   test('nonNullValue', () => {
     const it = iterateLenGetMap(createLengetMap({ a: undefined, b: null, c: 3, d: false, e: '', f: [] }));
-    expect(it.nonNullValue().toArray()).toEqual([
-      ['c', 3],
-      ['d', false],
-      ['e', ''],
-      ['f', []],
-    ]);
+    expect(it.nonNullValue().toArray()).toEqual([['c', 3], ['d', false], ['e', ''], ['f', []]]);
   });
   test('toArray', () => {
     const it = iterateLenGet(createLenget(1, true, 1, false, 'a', true, null, undefined, null));

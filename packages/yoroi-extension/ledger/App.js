@@ -18,8 +18,8 @@ const ConnectPage = lazy(() => import('./containers/ConnectPage'));
 const StyleVariableLoader = lazy(() => import('./containers/StyleVariableLoader'));
 
 type Props = {|
-  rootStore: RootStore,
-|};
+  rootStore: RootStore
+|}
 
 @observer
 export default class App extends React.Component<Props> {
@@ -36,14 +36,12 @@ export default class App extends React.Component<Props> {
     // (missed in object keys) just stay in english
     const mergedMessages = {
       ...translations[DEFAULT_LOCALE],
-      ...translations[locale],
+      ...translations[locale]
     };
 
     const loadingSpinner = (
       <LoadingSpinner
-        ref={component => {
-          this.loadingSpinner = component;
-        }}
+        ref={(component) => { this.loadingSpinner = component; }}
         showText
       />
     );
@@ -54,7 +52,7 @@ export default class App extends React.Component<Props> {
           <StyleVariableLoader variables={styleVariables} />
           <HashRouter basename={process.env.PUBLIC_URL}>
             <Routes>
-              <Route path="/" element={<ConnectPage rootStore={this.props.rootStore} />} />
+              <Route path="/" element={<ConnectPage rootStore={this.props.rootStore} />}/>
             </Routes>
           </HashRouter>
         </Suspense>

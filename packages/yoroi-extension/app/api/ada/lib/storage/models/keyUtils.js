@@ -1,15 +1,15 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type { lf$Database, lf$Transaction, } from 'lovefield';
 
-import type { KeyRow } from '../database/primitives/tables';
-import { ModifyKey } from '../database/primitives/api/write';
+import type { KeyRow, } from '../database/primitives/tables';
+import { ModifyKey, } from '../database/primitives/api/write';
 
-import type { IChangePasswordRequest, IChangePasswordResponse } from './common/interfaces';
+import type { IChangePasswordRequest, IChangePasswordResponse, } from './common/interfaces';
 
-import { decryptWithPassword, encryptWithPassword } from '../../../../../utils/passwordCipher';
+import { decryptWithPassword, encryptWithPassword, } from '../../../../../utils/passwordCipher';
 import type { IKey, KeySubkindType } from '../../cardanoCrypto/keys/types';
-import { KeyKind, KeySubkind } from '../../cardanoCrypto/keys/types';
+import { KeyKind, KeySubkind, } from '../../cardanoCrypto/keys/types';
 import {
   asPrivateKeyInstance,
   BIP32ED25519PrivateKey,
@@ -36,7 +36,10 @@ export function normalizeToPubDeriverLevel(request: {|
     password: request.password,
   });
 
-  const newKey = derivePath(key, request.path);
+  const newKey = derivePath(
+    key,
+    request.path,
+  );
   const privateKey = asPrivateKeyInstance(newKey);
   if (privateKey == null) throw new Error(`Should never happen`);
   return {
@@ -45,7 +48,10 @@ export function normalizeToPubDeriverLevel(request: {|
   };
 }
 
-export function decryptKey(keyRow: $ReadOnly<KeyRow>, password: null | string): string {
+export function decryptKey(
+  keyRow: $ReadOnly<KeyRow>,
+  password: null | string,
+): string {
   let rawKey;
   if (keyRow.IsEncrypted) {
     if (password === null) {
@@ -58,8 +64,15 @@ export function decryptKey(keyRow: $ReadOnly<KeyRow>, password: null | string): 
   return rawKey;
 }
 
-export function keyRowToClass(request: {| keyRow: $ReadOnly<KeyRow>, subkind: KeySubkindType, password: null | string |}): IKey {
-  const key = decryptKey(request.keyRow, request.password);
+export function keyRowToClass(request: {|
+  keyRow: $ReadOnly<KeyRow>,
+  subkind: KeySubkindType,
+  password: null | string,
+|}): IKey {
+  const key = decryptKey(
+    request.keyRow,
+    request.password,
+  );
   switch (request.keyRow.Type) {
     case KeyKind.BIP32ED25519: {
       if (request.subkind === KeySubkind.Private) {
@@ -87,14 +100,20 @@ export function keyRowToClass(request: {| keyRow: $ReadOnly<KeyRow>, subkind: Ke
 export async function rawChangePassword(
   db: lf$Database,
   tx: lf$Transaction,
-  deps: {| ModifyKey: Class<ModifyKey> |},
-  request: {| ...IChangePasswordRequest, oldKeyRow: $ReadOnly<KeyRow> |}
+  deps: {| ModifyKey: Class<ModifyKey>, |},
+  request: {| ...IChangePasswordRequest, oldKeyRow: $ReadOnly<KeyRow>, |},
 ): Promise<IChangePasswordResponse> {
-  const decryptedKey = decryptKey(request.oldKeyRow, request.oldPassword);
+  const decryptedKey = decryptKey(
+    request.oldKeyRow,
+    request.oldPassword,
+  );
 
   let newKey = decryptedKey;
   if (request.newPassword !== null) {
-    newKey = encryptWithPassword(request.newPassword, hexToBytes(decryptedKey));
+    newKey = encryptWithPassword(
+      request.newPassword,
+      hexToBytes(decryptedKey),
+    );
   }
 
   const newRow: KeyRow = {
@@ -105,5 +124,8 @@ export async function rawChangePassword(
     Type: request.oldKeyRow.Type,
   };
 
-  return await deps.ModifyKey.update(db, tx, newRow);
+  return await deps.ModifyKey.update(
+    db, tx,
+    newRow,
+  );
 }

@@ -51,11 +51,11 @@ async function refreshThreadMain(): Promise<void> {
 async function refreshAll(): Promise<void> {
   // this function should not have unhandled exception
   const localStorageApi = new LocalStorageApi();
-  const currentNetworkId = (await localStorageApi.loadCurrentNetworkId()) ?? networks.CardanoMainnet.NetworkId;
+  const currentNetworkId = await localStorageApi.loadCurrentNetworkId() ?? networks.CardanoMainnet.NetworkId;
 
   const db = await getDb();
-  const publicDerivers = (await getWallets({ db })).filter(
-    publicDeriver => publicDeriver.getParent().getNetworkInfo().NetworkId === currentNetworkId
+  const publicDerivers = (await getWallets({ db })).filter(publicDeriver =>
+    publicDeriver.getParent().getNetworkInfo().NetworkId === currentNetworkId
   );
 
   for (let i = 0; i < publicDerivers.length; i++) {
@@ -155,7 +155,12 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
       persistSubmittedTransactions(submittedTransactions);
     }
     console.debug('Syncing wallet %s finished.', publicDeriverId);
-    emitUpdate(publicDeriverId, false, (await getWalletsState(publicDeriverId))[0], newTxs);
+    emitUpdate(
+      publicDeriverId,
+      false,
+      (await getWalletsState(publicDeriverId))[0],
+      newTxs
+    );
 
     const networkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
     const baseConfig = getCardanoHaskellBaseConfig(getNetworkById(networkId));

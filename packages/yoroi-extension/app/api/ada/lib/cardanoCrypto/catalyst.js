@@ -21,24 +21,25 @@ export function generateRegistrationMetadata(
   stakingPublicKey: string,
   rewardAddress: string,
   nonce: number,
-  signer: Uint8Array => string
+  signer: Uint8Array => string,
 ): RustModule.WalletV4.AuxiliaryData {
+
   /**
-   * Catalyst follows CIP 36 to prove the voting power
-   * A transaction is submitted with following metadata format for the registration process
-   * label: 61284
-   * {
-   *   1: "the delegation array",
-   *   2: "stake key public key",
-   *   3: "address to receive rewards to"
-   *   4: "nonce (slot number)"
-   *   5: "purpose (0)"
-   * }
-   * label: 61285
-   * {
-   *   1: "signature of blake2b-256 hash of the metadata signed using stakekey"
-   * }
-   */
+    * Catalyst follows CIP 36 to prove the voting power
+    * A transaction is submitted with following metadata format for the registration process
+    * label: 61284
+    * {
+    *   1: "the delegation array",
+    *   2: "stake key public key",
+    *   3: "address to receive rewards to"
+    *   4: "nonce (slot number)"
+    *   5: "purpose (0)"
+    * }
+    * label: 61285
+    * {
+    *   1: "signature of blake2b-256 hash of the metadata signed using stakekey"
+    * }
+    */
 
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
@@ -51,11 +52,14 @@ export function generateRegistrationMetadata(
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );
   const generalMetadata = RustModule.WalletV4.GeneralTransactionMetadata.new();
-  generalMetadata.insert(RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()), registrationData);
+  generalMetadata.insert(
+    RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()),
+    registrationData
+  );
 
-  const hashedMetadata = blake2b(256 / 8)
-    .update(generalMetadata.to_bytes())
-    .digest('binary');
+  const hashedMetadata = blake2b(256 / 8).update(
+    generalMetadata.to_bytes()
+  ).digest('binary');
 
   generalMetadata.insert(
     RustModule.WalletV4.BigNum.from_str(CatalystLabels.SIG.toString()),
@@ -69,10 +73,20 @@ export function generateRegistrationMetadata(
 
   // This is how Ledger constructs the metadata. We must be consistent with it.
   const metadataList = RustModule.WalletV4.MetadataList.new();
-  metadataList.add(RustModule.WalletV4.TransactionMetadatum.from_bytes(generalMetadata.to_bytes()));
-  metadataList.add(RustModule.WalletV4.TransactionMetadatum.new_list(RustModule.WalletV4.MetadataList.new()));
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.from_bytes(
+      generalMetadata.to_bytes()
+    )
+  );
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.new_list(
+      RustModule.WalletV4.MetadataList.new()
+    )
+  );
 
-  return RustModule.WalletV4.AuxiliaryData.from_bytes(metadataList.to_bytes());
+  return RustModule.WalletV4.AuxiliaryData.from_bytes(
+    metadataList.to_bytes()
+  );
 }
 
 export function generateRegistration(request: {|
@@ -86,7 +100,7 @@ export function generateRegistration(request: {|
     bytesToHex(request.stakePrivateKey.to_public().as_bytes()),
     request.receiverAddress,
     request.slotNumber,
-    hashedMetadata => request.stakePrivateKey.sign(hashedMetadata).to_hex()
+    (hashedMetadata) => request.stakePrivateKey.sign(hashedMetadata).to_hex(),
   );
 }
 
@@ -95,23 +109,24 @@ export function generateCip15RegistrationMetadata(
   stakingPublicKey: string,
   rewardAddress: string,
   nonce: number,
-  signer: Uint8Array => string
+  signer: Uint8Array => string,
 ): RustModule.WalletV4.AuxiliaryData {
+
   /**
-   * Catalyst follows a certain standard to prove the voting power
-   * A transaction is submitted with following metadata format for the registration process
-   * label: 61284
-   * {
-   *   1: "pubkey generated for catalyst app",
-   *   2: "stake key public key",
-   *   3: "address to receive rewards to"
-   *   4: "slot number"
-   * }
-   * label: 61285
-   * {
-   *   1: "signature of blake2b-256 hash of the metadata signed using stakekey"
-   * }
-   */
+    * Catalyst follows a certain standard to prove the voting power
+    * A transaction is submitted with following metadata format for the registration process
+    * label: 61284
+    * {
+    *   1: "pubkey generated for catalyst app",
+    *   2: "stake key public key",
+    *   3: "address to receive rewards to"
+    *   4: "slot number"
+    * }
+    * label: 61285
+    * {
+    *   1: "signature of blake2b-256 hash of the metadata signed using stakekey"
+    * }
+    */
 
   const registrationData = RustModule.WalletV4.encode_json_str_to_metadatum(
     JSON.stringify({
@@ -123,11 +138,14 @@ export function generateCip15RegistrationMetadata(
     RustModule.WalletV4.MetadataJsonSchema.BasicConversions
   );
   const generalMetadata = RustModule.WalletV4.GeneralTransactionMetadata.new();
-  generalMetadata.insert(RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()), registrationData);
+  generalMetadata.insert(
+    RustModule.WalletV4.BigNum.from_str(CatalystLabels.DATA.toString()),
+    registrationData
+  );
 
-  const hashedMetadata = blake2b(256 / 8)
-    .update(generalMetadata.to_bytes())
-    .digest('binary');
+  const hashedMetadata = blake2b(256 / 8).update(
+    generalMetadata.to_bytes()
+  ).digest('binary');
 
   generalMetadata.insert(
     RustModule.WalletV4.BigNum.from_str(CatalystLabels.SIG.toString()),
@@ -141,8 +159,18 @@ export function generateCip15RegistrationMetadata(
 
   // This is how Ledger constructs the metadata. We must be consistent with it.
   const metadataList = RustModule.WalletV4.MetadataList.new();
-  metadataList.add(RustModule.WalletV4.TransactionMetadatum.from_bytes(generalMetadata.to_bytes()));
-  metadataList.add(RustModule.WalletV4.TransactionMetadatum.new_list(RustModule.WalletV4.MetadataList.new()));
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.from_bytes(
+      generalMetadata.to_bytes()
+    )
+  );
+  metadataList.add(
+    RustModule.WalletV4.TransactionMetadatum.new_list(
+      RustModule.WalletV4.MetadataList.new()
+    )
+  );
 
-  return RustModule.WalletV4.AuxiliaryData.from_bytes(metadataList.to_bytes());
+  return RustModule.WalletV4.AuxiliaryData.from_bytes(
+    metadataList.to_bytes()
+  );
 }

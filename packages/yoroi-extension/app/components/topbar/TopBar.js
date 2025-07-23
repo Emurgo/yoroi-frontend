@@ -18,7 +18,9 @@ export default class TopBar extends Component<Props> {
   };
 
   render(): Node {
-    const { title } = this.props;
+    const {
+      title,
+    } = this.props;
 
     return (
       <header className={styles.topBar}>

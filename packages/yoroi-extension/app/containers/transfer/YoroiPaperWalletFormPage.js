@@ -13,13 +13,15 @@ import BaseTransferPage from '../../components/transfer/BaseTransferPage';
 const messages = defineMessages({
   step0: {
     id: 'yoroiTransfer.form.instructions.step0Paper.text',
-    defaultMessage:
-      '!!!Enter the 21-word recovery phrase used to back up your Yoroi Paper wallet and your paper password to restore the balance and transfer all the funds.',
+    defaultMessage: '!!!Enter the 21-word recovery phrase used to back up your Yoroi Paper wallet and your paper password to restore the balance and transfer all the funds.',
   },
 });
 
 type Props = {|
-  +onSubmit: ({| recoveryPhrase: string, paperPassword: string |}) => void,
+  +onSubmit: {|
+    recoveryPhrase: string,
+    paperPassword: string,
+  |} => void,
   +onBack: void => void,
   +mnemonicValidator: string => boolean,
   +validWords: Array<string>,
@@ -30,7 +32,8 @@ type Props = {|
 
 @observer
 export default class YoroiPaperWalletFormPage extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   @observable mnemonicForm: void | ReactToolboxMobxForm;
   @observable paperPasswordForm: void | ReactToolboxMobxForm;
 
@@ -44,35 +47,35 @@ export default class YoroiPaperWalletFormPage extends Component<Props> {
     this.paperPasswordForm = form;
   }
 
-  getMnemonic: () => Promise<string> = () => {
+  getMnemonic: (() => Promise<string>) = () => {
     return new Promise<string>((resolve, reject) => {
       if (this.mnemonicForm == null) {
         throw new Error('YoroiPaperWalletFormPage mnemonicForm not set');
       }
       this.mnemonicForm.submit({
-        onSuccess: form => {
+        onSuccess: (form) => {
           const { recoveryPhrase } = form.values();
           resolve(join(recoveryPhrase, ' '));
         },
-        onError: () => reject(),
+        onError: () => reject()
       });
     });
-  };
-  getPaperPassword: () => Promise<string> = () => {
+  }
+  getPaperPassword: (() => Promise<string>) = () => {
     return new Promise<string>((resolve, reject) => {
       if (this.paperPasswordForm == null) {
         throw new Error('YoroiPaperWalletFormPage paperPasswordForm not set');
       }
       this.paperPasswordForm.submit({
-        onSuccess: form => {
+        onSuccess: (form) => {
           const { paperPassword } = form.values();
           resolve(paperPassword);
         },
-        onError: () => reject(),
+        onError: () => reject()
       });
     });
-  };
-  submit: () => Promise<void> = async () => {
+  }
+  submit: (() => Promise<void>) = async () => {
     if (this.mnemonicForm == null) {
       throw new Error('YoroiPaperWalletFormPage form not set');
     }
@@ -99,13 +102,13 @@ export default class YoroiPaperWalletFormPage extends Component<Props> {
         }
       >
         <MnemonicInput
-          setForm={form => this.setMnemonicFrom(form)}
+          setForm={(form) => this.setMnemonicFrom(form)}
           mnemonicValidator={this.props.mnemonicValidator}
           validWords={this.props.validWords}
           mnemonicLength={this.props.mnemonicLength}
         />
         <PaperPasswordInput
-          setForm={form => this.setPaperPasswordFrom(form)}
+          setForm={(form) => this.setPaperPasswordFrom(form)}
           passwordMatches={this.props.passwordMatches}
           includeLengthCheck={this.props.includeLengthCheck}
         />

@@ -31,7 +31,7 @@ type Props = {|
   +onStartWalletBackup: void => void,
   +onAcceptTermDevice: void => void,
   +onAcceptTermRecovery: void => void,
-  +onAddWord: ({| index: number, word: string |}) => void,
+  +onAddWord: {| index: number, word: string |} => void,
   +onClear: void => void,
   +onFinishBackup: void => PossiblyAsync<void>,
   +onRestartBackup: void => void,
@@ -41,32 +41,19 @@ type Props = {|
 
 @observer
 export default class WalletBackupDialog extends Component<Props> {
+
   render(): Node {
     const {
-      currentStep,
-      onCancelBackup,
-      canPhraseBeShown,
-      isPrivacyNoticeAccepted,
-      countdownRemaining,
-      togglePrivacyNotice,
-      onContinue,
-      onBack,
-      recoveryPhrase,
-      onStartWalletBackup,
-      isTermDeviceAccepted,
-      enteredPhrase,
-      removeWord,
-      hasWord,
-      isTermRecoveryAccepted,
-      isValid,
-      isSubmitting,
-      onAcceptTermDevice,
-      onAcceptTermRecovery,
-      onAddWord,
-      onClear,
-      onFinishBackup,
-      onRestartBackup,
-      recoveryPhraseSorted,
+      currentStep, onCancelBackup,
+      canPhraseBeShown, isPrivacyNoticeAccepted,
+      countdownRemaining, togglePrivacyNotice,
+      onContinue, onBack, recoveryPhrase,
+      onStartWalletBackup, isTermDeviceAccepted,
+      enteredPhrase, removeWord, hasWord,
+      isTermRecoveryAccepted, isValid, isSubmitting,
+      onAcceptTermDevice, onAcceptTermRecovery,
+      onAddWord, onClear, onFinishBackup,
+      onRestartBackup, recoveryPhraseSorted
     } = this.props;
 
     if (currentStep === 'privacyWarning') {

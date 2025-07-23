@@ -21,25 +21,30 @@ const messages = defineMessages({
 
 @observer
 export default class ComplexityLevelPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const { checkAdaServerStatus } = stores.serverConnectionStore;
 
     const { selected } = stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
-    const displayedBanner =
-      checkAdaServerStatus === ServerStatusErrors.Healthy ? (
-        <TestnetWarningBanner isTestnet={isWalletTestnet} />
-      ) : (
-        <ServerErrorBanner errorType={checkAdaServerStatus} />
-      );
+    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
+      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
 
-    const topbarTitle = <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />;
+    const topbarTitle = (
+      <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />
+    );
 
-    const topbarElement = <TopBar title={topbarTitle} />;
+    const topbarElement = (
+      <TopBar
+        title={topbarTitle}
+      />);
     return (
-      <TopBarLayout topbar={topbarElement} banner={displayedBanner}>
+      <TopBarLayout
+        topbar={topbarElement}
+        banner={displayedBanner}
+      >
         <ComplexityLevel
           complexityLevel={stores.profile.selectedComplexityLevel}
           onSubmit={stores.profile.selectComplexityLevel}

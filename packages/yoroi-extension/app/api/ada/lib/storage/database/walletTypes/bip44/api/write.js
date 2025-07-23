@@ -1,16 +1,36 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
-import { op } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
+import {
+  op,
+} from 'lovefield';
 
-import type { Bip44ChainRow } from '../../common/tables';
-import { Bip44ChainSchema } from '../../common/tables';
-import { GetDerivationSpecific } from '../../common/api/read';
-import type { CanonicalAddressRow } from '../../../primitives/tables';
-import { KeyDerivationSchema, CanonicalAddressSchema } from '../../../primitives/tables';
-import { GetChildWithSpecific, GetPathWithSpecific } from '../../../primitives/api/read';
+import type {
+  Bip44ChainRow,
+} from '../../common/tables';
+import {
+  Bip44ChainSchema,
+} from '../../common/tables';
+import {
+  GetDerivationSpecific,
+} from '../../common/api/read';
+import type {
+  CanonicalAddressRow,
+} from '../../../primitives/tables';
+import {
+  KeyDerivationSchema,
+  CanonicalAddressSchema,
+} from '../../../primitives/tables';
+import {
+  GetChildWithSpecific, GetPathWithSpecific,
+} from '../../../primitives/api/read';
 
-import { Bip44DerivationLevels } from './utils';
+import {
+  Bip44DerivationLevels,
+} from './utils';
 
 export class ModifyDisplayCutoff {
   static ownTables: {|
@@ -40,7 +60,7 @@ export class ModifyDisplayCutoff {
       derivationLevel: number,
       pathToLevel: Array<number>,
     |},
-    derivationTables: Map<number, string>
+    derivationTables: Map<number, string>,
   ): Promise<void | {|
     index: number,
     row: $ReadOnly<CanonicalAddressRow>,
@@ -49,50 +69,45 @@ export class ModifyDisplayCutoff {
 
     const oldChain = await (async () => {
       if (derivationLevel === Bip44DerivationLevels.CHAIN.level) {
-        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<Bip44ChainRow>(
-          db,
-          tx,
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+          Bip44ChainRow
+        >(
+          db, tx,
           [request.pubDeriverKeyDerivationId],
           Bip44DerivationLevels.CHAIN.level,
-          derivationTables
+          derivationTables,
         );
         const chainDerivation = result[0];
         if (chainDerivation === undefined) {
           // we know this level exists since we fetched it in GetChildIfExists
-          throw new Error(
-            `${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`
-          );
+          throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`);
         }
         return chainDerivation;
       }
       if (derivationLevel === Bip44DerivationLevels.ACCOUNT.level) {
-        return (
-          await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
-            db,
-            tx,
-            {
-              ...rest,
-              level: Bip44DerivationLevels.CHAIN.level,
-            },
-            async derivationId => {
-              const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<Bip44ChainRow>(
-                db,
-                tx,
-                [derivationId],
-                Bip44DerivationLevels.CHAIN.level,
-                derivationTables
-              );
-              const chainDerivation = result[0];
-              if (chainDerivation === undefined) {
-                // we know this level exists since we fetched it in GetChildIfExists
-                throw new Error(
-                  `${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`
-                );
-              }
-              return chainDerivation;
+        return (await ModifyDisplayCutoff.depTables.GetPathWithSpecific.getPath<Bip44ChainRow>(
+          db, tx,
+          {
+            ...rest,
+            level: Bip44DerivationLevels.CHAIN.level,
+          },
+          async (derivationId) => {
+            const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+              Bip44ChainRow
+            >(
+              db, tx,
+              [derivationId],
+              Bip44DerivationLevels.CHAIN.level,
+              derivationTables,
+            );
+            const chainDerivation = result[0];
+            if (chainDerivation === undefined) {
+              // we know this level exists since we fetched it in GetChildIfExists
+              throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing chain. Should never happen`);
             }
-          )
-        ).levelSpecific;
+            return chainDerivation;
+          },
+        )).levelSpecific;
       }
       throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} incorrect pubderiver level`);
     })();
@@ -105,28 +120,28 @@ export class ModifyDisplayCutoff {
 
     // Get the address at this new index
 
-    const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<CanonicalAddressRow>(
-      db,
-      tx,
-      async derivationId => {
-        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<CanonicalAddressRow>(
-          db,
-          tx,
+    const address = await ModifyDisplayCutoff.depTables.GetChildWithSpecific.get<
+      CanonicalAddressRow
+    >(
+      db, tx,
+      async (derivationId) => {
+        const result = await ModifyDisplayCutoff.depTables.GetDerivationSpecific.get<
+          CanonicalAddressRow
+        >(
+          db, tx,
           [derivationId],
           Bip44DerivationLevels.ADDRESS.level,
-          derivationTables
+          derivationTables,
         );
         const addressDerivation = result[0];
         if (addressDerivation === undefined) {
           // we know this level exists since we fetched it in GetChildIfExists
-          throw new Error(
-            `${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing address. Should never happen`
-          );
+          throw new Error(`${nameof(ModifyDisplayCutoff)}::${nameof(ModifyDisplayCutoff.pop)} missing address. Should never happen`);
         }
         return addressDerivation;
       },
       oldChain.KeyDerivationId,
-      newIndex
+      newIndex,
     );
 
     // note: if the address doesn't exist, return right away
@@ -137,10 +152,14 @@ export class ModifyDisplayCutoff {
 
     // Update the external chain DisplayCutoff
 
-    await ModifyDisplayCutoff.set(db, tx, {
-      derivationId: oldChain.KeyDerivationId,
-      newIndex,
-    });
+
+    await ModifyDisplayCutoff.set(
+      db, tx,
+      {
+        derivationId: oldChain.KeyDerivationId,
+        newIndex
+      },
+    );
 
     return {
       index: newIndex,
@@ -154,13 +173,22 @@ export class ModifyDisplayCutoff {
     request: {|
       derivationId: number,
       newIndex: number,
-    |}
+    |},
   ): Promise<void> {
-    const chainTable = db.getSchema().table(ModifyDisplayCutoff.ownTables[Bip44ChainSchema.name].name);
+    const chainTable = db.getSchema().table(
+      ModifyDisplayCutoff.ownTables[Bip44ChainSchema.name].name
+    );
     const updateQuery = db
       .update(chainTable)
-      .set(chainTable[Bip44ChainSchema.properties.DisplayCutoff], request.newIndex)
-      .where(op.and(chainTable[Bip44ChainSchema.properties.KeyDerivationId].eq(request.derivationId)));
+      .set(
+        chainTable[Bip44ChainSchema.properties.DisplayCutoff],
+        request.newIndex
+      )
+      .where(op.and(
+        chainTable[Bip44ChainSchema.properties.KeyDerivationId].eq(
+          request.derivationId
+        ),
+      ));
 
     await tx.attach(updateQuery);
   }

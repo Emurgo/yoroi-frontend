@@ -1,8 +1,14 @@
 // @flow
 
-import type { lf$Database, lf$Transaction } from 'lovefield';
+import type {
+  lf$Database,
+  lf$Transaction,
+} from 'lovefield';
 import * as Tables from '../tables';
-import type { ExplorerInsert, ExplorerRow, PreferredExplorerInsert, PreferredExplorerRow } from '../tables';
+import type {
+  ExplorerInsert, ExplorerRow,
+  PreferredExplorerInsert, PreferredExplorerRow,
+} from '../tables';
 import { removeFromTableBatch, addOrReplaceRows } from '../../utils';
 
 export class ModifyExplorers {
@@ -16,13 +22,12 @@ export class ModifyExplorers {
   static async upsert(
     db: lf$Database,
     tx: lf$Transaction,
-    rows: $ReadOnlyArray<$ReadOnly<ExplorerInsert>>
+    rows: $ReadOnlyArray<$ReadOnly<ExplorerInsert>>,
   ): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
     const result = await addOrReplaceRows<ExplorerInsert, ExplorerRow>(
-      db,
-      tx,
+      db, tx,
       rows,
-      ModifyExplorers.ownTables[Tables.ExplorerSchema.name].name
+      ModifyExplorers.ownTables[Tables.ExplorerSchema.name].name,
     );
 
     return result;
@@ -39,23 +44,21 @@ export class ModifyPreferredExplorer {
   static async upsert(
     db: lf$Database,
     tx: lf$Transaction,
-    row: PreferredExplorerInsert
+    row: PreferredExplorerInsert,
   ): Promise<$ReadOnlyArray<$ReadOnly<PreferredExplorerRow>>> {
     // we can't upsert based off networkId
     // since lovefield tables all need their own primary key (not just foreign)
     // so instead, we delete any row that might already exist, then add a new row
     await removeFromTableBatch(
-      db,
-      tx,
+      db, tx,
       ModifyPreferredExplorer.ownTables[Tables.PreferredExplorerSchema.name].name,
       ModifyPreferredExplorer.ownTables[Tables.PreferredExplorerSchema.name].properties.NetworkId,
-      ([row.NetworkId]: Array<number>)
+      ([row.NetworkId]: Array<number>),
     );
     const result = await addOrReplaceRows<PreferredExplorerInsert, PreferredExplorerRow>(
-      db,
-      tx,
+      db, tx,
       [row],
-      ModifyPreferredExplorer.ownTables[Tables.PreferredExplorerSchema.name].name
+      ModifyPreferredExplorer.ownTables[Tables.PreferredExplorerSchema.name].name,
     );
 
     return result;

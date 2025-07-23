@@ -10,11 +10,11 @@ type AnalyticsAsset = {|
 |};
 
 type FromAsset = {|
-  from_asset: Array<AnalyticsAsset>,
+  from_asset: Array<AnalyticsAsset>
 |};
 
 type ToAsset = {|
-  to_asset: Array<AnalyticsAsset>,
+  to_asset: Array<AnalyticsAsset>
 |};
 
 type FromAndToAssets = {| ...FromAsset, ...ToAsset |};

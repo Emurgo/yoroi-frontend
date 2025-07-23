@@ -68,7 +68,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       coinPriceCurrencyId: {
@@ -142,7 +142,13 @@ export default class UnitOfAccountSettings extends Component<Props> {
         className={componentClassNames}
       >
         {dialog}
-        <Typography component="h2" variant="body1" fontWeight={500} mb="16px" color="ds.text_gray_medium">
+        <Typography
+          component="h2"
+          variant="body1"
+          fontWeight={500}
+          mb="16px"
+          color="ds.text_gray_medium"
+        >
           {intl.formatMessage(messages.unitOfAccountTitle)}
         </Typography>
 
@@ -160,9 +166,13 @@ export default class UnitOfAccountSettings extends Component<Props> {
             {...coinPriceCurrencyId.bind()}
             onChange={this.props.onSelect}
             value={currentValue}
-            maxHeight="280px"
+            maxHeight='280px'
             renderValue={value => (
-              <Typography component="div" variant="body1" fontWeight="400" color="ds.text_gray_medium">
+              <Typography component="div"
+                variant="body1"
+                fontWeight="400"
+                color="ds.text_gray_medium"
+              >
                 {/* $FlowFixMe[prop-missing] */}
                 {value} - {currencies.filter(item => item.value === value)[0].name}
               </Typography>
@@ -171,7 +181,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
             {currencies.map(option => optionRenderer(option))}
           </Select>
 
-          {
+          {(
             <>
               <Typography component="div" variant="caption1" display="inline-block" color="ds.text_gray_low" mt="4px">
                 <FormattedMessage {...messages.noteRevamp} />
@@ -190,7 +200,7 @@ export default class UnitOfAccountSettings extends Component<Props> {
                 <FormattedMessage {...messages.lastUpdated} values={{ lastUpdated, strong }} />
               </Typography>
             </>
-          }
+          )}
         </Box>
       </Box>
     );

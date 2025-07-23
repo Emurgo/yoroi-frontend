@@ -22,14 +22,14 @@ export function asPaginate(input: any): Paginate {
   if (typeof input === 'object' && typeof input.page === 'number' && typeof input.limit === 'number') {
     return {
       page: input.page,
-      limit: input.limit,
+      limit: input.limit
     };
   }
   throw ConnectorError.invalidRequest(`invalid Paginate: ${JSON.stringify(input)}`);
 }
 
 export type PaginateError = {|
-  maxSize: number,
+    maxSize: number,
 |};
 
 export type TokenId = string;
@@ -77,8 +77,8 @@ export const TxSendErrorCodes = Object.freeze({
 export type TxSendErrorCode = $Values<typeof TxSendErrorCodes>;
 
 export type TxSendError = {|
-  code: TxSendErrorCode,
-  info: string,
+	code: TxSendErrorCode,
+	info: string,
 |};
 
 export const TxSignErrorCodes = Object.freeze({
@@ -88,8 +88,8 @@ export const TxSignErrorCodes = Object.freeze({
 export type TxSignErrorCode = $Values<typeof TxSignErrorCodes>;
 
 export type TxSignError = {|
-  code: TxSignErrorCode,
-  info: string,
+	code: TxSignErrorCode,
+	info: string,
 |};
 
 export const DataSignErrorCodes = Object.freeze({
@@ -102,7 +102,7 @@ export type DataSignErrorCode = $Values<typeof DataSignErrorCodes>;
 
 export type DataSignError = {|
   code: DataSignErrorCode,
-  info: string,
+  info: string
 |};
 
 export const APIErrorCodes = Object.freeze({
@@ -114,7 +114,7 @@ export type APIErrorCode = $Values<typeof APIErrorCodes>;
 
 export type APIError = {|
   code: APIErrorCode,
-  info: string,
+  info: string
 |};
 
 // ----- Types used inside the connector only ----- //
@@ -124,7 +124,7 @@ export type PublicDeriverCache = {|
   name: string,
   balance: MultiToken,
   checksum: void | WalletChecksum,
-|};
+|}
 
 export type WalletAuthEntry = {|
   walletId: string,
@@ -157,27 +157,24 @@ export type ConnectedSites = {|
 |};
 
 type RpcUid = number;
-export type PendingSignData =
-  | {|
-      type: 'data',
-      uid: RpcUid,
-      address: Address,
-      payload: string,
-    |}
-  | {|
-      type: 'tx/cardano',
-      uid: RpcUid,
-      tx: CardanoTx,
-    |}
-  | {|
-      type: 'tx-reorg/cardano',
-      uid: RpcUid,
-      tx: {|
-        usedUtxoIds: Array<string>,
-        reorgTargetAmount: string,
-        utxos: IGetAllUtxosResponse,
-      |},
-    |};
+export type PendingSignData = {|
+  type: 'data',
+  uid: RpcUid,
+  address: Address,
+  payload: string
+|} | {|
+  type: 'tx/cardano',
+  uid: RpcUid,
+  tx: CardanoTx,
+|} | {|
+  type: 'tx-reorg/cardano',
+  uid: RpcUid,
+  tx: {|
+    usedUtxoIds: Array<string>,
+    reorgTargetAmount: string,
+    utxos: IGetAllUtxosResponse,
+  |},
+|};
 
 // Errors: Yoroi-only
 
@@ -185,7 +182,7 @@ export type PendingSignData =
 export type AllErrors = TxSendError | TxSignError | APIError | DataSignError | PaginateError;
 
 export class ConnectorError extends Error {
-  e: AllErrors;
+  e: AllErrors
 
   constructor(e: AllErrors) {
     super(JSON.stringify(e));

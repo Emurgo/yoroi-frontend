@@ -17,13 +17,14 @@ type Props = {|
 const dialogMessages = defineMessages({
   warning: {
     id: 'wallet.settings.resync.warning',
-    defaultMessage: '!!!This will also cause failed transactions to disappear as they are not stored on the blockchain.',
+    defaultMessage:
+      '!!!This will also cause failed transactions to disappear as they are not stored on the blockchain.',
   },
 });
 
 @observer
 export default class ResyncWalletDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.clearHistory.reset();
   }
@@ -64,10 +65,18 @@ export default class ResyncWalletDialogContainer extends Component<{| ...Props, 
         }}
         id="resyncWalletDialog"
       >
-        <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
+        <Typography
+          variant='body1'
+          mb='16px'
+          color="ds.text_gray_medium"
+        >
           {intl.formatMessage(messages.resyncExplanation)}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" mb="16px">
+        <Typography
+          variant='body1'
+          color="ds.text_gray_medium"
+          mb='16px'
+        >
           {intl.formatMessage(dialogMessages.warning)}
         </Typography>
       </DangerousActionDialog>

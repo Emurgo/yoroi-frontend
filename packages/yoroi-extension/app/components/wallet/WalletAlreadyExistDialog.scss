@@ -1,17 +1,18 @@
 .component {
-  & > div {
-    overflow: hidden;
-  }
-  .wrapper {
-    display: grid;
-    grid-template-columns: 1fr 4fr;
-    grid-gap: 8px;
-    overflow: hidden;
-  }
+    
+    & > div {
+        overflow: hidden;
+    }
+    .wrapper {
+        display: grid;
+        grid-template-columns: 1fr 4fr;
+        grid-gap: 8px;
+        overflow: hidden;
+    }
 
-  .explanation {
-    font-size: 14px;
-    color: var(--yoroi-palette-gray-600);
-    margin-top: 16px;
-  }
+    .explanation {
+        font-size: 14px;
+        color: var(--yoroi-palette-gray-600);
+        margin-top: 16px;
+    }
 }

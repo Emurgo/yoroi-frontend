@@ -2,24 +2,36 @@
 
 import type { Ticker, PriceDataInsert, PriceDataRow } from '../../../../ada/lib/storage/database/prices/tables';
 import type { lf$Database } from 'lovefield';
-import { getAllSchemaTables, raii } from '../../../../ada/lib/storage/database/utils';
+import {
+  getAllSchemaTables,
+  raii,
+} from '../../../../ada/lib/storage/database/utils';
 import { GetPriceData } from '../../../../ada/lib/storage/database/prices/api/read';
 import { ModifyPriceData } from '../../../../ada/lib/storage/database/prices/api/write';
 
-export function getPriceKey(fromCurrency: string, toCurrency: string, time: Date): string {
+
+export function getPriceKey(
+  fromCurrency: string,
+  toCurrency: string,
+  time: Date
+): string {
   return JSON.stringify({
     From: fromCurrency,
     To: toCurrency,
-    Time: time,
+    Time: time
   });
 }
 
-export function getPrice(fromCurrency: string, toCurrency: string, tickers: ?Array<Ticker>): number | null {
+export function getPrice(
+  fromCurrency: string,
+  toCurrency: string,
+  tickers: ?Array<Ticker>
+): number|null {
   if (!tickers) {
     return null;
   }
 
-  const ticker = tickers.find(t => t.From === fromCurrency && t.To === toCurrency);
+  const ticker = tickers.find(t => (t.From === fromCurrency) && (t.To === toCurrency));
   if (!ticker) {
     return null;
   }
@@ -33,7 +45,9 @@ export type UpsertPriceRequest = {|
   prices: $ReadOnlyArray<PriceDataInsert | PriceDataRow>,
 |};
 export type UpsertPriceResponse = $ReadOnlyArray<PriceDataRow>;
-export type UpsertPriceFunc = (request: UpsertPriceRequest) => Promise<UpsertPriceResponse>;
+export type UpsertPriceFunc = (
+  request: UpsertPriceRequest
+) => Promise<UpsertPriceResponse>;
 
 // getAllPrices
 
@@ -41,26 +55,45 @@ export type GetAllPricesRequest = {|
   db: lf$Database,
 |};
 export type GetAllPricesResponse = $ReadOnlyArray<$ReadOnly<PriceDataRow>>;
-export type GetAllPricesFunc = (request: GetAllPricesRequest) => Promise<GetAllPricesResponse>;
+export type GetAllPricesFunc = (
+  request: GetAllPricesRequest
+) => Promise<GetAllPricesResponse>;
 
-export async function upsertPrices(request: UpsertPriceRequest): Promise<UpsertPriceResponse> {
+export async function upsertPrices(
+  request: UpsertPriceRequest
+): Promise<UpsertPriceResponse> {
   const deps = Object.freeze({
-    ModifyPriceData,
+    ModifyPriceData
   });
-  const depTables = Object.keys(deps)
+  const depTables = Object
+    .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii<UpsertPriceResponse>(request.db, depTables, async tx =>
-    deps.ModifyPriceData.upsertPrices(request.db, tx, request.prices)
+  return await raii<UpsertPriceResponse>(
+    request.db,
+    depTables,
+    async tx => deps.ModifyPriceData.upsertPrices(
+      request.db, tx,
+      request.prices
+    )
   );
 }
 
-export async function getAllPrices(request: GetAllPricesRequest): Promise<GetAllPricesResponse> {
+export async function getAllPrices(
+  request: GetAllPricesRequest
+): Promise<GetAllPricesResponse> {
   const deps = Object.freeze({
-    GetPriceData,
+    GetPriceData
   });
-  const depTables = Object.keys(deps)
+  const depTables = Object
+    .keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii<GetAllPricesResponse>(request.db, depTables, async tx => deps.GetPriceData.getAllPrices(request.db, tx));
+  return await raii<GetAllPricesResponse>(
+    request.db,
+    depTables,
+    async tx => deps.GetPriceData.getAllPrices(
+      request.db, tx,
+    )
+  );
 }

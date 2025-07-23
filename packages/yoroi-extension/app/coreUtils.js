@@ -20,7 +20,7 @@ export function utfToBytes(utf: string): Buffer {
   return Buffer.from(utf, 'utf-8');
 }
 
-export function logErr<T>(f: () => T, msg: string | (Error => string)): T {
+export function logErr<T>(f: () => T, msg: (string | (Error) => string)): T {
   try {
     return f();
   } catch (e) {
@@ -35,9 +35,9 @@ export function logErr<T>(f: () => T, msg: string | (Error => string)): T {
  */
 export function urlResolveForIpfsAndCorsproxy<T: ?string>(url: T): T {
   // $FlowIgnore
-  return maybe(url, (u: string): string =>
-    u.startsWith('ipfs://') ? u.replace('ipfs://', 'https://ipfs.io/ipfs/') : `https://corsproxy.io/?url=${u}`
-  );
+  return maybe(url, (u: string): string => u.startsWith('ipfs://')
+    ? u.replace('ipfs://', 'https://ipfs.io/ipfs/')
+    : `https://corsproxy.io/?url=${u}`);
 }
 
 /**
@@ -56,7 +56,7 @@ export function createFilterUniqueBy<T>(getter: T => any = x => x): T => boolean
     // false && <ignored> - when set already has entry
     // true && set.add - when doesn't have
     return !set.has(k) && set.add(k) && true;
-  };
+  }
 }
 
 /**
@@ -68,7 +68,7 @@ export function comparatorByGetter<T>(getter: T => any): (T, T) => number {
     if (aV < bV) return -1;
     if (aV > bV) return 1;
     return 0;
-  };
+  }
 }
 
 /**
@@ -87,8 +87,8 @@ export function listValues<T>(obj: { [any]: T }): Array<T> {
  * @param obj - any object
  * @return {Array<[K,V]>} - the array of tuples force-casted as [K,V]
  */
-export function listEntries<K, V>(obj: { [K]: V }): Array<[K, V]> {
-  return ((Object.entries(obj): any): Array<[K, V]>);
+export function listEntries<K,V>(obj: { [K]: V }): Array<[K,V]> {
+  return ((Object.entries(obj): any): Array<[K,V]>);
 }
 
 /**
@@ -115,36 +115,33 @@ export function last<T>(arr: T[]): ?T {
 /**
  * Aggregates an array of key-value tuples into a map
  */
-export function entriesIntoMap<K, V>(col: Array<[K, V]>): { [K]: V } {
-  return entriesIntoMapBy<[K, V], K, V>(col, x => x);
+export function entriesIntoMap<K,V>(col: Array<[K,V]>): { [K]: V } {
+  return entriesIntoMapBy<[K,V],K,V>(col, x => x);
 }
 
 /**
  * Converts each object in the array into a key-value tuple, using the provided function,
  * and then aggregates tuples into a map
  */
-export function entriesIntoMapBy<T, K, V>(col: Array<T>, f: T => [K, V]): { [K]: V } {
-  return col.reduce(
-    (map, e) => {
-      const [k, v]: [K, V] = f(e);
-      map[k] = v;
-      return map;
-    },
-    ({}: { [K]: V })
-  );
+export function entriesIntoMapBy<T,K,V>(col: Array<T>, f: (T => [K,V])): { [K]: V } {
+  return col.reduce((map, e) => {
+    const [k, v]: [K, V] = f(e);
+    map[k] = v;
+    return map;
+  },({}: { [K]: V }));
 }
 
 /**
  * Maps t if != null, otherwise returns same t
  */
-export function maybe<T, R>(t: ?T, f: T => ?R): ?R {
+export function maybe<T,R>(t: ?T, f: T => ?R): ?R {
   return t == null ? t : f(t);
 }
 
 /**
  * Composes two functions in a null-safe manner
  */
-export function compose<A, B, C>(f1: A => ?B, f2: B => ?C): A => ?C {
+export function compose<A,B,C>(f1: A => ?B, f2: B => ?C): (A => ?C) {
   return a => maybe(f1(a), f2);
 }
 
@@ -211,14 +208,14 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
   return () => {
     const time = Date.now();
     if (cache[0] != null && ttl !== 0) {
-      if (ttl < 0 || time < cache[0].time + ttl) {
+      if (ttl < 0 || time < (cache[0].time + ttl)) {
         return cache[0].value;
       }
     }
     const value = fun();
     cache[0] = { value, time };
     return value;
-  };
+  }
 }
 
 /**
@@ -230,7 +227,7 @@ export function timeCached<R>(fun: () => R, ttl: number): () => R {
 export function sanitizeForLog(v: any): any {
   const fields: Array<any> = ['password'];
   if (v != null && typeof v === 'object') {
-    let r = Object.keys(v).reduce((o, k) => ({ ...o, [k]: sanitizeForLog(v[k]) }), {});
+    let r = Object.keys(v).reduce((o, k) => ({ ...o, [k]: sanitizeForLog(v[k]) }) , {})
     for (const f of fields) {
       if (r[f] != null) {
         r = { ...r, [f]: '[sanitized]' };
@@ -261,59 +258,54 @@ export function ensureArray<T>(t: T | Array<T>): Array<T> {
 export function filterByValues<V>(obj: { [string]: V }, predicate: V => boolean): { [string]: V } {
   // $FlowIgnore
   return (Object.entries(obj): Array<[string, V]>)
-    .filter(([, v]) => predicate(v))
-    .reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {});
+    .filter(([,v]) => predicate(v))
+    .reduce((acc, [k,v]) => ({ ...acc, [k]: v }), {});
 }
 
 export type LenGet<T> = { +len: () => number, +get: number => T, ... };
-export type LenGetMap<K, V> = { +keys: () => LenGet<K>, +get: K => V, ... };
+export type LenGetMap<K,V> = { +keys: () => LenGet<K>, +get: K => V, ... };
 
 export function iterateLenGet<T>(lenget: ?LenGet<T>): ExtendedIterable<T> {
-  return ExtendedIterable.from<T>(
-    (function* () {
-      if (lenget != null) {
-        const len = lenget.len();
-        for (let i = 0; i < len; i++) {
-          yield lenget.get(i);
-        }
+  return ExtendedIterable.from<T>((function*() {
+    if (lenget != null) {
+      const len = lenget.len();
+      for (let i = 0; i < len; i++) {
+        yield lenget.get(i);
       }
-    })()
-  );
+    }
+  })());
 }
 
-export function iterateLenGetMap<K, V>(map: ?LenGetMap<K, V>): ExtendedIterableMap<K, V> {
-  return ExtendedIterableMap.fromTuples<K, V>(
-    (function* () {
-      if (map) {
-        for (const k of iterateLenGet(map.keys())) {
-          yield [k, map.get(k)];
-        }
+export function iterateLenGetMap<K, V>(map: ?LenGetMap<K,V>): ExtendedIterableMap<K, V> {
+  return ExtendedIterableMap.fromTuples<K,V>((function*() {
+    if (map) {
+      for (const k of iterateLenGet(map.keys())) {
+        yield [k, map.get(k)];
       }
-    })()
-  );
+    }
+  })());
 }
 
-export function zipGenerators<A, B>(iterA: Iterable<A>, iterB: Iterable<B>): ExtendedIterable<[A, B]> {
-  return ExtendedIterable.from<[A, B]>(
-    (function* () {
-      // $FlowIgnore
-      const as = iterA[Symbol.iterator]();
-      // $FlowIgnore
-      const bs = iterB[Symbol.iterator]();
-      while (true) {
-        const nextA = as.next();
-        const nextB = bs.next();
-        if (nextA.done || nextB.done) {
-          break;
-        }
-        yield [nextA.value, nextB.value];
+export function zipGenerators<A,B>(iterA: Iterable<A>, iterB: Iterable<B>): ExtendedIterable<[A,B]> {
+  return ExtendedIterable.from<[A,B]>((function*() {
+    // $FlowIgnore
+    const as = iterA[Symbol.iterator]();
+    // $FlowIgnore
+    const bs = iterB[Symbol.iterator]();
+    while (true) {
+      const nextA = as.next();
+      const nextB = bs.next();
+      if (nextA.done || nextB.done) {
+        break;
       }
-    })()
-  );
+      yield [nextA.value, nextB.value];
+    }
+  })());
 }
 
 // $FlowIgnore
 export class ExtendedIterable<T> implements Iterable<T> {
+
   __source: Iterable<T>;
 
   constructor(source: Iterable<T>) {
@@ -325,7 +317,8 @@ export class ExtendedIterable<T> implements Iterable<T> {
   }
 
   // $FlowIgnore
-  [Symbol.iterator](): Iterator<T> {
+  [Symbol.iterator]()
+    : Iterator<T> {
     return this.__source[Symbol.iterator]();
   }
 
@@ -335,18 +328,16 @@ export class ExtendedIterable<T> implements Iterable<T> {
     }
   }
 
-  zip<B>(iterB: Iterable<B>): ExtendedIterable<[T, B]> {
-    return zipGenerators<T, B>(this.__source, iterB);
+  zip<B>(iterB: Iterable<B>): ExtendedIterable<[T,B]> {
+    return zipGenerators<T,B>(this.__source, iterB);
   }
 
   join(iterB: Iterable<T>): ExtendedIterable<T> {
     const source = this.__source;
-    return ExtendedIterable.from<T>(
-      (function* () {
-        for (const t of source) yield t;
-        for (const t of iterB) yield t;
-      })()
-    );
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) yield t;
+      for (const t of iterB) yield t;
+    })());
   }
 
   toArray(): Array<T> {
@@ -359,39 +350,33 @@ export class ExtendedIterable<T> implements Iterable<T> {
 
   map<R>(f: T => R): ExtendedIterable<R> {
     const source = this.__source;
-    return ExtendedIterable.from<R>(
-      (function* () {
-        for (const t of source) {
-          yield f(t);
-        }
-      })()
-    );
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        yield f(t);
+      }
+    })());
   }
 
   flatMap<R>(f: T => Iterable<R>): ExtendedIterable<R> {
     const source = this.__source;
-    return ExtendedIterable.from<R>(
-      (function* () {
-        for (const t of source) {
-          for (const r of f(t)) {
-            yield r;
-          }
+    return ExtendedIterable.from<R>((function*(){
+      for (const t of source) {
+        for (const r of f(t)) {
+          yield r;
         }
-      })()
-    );
+      }
+    })());
   }
 
   filter(f: T => boolean): ExtendedIterable<T> {
     const source = this.__source;
-    return ExtendedIterable.from<T>(
-      (function* () {
-        for (const t of source) {
-          if (f(t)) {
-            yield t;
-          }
+    return ExtendedIterable.from<T>((function*(){
+      for (const t of source) {
+        if (f(t)) {
+          yield t;
         }
-      })()
-    );
+      }
+    })());
   }
 
   unique(): ExtendedIterable<T> {
@@ -408,8 +393,9 @@ export class ExtendedIterable<T> implements Iterable<T> {
   }
 }
 
-export class ExtendedIterableMap<K, V> extends ExtendedIterable<[K, V]> {
-  static fromTuples<X, Y>(col: Iterable<[X, Y]>): ExtendedIterableMap<X, Y> {
+export class ExtendedIterableMap<K,V> extends ExtendedIterable<[K,V]> {
+
+  static fromTuples<X,Y>(col: Iterable<[X,Y]>): ExtendedIterableMap<X,Y> {
     return new ExtendedIterableMap<X, Y>(col);
   }
 
@@ -418,10 +404,10 @@ export class ExtendedIterableMap<K, V> extends ExtendedIterable<[K, V]> {
   }
 
   values(): ExtendedIterable<V> {
-    return this.map(([, v]) => v);
+    return this.map(([,v]) => v);
   }
 
-  nonNullValue(): ExtendedIterableMap<K, $NonMaybeType<V>> {
-    return ExtendedIterableMap.fromTuples(this.filter(([, v]) => v != null));
+  nonNullValue(): ExtendedIterableMap<K,$NonMaybeType<V>> {
+    return ExtendedIterableMap.fromTuples(this.filter(([,v]) => v != null));
   }
 }

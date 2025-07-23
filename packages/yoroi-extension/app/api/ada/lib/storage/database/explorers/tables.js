@@ -30,7 +30,7 @@ export const PreferredExplorerSchema: {|
     PreferredExplorerId: 'PreferredExplorerId',
     ExplorerId: 'ExplorerId',
     NetworkId: 'NetworkId',
-  },
+  }
 };
 
 export type ExplorerInsert = {|
@@ -61,12 +61,11 @@ export const ExplorerSchema: {|
     IsBackup: 'IsBackup',
     Endpoints: 'Endpoints',
     Name: 'Name',
-  },
+  }
 };
 
-export const populateExplorerDb: lf$schema$Builder => void = schemaBuilder => {
-  schemaBuilder
-    .createTable(ExplorerSchema.name)
+export const populateExplorerDb: lf$schema$Builder => void = (schemaBuilder) => {
+  schemaBuilder.createTable(ExplorerSchema.name)
     .addColumn(ExplorerSchema.properties.ExplorerId, Type.INTEGER)
     .addColumn(ExplorerSchema.properties.NetworkId, Type.INTEGER)
     .addColumn(ExplorerSchema.properties.IsBackup, Type.BOOLEAN)
@@ -74,25 +73,31 @@ export const populateExplorerDb: lf$schema$Builder => void = schemaBuilder => {
     .addColumn(ExplorerSchema.properties.Name, Type.STRING)
     .addPrimaryKey(
       /* note: doesn't auto-increment
-       * since we may want to support users adding custom networks eventually
-       * so we need custom user networks to live in a different ID range than pre-built networks
-       * so that if we add any new premade-network, we can just hardcode an ID without conflict
-       */
-      ([ExplorerSchema.properties.ExplorerId]: Array<string>)
+      * since we may want to support users adding custom networks eventually
+      * so we need custom user networks to live in a different ID range than pre-built networks
+      * so that if we add any new premade-network, we can just hardcode an ID without conflict
+      */
+      ([ExplorerSchema.properties.ExplorerId]: Array<string>),
     )
-    .addIndex('Explorer_IsBackup_Index', ([ExplorerSchema.properties.IsBackup]: Array<string>), false)
+    .addIndex(
+      'Explorer_IsBackup_Index',
+      ([ExplorerSchema.properties.IsBackup]: Array<string>),
+      false
+    )
     .addForeignKey('Explorer_NetworkId', {
       local: ExplorerSchema.properties.NetworkId,
       ref: `${NetworkSchema.name}.${NetworkSchema.properties.NetworkId}`,
       action: ConstraintAction.CASCADE,
     });
 
-  schemaBuilder
-    .createTable(PreferredExplorerSchema.name)
+  schemaBuilder.createTable(PreferredExplorerSchema.name)
     .addColumn(PreferredExplorerSchema.properties.PreferredExplorerId, Type.INTEGER)
     .addColumn(PreferredExplorerSchema.properties.ExplorerId, Type.INTEGER)
     .addColumn(PreferredExplorerSchema.properties.NetworkId, Type.INTEGER)
-    .addPrimaryKey(([PreferredExplorerSchema.properties.PreferredExplorerId]: Array<string>), true)
+    .addPrimaryKey(
+      ([PreferredExplorerSchema.properties.PreferredExplorerId]: Array<string>),
+      true
+    )
     .addUnique('PreferredExplorer_NetworkId_Unique', [
       // User should only have one preferred explore preference per network
       PreferredExplorerSchema.properties.NetworkId,

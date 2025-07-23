@@ -101,7 +101,7 @@ export const CertificateType = {
   VoteRegistrationAndDelegation: 'VoteRegistrationAndDelegation', // NO
 } as const;
 
-export type CertificateType = (typeof CertificateType)[keyof typeof CertificateType];
+export type CertificateType = typeof CertificateType[keyof typeof CertificateType];
 
 // Makes sure CertificateType lists all the certificates in CertificateJSON
 export type AssertAllImplementedCertTypes = AssertEqual<CertificateType, keyof UnionToIntersection<CertificateJSON>>;
@@ -111,4 +111,4 @@ export const TransactionResult = {
   FAIL: 'fail', //
 } as const;
 
-export type TransactionResultType = (typeof TransactionResult)[keyof typeof TransactionResult];
+export type TransactionResultType = typeof TransactionResult[keyof typeof TransactionResult];

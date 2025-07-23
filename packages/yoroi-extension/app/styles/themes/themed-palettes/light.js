@@ -24,7 +24,7 @@ export const light: DSColorPalette = {
 
   bg_color_max: lightPalette.gray_min, // bottom surface
   bg_color_min: lightPalette.gray_100, // upper surface
-  bg_color_contrast_high: lightPalette.gray_min, // dropdown idle item
+  bg_color_contrast_high: lightPalette.gray_min , // dropdown idle item
   bg_color_contrast_min: lightPalette.gray_100, // dropdown selected\highlighted surface
   bg_color_notification: lightPalette.gray_50,
 

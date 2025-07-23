@@ -10,7 +10,7 @@ import Dialog from '../../widgets/Dialog';
 import WalletRecoveryInstructions from './WalletRecoveryInstructions';
 import globalMessages from '../../../i18n/global-messages';
 import styles from './WalletRecoveryPhraseDisplayDialog.scss';
-import { ReactComponent as RecoveryPhraseSvg } from '../../../assets/images/recovery-phrase.inline.svg';
+import { ReactComponent as RecoveryPhraseSvg }  from '../../../assets/images/recovery-phrase.inline.svg';
 
 const messages = defineMessages({
   backupInstructions: {
@@ -21,7 +21,7 @@ const messages = defineMessages({
   buttonLabelIHaveWrittenItDown: {
     id: 'wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown',
     defaultMessage: '!!!Yes, I’ve written it down',
-  },
+  }
 });
 
 type Props = {|
@@ -33,17 +33,23 @@ type Props = {|
 
 @observer
 export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const { recoveryPhrase, onStartWalletBackup, onCancelBackup, onBack } = this.props;
+    const {
+      recoveryPhrase,
+      onStartWalletBackup,
+      onCancelBackup,
+      onBack,
+    } = this.props;
 
     const actions = [
       {
         label: intl.formatMessage(messages.buttonLabelIHaveWrittenItDown),
         onClick: onStartWalletBackup,
-        primary: true,
-      },
+        primary: true
+      }
     ];
 
     return (
@@ -56,13 +62,14 @@ export default class WalletRecoveryPhraseDisplayDialog extends Component<Props> 
         closeButton={<DialogCloseButton onClose={onCancelBackup} />}
         backButton={<DialogBackButton onBack={onBack} />}
       >
-        <span className={styles.recoveryImage}>
-          <RecoveryPhraseSvg />
-        </span>
+        <span className={styles.recoveryImage}><RecoveryPhraseSvg/></span>
 
-        <WalletRecoveryInstructions instructionsText={<FormattedMessage {...messages.backupInstructions} />} />
+        <WalletRecoveryInstructions
+          instructionsText={<FormattedMessage {...messages.backupInstructions} />}
+        />
         <WalletRecoveryPhraseMnemonic phrase={recoveryPhrase} />
       </Dialog>
     );
   }
+
 }

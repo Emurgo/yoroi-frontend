@@ -3,9 +3,9 @@
 import type { lf$Database } from 'lovefield';
 import BigNumber from 'bignumber.js';
 import { Logger, stringifyData, stringifyError } from '../../utils/logging';
-import { loadWalletsFromStorage } from '../ada/lib/storage/models/load';
-import { PublicDeriver } from '../ada/lib/storage/models/PublicDeriver/index';
-import { GenericApiError } from './errors';
+import { loadWalletsFromStorage, } from '../ada/lib/storage/models/load';
+import { PublicDeriver, } from '../ada/lib/storage/models/PublicDeriver/index';
+import { GenericApiError, } from './errors';
 import LocalizableError from '../../i18n/LocalizableError';
 import type {
   IDisplayCutoffPopFunc,
@@ -17,14 +17,14 @@ import type {
 import { ConceptualWallet } from '../ada/lib/storage/models/ConceptualWallet/index';
 import WalletTransaction from '../../domain/WalletTransaction';
 import type { TransactionExportDataFormat, TransactionExportFileType, TransactionExportRow } from '../export';
-import type { GetBalanceRequest, GetBalanceResponse, SendTokenList } from './types';
+import type { GetBalanceRequest, GetBalanceResponse, SendTokenList, } from './types';
 import type {
   IChangePasswordRequest,
   IChangePasswordRequestFunc,
   IChangePasswordResponse,
 } from '../ada/lib/storage/models/common/interfaces';
 import type { TokenRow } from '../ada/lib/storage/database/primitives/tables';
-import type { CoreAddressT } from '../ada/lib/storage/database/primitives/enums';
+import type { CoreAddressT, } from '../ada/lib/storage/database/primitives/enums';
 import { getAllTokenInfo } from './lib/tokens/utils';
 import type { DefaultTokenEntry } from './lib/MultiToken';
 import { MultiToken } from './lib/MultiToken';
@@ -36,15 +36,21 @@ export type GetTokenInfoRequest = {|
   db: lf$Database,
 |};
 export type GetTokenInfoResponse = $ReadOnlyArray<$ReadOnly<TokenRow>>;
-export type GetTokenInfoFunc = (request: GetTokenInfoRequest) => Promise<GetTokenInfoResponse>;
+export type GetTokenInfoFunc = (
+  request: GetTokenInfoRequest
+) => Promise<GetTokenInfoResponse>;
 
 // getWallets
 
-export type GetWalletsRequest = {| db: lf$Database |};
+export type GetWalletsRequest = {| db: lf$Database, |};
 export type GetWalletsResponse = Array<PublicDeriver<>>;
-export type GetWalletsFunc = (request: GetWalletsRequest) => Promise<GetWalletsResponse>;
+export type GetWalletsFunc = (
+  request: GetWalletsRequest
+) => Promise<GetWalletsResponse>;
 
-export async function getWallets(request: GetWalletsRequest): Promise<GetWalletsResponse> {
+export async function getWallets(
+  request: GetWalletsRequest,
+): Promise<GetWalletsResponse> {
   try {
     const wallets = await loadWalletsFromStorage(request.db);
     return wallets;
@@ -72,7 +78,9 @@ export type RemoveAllTransactionsRequest = {|
   refreshWallet: () => Promise<void>,
 |};
 export type RemoveAllTransactionsResponse = void;
-export type RemoveAllTransactionsFunc = (request: RemoveAllTransactionsRequest) => Promise<RemoveAllTransactionsResponse>;
+export type RemoveAllTransactionsFunc = (
+  request: RemoveAllTransactionsRequest
+) => Promise<RemoveAllTransactionsResponse>;
 
 // getForeignAddresses
 
@@ -83,7 +91,9 @@ export type GetForeignAddressesResponse = Array<{|
   address: string,
   type: CoreAddressT,
 |}>;
-export type GetForeignAddressesFunc = (request: GetForeignAddressesRequest) => Promise<GetForeignAddressesResponse>;
+export type GetForeignAddressesFunc = (
+  request: GetForeignAddressesRequest
+) => Promise<GetForeignAddressesResponse>;
 
 // getTxLastUpdatedDate
 
@@ -91,7 +101,9 @@ export type GetTxLastUpdateDateRequest = {|
   getLastSyncInfo: () => Promise<IGetLastSyncInfoResponse>,
 |};
 export type GetTxLastUpdateDateResponse = IGetLastSyncInfoResponse;
-export type GetTxLastUpdateDateFunc = (request: GetTxLastUpdateDateRequest) => Promise<GetTxLastUpdateDateResponse>;
+export type GetTxLastUpdateDateFunc = (
+  request: GetTxLastUpdateDateRequest
+) => Promise<GetTxLastUpdateDateResponse>;
 
 // refreshTransactions
 
@@ -117,7 +129,9 @@ export type BaseGetTransactionsRequest = {|
 |};
 export type GetTransactionsResponse = Array<WalletTransaction>;
 
-export type GetTransactionsFunc = (request: BaseGetTransactionsRequest) => Promise<GetTransactionsResponse>;
+export type GetTransactionsFunc = (
+  request: BaseGetTransactionsRequest
+) => Promise<GetTransactionsResponse>;
 
 export type GetTransactionsDataResponse = {|
   hash: number,
@@ -128,10 +142,12 @@ export type GetTransactionsDataResponse = {|
   assetIds: Array<string>,
 |};
 
-export type GetTransactionsDataFunc = (request: {|
-  publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
-  isLocalRequest: boolean,
-|}) => Promise<GetTransactionsDataResponse>;
+export type GetTransactionsDataFunc = (
+  request: {|
+    publicDeriver: IPublicDeriver<ConceptualWallet> & IGetLastSyncInfo,
+    isLocalRequest: boolean,
+  |}
+) => Promise<GetTransactionsDataResponse>;
 
 export type ExportTransactionsRequest = {|
   ticker: string,
@@ -141,14 +157,18 @@ export type ExportTransactionsRequest = {|
   format?: TransactionExportDataFormat,
   fileType?: TransactionExportFileType,
 |};
-export type ExportTransactionsResponse = void; // TODO: Implement in the Next iteration
-export type ExportTransactionsFunc = (request: ExportTransactionsRequest) => Promise<ExportTransactionsResponse>;
+export type ExportTransactionsResponse = void;  // TODO: Implement in the Next iteration
+export type ExportTransactionsFunc = (
+  request: ExportTransactionsRequest
+) => Promise<ExportTransactionsResponse>;
 
 // createAddress
 
-export type CreateAddressRequest = {| popFunc: IDisplayCutoffPopFunc |};
+export type CreateAddressRequest = {| popFunc: IDisplayCutoffPopFunc, |};
 export type CreateAddressResponse = IDisplayCutoffPopResponse;
-export type CreateAddressFunc = (request: CreateAddressRequest) => Promise<CreateAddressResponse>;
+export type CreateAddressFunc = (
+  request: CreateAddressRequest
+) => Promise<CreateAddressResponse>;
 
 // changeModelPassword
 
@@ -157,10 +177,16 @@ export type ChangeModelPasswordRequest = {|
   request: IChangePasswordRequest,
 |};
 export type ChangeModelPasswordResponse = IChangePasswordResponse;
-export type ChangeModelPasswordFunc = (request: ChangeModelPasswordRequest) => Promise<ChangeModelPasswordResponse>;
+export type ChangeModelPasswordFunc = (
+  request: ChangeModelPasswordRequest
+) => Promise<ChangeModelPasswordResponse>;
+
 
 export default class CommonApi {
-  async getTokenInfo(request: GetTokenInfoRequest): Promise<GetTokenInfoResponse> {
+
+  async getTokenInfo(
+    request: GetTokenInfoRequest,
+  ): Promise<GetTokenInfoResponse> {
     Logger.debug(`${nameof(this.getTokenInfo)} called`);
     try {
       const tokens = await getAllTokenInfo(request);
@@ -173,7 +199,9 @@ export default class CommonApi {
     }
   }
 
-  async getTxLastUpdatedDate(request: GetTxLastUpdateDateRequest): Promise<GetTxLastUpdateDateResponse> {
+  async getTxLastUpdatedDate(
+    request: GetTxLastUpdateDateRequest
+  ): Promise<GetTxLastUpdateDateResponse> {
     try {
       return await request.getLastSyncInfo();
     } catch (error) {
@@ -183,9 +211,12 @@ export default class CommonApi {
     }
   }
 
-  async createAddress(request: CreateAddressRequest): Promise<CreateAddressResponse> {
+  async createAddress(
+    request: CreateAddressRequest,
+  ): Promise<CreateAddressResponse> {
     Logger.debug(`${nameof(CommonApi)}::${nameof(this.createAddress)} called`);
     try {
+
       const newAddress = await request.popFunc();
       Logger.debug(`${nameof(CommonApi)}::${nameof(this.createAddress)} success: ` + stringifyData(newAddress));
       return newAddress;
@@ -196,7 +227,9 @@ export default class CommonApi {
     }
   }
 
-  async getBalance(request: GetBalanceRequest): Promise<GetBalanceResponse> {
+  async getBalance(
+    request: GetBalanceRequest
+  ): Promise<GetBalanceResponse> {
     try {
       const balance = await request.getBalance();
       return balance;
@@ -207,7 +240,9 @@ export default class CommonApi {
     }
   }
 
-  async getAssetDeposit(request: GetBalanceRequest): Promise<GetBalanceResponse> {
+  async getAssetDeposit(
+    request: GetBalanceRequest
+  ): Promise<GetBalanceResponse> {
     try {
       return await request.getBalance();
     } catch (error) {
@@ -217,26 +252,34 @@ export default class CommonApi {
     }
   }
 
-  async exportLocalDatabase(db: lf$Database): Promise<string> {
+  async exportLocalDatabase(
+    db: lf$Database,
+  ): Promise<string> {
     const data = await db.export();
     return JSON.stringify(data);
   }
 
-  async changeModelPassword(request: ChangeModelPasswordRequest): Promise<ChangeModelPasswordResponse> {
+  async changeModelPassword(
+    request: ChangeModelPasswordRequest
+  ): Promise<ChangeModelPasswordResponse> {
     Logger.debug(`${nameof(CommonApi)}::${nameof(this.changeModelPassword)} called`);
     try {
       const result = await request.func(request.request);
       Logger.debug(`${nameof(CommonApi)}::${nameof(this.changeModelPassword)} success`);
       return result;
     } catch (error) {
-      Logger.error(`${nameof(CommonApi)}::${nameof(this.changeModelPassword)} error: ` + stringifyError(error));
+      Logger.error(
+        `${nameof(CommonApi)}::${nameof(this.changeModelPassword)} error: ` + stringifyError(error)
+      );
       if (error instanceof LocalizableError) throw error;
       throw new GenericApiError();
     }
   }
 }
 
-export function hasSendAllDefault(tokens: SendTokenList): boolean {
+export function hasSendAllDefault(
+  tokens: SendTokenList,
+): boolean {
   const defaultSendAll = tokens.find(token => {
     if (token.shouldSendAll === true && token.token.IsDefault) return true;
     return false;
@@ -246,8 +289,12 @@ export function hasSendAllDefault(tokens: SendTokenList): boolean {
 
 /**
  * Construct the list of what will be included in the tx output
- */
-export function builtSendTokenList(defaultToken: DefaultTokenEntry, tokens: SendTokenList, utxos: Array<MultiToken>): MultiToken {
+*/
+export function builtSendTokenList(
+  defaultToken: DefaultTokenEntry,
+  tokens: SendTokenList,
+  utxos: Array<MultiToken>,
+): MultiToken {
   const amount = new MultiToken([], defaultToken);
 
   for (const token of tokens) {
@@ -261,7 +308,10 @@ export function builtSendTokenList(defaultToken: DefaultTokenEntry, tokens: Send
     } else if (token.token.IsDefault) {
       // if we add a non-specific amount of the default token
       // sum amount values in the UTXO
-      const relatedUtxoSum = utxos.reduce((value, next) => value.plus(next.getDefaultEntry().amount), new BigNumber(0));
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => value.plus(next.getDefaultEntry().amount),
+        new BigNumber(0)
+      );
       amount.add({
         amount: relatedUtxoSum,
         identifier: token.token.Identifier,
@@ -270,13 +320,18 @@ export function builtSendTokenList(defaultToken: DefaultTokenEntry, tokens: Send
     } else {
       // if we add a non-specific amount of a given token
       // sum up the value of all our UTXOs with this token
-      const relatedUtxoSum = utxos.reduce((value, next) => {
-        const assetEntry = next.nonDefaultEntries().find(entry => entry.identifier === token.token.Identifier);
-        if (assetEntry != null) {
-          return value.plus(assetEntry.amount);
-        }
-        return value;
-      }, new BigNumber(0));
+      const relatedUtxoSum = utxos.reduce(
+        (value, next) => {
+          const assetEntry = next.nonDefaultEntries().find(
+            entry => entry.identifier === token.token.Identifier
+          );
+          if (assetEntry != null) {
+            return value.plus(assetEntry.amount);
+          }
+          return value;
+        },
+        new BigNumber(0)
+      );
       amount.add({
         amount: relatedUtxoSum,
         identifier: token.token.Identifier,

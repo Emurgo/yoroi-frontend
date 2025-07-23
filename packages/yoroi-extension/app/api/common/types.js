@@ -46,7 +46,7 @@ export type SendTokenList = Array<
     token: $ReadOnly<TokenRow>,
     amount?: string, // in lovelaces
     shouldSendAll?: boolean,
-  |}>,
+  |}>
 >;
 
 export type TxDataOutput = {|

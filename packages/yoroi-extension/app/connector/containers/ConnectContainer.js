@@ -22,7 +22,10 @@ type State = {|
 |};
 
 @observer
-export default class ConnectContainer extends Component<ConnectorStoresProps, State> {
+export default class ConnectContainer extends Component<
+  ConnectorStoresProps,
+  State
+> {
   state: State = {
     isAppAuth: false,
     selectedWallet: {
@@ -41,7 +44,9 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
 
   componentDidMount() {
     autorun(() => {
-      if (this.props.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS) {
+      if (
+        this.props.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS
+      ) {
         ampli.dappPopupConnectWalletPageViewed({
           wallet_count: this.props.stores.connector.wallets.length,
         });
@@ -57,15 +62,17 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
     window.addEventListener('unload', this.onUnload);
   }
 
-  onConnect: (deriver: WalletState, checksum: ?WalletChecksum, password: ?string) => Promise<void> = async (
-    deriver,
-    _checksum,
-    password
-  ) => {
+  onConnect: (
+    deriver: WalletState,
+    checksum: ?WalletChecksum,
+    password: ?string
+  ) => Promise<void> = async (deriver, _checksum, password) => {
     const { stores } = this.props;
     const chromeMessage = stores.connector.connectingMessage;
     if (chromeMessage == null) {
-      throw new Error(`${nameof(chromeMessage)} connecting to a wallet but no connect message found`);
+      throw new Error(
+        `${nameof(chromeMessage)} connecting to a wallet but no connect message found`
+      );
     }
 
     const url = chromeMessage.url;
@@ -76,7 +83,7 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
       authEntry = await connectorCreateAuthEntry({
         appAuthID,
         publicDeriverId: deriver.publicDeriverId,
-        password,
+        password
       });
     } else {
       authEntry = null;
@@ -84,7 +91,9 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
 
     const { publicDeriverId } = deriver;
 
-    const currentNetworkWalletIdSet = new Set(stores.connector.wallets.map(w => w.publicDeriverId));
+    const currentNetworkWalletIdSet = new Set(
+      stores.connector.wallets.map(w => w.publicDeriverId)
+    );
     // Removing any previous whitelisted connections for the same url, but keep
     // the connection of wallets in other networks
     const whitelist = stores.connector.currentConnectorWhitelist.filter(
@@ -111,12 +120,13 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
 
     // if we close the window immediately, the previous message may not be able to
     // to reach the service worker
-    setTimeout(() => {
-      stores.connector.closeWindow();
-    }, 100);
+    setTimeout(() => { stores.connector.closeWindow(); }, 100);
   };
 
-  onSelectWallet: (deriver: WalletState, checksum: ?WalletChecksum) => void = (deriver, checksum) => {
+  onSelectWallet: (deriver: WalletState, checksum: ?WalletChecksum) => void = (
+    deriver,
+    checksum
+  ) => {
     const wallets = this.props.stores.connector.wallets;
     if (wallets) {
       const index = deriver.publicDeriverId;

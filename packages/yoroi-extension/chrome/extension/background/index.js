@@ -14,15 +14,17 @@ import type { ConfigType } from '../../../config/config-types';
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 
+/*::
 declare var chrome: any;
 declare var browser: any;
+*/
+
 // noinspection JSIgnoredPromiseFromCall
 bringInitBackground({
   identifier: CONFIG.bring.identifier,
   apiEndpoint: CONFIG.bring.apiEndpoint,
   cashbackPagePath: '/main_window.html#/cashback',
-  whitelistEndpoint:
-    'https://raw.githubusercontent.com/Emurgo/bring-chromeExtension/refs/heads/main/bring-cashback-redirect-whitelist.json',
+  whitelistEndpoint: 'https://raw.githubusercontent.com/Emurgo/bring-chromeExtension/refs/heads/main/bring-cashback-redirect-whitelist.json',
 });
 
 const onYoroiIconClicked = () => {
@@ -36,6 +38,7 @@ if (chrome.action) {
   // manifest v2
   chrome.browserAction.onClicked.addListener(debounce(onYoroiIconClicked, 500, { leading: true }));
 }
+
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   //fixme: verify sender.id === extension id

@@ -53,7 +53,7 @@ type Props = {|
 
 @observer
 export default class SupportSettings extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const { onExternalLinkClick, onDownloadLogs } = this.props;
     const intl = this.context;

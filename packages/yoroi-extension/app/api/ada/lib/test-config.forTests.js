@@ -24,12 +24,12 @@ const CONFIG: ConfigType = {
   bring: {
     baseUrl: '',
     identifier: '',
-    apiEndpoint: '',
+    apiEndpoint: ''
   },
   bringSandbox: {
     baseUrl: '',
     identifier: '',
-    apiEndpoint: '',
+    apiEndpoint: ''
   },
   fcm: {
     apiKey: '',

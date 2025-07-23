@@ -60,7 +60,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
     <Stack alignItems="center" justifyContent="center" id="learnAboutRecoveryPhraseComponent">
       <Stack maxWidth="648px">
         <Typography component="div" mb="16px" variant="body1" color="ds.text_gray_medium">
-          {intl.formatMessage(text.shortDescription, { strong: chunks => <strong>{chunks}</strong> })}
+           {intl.formatMessage(text.shortDescription, {strong: chunks => <strong>{chunks}</strong>})}
         </Typography>
 
         <Stack
@@ -81,7 +81,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             {tips.map(tip => (
               <Box component="li" key={tip.id}>
                 <Typography component="div" variant="body1" color="ds.text_gray_medium" mb="4px">
-                  {intl.formatMessage(tip, { strong: chunks => <strong>{chunks}</strong> })}
+                   {intl.formatMessage(tip, {strong: chunks => <strong>{chunks}</strong>})}
                 </Typography>
               </Box>
             ))}

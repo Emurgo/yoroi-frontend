@@ -16,7 +16,11 @@ import { ampli } from '../../../../ampli/index';
 
 type Props = {|
   genWalletRecoveryPhrase: void => Promise<Array<string>>,
-  createWallet: ({| walletName: string, walletPassword: string, recoveryPhrase: Array<string> |}) => void,
+  createWallet: ({|
+    walletName: string,
+    walletPassword: string,
+    recoveryPhrase: Array<string>,
+  |}) => void,
   selectedNetwork: $ReadOnly<NetworkRow>,
   openDialog(dialog: any): void,
   closeDialog(): void,
@@ -31,9 +35,17 @@ export type ManageDialogsProps = {|
 |};
 
 function CreateWalletPage(props: Props): Node {
-  const { genWalletRecoveryPhrase, createWallet, selectedNetwork, isDialogOpen, openDialog, closeDialog, goToRoute } = props;
+  const {
+    genWalletRecoveryPhrase,
+    createWallet,
+    selectedNetwork,
+    isDialogOpen,
+    openDialog,
+    closeDialog,
+    goToRoute,
+  } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
-  const setCurrentStepAndTrack = step => {
+  const setCurrentStepAndTrack = (step) => {
     setCurrentStep(step);
     if (step === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
       ampli.createWalletLearnPhraseStepViewed();
@@ -44,7 +56,7 @@ function CreateWalletPage(props: Props): Node {
     } else if (step === CREATE_WALLET_SETPS.ADD_WALLET_DETAILS) {
       ampli.createWalletDetailsStepViewed();
     }
-  };
+  }
 
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [isRecoveryPhraseEntered, markRecoveryPhraseAsEntered] = useState<boolean>(false);
@@ -79,7 +91,7 @@ function CreateWalletPage(props: Props): Node {
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
       <SaveRecoveryPhraseStep
-        setCurrentStep={step => {
+        setCurrentStep={(step) => {
           if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
             setCurrentStepAndTrack(step);
           } else {
@@ -110,7 +122,8 @@ function CreateWalletPage(props: Props): Node {
         onSubmit={(walletName: string, walletPassword: string) => {
           if (!recoveryPhrase) throw new Error('Recovery phrase must be generated first');
 
-          if (!selectedNetwork) throw new Error('Network must be selected to create a wallet. Should never happen');
+          if (!selectedNetwork)
+            throw new Error('Network must be selected to create a wallet. Should never happen');
 
           createWallet({
             walletName,

@@ -24,7 +24,10 @@ import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
 import { asAddressedUtxo } from '../../api/ada/transactions/utils';
 
+/*::
 declare var chrome: any;
+*/
+
 /**
  * The base wallet store that contains the shared logic
  * dealing with wallets / accounts.
@@ -42,17 +45,23 @@ export default class WalletStore extends Store<StoresMap> {
 
   @observable getInitialWallets: Request<typeof getWallets> = new Request(getWallets);
 
-  @observable createWalletRequest: Request<(() => Promise<WalletState>) => Promise<WalletState>> = new Request(async create => {
+  @observable createWalletRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async create => {
     const createdWallet = await create();
-    if (!createdWallet) throw new Error(`${nameof(this.createWalletRequest)} failed to create wallet`);
+    if (!createdWallet)
+      throw new Error(`${nameof(this.createWalletRequest)} failed to create wallet`);
 
     await this._baseAddNewWallet(createdWallet);
     this.stores.walletBackup.teardown();
     return createdWallet;
   });
-  @observable restoreRequest: Request<(() => Promise<WalletState>) => Promise<WalletState>> = new Request(async restore => {
+  @observable restoreRequest: Request<
+    (() => Promise<WalletState>) => Promise<WalletState>
+  > = new Request(async restore => {
     const restoredWallet = await restore();
-    if (!restoredWallet) throw new Error(`${nameof(this.createWalletRequest)} failed to restore wallet`);
+    if (!restoredWallet)
+      throw new Error(`${nameof(this.createWalletRequest)} failed to restore wallet`);
 
     await this._baseAddNewWallet(restoredWallet);
     this.restoreRequest.reset();
@@ -62,13 +71,15 @@ export default class WalletStore extends Store<StoresMap> {
   flagStorage: StorageAPI;
   absoluteSlotGetters: { [string]: () => Promise<number> } = {};
 
-  @observable getCashbackWalletRequest: Request<() => Promise<?WalletState>> = new Request(this.getCashbackWallet.bind(this));
+  @observable getCashbackWalletRequest: Request<
+    () => Promise<?WalletState>
+  > = new Request(this.getCashbackWallet.bind(this));
 
   setup(): void {
     super.setup();
     this.flagStorage = createFlagStorage();
 
-    listenForWalletStateUpdate(async params => {
+    listenForWalletStateUpdate(async (params) => {
       if (params.eventType === 'update') {
         const index = this.wallets.findIndex(wallet => wallet.publicDeriverId === params.publicDeriverId);
         if (index === -1) {
@@ -124,18 +135,15 @@ export default class WalletStore extends Store<StoresMap> {
           console.warn('Failing to resolve absolute slot, bestblock info without epoch or slot: ', bestblockInfo);
           return -1;
         },
-        60_000 // 1 minute
+        60_000, // 1 minute
       );
       this.absoluteSlotGetters[networkName] = absoluteSlotGetter;
     }
 
     const absoluteSlot = await absoluteSlotGetter();
 
-    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage).readFlag(
-      feature,
-      networkName,
-      absoluteSlot
-    );
+    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+      .readFlag(feature, networkName, absoluteSlot);
   }
 
   @computed get selected(): null | WalletState {
@@ -155,7 +163,9 @@ export default class WalletStore extends Store<StoresMap> {
   @action
   _baseAddNewWallet: WalletState => Promise<void> = async newWallet => {
     if (this.stores.loading.isFromCashback()) {
-      noop(this.api.localStorage.setSelectedWalletPublicKey(newWallet.publicKey));
+      noop(this.api.localStorage.setSelectedWalletPublicKey(
+        newWallet.publicKey
+      ));
       setCashbackWallet(newWallet.publicDeriverId);
       setTimeout(() => {
         window.close();
@@ -200,12 +210,12 @@ export default class WalletStore extends Store<StoresMap> {
     return this.wallets.length > 0;
   }
 
-  refreshWalletFromRemote: number => Promise<void> = async _publicDeriverId => {
+  refreshWalletFromRemote: (number) => Promise<void> = async _publicDeriverId => {
     // legacy code, no-op now, to be removed
-  };
+  }
 
   @action
-  addHwWallet: WalletState => Promise<void> = async (wallet): Promise<void> => {
+  addHwWallet: (WalletState) => Promise<void> = async (wallet): Promise<void> => {
     this.registerObserversForNewWallet({
       publicDeriver: wallet,
       lastSyncInfo: wallet.lastSyncInfo,
@@ -218,7 +228,9 @@ export default class WalletStore extends Store<StoresMap> {
 
   /** Make all API calls required to setup/update wallet */
   @action restoreWalletsFromStorage: void => Promise<void> = async () => {
-    const result = await this.getInitialWallets.execute(this.stores.profile.getCurrentNetworkId()).promise;
+    const result = await this.getInitialWallets.execute(
+      this.stores.profile.getCurrentNetworkId()
+    ).promise;
     if (result == null || result.length === 0) return;
 
     for (const publicDeriver of result) {
@@ -232,40 +244,45 @@ export default class WalletStore extends Store<StoresMap> {
 
     const orderMap: Map<string, number> = new Map();
     (await this.api.localStorage.loadWalletListOrder()).forEach((publicKey, index) => {
-      orderMap.set(publicKey, index);
+      orderMap.set(publicKey, index)
     });
-    result.sort((w1, w2) => (orderMap.get(w1.publicKey) ?? Number.MAX_VALUE) - (orderMap.get(w2.publicKey) ?? Number.MAX_VALUE));
+    result.sort((w1, w2) => (
+      (orderMap.get(w1.publicKey) ?? Number.MAX_VALUE) -
+        (orderMap.get(w2.publicKey) ?? Number.MAX_VALUE)
+    ));
 
     runInAction(() => {
       this.wallets.push(...result);
     });
   };
 
-  @action registerObserversForNewWallet: ({| publicDeriver: WalletState, lastSyncInfo: IGetLastSyncInfoResponse |}) => void =
-    request => {
-      const { addresses, transactions, substores } = this.stores;
-      addresses.addObservedWallet(request.publicDeriver);
-      transactions.addObservedWallet(request.publicDeriver);
-      const { time, delegation } = substores.ada;
+  @action registerObserversForNewWallet: ({|
+    publicDeriver: WalletState,
+    lastSyncInfo: IGetLastSyncInfoResponse,
+  |}) => void = request => {
+    const { addresses, transactions, substores } = this.stores;
+    addresses.addObservedWallet(request.publicDeriver);
+    transactions.addObservedWallet(request.publicDeriver);
+    const { time, delegation } = substores.ada;
 
-      time.addObservedTime(request.publicDeriver);
+    time.addObservedTime(request.publicDeriver);
 
-      addresses.addObservedWallet(request.publicDeriver);
+    addresses.addObservedWallet(request.publicDeriver);
 
-      transactions.addObservedWallet(request.publicDeriver);
+    transactions.addObservedWallet(request.publicDeriver);
 
-      delegation.addObservedWallet(request.publicDeriver);
-      delegation.refreshDelegation(request.publicDeriver);
+    delegation.addObservedWallet(request.publicDeriver);
+    delegation.refreshDelegation(request.publicDeriver);
 
-      this.stores.walletSettings.walletWarnings.push({
-        publicDeriverId: request.publicDeriver.publicDeriverId,
-        dialogs: [],
-      });
+    this.stores.walletSettings.walletWarnings.push({
+      publicDeriverId: request.publicDeriver.publicDeriverId,
+      dialogs: [],
+    });
 
-      this._queueWarningIfNeeded(request.publicDeriver);
+    this._queueWarningIfNeeded(request.publicDeriver);
 
-      this.stores.tokenInfoStore.refreshTokenInfo().catch(console.error);
-    };
+    this.stores.tokenInfoStore.refreshTokenInfo().catch(console.error);
+  };
 
   // =================== ACTIVE WALLET ==================== //
 
@@ -276,7 +293,9 @@ export default class WalletStore extends Store<StoresMap> {
     }
     this.selectedIndex = walletIndex;
     this.selectedWalletName = this.wallets[walletIndex].name;
-    noop(this.api.localStorage.setSelectedWalletPublicKey(this.wallets[walletIndex].publicKey));
+    noop(this.api.localStorage.setSelectedWalletPublicKey(
+      this.wallets[walletIndex].publicKey
+    ));
     noop(subscribe(publicDeriverId));
     // Catalyst update // todo: maybe check if network changed
     noop(this.stores.substores.ada.votingStore.updateCatalystRoundInfo());
@@ -312,7 +331,7 @@ export default class WalletStore extends Store<StoresMap> {
   };
 
   @action
-  _queueWarningIfNeeded: WalletState => void = publicDeriver => {
+  _queueWarningIfNeeded: (WalletState) => void = publicDeriver => {
     if (environment.isTest()) return;
     if (!environment.isProduction()) return;
 
@@ -339,7 +358,7 @@ export default class WalletStore extends Store<StoresMap> {
           plate.TextPart,
           action(() => {
             existingWarnings.dialogs.pop();
-          })
+          }),
         )
       );
     }
@@ -349,27 +368,27 @@ export default class WalletStore extends Store<StoresMap> {
           plate.TextPart,
           action(() => {
             existingWarnings.dialogs.pop();
-          })
+          }),
         )
       );
     }
   };
 
-  @action onRenameSelectedWallet: string => void = newName => {
+  @action onRenameSelectedWallet: (string) => void = (newName) => {
     this.selectedWalletName = newName;
     if (this.selectedIndex != null) {
       this.wallets[this.selectedIndex].name = newName;
     }
-  };
+  }
 
   async getAddressedUtxos(): Promise<Array<CardanoAddressedUtxo>> {
     const wallet = this.selectedOrFail;
-    const submittedTxs = (await loadSubmittedTransactions()) || [];
+    const submittedTxs = await loadSubmittedTransactions() || [];
     return this.api.ada._addressedUtxosWithSubmittedTxs(
       asAddressedUtxo(wallet.utxos),
       wallet.publicDeriverId,
       wallet.allUtxoAddresses,
-      submittedTxs
+      submittedTxs,
     );
   }
 

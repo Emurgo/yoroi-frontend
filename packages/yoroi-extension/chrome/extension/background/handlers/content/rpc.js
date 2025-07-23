@@ -164,9 +164,9 @@ const checkWalletIsStillConnected = async <ParamT, ReturnT, WalletType>(
 const signDataHandler = NewHandler.withSyncedWallet<
   [
     string, // rawAddress
-    string, // payload
+    string // payload
   ],
-  void,
+  void
 >(async ({ message, wallet, tabId }) => {
   const rawAddress = message.params[0];
   const payload = message.params[1];
@@ -226,9 +226,9 @@ const Handlers = Object.freeze({
         tx: string,
         partialSign: boolean,
         returnTx: boolean,
-      |},
+      |}
     ],
-    void,
+    void
   >(async ({ message, tabId }) => {
     const connection = await getConnectedSite(tabId);
     if (connection == null) {
@@ -287,9 +287,9 @@ const Handlers = Object.freeze({
   'get_utxos/cardano': NewHandler.withSyncedWallet<
     [
       string | null, // valueExpected
-      boolean, // paginate
+      boolean // paginate
     ],
-    null,
+    null
   >(async ({ wallet, message }) => {
     const valueExpected = message.params[0] == null ? null : asValue(message.params[0]);
     const paginate = message.params[1] == null ? null : asPaginate(message.params[1]);

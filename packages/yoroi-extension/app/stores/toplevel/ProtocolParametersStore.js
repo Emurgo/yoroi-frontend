@@ -12,9 +12,8 @@ import { observable } from 'mobx';
 export default class ProtocolParametersStore<
   StoresMapType: { ... }, // no dependency on other stores
 > extends Store<StoresMapType> {
-  @observable loadProtocolParametersRequest: LocalizedRequest<() => Promise<void>> = new LocalizedRequest(() =>
-    this.loadProtocolParameters()
-  );
+  @observable loadProtocolParametersRequest: LocalizedRequest<() => Promise<void>> =
+    new LocalizedRequest(() => this.loadProtocolParameters());
 
   cache: Map<number, ProtocolParameters> = new Map();
 

@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import type { Node } from 'react';
-import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
+import { defineMessages, IntlContext, FormattedMessage, } from 'react-intl';
 import { observer } from 'mobx-react';
 import BaseWarningDialog from './BaseWarningDialog';
 
@@ -20,7 +20,7 @@ type Props = {|
 
 @observer
 export default class DebugWalletDialog extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
 
   render(): Node {
     const { checksumTextPart } = this.props;
@@ -29,10 +29,7 @@ export default class DebugWalletDialog extends Component<Props> {
         onClose={this.props.onClose}
         onExternalLinkClick={this.props.onExternalLinkClick}
         explanationHeader={
-          <>
-            <FormattedMessage {...messages.explanation1} values={{ checksumTextPart }} />
-            <br />
-          </>
+          <><FormattedMessage {...messages.explanation1} values={{ checksumTextPart }} /><br /></>
         }
       />
     );

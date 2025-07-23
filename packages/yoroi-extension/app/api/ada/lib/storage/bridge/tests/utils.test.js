@@ -3,7 +3,7 @@
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { normalizeToAddress } from '../utils';
 
-test('normalizeToAddress parses ByronAddress', async done => {
+test('normalizeToAddress parses ByronAddress', async (done) => {
   await RustModule.load();
   const address = 'Ae2tdPwUPEZC6WJfVQxTNN2tWw4skGrN6zRVukvxJmTFy1nYkVGQBuURU3L';
   const normalizedAddress = await normalizeToAddress(address);
@@ -11,7 +11,7 @@ test('normalizeToAddress parses ByronAddress', async done => {
   done();
 });
 
-test('normalizeToAddress parses hex ByronAddress', async done => {
+test('normalizeToAddress parses hex ByronAddress', async (done) => {
   await RustModule.load();
   const address = '82d818582183581c99394e1ca570f79e250651062545898c022145444079d9019b612a51a0001a2ebac743';
   const normalizedAddress = await normalizeToAddress(address);
@@ -50,11 +50,11 @@ const addresses = [
   'stake17549cufdznnkpy8c69z8utt8684403xmm8k4zamnncgpclcdpynl8',
   // reward hex
   'e89ec1b053b44c4ec71efbd200e80eb2ef4cef788f984ee5846f6f11bf',
-  'f52a5c712d14e76090f8d1447e2d67d1eb57c4dbd9ed5177739e101c7f',
+  'f52a5c712d14e76090f8d1447e2d67d1eb57c4dbd9ed5177739e101c7f'
 ];
 
 for (const address of addresses) {
-  test(`normalizeToAddress parses ${address}`, async done => {
+  test(`normalizeToAddress parses ${address}`, async (done) => {
     await RustModule.load();
     const normalizedAddress = await normalizeToAddress(address);
     expect(normalizedAddress).toBeTruthy();

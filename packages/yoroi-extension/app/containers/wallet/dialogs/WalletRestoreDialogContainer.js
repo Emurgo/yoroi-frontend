@@ -29,7 +29,7 @@ type LocalProps = {|
 
 @observer
 export default class WalletRestoreDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   static defaultProps: {| introMessage: void |} = {
     introMessage: undefined,
   };
@@ -65,7 +65,7 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
     await this.props.stores.profile.updateHideBalance();
   };
 
-  openToTransactions: number => void = publicDeriverId => {
+  openToTransactions: (number) => void = publicDeriverId => {
     this.props.stores.wallets.setActiveWallet({
       publicDeriverId,
     });
@@ -112,12 +112,18 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
           throw new Error(`${nameof(WalletRestoreDialogContainer)} no duplicated wallet`);
         }
         const balance = duplicatedWallet.balance;
-        const rewards = stores.delegation.getRewardBalanceOrZero(duplicatedWallet);
+        const rewards = stores.delegation.getRewardBalanceOrZero(
+          duplicatedWallet
+        );
 
         return (
           <WalletAlreadyExistDialog
             walletPlate={
-              <NavPlate plate={duplicatedWallet.plate} walletType={duplicatedWallet.type} name={duplicatedWallet.name} />
+              <NavPlate
+                plate={duplicatedWallet.plate}
+                walletType={duplicatedWallet.type}
+                name={duplicatedWallet.name}
+              />
             }
             walletSumDetails={
               <WalletDetails
@@ -148,12 +154,15 @@ export default class WalletRestoreDialogContainer extends Component<{| ...Stores
         if (restoreRequest.error instanceof CheckAddressesInUseApiError === false) {
           error = restoreRequest.error;
         }
-        const isSubmitting = restoreRequest.isExecuting || restoreRequest.error instanceof CheckAddressesInUseApiError;
+        const isSubmitting =
+          restoreRequest.isExecuting || restoreRequest.error instanceof CheckAddressesInUseApiError;
         return (
           <WalletRestoreVerifyDialog
             plates={walletRestore.recoveryResult?.plates ?? []}
             selectedExplorer={
-              stores.explorers.selectedExplorer.get(this.getSelectedNetwork().NetworkId) ??
+              stores.explorers.selectedExplorer.get(
+                this.getSelectedNetwork().NetworkId
+              ) ??
               (() => {
                 throw new Error('No explorer for wallet network');
               })()

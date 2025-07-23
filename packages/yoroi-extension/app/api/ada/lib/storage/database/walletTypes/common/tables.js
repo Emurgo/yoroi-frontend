@@ -1,6 +1,8 @@
 // @flow
 
-import { KeyDerivationSchema } from '../../primitives/tables';
+import {
+  KeyDerivationSchema,
+} from '../../primitives/tables';
 import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
@@ -19,7 +21,7 @@ export const RootDerivationSchema: {|
   properties: {
     RootDerivationId: 'RootDerivationId',
     KeyDerivationId: 'KeyDerivationId',
-  },
+  }
 };
 
 export type PurposeDerivationInsert = {|
@@ -53,7 +55,7 @@ export const PurposeDerivationSchema: {|
   properties: {
     PurposeDerivationId: 'PurposeDerivationId',
     KeyDerivationId: 'KeyDerivationId',
-  },
+  }
 };
 export type CoinTypeDerivationInsert = {|
   KeyDerivationId: number,
@@ -63,14 +65,14 @@ export type CoinTypeDerivationRow = {|
   ...CoinTypeDerivationInsert,
 |};
 export const CoinTypeDerivationSchema: {|
-  +name: 'CoinTypeDerivation',
+  +name:'CoinTypeDerivation',
   properties: $ObjMapi<CoinTypeDerivationRow, ToSchemaProp>,
 |} = {
   name: 'CoinTypeDerivation',
   properties: {
     CoinTypeDerivationId: 'CoinTypeDerivationId',
     KeyDerivationId: 'KeyDerivationId',
-  },
+  }
 };
 export type Bip44AccountInsert = {|
   KeyDerivationId: number,
@@ -87,7 +89,7 @@ export const Bip44AccountSchema: {|
   properties: {
     Bip44AccountId: 'Bip44AccountId',
     KeyDerivationId: 'KeyDerivationId',
-  },
+  }
 };
 
 export type Bip44ChainInsert = {|
@@ -107,65 +109,77 @@ export const Bip44ChainSchema: {|
     Bip44ChainId: 'Bip44ChainId',
     KeyDerivationId: 'KeyDerivationId',
     DisplayCutoff: 'DisplayCutoff',
-  },
+  }
 };
 
 export const populateCommonDb = (schemaBuilder: lf$schema$Builder) => {
   // RootDerivation
-  schemaBuilder
-    .createTable(RootDerivationSchema.name)
+  schemaBuilder.createTable(RootDerivationSchema.name)
     .addColumn(RootDerivationSchema.properties.RootDerivationId, Type.INTEGER)
     .addColumn(RootDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(([RootDerivationSchema.properties.RootDerivationId]: Array<string>), true)
+    .addPrimaryKey(
+      ([RootDerivationSchema.properties.RootDerivationId]: Array<string>),
+      true
+    )
     .addForeignKey('RootDerivation_KeyDerivation', {
       local: RootDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     });
   // PurposeDerivation
-  schemaBuilder
-    .createTable(PurposeDerivationSchema.name)
+  schemaBuilder.createTable(PurposeDerivationSchema.name)
     .addColumn(PurposeDerivationSchema.properties.PurposeDerivationId, Type.INTEGER)
     .addColumn(PurposeDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(([PurposeDerivationSchema.properties.PurposeDerivationId]: Array<string>), true)
+    .addPrimaryKey(
+      ([PurposeDerivationSchema.properties.PurposeDerivationId]: Array<string>),
+      true
+    )
     .addForeignKey('PurposeDerivation_KeyDerivation', {
       local: PurposeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     });
   // CoinTypeDerivation
-  schemaBuilder
-    .createTable(CoinTypeDerivationSchema.name)
+  schemaBuilder.createTable(CoinTypeDerivationSchema.name)
     .addColumn(CoinTypeDerivationSchema.properties.CoinTypeDerivationId, Type.INTEGER)
     .addColumn(CoinTypeDerivationSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(([CoinTypeDerivationSchema.properties.CoinTypeDerivationId]: Array<string>), true)
+    .addPrimaryKey(
+      ([CoinTypeDerivationSchema.properties.CoinTypeDerivationId]: Array<string>),
+      true
+    )
     .addForeignKey('CoinTypeDerivation_KeyDerivation', {
       local: CoinTypeDerivationSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     });
   // Bip44Account
-  schemaBuilder
-    .createTable(Bip44AccountSchema.name)
+  schemaBuilder.createTable(Bip44AccountSchema.name)
     .addColumn(Bip44AccountSchema.properties.Bip44AccountId, Type.INTEGER)
     .addColumn(Bip44AccountSchema.properties.KeyDerivationId, Type.INTEGER)
-    .addPrimaryKey(([Bip44AccountSchema.properties.Bip44AccountId]: Array<string>), true)
+    .addPrimaryKey(
+      ([Bip44AccountSchema.properties.Bip44AccountId]: Array<string>),
+      true
+    )
     .addForeignKey('Bip44Account_KeyDerivation', {
       local: Bip44AccountSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     });
   // Bip44Chain
-  schemaBuilder
-    .createTable(Bip44ChainSchema.name)
+  schemaBuilder.createTable(Bip44ChainSchema.name)
     .addColumn(Bip44ChainSchema.properties.Bip44ChainId, Type.INTEGER)
     .addColumn(Bip44ChainSchema.properties.KeyDerivationId, Type.INTEGER)
     .addColumn(Bip44ChainSchema.properties.DisplayCutoff, Type.INTEGER)
-    .addPrimaryKey(([Bip44ChainSchema.properties.Bip44ChainId]: Array<string>), true)
+    .addPrimaryKey(
+      ([Bip44ChainSchema.properties.Bip44ChainId]: Array<string>),
+      true
+    )
     .addForeignKey('Bip44Chain_KeyDerivation', {
       local: Bip44ChainSchema.properties.KeyDerivationId,
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     })
-    .addNullable([Bip44ChainSchema.properties.DisplayCutoff]);
+    .addNullable([
+      Bip44ChainSchema.properties.DisplayCutoff,
+    ]);
 };

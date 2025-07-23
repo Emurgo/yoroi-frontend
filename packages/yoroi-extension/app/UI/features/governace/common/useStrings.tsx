@@ -113,7 +113,8 @@ export const messages = Object.freeze(
     },
     yoroiVotingRecordLink: {
       id: 'governance.yoroiVotingRecordLink',
-      defaultMessage: '!!!See Yoroi’s voting record',
+      defaultMessage:
+        '!!!See Yoroi’s voting record',
     },
     total: {
       id: 'wallet.send.confirmationDialog.totalLabel',

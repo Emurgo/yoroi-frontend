@@ -18,13 +18,15 @@ const messages = defineMessages({
 
 @observer
 export default class NightlyPage extends Component<StoresProps> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   acceptNightly: void => void = () => {
     this.props.stores.profile.acceptNightly();
   };
 
   render(): Node {
-    const topBartitle = <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />;
+    const topBartitle = (
+      <StaticTopbarTitle title={this.context.formatMessage(messages.title)} />
+    );
     const topBar = <TopBar title={topBartitle} />;
     return (
       <TopBarLayout topbar={topBar} banner={undefined}>

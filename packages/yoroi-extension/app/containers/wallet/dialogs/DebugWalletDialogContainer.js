@@ -12,6 +12,7 @@ type Props = {|
 
 @observer
 export default class DebugWalletDialogContainer extends Component<Props> {
+
   render(): Node {
     return (
       <DebugWalletDialog
@@ -23,6 +24,12 @@ export default class DebugWalletDialogContainer extends Component<Props> {
   }
 }
 
-export function createDebugWalletDialog(checksumTextPart: string, onClose: void => void): void => Node {
-  return () => <DebugWalletDialogContainer checksumTextPart={checksumTextPart} onClose={onClose} />;
+export function createDebugWalletDialog(
+  checksumTextPart: string,
+  onClose: void => void,
+): (void => Node) {
+  return (() => <DebugWalletDialogContainer
+    checksumTextPart={checksumTextPart}
+    onClose={onClose}
+  />);
 }

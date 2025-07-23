@@ -8,7 +8,7 @@ import HorizontalFlexContainer from './HorizontalFlexContainer';
 
 type Props = {|
   +children: ?Node,
-  +rowSize: number,
+  +rowSize: number
 |};
 
 @observer
@@ -22,9 +22,13 @@ export default class GridFlexContainer extends Component<Props> {
     /* eslint-disable react/no-array-index-key */
     return (
       <div>
-        {chunkedChildren.map((childChunk, i) => (
-          <HorizontalFlexContainer key={i}>{childChunk}</HorizontalFlexContainer>
-        ))}
+        {
+          chunkedChildren.map((childChunk, i) => (
+            <HorizontalFlexContainer key={i}>
+              {childChunk}
+            </HorizontalFlexContainer>
+          ))
+        }
       </div>
     );
     /* eslint-enable react/no-array-index-key */

@@ -28,7 +28,12 @@ type RewardHistoryItemProps = {|
 |};
 type Intl = {| intl: $npm$ReactIntl$IntlShape |};
 
-export const RewardHistoryItem = ({ poolId, poolName, poolAvatar, historyList }: RewardHistoryItemProps): Node => {
+export const RewardHistoryItem = ({
+  poolId,
+  poolName,
+  poolAvatar,
+  historyList,
+}: RewardHistoryItemProps): Node => {
   const avatarGenerated = getAvatarFromPoolId(poolId);
 
   return (
@@ -77,7 +82,13 @@ export const RewardHistoryItem = ({ poolId, poolName, poolAvatar, historyList }:
 };
 
 const Accordion = styled((props /* AccordionProps */) => (
-  <MuiAccordion TransitionProps={{ timeout: { exit: 500 } }} disableGutters elevation={0} square {...props} />
+  <MuiAccordion
+    TransitionProps={{ timeout: { exit: 500 } }}
+    disableGutters
+    elevation={0}
+    square
+    {...props}
+  />
 ))(() => ({
   borderBottom: `1px solid var(--yoroi-palette-gray-50)`,
   '&:not(:last-child)': {
@@ -141,7 +152,11 @@ type RewardHistoryGraphProps = {|
   onOpenRewardList: () => void,
 |};
 
-function RewardHistoryGraph({ graphData, onOpenRewardList, intl }: RewardHistoryGraphProps & Intl): Node {
+function RewardHistoryGraph({
+  graphData,
+  onOpenRewardList,
+  intl,
+}: RewardHistoryGraphProps & Intl): Node {
   const { rewardsGraphData } = graphData;
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = intl.formatMessage(globalMessages.rewardHistory);
@@ -158,11 +173,17 @@ function RewardHistoryGraph({ graphData, onOpenRewardList, intl }: RewardHistory
         <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
           {title}
         </Typography>
-        <Button variant="tertiary" color="primary" size="medium" onClick={onOpenRewardList} sx={{ lineHeight: '21px' }}>
+        <Button
+          variant="tertiary"
+          color="primary"
+          size="medium"
+          onClick={onOpenRewardList}
+          sx={{ lineHeight: '21px' }}
+        >
           {title}
         </Button>
       </Box>
-      {rewardsGraphData.error && !rewardsGraphData.items && (
+      {(rewardsGraphData.error && !rewardsGraphData.items) && (
         <div>
           <center>
             <InvalidURIImg />

@@ -15,7 +15,7 @@ type Props = {|
 
 @observer
 export default class ErrorBlock extends Component<Props> {
-  static contextType: any = IntlContext;
+  static contextType:any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { error, parentId } = this.props;
@@ -31,9 +31,7 @@ export default class ErrorBlock extends Component<Props> {
 
     return (
       <Box mt="10px" textAlign="center" id={localId + '-errorMessage-box'}>
-        <Typography variant="body2" color="ds.text_error" id={localId + '-errorMessage-text'}>
-          {errorText}
-        </Typography>
+        <Typography variant="body2" color="ds.text_error" id={localId + '-errorMessage-text'}>{errorText}</Typography>
       </Box>
     );
   }

@@ -2,11 +2,14 @@
 /* eslint-disable  import/no-unused-modules */
 const { injectedScripts } = require('./constants');
 
+/*::
 type Icons = {|
   '16': string,
   '48': string,
   '128': string,
 |};
+*/
+
 export default ({
   description,
   defaultTitle,
@@ -19,7 +22,7 @@ export default ({
   version,
   enableProtocolHandlers,
   shouldInjectConnector,
-}: {|
+} /*: {|
   description: string,
   defaultTitle: string,
   titleOverride?: boolean,
@@ -31,18 +34,17 @@ export default ({
   version: string,
   enableProtocolHandlers: boolean,
   shouldInjectConnector: boolean,
-|}): * => {
-  // eslint-disable-line function-paren-newline
-  const icons =
-    iconOverride == null
-      ? {
-          /* eslint-disable quote-props */
-          '16': 'img/icon-16.png',
-          '48': 'img/icon-48.png',
-          '128': 'img/icon-128.png',
-          /* eslint-enable quote-props */
-        }
-      : iconOverride;
+|} */
+)/* : * */ => { // eslint-disable-line function-paren-newline
+  const icons = iconOverride == null
+    ? {
+      /* eslint-disable quote-props */
+      '16': 'img/icon-16.png',
+      '48': 'img/icon-48.png',
+      '128': 'img/icon-128.png',
+      /* eslint-enable quote-props */
+    }
+    : iconOverride;
   const base = {
     version,
     // the name shown in chrome://extensions
@@ -70,49 +72,71 @@ export default ({
       // so that the background service could access `chrome.system.display.width`
       'system.display',
     ],
-    host_permissions: ['*://connect.trezor.io/*'],
+    host_permissions: [
+      '*://connect.trezor.io/*',
+    ],
     content_scripts: [
       {
         matches: ['*://connect.trezor.io/*/popup.html*'],
         js: ['js/trezor-content-script.js'],
       },
       {
-        matches: ['file://*/*', 'http://*/*', 'https://*/*'],
-        js: ['js/bringInject.js'],
+        matches: [
+          'file://*/*',
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/bringInject.js',
+        ],
         run_at: 'document_start',
         all_frames: true,
-      },
+      }
     ],
     content_security_policy: {
-      extension_pages: contentSecurityPolicy,
+      extension_pages: contentSecurityPolicy
     },
     protocol_handlers: !enableProtocolHandlers
       ? []
       : [
-          {
-            protocol: 'web+cardano',
-            name: 'Yoroi',
-            uriTemplate: 'main_window.html#/send-from-uri?q=%s',
-          },
-        ],
+        {
+          protocol: 'web+cardano',
+          name: 'Yoroi',
+          uriTemplate: 'main_window.html#/send-from-uri?q=%s',
+        },
+      ],
     web_accessible_resources: [],
   };
 
   if (shouldInjectConnector) {
-    base.content_scripts.push({
-      matches: ['file://*/*', 'http://*/*', 'https://*/*'],
-      js: ['js/inject.js'],
-      run_at: 'document_start',
-      all_frames: true,
-    });
-    base.web_accessible_resources.push({
-      resources: injectedScripts.map(script => `js/${script}`),
-      matches: ['<all_urls>'],
-    });
+    base.content_scripts.push(
+      {
+        matches: [
+          'file://*/*',
+          'http://*/*',
+          'https://*/*',
+        ],
+        js: [
+          'js/inject.js',
+        ],
+        run_at: 'document_start',
+        all_frames: true,
+      }
+    );
+    base.web_accessible_resources.push(
+      {
+        resources: injectedScripts.map(script => `js/${script}`),
+        matches: ['<all_urls>'],
+      }
+    );
   }
 
-  const verName: {| version_name?: string |} = versionName != null ? { version_name: versionName } : Object.freeze({});
-  const extKey: {| key?: string |} = extensionKey != null ? { key: extensionKey } : Object.freeze({});
+  const verName /*: {| version_name?: string |} */ = versionName != null
+    ? { version_name: versionName }
+    : Object.freeze({});
+  const extKey /*: {| key?: string |} */ = extensionKey != null
+    ? { key: extensionKey }
+    : Object.freeze({});
   return {
     ...verName,
     ...base,
