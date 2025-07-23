@@ -18,11 +18,11 @@ class TrezorConnect extends BasePage {
   exportAddressTitleTextLocator = {
     locator: '#container > div > div:nth-child(1) > h3',
     method: 'css',
-  }
+  };
   exportAddressButtonLocator = {
     locator: 'button.confirm[data-testid="@export-address/confirm-button"]',
     css: 'css',
-  }
+  };
   // functions
   async tickCheckbox() {
     this.logger.info(`TrezorConnect::tickCheckbox is called`);

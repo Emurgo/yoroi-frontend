@@ -41,22 +41,16 @@ class ConnectorTab extends WalletCommonBase {
     const allWallets = await this.findElements(this.connectedWalletRowLocator);
     for (const walletElem of allWallets) {
       // name
-      const walletNameElem = await walletElem.findElement(
-        getByLocator(this.connectedWalletNameLabelLocator)
-      );
+      const walletNameElem = await walletElem.findElement(getByLocator(this.connectedWalletNameLabelLocator));
       const walletNameText = await walletNameElem.getText();
       if (walletNameText !== walletName) {
         break;
       }
       // balance
-      const walletBalanceElem = await walletElem.findElement(
-        getByLocator(this.connectedWalletBalanceLocator)
-      );
+      const walletBalanceElem = await walletElem.findElement(getByLocator(this.connectedWalletBalanceLocator));
       const walletBalance = Number((await walletBalanceElem.getText()).split(' ')[0]);
       // dapp url
-      const dappUrlElem = await walletElem.findElement(
-        getByLocator(this.connectedWalletDappUrlLabelLocator)
-      );
+      const dappUrlElem = await walletElem.findElement(getByLocator(this.connectedWalletDappUrlLabelLocator));
       const dappUrl = await dappUrlElem.getText();
 
       return {
@@ -72,13 +66,9 @@ class ConnectorTab extends WalletCommonBase {
     this.logger.info(`ConnectorTab::disconnectWallet is called for the wallet "${walletName}"`);
     const allWallets = await this.findElements(this.connectedWalletRowLocator);
     for (const walletElem of allWallets) {
-      const walletNameElem = await walletElem.findElement(
-        getByLocator(this.connectedWalletNameLabelLocator)
-      );
+      const walletNameElem = await walletElem.findElement(getByLocator(this.connectedWalletNameLabelLocator));
       const walletNameText = await walletNameElem.getText();
-      const dappUrlElem = await walletElem.findElement(
-        getByLocator(this.connectedWalletDappUrlLabelLocator)
-      );
+      const dappUrlElem = await walletElem.findElement(getByLocator(this.connectedWalletDappUrlLabelLocator));
       const dappUrlText = await dappUrlElem.getText();
       if (walletNameText === walletName && dappUrlText === dappUrl) {
         await this.hoverOnElement(walletElem);

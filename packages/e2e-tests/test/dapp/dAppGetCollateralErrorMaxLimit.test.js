@@ -50,9 +50,7 @@ describe('dApp, getCollateral, error, max limit', function () {
   it('Getting collateral for 6 ADA', async function () {
     const collateralResponse = await mockedDApp.getCollateral(String(6 * adaInLovelaces));
     expect(collateralResponse.success, 'The request getCollateral was successful').to.be.false;
-    expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(
-      ApiErrorCode.InternalError
-    );
+    expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(ApiErrorCode.InternalError);
   });
 
   afterEach(function (done) {
