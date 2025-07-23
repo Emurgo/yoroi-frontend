@@ -322,11 +322,12 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
 
     try {
-      const { signedTxHex: signedCollateralReorgTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
-        wallet,
-        transactionHex: collateralReorgTxObj.cbor,
-        password: passswordInput,
-      });
+      const { signedTxHex: signedCollateralReorgTx } =
+        await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+          wallet,
+          transactionHex: collateralReorgTxObj.cbor,
+          password: passswordInput,
+        });
 
       setOpenTxModalAfterColateral({
         open: true,
@@ -519,8 +520,8 @@ const SwapTxCancelInfo = ({ defaultTokenInfo, order, swapPoolLabel, formattedFee
 };
 
 const AssetAndAmountRow = ({ order, defaultTokenInfo, type }) => {
-  const assetName = type === 'from' ? order.from?.token.ticker ?? '-' : order.to?.token.ticker ?? '-';
-  const assetFingerprint = type === 'from' ? order.from?.token.fingerprint ?? '-' : order.to?.token.fingerprint ?? '-';
+  const assetName = type === 'from' ? (order.from?.token.ticker ?? '-') : (order.to?.token.ticker ?? '-');
+  const assetFingerprint = type === 'from' ? (order.from?.token.fingerprint ?? '-') : (order.to?.token.fingerprint ?? '-');
   const assetImage =
     type === 'from'
       ? tokenImg(order.from.token, defaultTokenInfo, '48px', '48px')

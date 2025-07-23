@@ -54,15 +54,13 @@ export default class InlineEditingInput extends Component<Props, State> {
     isActive: false,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   validator: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
         inputField: {
           value: this.props.inputFieldValue,
-          validators: [
-            ({ field }) => [this.props.isValid(field.value), this.props.validationErrorMessage],
-          ],
+          validators: [({ field }) => [this.props.isValid(field.value), this.props.validationErrorMessage]],
         },
       },
     },
@@ -151,13 +149,7 @@ export default class InlineEditingInput extends Component<Props, State> {
     ]);
 
     return (
-      <div
-        className={componentStyles}
-        onBlur={this.onBlur}
-        onClick={this.onFocus}
-        role="presentation"
-        aria-hidden
-      >
+      <div className={componentStyles} onBlur={this.onBlur} onClick={this.onFocus} role="presentation" aria-hidden>
         <TextField
           className={inputStyles}
           type="text"
@@ -176,11 +168,7 @@ export default class InlineEditingInput extends Component<Props, State> {
           }}
         />
 
-        {successfullyUpdated && (
-          <div className={styles.savingResultLabel}>
-            {intl.formatMessage(messages.changesSaved)}
-          </div>
-        )}
+        {successfullyUpdated && <div className={styles.savingResultLabel}>{intl.formatMessage(messages.changesSaved)}</div>}
       </div>
     );
   }

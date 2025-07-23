@@ -222,7 +222,9 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       backgroundColor: themePalette[`${variant}_100`],
       color: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max,
       '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
-      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max },
+      '& .MuiButton-startIcon svg path': {
+        fill: variant === 'primary' ? themePalette.text_primary_max : themePalette.text_gray_max,
+      },
     },
     ':active': {
       backgroundColor: themePalette.gray_100,
@@ -239,7 +241,9 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       cursor: 'not-allowed',
       pointerEvents: 'unset',
       '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
-      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': {
+        fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
+      },
     },
     '&.Mui-disabled': {
       color: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
@@ -247,7 +251,9 @@ function getTertiaryStyles(variant: 'primary' | 'grayscale', themePalette: Objec
       pointerEvents: 'unset',
       opacity: 1,
       '& .MuiButton-startIcon svg': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
-      '& .MuiButton-startIcon svg path': { fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min },
+      '& .MuiButton-startIcon svg path': {
+        fill: variant === 'primary' ? themePalette.text_primary_min : themePalette.text_gray_min,
+      },
     },
     '& .MuiLoadingButton-loadingIndicator': { color: themePalette[`${variant}_600`] },
     '& .MuiButton-startIcon svg': { fill: themePalette.text_primary_medium },

@@ -5,8 +5,7 @@ import type { Node } from 'react';
 import { Component } from 'react';
 import ThemeToggler from '../../themeToggler';
 
-type Props = {|
-|};
+type Props = {||};
 
 @observer
 export default class ThemeSettingsBlock extends Component<Props> {
@@ -21,7 +20,7 @@ export default class ThemeSettingsBlock extends Component<Props> {
         }}
       >
         <Box sx={{ mt: '20px' }}>
-          <ThemeToggler/>
+          <ThemeToggler />
         </Box>
       </Box>
     );

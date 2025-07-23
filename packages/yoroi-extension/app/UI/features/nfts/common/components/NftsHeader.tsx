@@ -25,7 +25,14 @@ export default function NftsHeader({ numNfts, columns, search, listColumnViews }
 
   return (
     <Box display="flex" alignItems="center" justifyContent="space-between" marginBottom="30px" paddingBottom="16px">
-      <Typography component="div" variant="h5" color="ds.el_gray_medium" fontWeight={500} fontSize="18px" id="nftsList-nftsCount-text">
+      <Typography
+        component="div"
+        variant="h5"
+        color="ds.el_gray_medium"
+        fontWeight={500}
+        fontSize="18px"
+        id="nftsList-nftsCount-text"
+      >
         {numNfts === 0 ? strings.nfts : strings.nftsCount(numNfts)}
       </Typography>
       <Box display="flex" alignItems="center">

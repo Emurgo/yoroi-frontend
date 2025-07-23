@@ -2,12 +2,7 @@
 import '../test-config.forTests';
 import { RustModule } from './rustLoader';
 import { generateLedgerWalletRootKey } from './cryptoWallet';
-import {
-  ChainDerivations,
-  CoinTypes,
-  WalletTypePurpose,
-  HARD_DERIVATION_START,
-} from '../../../../config/numbersConfig';
+import { ChainDerivations, CoinTypes, WalletTypePurpose, HARD_DERIVATION_START } from '../../../../config/numbersConfig';
 import { v4PublicToV2 } from './utils';
 import { getCardanoHaskellBaseConfig, networks } from '../storage/database/prepackaged/networks';
 
@@ -16,8 +11,7 @@ beforeAll(async () => {
 });
 
 const getAddressForLedgerMnemonic = (mnemonic: string): string => {
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce((acc, next) => Object.assign(acc, next), {});
   const settings = RustModule.WalletV2.BlockchainSettings.from_json({
     protocol_magic: baseConfig.ByronNetworkId,
   });
@@ -32,9 +26,7 @@ const getAddressForLedgerMnemonic = (mnemonic: string): string => {
     .to_public();
 
   const v2Key = v4PublicToV2(firstExternalAddressKey);
-  const firstExternalAddressHash = v2Key
-    .bootstrap_era_address(settings)
-    .to_base58();
+  const firstExternalAddressHash = v2Key.bootstrap_era_address(settings).to_base58();
 
   return firstExternalAddressHash;
 };

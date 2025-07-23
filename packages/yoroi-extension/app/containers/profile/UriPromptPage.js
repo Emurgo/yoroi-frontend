@@ -21,11 +21,10 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class UriPromptPage extends Component<StoresProps> {
-
   @observable
   isAccepted: boolean = false;
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   onAccept: void => void = () => {
     registerProtocols();
     runInAction(() => {
@@ -43,44 +42,33 @@ export default class UriPromptPage extends Component<StoresProps> {
     });
   };
 
-  _getContent: (() => Node) = () => {
+  _getContent: () => Node = () => {
     if (!this.isAccepted) {
-        return <UriPromptForm
-          onAccept={this.onAccept}
-          onSkip={this.onSkip}
-        />;
+      return <UriPromptForm onAccept={this.onAccept} onSkip={this.onSkip} />;
     }
 
     if (this.isAccepted) {
-        return <UriAccept
-          onConfirm={this.props.stores.profile.acceptUriScheme}
-          onBack={this.onBack}
-        />;
+      return <UriAccept onConfirm={this.props.stores.profile.acceptUriScheme} onBack={this.onBack} />;
     }
 
     throw new Error('UriPromptPage::_getContent Should never happen');
-  }
+  };
 
   render(): Node {
     const { checkAdaServerStatus } = this.props.stores.serverConnectionStore;
     const { selected } = this.props.stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
 
-    const displayedBanner = checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
-      : <ServerErrorBanner errorType={checkAdaServerStatus} />;
-    const topbarTitle = (
-      <StaticTopbarTitle title={this.context.formatMessage(globalMessages.uriSchemeLabel)} />
-    );
-    const topbarElement = (
-      <TopBar
-        title={topbarTitle}
-      />);
+    const displayedBanner =
+      checkAdaServerStatus === ServerStatusErrors.Healthy ? (
+        <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      ) : (
+        <ServerErrorBanner errorType={checkAdaServerStatus} />
+      );
+    const topbarTitle = <StaticTopbarTitle title={this.context.formatMessage(globalMessages.uriSchemeLabel)} />;
+    const topbarElement = <TopBar title={topbarTitle} />;
     return (
-      <TopBarLayout
-        topbar={topbarElement}
-        banner={displayedBanner}
-      >
+      <TopBarLayout topbar={topbarElement} banner={displayedBanner}>
         {this._getContent()}
       </TopBarLayout>
     );

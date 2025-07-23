@@ -10,8 +10,7 @@ export const messages = Object.freeze(
     },
     notifSettingsDesc: {
       id: 'notifications.settings.description',
-      defaultMessage:
-        '!!!Allow display of in-app notifications for key transactions',
+      defaultMessage: '!!!Allow display of in-app notifications for key transactions',
     },
     duration: {
       id: 'notifications.settings.duration',

@@ -27,7 +27,7 @@ const StakingPageContent = lazy(StakingPageContentPromise);
 
 @observer
 class StakingPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const { stores } = this.props;
     const sidebarContainer = <SidebarContainer stores={stores} />;
@@ -59,8 +59,8 @@ class StakingPage extends Component<StoresProps> {
               </ReviewTxProvider>
             </ModalProvider>
           </CurrencyProvider>
-        </Suspense >
-      </TopBarLayout >
+        </Suspense>
+      </TopBarLayout>
     );
   }
 }

@@ -13,7 +13,7 @@ import vjf from 'mobx-react-form/lib/validators/VJF';
 import TextField from '../../common/TextField';
 import type { TxMemoTablePreInsert } from '../../../api/ada/lib/storage/bridge/memos';
 import { isValidMemo } from '../../../utils/validations';
-import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
 import { MAX_MEMO_SIZE } from '../../../config/externalStorageConfig';
@@ -42,8 +42,7 @@ type State = {|
 
 @observer
 export default class AddMemoDialog extends Component<Props, State> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -51,33 +50,36 @@ export default class AddMemoDialog extends Component<Props, State> {
   // $FlowFixMe[value-as-type]
   memoContentInput: TextField;
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      memoContent: {
-        label: this.context.formatMessage(memoMessages.memoLabel),
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => (
-          [
-            isValidMemo(field.value),
-            this.context.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE, })
-          ]
-        )],
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        memoContent: {
+          label: this.context.formatMessage(memoMessages.memoLabel),
+          placeholder: '',
+          value: '',
+          validators: [
+            ({ field }) => [
+              isValidMemo(field.value),
+              this.context.formatMessage(globalMessages.invalidMemo, { maxMemo: MAX_MEMO_SIZE }),
+            ],
+          ],
+        },
+      },
+    },
+    {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
+      },
+      plugins: {
+        vjf: vjf(),
       },
     }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  );
 
   submit: void => void = () => {
     this.form.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         this.setState({ isSubmitting: true });
         const { memoContent } = form.values();
         const memoRequest = {
@@ -86,7 +88,7 @@ export default class AddMemoDialog extends Component<Props, State> {
           memo: {
             Content: memoContent.replace(/ +/g, ' '),
             TransactionHash: this.props.selectedTransaction.txid,
-            LastUpdated: new Date()
+            LastUpdated: new Date(),
           },
         };
         await this.props.onSubmit(memoRequest);
@@ -102,11 +104,9 @@ export default class AddMemoDialog extends Component<Props, State> {
     const { form } = this;
     const { memoContent } = form.values();
     const { isSubmitting } = this.state;
-    const { error, onCancel, } = this.props;
+    const { error, onCancel } = this.props;
 
-    const disabledCondition = !(
-      isValidMemo(memoContent)
-    );
+    const disabledCondition = !isValidMemo(memoContent);
 
     const actions = [
       {
@@ -115,7 +115,7 @@ export default class AddMemoDialog extends Component<Props, State> {
         primary: true,
         onClick: this.submit,
         isSubmitting,
-        disabled: disabledCondition
+        disabled: disabledCondition,
       },
     ];
 
@@ -129,16 +129,19 @@ export default class AddMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onCancel}
-        id='addMemoDialog'
+        id="addMemoDialog"
       >
         <TextField
           className={styles.memoContent}
-          inputRef={(input) => { this.memoContentInput = input; }}
+          inputRef={input => {
+            this.memoContentInput = input;
+          }}
           {...memoContentField.bind()}
           done={memoContentField.isValid}
           error={memoContentField.error}
         />
-        { error ? (<ErrorBlock error={error} />) : null }
-      </Dialog>);
+        {error ? <ErrorBlock error={error} /> : null}
+      </Dialog>
+    );
   }
 }

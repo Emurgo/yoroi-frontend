@@ -1,4 +1,4 @@
-import { Box, Stack, Typography , CircularProgress } from '@mui/material';
+import { Box, Stack, Typography, CircularProgress } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';
 import { RegistrationStepper } from '../RegistrationStepper';
 

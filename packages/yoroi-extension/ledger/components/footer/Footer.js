@@ -19,18 +19,15 @@ const messages = defineMessages({
 
 type Props = {|
   appVersion: string,
-  transportId: string
+  transportId: string,
 |};
 
 @observer
 export default class Footer extends React.Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const {
-      appVersion,
-      transportId
-    } = this.props;
+    const { appVersion, transportId } = this.props;
 
     return (
       <footer className={styles.component}>

@@ -4,30 +4,24 @@ import { RustModule } from './rustLoader';
 import { bytesToHex, fail, forceNonNull, hexToBytes, iterateLenGet, maybe } from '../../../../coreUtils';
 import { base32ToHex, hexToBase32 } from '../storage/bridge/utils';
 
-export function v4PublicToV2(
-  v4Key: RustModule.WalletV4.Bip32PublicKey
-): RustModule.WalletV2.PublicKey {
+export function v4PublicToV2(v4Key: RustModule.WalletV4.Bip32PublicKey): RustModule.WalletV2.PublicKey {
   return RustModule.WalletV2.PublicKey.from_hex(bytesToHex(v4Key.as_bytes()));
 }
 
 export function poolIdHexToBech32(hex: string): string {
-  return RustModule.WasmScope(Module =>
-    Module.WalletV4.Ed25519KeyHash.from_hex(hex).to_bech32('pool'));
+  return RustModule.WasmScope(Module => Module.WalletV4.Ed25519KeyHash.from_hex(hex).to_bech32('pool'));
 }
 
 export function addressHexToBech32(hex: string): string {
-  return RustModule.WasmScope(Module =>
-    Module.WalletV4.Address.from_hex(hex).to_bech32());
+  return RustModule.WasmScope(Module => Module.WalletV4.Address.from_hex(hex).to_bech32());
 }
 
 export function addressBech32ToHex(bech32: string): string {
-  return RustModule.WasmScope(Module =>
-    Module.WalletV4.Address.from_bech32(bech32).to_hex());
+  return RustModule.WasmScope(Module => Module.WalletV4.Address.from_bech32(bech32).to_hex());
 }
 
 export function transactionHexToWitnessSet(txHex: string): string {
-  return RustModule.WasmScope(Module =>
-    bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_witness_set()));
+  return RustModule.WasmScope(Module => bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_witness_set()));
 }
 
 export function transactionBodyHexToTransaction(txBodyHex: string): string {
@@ -35,18 +29,17 @@ export function transactionBodyHexToTransaction(txBodyHex: string): string {
     Module.WalletV4.FixedTransaction.new(
       hexToBytes(txBodyHex),
       Module.WalletV4.TransactionWitnessSet.new().to_bytes(),
-      true,
-    ).to_hex());
+      true
+    ).to_hex()
+  );
 }
 
 export function transactionHexToBodyHex(txHex: string): string {
-  return RustModule.WasmScope(Module =>
-    bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_body()));
+  return RustModule.WasmScope(Module => bytesToHex(Module.WalletV4.FixedTransaction.from_hex(txHex).raw_body()));
 }
 
 export function transactionHexToHash(txHex: string): string {
-  return RustModule.WasmScope(Module =>
-    Module.WalletV4.FixedTransaction.from_hex(txHex).transaction_hash().to_hex());
+  return RustModule.WasmScope(Module => Module.WalletV4.FixedTransaction.from_hex(txHex).transaction_hash().to_hex());
 }
 
 export function transactionHexReplaceWitnessSet(txHex: string, witnessSetHex: string): string {
@@ -81,28 +74,23 @@ export function dRepToMaybeCredentialHex(s: string): ?string {
           return maybe(base32ToHex(s), dRepToMaybeCredentialHex);
         }
         // Pre CIP129 drep1 encoding means same as drep_vkh1 now
-        return Module.WalletV4.Credential
-          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+        return Module.WalletV4.Credential.from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
       }
       if (s.startsWith('drep_vkh1')) {
-        return Module.WalletV4.Credential
-          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
+        return Module.WalletV4.Credential.from_keyhash(Module.WalletV4.Ed25519KeyHash.from_bech32(s)).to_hex();
       }
       if (s.startsWith('drep_script1')) {
-        return Module.WalletV4.Credential
-          .from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
+        return Module.WalletV4.Credential.from_scripthash(Module.WalletV4.ScriptHash.from_bech32(s)).to_hex();
       }
       if (isPotentiallyValidHex && s.startsWith('22')) {
-        return Module.WalletV4.Credential
-          .from_keyhash(Module.WalletV4.Ed25519KeyHash.from_hex(s.substr(2))).to_hex();
+        return Module.WalletV4.Credential.from_keyhash(Module.WalletV4.Ed25519KeyHash.from_hex(s.substr(2))).to_hex();
       }
       if (isPotentiallyValidHex && s.startsWith('23')) {
-        return Module.WalletV4.Credential
-          .from_scripthash(Module.WalletV4.ScriptHash.from_hex(s.substr(2))).to_hex();
+        return Module.WalletV4.Credential.from_scripthash(Module.WalletV4.ScriptHash.from_hex(s.substr(2))).to_hex();
       }
     } catch {} // eslint-disable-line no-empty
     return null;
-  })
+  });
 }
 
 function parseDrep(drep: string): ?{| hash: string, isScript: boolean |} {
@@ -113,11 +101,9 @@ function parseDrep(drep: string): ?{| hash: string, isScript: boolean |} {
   return RustModule.WasmScope(Module => {
     const cred = Module.WalletV4.Credential.from_hex(credentialHex);
     const isScript = cred.kind() === Module.WalletV4.CredKind.Script;
-    const hash = isScript ?
-      forceNonNull(cred.to_scripthash()).to_hex()
-      : forceNonNull(cred.to_keyhash()).to_hex();
+    const hash = isScript ? forceNonNull(cred.to_scripthash()).to_hex() : forceNonNull(cred.to_keyhash()).to_hex();
     return { hash, isScript };
-  })
+  });
 }
 
 export function dRepNormalize(drep: string, kind?: string): string {
@@ -134,8 +120,10 @@ export function dRepNormalize(drep: string, kind?: string): string {
     // drep already cip129
     return drep;
   }
-  return maybe(parseDrep(drep), r => encodeDrepHash(r.hash, r.isScript))
-    ?? fail('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind));
+  return (
+    maybe(parseDrep(drep), r => encodeDrepHash(r.hash, r.isScript)) ??
+    fail('Failed to normalize drep: ' + drep + ' | kind: ' + String(kind))
+  );
 }
 
 export function dRepToPreCip129(drep: string): string {
@@ -143,31 +131,31 @@ export function dRepToPreCip129(drep: string): string {
     // drep already pre cip129 compatible
     return drep;
   }
-  return maybe(parseDrep(drep), r => hexToBase32(r.hash, r.isScript ? 'drep_script' : 'drep'))
-    ?? fail('Failed to normalize drep: ' + drep);
+  return (
+    maybe(parseDrep(drep), r => hexToBase32(r.hash, r.isScript ? 'drep_script' : 'drep')) ??
+    fail('Failed to normalize drep: ' + drep)
+  );
 }
 
 export function pubKeyHashToRewardAddress(hex: string, network: number): string {
   return RustModule.WasmScope(Module =>
     Module.WalletV4.RewardAddress.new(
       network,
-      Module.WalletV4.Credential.from_keyhash(
-        Module.WalletV4.Ed25519KeyHash.from_hex(hex),
-      ),
-    ).to_address().to_hex(),
+      Module.WalletV4.Credential.from_keyhash(Module.WalletV4.Ed25519KeyHash.from_hex(hex))
+    )
+      .to_address()
+      .to_hex()
   );
 }
 
 export const cip8Sign = async (
   address: Buffer,
   signKey: RustModule.WalletV4.PrivateKey,
-  payload: Buffer,
+  payload: Buffer
 ): Promise<RustModule.MessageSigning.COSESign1> => {
   const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
   protectedHeader.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(
-      RustModule.MessageSigning.AlgorithmId.EdDSA
-    )
+    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
   );
   protectedHeader.set_header(
     RustModule.MessageSigning.Label.new_text('address'),
@@ -180,19 +168,17 @@ export const cip8Sign = async (
   const toSign = builder.make_data_to_sign().to_bytes();
   const signedSigStruct = signKey.sign(toSign).to_bytes();
   return builder.build(signedSigStruct);
-}
+};
 
 export const buildCoseSign1FromSignature = async (
   address: Buffer,
   signature: Buffer,
   payload: Buffer,
-  payloadHashed: boolean = false,
+  payloadHashed: boolean = false
 ): Promise<RustModule.MessageSigning.COSESign1> => {
   const protectedHeader = RustModule.MessageSigning.HeaderMap.new();
   protectedHeader.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(
-      RustModule.MessageSigning.AlgorithmId.EdDSA
-    )
+    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
   );
   protectedHeader.set_header(
     RustModule.MessageSigning.Label.new_text('address'),
@@ -203,9 +189,7 @@ export const buildCoseSign1FromSignature = async (
   if (payloadHashed) {
     unprotected.set_header(
       RustModule.MessageSigning.Label.new_text('hashed'),
-      RustModule.MessageSigning.CBORValue.new_special(
-        RustModule.MessageSigning.CBORSpecial.new_bool(true)
-      ),
+      RustModule.MessageSigning.CBORValue.new_special(RustModule.MessageSigning.CBORSpecial.new_bool(true))
     );
   }
   const headers = RustModule.MessageSigning.Headers.new(protectedSerialized, unprotected);
@@ -214,38 +198,30 @@ export const buildCoseSign1FromSignature = async (
     builder.hash_payload();
   }
   return builder.build(signature);
-}
+};
 
-export const makeCip8Key: (Uint8Array) => RustModule.MessageSigning.COSEKey = (publicSigningKey) => {
+export const makeCip8Key: Uint8Array => RustModule.MessageSigning.COSEKey = publicSigningKey => {
   const key = RustModule.MessageSigning.COSEKey.new(
     RustModule.MessageSigning.Label.from_key_type(RustModule.MessageSigning.KeyType.OKP)
   );
-  key.set_algorithm_id(
-    RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA)
-  );
+  key.set_algorithm_id(RustModule.MessageSigning.Label.from_algorithm_id(RustModule.MessageSigning.AlgorithmId.EdDSA));
   key.set_header(
     RustModule.MessageSigning.Label.new_int(
       RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('1'))
     ),
-    RustModule.MessageSigning.CBORValue.new_int(
-      RustModule.MessageSigning.Int.new_i32(6)
-    )
+    RustModule.MessageSigning.CBORValue.new_int(RustModule.MessageSigning.Int.new_i32(6))
   );
   key.set_header(
     RustModule.MessageSigning.Label.new_int(
       RustModule.MessageSigning.Int.new_negative(RustModule.MessageSigning.BigNum.from_str('2'))
     ),
-    RustModule.MessageSigning.CBORValue.new_bytes(
-      publicSigningKey
-    )
+    RustModule.MessageSigning.CBORValue.new_bytes(publicSigningKey)
   );
 
   return key;
-}
+};
 
-function getWithdrawalKeyHashesFromTransactionBody(
-  txBody: RustModule.WalletV4.TransactionBody,
-): Set<string> {
+function getWithdrawalKeyHashesFromTransactionBody(txBody: RustModule.WalletV4.TransactionBody): Set<string> {
   const result = new Set<string>();
   const withdrawals = txBody.withdrawals?.();
   if (withdrawals != null) {
@@ -256,18 +232,14 @@ function getWithdrawalKeyHashesFromTransactionBody(
   return result;
 }
 
-function resolveCredential(
-  cred: RustModule.WalletV4.Credential,
-): {| keyHash: ?string, scriptHash: ?string |} {
+function resolveCredential(cred: RustModule.WalletV4.Credential): {| keyHash: ?string, scriptHash: ?string |} {
   return {
     keyHash: cred.to_keyhash()?.to_hex(),
     scriptHash: cred.to_scripthash()?.to_hex(),
   };
 }
 
-function getCertificateStakeCredential(
-  cert: RustModule.WalletV4.Certificate,
-): ?{| keyHash: ?string, scriptHash: ?string |} {
+function getCertificateStakeCredential(cert: RustModule.WalletV4.Certificate): ?{| keyHash: ?string, scriptHash: ?string |} {
   switch (cert.kind()) {
     case RustModule.WalletV4.CertificateKind.StakeRegistration: {
       const stakeRegCert = forceNonNull(cert.as_stake_registration());
@@ -295,9 +267,7 @@ function getCertificateStakeCredential(
   }
 }
 
-function getCertificateKeyHashesFromTransactionBody(
-  txBody: RustModule.WalletV4.TransactionBody,
-): Set<string> {
+function getCertificateKeyHashesFromTransactionBody(txBody: RustModule.WalletV4.TransactionBody): Set<string> {
   const result = new Set<string>();
   const certificates = txBody.certs?.();
   if (certificates != null) {
@@ -313,6 +283,6 @@ export function getStakingKeyHashesInTransactionBody(txBodyHex: string): Set<str
     const txBody = Module.WalletV4.TransactionBody.from_hex(txBodyHex);
     const withdrawalKeys = getWithdrawalKeyHashesFromTransactionBody(txBody);
     const certificateKeys = getCertificateKeyHashesFromTransactionBody(txBody);
-    return new Set([ ...withdrawalKeys, ...certificateKeys ]);
+    return new Set([...withdrawalKeys, ...certificateKeys]);
   });
 }

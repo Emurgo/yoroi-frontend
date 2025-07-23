@@ -9,7 +9,7 @@ import { TOKEN_CHART_INTERVAL } from '../helpers/constants';
 import { getTimestampsTokenInterval } from '../helpers/getTimestampsTokenInterval';
 import { priceChange } from '../helpers/priceChange';
 
-export type TokenChartInterval = typeof TOKEN_CHART_INTERVAL[keyof typeof TOKEN_CHART_INTERVAL];
+export type TokenChartInterval = (typeof TOKEN_CHART_INTERVAL)[keyof typeof TOKEN_CHART_INTERVAL];
 
 type TokenChartData = {
   label: string;
@@ -107,7 +107,8 @@ export const useGetPortfolioTokenChart = (
 
         const tickers = response.value.data.tickers;
         // @ts-ignore
-        const validCurrency = currency === primaryTokenInfo.name ? supportedCurrencies.USD : currency ?? supportedCurrencies.USD;
+        const validCurrency =
+          currency === primaryTokenInfo.name ? supportedCurrencies.USD : (currency ?? supportedCurrencies.USD);
 
         const initialPrice = tickers[0]?.prices[validCurrency];
         const records = tickers

@@ -1,9 +1,12 @@
 // @flow
 
 import type {
-  ServerStatusRequest, ServerStatusResponse,
-  CurrentCoinPriceRequest, CurrentCoinPriceResponse,
-  HistoricalCoinPriceRequest, HistoricalCoinPriceResponse,
+  ServerStatusRequest,
+  ServerStatusResponse,
+  CurrentCoinPriceRequest,
+  CurrentCoinPriceResponse,
+  HistoricalCoinPriceRequest,
+  HistoricalCoinPriceResponse,
 } from './types';
 
 export interface IFetcher {

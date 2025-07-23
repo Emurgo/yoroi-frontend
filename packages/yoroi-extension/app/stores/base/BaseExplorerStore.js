@@ -1,31 +1,19 @@
 // @flow
-import {
-  observable,
-  computed,
-} from 'mobx';
+import { observable, computed } from 'mobx';
 
 import Store from './Store';
 import Request from '../lib/LocalizedRequest';
-import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer, } from '../../api/thunk';
+import { getSelectedExplorer, getAllExplorers, saveSelectedExplorer } from '../../api/thunk';
 import type { GetAllExplorersResponse } from '../../api/ada/lib/storage/bridge/explorers';
-import { prepackagedExplorers, } from '../../api/ada/lib/storage/database/prepackaged/explorers';
+import { prepackagedExplorers } from '../../api/ada/lib/storage/database/prepackaged/explorers';
 import { SelectedExplorer, defaultToSelectedExplorer } from '../../domain/SelectedExplorer';
 
-export default class BaseExplorerStore
-  <
-    TStores: {
-      ...,
-    }
-  > extends Store<TStores> {
+export default class BaseExplorerStore<TStores: { ... }> extends Store<TStores> {
+  @observable getSelectedExplorerRequest: Request<typeof getSelectedExplorer> = new Request(getSelectedExplorer);
 
-  @observable getSelectedExplorerRequest: Request<typeof getSelectedExplorer>
-    = new Request(getSelectedExplorer);
+  @observable setSelectedExplorerRequest: Request<typeof saveSelectedExplorer> = new Request(saveSelectedExplorer);
 
-  @observable setSelectedExplorerRequest: Request<typeof saveSelectedExplorer>
-    = new Request(saveSelectedExplorer);
-
-  @observable getAllExplorerRequest: Request<typeof getAllExplorers>
-    = new Request(getAllExplorers);
+  @observable getAllExplorerRequest: Request<typeof getAllExplorers> = new Request(getAllExplorers);
 
   // ========== Selected Explorer ========== //
 
@@ -52,12 +40,8 @@ export default class BaseExplorerStore
     return this.getAllExplorerRequest.result;
   }
 
-  setSelectedExplorer: {|
-    networkId: number, explorerId: string,
-  |} => Promise<void> = async (request): Promise<void> => {
-    const explorer = this.allExplorers.get(request.networkId)?.find(
-      ({ ExplorerId }) => request.explorerId === ExplorerId
-    );
+  setSelectedExplorer: ({| networkId: number, explorerId: string |}) => Promise<void> = async (request): Promise<void> => {
+    const explorer = this.allExplorers.get(request.networkId)?.find(({ ExplorerId }) => request.explorerId === ExplorerId);
     if (!explorer) {
       return;
     }

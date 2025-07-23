@@ -41,7 +41,7 @@ export default class GeneralSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   selectLanguage: string => Promise<void> = async locale => {
     await this.props.onSelectLanguage({ locale });
   };
@@ -91,11 +91,7 @@ export default class GeneralSettings extends Component<Props> {
             )}
           >
             {languageOptions.map(option => (
-              <MenuItemStyled
-                key={option.value}
-                value={option.value}
-                id={'selectLanguage-' + option.value + '-menuItem'}
-              >
+              <MenuItemStyled key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
                 <FlagLabel svg={option.svg} label={option.label} />
               </MenuItemStyled>
             ))}

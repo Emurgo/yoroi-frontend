@@ -45,8 +45,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
 
   const isActiveDialog = isDialogOpen(HowToSaveRecoveryPhraseTipsDialog);
   useEffect(() => {
-    if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE))
-      openDialog(HowToSaveRecoveryPhraseTipsDialog);
+    if (!isActiveDialog && !isDialogShownBefore(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)) openDialog(HowToSaveRecoveryPhraseTipsDialog);
   }, []);
 
   return (
@@ -54,12 +53,9 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
       <Stack direction="column" alignItems="left" justifyContent="center" maxWidth="700px">
         <Stack mb="8px" flexDirection="row" alignItems="center" gap="6px">
           <Typography component="div" color="ds.text_gray_medium">
-            <FormattedMessage {...messages.description} values={{ strong }}/>
+            <FormattedMessage {...messages.description} values={{ strong }} />
           </Typography>
-          <Box
-            sx={{ cursor: 'pointer' }}
-            onClick={() => openDialog(HowToSaveRecoveryPhraseTipsDialog)}
-          >
+          <Box sx={{ cursor: 'pointer' }} onClick={() => openDialog(HowToSaveRecoveryPhraseTipsDialog)}>
             <IconWrapper>
               <InfoIcon />
             </IconWrapper>
@@ -92,10 +88,7 @@ function SaveRecoveryPhraseStep(props: Props & Intl): Node {
         />
       </Stack>
 
-      <HowToSaveRecoveryPhraseTipsDialog
-        open={isActiveDialog}
-        onClose={() => closeDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)}
-      />
+      <HowToSaveRecoveryPhraseTipsDialog open={isActiveDialog} onClose={() => closeDialog(TIPS_DIALOGS.SAVE_RECOVERY_PHRASE)} />
     </Stack>
   );
 }
