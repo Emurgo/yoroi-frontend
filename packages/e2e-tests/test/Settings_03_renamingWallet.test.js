@@ -19,7 +19,7 @@ describe('Renaming the wallet', function () {
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
-    await prepareWallet(webdriver, logger,'testWallet1', this);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
   it('Go to Wallet subtab in Settings', async function () {
@@ -39,20 +39,14 @@ describe('Renaming the wallet', function () {
     const settingsWalletPage = new WalletSubTab(webdriver, logger);
     const walletInfo = await settingsWalletPage.getSelectedWalletInfo();
     const shortedWalletName = walletNameShortener(newWalletName);
-    expect(walletInfo.name, `The wallet name should be "${newWalletName}"`).to.equal(
-      shortedWalletName
-    );
+    expect(walletInfo.name, `The wallet name should be "${newWalletName}"`).to.equal(shortedWalletName);
     await settingsWalletPage.openChangeWalletModal();
     // there is 0 (zero) because we have only one added wallet
     const walletsListWalletInfo = await settingsWalletPage.getWalletInfoFromChangeWalletDialog(0);
-    expect(
-      walletsListWalletInfo.name,
-      `Expected wallet name "${newWalletName}" in the wallet list`
-    ).to.equal(newWalletName);
-    expect(
-      walletsListWalletInfo.balance,
-      `Expected wallet balance "${testWallet1.balance}" in the wallet list`
-    ).to.equal(testWallet1.balance);
+    expect(walletsListWalletInfo.name, `Expected wallet name "${newWalletName}" in the wallet list`).to.equal(newWalletName);
+    expect(walletsListWalletInfo.balance, `Expected wallet balance "${testWallet1.balance}" in the wallet list`).to.equal(
+      testWallet1.balance
+    );
   });
 
   afterEach(function (done) {

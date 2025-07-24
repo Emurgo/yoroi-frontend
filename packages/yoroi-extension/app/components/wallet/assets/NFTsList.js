@@ -281,7 +281,7 @@ function NftCardImage({ ipfsUrl, name, nftPathId }: {| ipfsUrl: string | null, n
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} id={`${nftPathId}-component-button`}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId}/>
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId} />
       </Box>
       <Box>
         <Typography
@@ -310,7 +310,7 @@ const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   '& input::placeholder': {
     color: theme.palette.ds.el_gray_low,
     opacity: 1,
-  }
+  },
 }));
 
 const SLink = styled(Link)({

@@ -5,15 +5,14 @@
   .infoIcon {
     flex: 1;
   }
-
 }
 
 .PoolAvatarTooltip {
-  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward))  {
+  :global(.SimpleBubble_root:not(.SimpleBubble_openUpward)) {
     margin-top: 15px !important;
     margin-left: 70px;
   }
-  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward)  {
+  :global(.SimpleBubble_root.SimpleBubble_transparent.SimpleBubble_openUpward) {
     margin-bottom: -15px !important;
     margin-left: 70px;
   }

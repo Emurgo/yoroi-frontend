@@ -20,16 +20,13 @@ import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import { CheckAddressesInUseApiError } from '../../api/common/errors';
 
 import { Logger, stringifyData, stringifyError } from '../../utils/logging';
-import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
-import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
+import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
-import {
-  getCardanoHaskellBaseConfig,
-  networks,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import type { StoresMap } from '../index';
-import type { GetExtendedPublicKeyResponse, } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { GetExtendedPublicKeyResponse } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
@@ -37,8 +34,8 @@ import { ampli } from '../../../ampli/index';
 
 export default class LedgerConnectStore
   extends Store<StoresMap>
-  implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>> {
-
+  implements HWConnectStoreTypes<ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>>
+{
   // =================== VIEW RELATED =================== //
   @observable progressInfo: ProgressInfo;
   @observable derivationIndex: number = HARD_DERIVATION_START + 0; // assume single account
@@ -56,7 +53,7 @@ export default class LedgerConnectStore
   }
 
   /** While ledger wallet creation is taking place, we need to block users from starting a
-    * ledger wallet creation on a separate wallet and explain to them why the action is blocked */
+   * ledger wallet creation on a separate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
 
   setup(): void {
@@ -65,10 +62,10 @@ export default class LedgerConnectStore
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dialog is about to show */
+   * _init() is called when connect dialog is about to show */
   init: void => void = () => {
     Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this.init)} called`);
-  }
+  };
 
   @action cancel: void => void = () => {
     this.teardown();
@@ -126,9 +123,7 @@ export default class LedgerConnectStore
     await this._checkAndStoreHWDeviceInfo();
   };
 
-  _getPublicKey: {|
-    path: Array<number>
-  |} => Promise<HWDeviceInfo> = async (request) => {
+  _getPublicKey: ({| path: Array<number> |}) => Promise<HWDeviceInfo> = async request => {
     Logger.debug(stringifyData(request));
     try {
       const ledgerConnect = new LedgerConnect({
@@ -149,14 +144,12 @@ export default class LedgerConnectStore
     } finally {
       if (this.ledgerConnect != null) {
         this.ledgerConnect.dispose();
-      };
+      }
       this.ledgerConnect = undefined;
     }
-  }
+  };
 
-  _getMultiplePublicKeys: {|
-    paths: Array<Array<number>>
-  |} => Promise<Array<HWDeviceInfo>> = async (request) => {
+  _getMultiplePublicKeys: ({| paths: Array<Array<number>> |}) => Promise<Array<HWDeviceInfo>> = async request => {
     Logger.debug(stringifyData(request));
     try {
       const ledgerConnect = new LedgerConnect({
@@ -173,25 +166,22 @@ export default class LedgerConnectStore
         serial: undefined,
       });
 
-      return extendedPublicKeysResp.response.map(response => (
-        {
+      return extendedPublicKeysResp.response
+        .map(response => ({
           response,
           deviceVersion: extendedPublicKeysResp.deviceVersion,
           deriveSerial: extendedPublicKeysResp.deriveSerial,
-        }
-      )).map(this._normalizeHWResponse);
+        }))
+        .map(this._normalizeHWResponse);
     } finally {
       if (this.ledgerConnect != null) {
         this.ledgerConnect.dispose();
       }
       this.ledgerConnect = undefined;
     }
-  }
+  };
 
-  _generateTransferTx: (string, string) => Promise<void> = async (
-    bip44Key,
-    cip1852Key,
-  ) => {
+  _generateTransferTx: (string, string) => Promise<void> = async (bip44Key, cip1852Key) => {
     const bip44AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(bip44Key);
     const cip1852AccountPubKey = RustModule.WalletV4.Bip32PublicKey.from_hex(cip1852Key);
     const stateFetcher = this.stores.substores.ada.stateFetchStore.fetcher;
@@ -200,9 +190,7 @@ export default class LedgerConnectStore
     }
     // regardless the current network, we only recover Byron balance on the mainnet
     const selectedNetwork = networks.CardanoMainnet;
-    const fullConfig = getCardanoHaskellBaseConfig(
-      selectedNetwork
-    );
+    const fullConfig = getCardanoHaskellBaseConfig(selectedNetwork);
     const protocolParameters = await getProtocolParameters({ networkId: selectedNetwork.NetworkId });
     try {
       const currentTime = this.stores.serverConnectionStore.serverTime ?? new Date();
@@ -222,7 +210,7 @@ export default class LedgerConnectStore
       // usually this means no internet connection or not enough ADA to upgrade
       // so we just ignore this case
     }
-  }
+  };
 
   _checkAndStoreHWDeviceInfo: void => Promise<void> = async () => {
     this.stores.substores.ada.yoroiTransfer.transferRequest.reset();
@@ -233,17 +221,15 @@ export default class LedgerConnectStore
         const bip44Path = [...accountPath];
         bip44Path[0] = WalletTypePurpose.BIP44;
 
-        const [ pubKeyResponse, bip44Response ] = await this._getMultiplePublicKeys(
-          {
-            paths: [accountPath, bip44Path],
-          }
-        );
+        const [pubKeyResponse, bip44Response] = await this._getMultiplePublicKeys({
+          paths: [accountPath, bip44Path],
+        });
 
         this.hwDeviceInfo = pubKeyResponse;
 
         await this._generateTransferTx(
           bip44Response.publicMasterKey,
-          pubKeyResponse.publicMasterKey, // cip1852
+          pubKeyResponse.publicMasterKey // cip1852
         );
       } else {
         const pubKeyResponse = await this._getPublicKey({ path: accountPath });
@@ -256,12 +242,10 @@ export default class LedgerConnectStore
     }
   };
 
-  _normalizeHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => HWDeviceInfo = (
-    resp,
-  ) => {
+  _normalizeHWResponse: (ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>) => HWDeviceInfo = resp => {
     this._validateHWResponse(resp);
 
-    const { response, } = resp;
+    const { response } = resp;
 
     return {
       publicMasterKey: response.publicKeyHex + response.chainCodeHex,
@@ -272,11 +256,9 @@ export default class LedgerConnectStore
       },
       defaultName: '',
     };
-  }
+  };
 
-  _validateHWResponse: ExtendedPublicKeyResp<GetExtendedPublicKeyResponse> => boolean = (
-    resp,
-  ) => {
+  _validateHWResponse: (ExtendedPublicKeyResp<GetExtendedPublicKeyResponse>) => boolean = resp => {
     if (resp.deviceVersion == null) {
       throw new Error('Ledger device version response is undefined');
     }
@@ -287,7 +269,7 @@ export default class LedgerConnectStore
     return true;
   };
 
-  _handleConnectError: Error => void = (error) => {
+  _handleConnectError: Error => void = error => {
     this.hwDeviceInfo = undefined;
     this.error = convertToLocalizableError(error);
 
@@ -315,29 +297,21 @@ export default class LedgerConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action submitSave: (string) => Promise<void> = async (
-    walletName,
-  ) => {
+  @action submitSave: string => Promise<void> = async walletName => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
-    await this._saveHW(
-      walletName,
-    );
+    await this._saveHW(walletName);
     ampli.connectWalletDetailsSubmitted({ hardware_wallet: 'Ledger' });
   };
 
   /** creates new wallet and loads it */
-  _saveHW: (string) => Promise<void> = async (
-    walletName,
-  )  => {
+  _saveHW: string => Promise<void> = async walletName => {
     try {
       Logger.debug(`${nameof(LedgerConnectStore)}::${nameof(this._saveHW)}:: called`);
       this._setIsCreateHWActive(true);
 
-      const reqParams = this._prepareCreateHWReqParams(
-        walletName,
-      );
+      const reqParams = this._prepareCreateHWReqParams(walletName);
       const newWallet = await createHardwareWallet(reqParams);
 
       await this._onSaveSuccess(newWallet);
@@ -367,12 +341,8 @@ export default class LedgerConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
-    walletName,
-  ) => {
-    if (this.hwDeviceInfo == null
-      || this.hwDeviceInfo.publicMasterKey == null
-      || this.hwDeviceInfo.hwFeatures == null) {
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = walletName => {
+    if (this.hwDeviceInfo == null || this.hwDeviceInfo.publicMasterKey == null || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Ledger device hardware info not valid');
     }
     const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
@@ -394,7 +364,7 @@ export default class LedgerConnectStore
 
   getPath: void => Array<number> = () => {
     return [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, this.derivationIndex];
-  }
+  };
 
   async _onSaveSuccess(wallet: WalletState): Promise<void> {
     // close the active dialog
@@ -428,7 +398,7 @@ export default class LedgerConnectStore
 
     this.teardown();
     Logger.info('SUCCESS: Ledger Connected Wallet created and loaded');
-  }
+  };
 
   @action _goToSaveError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.SAVE;
@@ -437,18 +407,18 @@ export default class LedgerConnectStore
   // =================== SAVE =================== //
 
   // =================== API =================== //
-  @action _setIsCreateHWActive: boolean => void = (active) => {
+  @action _setIsCreateHWActive: boolean => void = active => {
     this.isCreateHWActive = active;
   };
 
   // this is used to inject test data
-  setSelectedMockWallet: string => Promise<void> = async (serial) => {
+  setSelectedMockWallet: string => Promise<void> = async serial => {
     // $FlowExpectedError[prop-missing] only added in tests
     if (LedgerConnect.setSelectedWallet != null) {
       // $FlowExpectedError[not-a-function] only added in tests
       await LedgerConnect.setSelectedWallet(serial);
     }
-  }
+  };
 
   // =================== API =================== //
 }

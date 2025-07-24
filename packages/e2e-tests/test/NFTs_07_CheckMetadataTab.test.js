@@ -48,9 +48,7 @@ describe('Check the Metadata tab', function () {
     await nftDetailsPage.selectMetadata();
     const displayedMetadata = await nftDetailsPage.getMetadata();
     const parsedMetadata = parseNftMetadata(displayedMetadata, testNFT.policyId, testNFT.title);
-    expect(parsedMetadata.description, 'Incorrect description in metadata').to.equal(
-      testNFT.description
-    );
+    expect(parsedMetadata.description, 'Incorrect description in metadata').to.equal(testNFT.description);
     expect(parsedMetadata.image, 'Incorrect image path in metadata').to.equal(testNFT.src);
     expect(parsedMetadata.name, 'Incorrect name in metadata').to.equal(testNFT.name);
   });
@@ -62,9 +60,7 @@ describe('Check the Metadata tab', function () {
     const copiedMetadata = await nftDetailsPage.getClipboardData();
     const parsedMetadata = parseNftMetadata(copiedMetadata, testNFT.policyId, testNFT.title);
 
-    expect(parsedMetadata.description, 'Incorrect description in copied metadata').to.equal(
-      testNFT.description
-    );
+    expect(parsedMetadata.description, 'Incorrect description in copied metadata').to.equal(testNFT.description);
     expect(parsedMetadata.image, 'Incorrect image path in copied metadata').to.equal(testNFT.src);
     expect(parsedMetadata.name, 'Incorrect name in copied metadata').to.equal(testNFT.name);
   });

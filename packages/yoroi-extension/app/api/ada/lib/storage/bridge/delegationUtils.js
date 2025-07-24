@@ -2,9 +2,9 @@
 
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
-import { normalizeToAddress, unwrapStakingKey, } from './utils';
-import type { IGetAllUtxosResponse, } from '../models/PublicDeriver/interfaces';
-import { MultiToken, } from '../../../../common/lib/MultiToken';
+import { normalizeToAddress, unwrapStakingKey } from './utils';
+import type { IGetAllUtxosResponse } from '../models/PublicDeriver/interfaces';
+import { MultiToken } from '../../../../common/lib/MultiToken';
 import type { WalletState } from '../../../../../../chrome/extension/background/types';
 import { maybe, fail } from '../../../../../coreUtils';
 
@@ -23,26 +23,19 @@ export type GetDelegatedBalanceResponse = {|
   allRewards: string | null,
   stakeRegistered: ?boolean,
 |};
-export type GetDelegatedBalanceFunc = (
-  request: GetDelegatedBalanceRequest
-) => Promise<GetDelegatedBalanceResponse>;
+export type GetDelegatedBalanceFunc = (request: GetDelegatedBalanceRequest) => Promise<GetDelegatedBalanceResponse>;
 export type RewardHistoryRequest = string;
-export type RewardHistoryResponse = Array<[
-  number, // epoch
-  MultiToken, // amount
-  string, // poolHash
-]>;
-export type RewardHistoryFunc = (
-  request: RewardHistoryRequest
-) => Promise<RewardHistoryResponse>;
+export type RewardHistoryResponse = Array<
+  [
+    number, // epoch
+    MultiToken, // amount
+    string, // poolHash
+  ],
+>;
+export type RewardHistoryFunc = (request: RewardHistoryRequest) => Promise<RewardHistoryResponse>;
 
-export async function getDelegatedBalance(
-  request: GetDelegatedBalanceRequest,
-): Promise<GetDelegatedBalanceResponse> {
-  const utxoPart = await getUtxoDelegatedBalance(
-    request.wallet,
-    request.stakingAddress,
-  );
+export async function getDelegatedBalance(request: GetDelegatedBalanceRequest): Promise<GetDelegatedBalanceResponse> {
+  const utxoPart = await getUtxoDelegatedBalance(request.wallet, request.stakingAddress);
 
   return {
     utxoPart,
@@ -56,7 +49,7 @@ export async function getDelegatedBalance(
 export function addrContainsAccountKey(
   address: string,
   targetAccountKey: RustModule.WalletV4.Credential | string,
-  acceptTypeMismatch: boolean,
+  acceptTypeMismatch: boolean
 ): boolean {
   const wasmAddr = normalizeToAddress(address);
   if (wasmAddr == null) throw new Error(`${nameof(addrContainsAccountKey)} invalid address ${address}`);
@@ -70,13 +63,12 @@ export function addrContainsAccountKey(
     // clean: de-allocate the pointer
     asBase.free();
     if (isAccountKey) return true;
-
   }
 
   const asPointer = RustModule.WalletV4.PointerAddress.from_address(wasmAddr);
   if (asPointer != null) {
     // clean: de-allocate the pointer
-    asPointer.free()
+    asPointer.free();
   }
 
   // clean: de-allocate the pointer
@@ -88,7 +80,7 @@ export function addrContainsAccountKey(
 export function filterAddressesByStakingKey<T: { +address: string, ... }>(
   stakingKey: RustModule.WalletV4.Credential,
   utxos: $ReadOnlyArray<$ReadOnly<T>>,
-  acceptTypeMismatch: boolean,
+  acceptTypeMismatch: boolean
 ): $ReadOnlyArray<$ReadOnly<T>> {
   const result = [];
   for (const utxo of utxos) {
@@ -99,20 +91,13 @@ export function filterAddressesByStakingKey<T: { +address: string, ... }>(
   return result;
 }
 
-export async function getUtxoDelegatedBalance(
-  wallet: WalletState,
-  _stakingAddress: string,
-): Promise<MultiToken> {
+export async function getUtxoDelegatedBalance(wallet: WalletState, _stakingAddress: string): Promise<MultiToken> {
   // TODO: need to also deal with pointer address summing
   // can get most recent pointer from getCurrentDelegation result
 
   const stakingKey = unwrapStakingKey(wallet.stakingAddress);
   const allUtxo = wallet.utxos;
-  const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(
-    stakingKey,
-    allUtxo,
-    false,
-  );
+  const allUtxosForKey = filterAddressesByStakingKey<ElementOf<IGetAllUtxosResponse>>(stakingKey, allUtxo, false);
   const defaultToken = {
     defaultNetworkId: wallet.networkId,
     defaultIdentifier: wallet.defaultTokenId,
@@ -120,15 +105,18 @@ export async function getUtxoDelegatedBalance(
   const defaultMultiToken = new MultiToken([], defaultToken);
 
   const utxoSum = allUtxosForKey.reduce(
-    (sum, utxo) => sum.joinAddMutable(new MultiToken(
-      utxo.output.tokens.map(token => ({
-        identifier: token.Token.Identifier,
-        amount: new BigNumber(token.TokenList.Amount),
-        networkId: token.Token.NetworkId,
-      })),
-      defaultToken,
-    )),
-    defaultMultiToken,
+    (sum, utxo) =>
+      sum.joinAddMutable(
+        new MultiToken(
+          utxo.output.tokens.map(token => ({
+            identifier: token.Token.Identifier,
+            amount: new BigNumber(token.TokenList.Amount),
+            networkId: token.Token.NetworkId,
+          })),
+          defaultToken
+        )
+      ),
+    defaultMultiToken
   );
 
   return utxoSum;
@@ -144,9 +132,11 @@ function parseDrep(drepCredential: string): RustModule.WalletV4.DRep {
     if (drepCredential === DREP_ALWAYS_ABSTAIN) return DRep.new_always_abstain();
     if (drepCredential === DREP_ALWAYS_NO_CONFIDENCE) return DRep.new_always_no_confidence();
     const credential = RustModule.WalletV4.Credential.from_hex(drepCredential);
-    return maybe(credential.to_keyhash(), k => DRep.new_key_hash(k))
-      ?? maybe(credential.to_scripthash(), s => DRep.new_script_hash(s))
-      ?? fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
+    return (
+      maybe(credential.to_keyhash(), k => DRep.new_key_hash(k)) ??
+      maybe(credential.to_scripthash(), s => DRep.new_script_hash(s)) ??
+      fail('weird credential cannot be converted into a drep: ' + credential.to_hex())
+    );
   } catch (e) {
     console.log('Fail to parse a drep credential: ' + drepCredential, e);
     throw e;
@@ -158,39 +148,32 @@ export function createCertificate(
   stakingKeyHashHex: string,
   isRegistered: boolean,
   poolRequest: void | string,
-  drepCredential: void | string,
+  drepCredential: void | string
 ): Array<RustModule.WalletV4.Certificate> {
-  const credential = RustModule.WalletV4.Credential.from_keyhash(
-    RustModule.WalletV4.Ed25519KeyHash.from_hex(stakingKeyHashHex)
-  );
+  const credential = RustModule.WalletV4.Credential.from_keyhash(RustModule.WalletV4.Ed25519KeyHash.from_hex(stakingKeyHashHex));
   if (poolRequest == null && drepCredential == null) {
     if (isRegistered) {
-      return [
-        RustModule.WalletV4.Certificate.new_stake_deregistration(
-          RustModule.WalletV4.StakeDeregistration.new(credential)
-        )
-      ];
+      return [RustModule.WalletV4.Certificate.new_stake_deregistration(RustModule.WalletV4.StakeDeregistration.new(credential))];
     }
     return []; // no need to undelegate if no staking key registered
   }
   const result = [];
   if (!isRegistered) {
     // if unregistered, need to register first
-    result.push(RustModule.WalletV4.Certificate.new_stake_registration(
-      RustModule.WalletV4.StakeRegistration.new(credential)
-    ));
+    result.push(RustModule.WalletV4.Certificate.new_stake_registration(RustModule.WalletV4.StakeRegistration.new(credential)));
   }
   if (poolRequest != null) {
     const poolKeyHash = RustModule.WalletV4.Ed25519KeyHash.from_hex(poolRequest);
-    result.push(RustModule.WalletV4.Certificate.new_stake_delegation(
-      RustModule.WalletV4.StakeDelegation.new(credential, poolKeyHash),
-    ));
+    result.push(
+      RustModule.WalletV4.Certificate.new_stake_delegation(RustModule.WalletV4.StakeDelegation.new(credential, poolKeyHash))
+    );
   }
   if (drepCredential != null) {
-    result.push(RustModule.WalletV4.Certificate.new_vote_delegation(
-      RustModule.WalletV4.VoteDelegation.new(credential, parseDrep(drepCredential)),
-    ));
+    result.push(
+      RustModule.WalletV4.Certificate.new_vote_delegation(
+        RustModule.WalletV4.VoteDelegation.new(credential, parseDrep(drepCredential))
+      )
+    );
   }
   return result;
 }
-

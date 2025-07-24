@@ -35,9 +35,7 @@ class DAppConnectWallet extends DAppBase {
   async _findWallet(wallets, walletPlate) {
     this.logger.info(`DAppConnectWallet::_findWallet is called`);
     const resultWallets = wallets.filter(async walletEl => {
-      const nameAndPlate = await walletEl.findElement(
-        getByLocator(this.walletItemPlateLabelLocator)
-      );
+      const nameAndPlate = await walletEl.findElement(getByLocator(this.walletItemPlateLabelLocator));
       return (await nameAndPlate.getText()).includes(walletPlate);
     });
     if (resultWallets.length === 0) {
@@ -57,19 +55,13 @@ class DAppConnectWallet extends DAppBase {
     const wallets = await this.getWallets();
     const walletElem = await this._findWallet(wallets, walletChecksum);
 
-    const walletNameFieldElem = await walletElem.findElement(
-      getByLocator(this.walletItemNameLabelLocator)
-    );
+    const walletNameFieldElem = await walletElem.findElement(getByLocator(this.walletItemNameLabelLocator));
     const walletName = await walletNameFieldElem.getText();
 
-    const walletPlateElem = await walletElem.findElement(
-      getByLocator(this.walletItemPlateLabelLocator)
-    );
+    const walletPlateElem = await walletElem.findElement(getByLocator(this.walletItemPlateLabelLocator));
     const walletPlate = await walletPlateElem.getText();
 
-    const walletBalanceElem = await walletElem.findElement(
-      getByLocator(this.walletItemBalanceLabelLocator)
-    );
+    const walletBalanceElem = await walletElem.findElement(getByLocator(this.walletItemBalanceLabelLocator));
     const fullBalanceText = await walletBalanceElem.getText();
     const walletBalance = Number(fullBalanceText.split(' ')[0]);
 

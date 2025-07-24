@@ -1,33 +1,22 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
-import {
-  op,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
+import { op } from 'lovefield';
 
 import * as Tables from '../tables';
 import type {
-  UtxoTransactionInputInsert, UtxoTransactionInputRow,
-  UtxoTransactionOutputInsert, UtxoTransactionOutputRow,
-  DbUtxoInputs, DbUtxoOutputs,
+  UtxoTransactionInputInsert,
+  UtxoTransactionInputRow,
+  UtxoTransactionOutputInsert,
+  UtxoTransactionOutputRow,
+  DbUtxoInputs,
+  DbUtxoOutputs,
 } from '../tables';
-import type {
-  TransactionRow,
-  TokenRow,
-  TokenListRow,
-} from '../../../primitives/tables';
+import type { TransactionRow, TokenRow, TokenListRow } from '../../../primitives/tables';
 
-import {
-  addBatchToTable,
-} from '../../../utils';
+import { addBatchToTable } from '../../../utils';
 
-import {
-  GetUtxoTxOutputsWithTx,
-} from './read';
-
+import { GetUtxoTxOutputsWithTx } from './read';
 
 export type MarkAsRequest = {|
   txId: number,
@@ -41,7 +30,7 @@ export type MarkAsResponse = void | {|
   tokens: $ReadOnlyArray<{|
     TokenList: $ReadOnly<TokenListRow>,
     Token: $ReadOnly<TokenRow>,
-  |}>
+  |}>,
 |};
 export class MarkUtxo {
   static ownTables: {|
@@ -49,41 +38,31 @@ export class MarkUtxo {
   |} = Object.freeze({
     [Tables.UtxoTransactionOutputSchema.name]: Tables.UtxoTransactionOutputSchema,
   });
-  static depTables: {|GetUtxoTxOutputsWithTx: typeof GetUtxoTxOutputsWithTx|} = Object.freeze({
-    GetUtxoTxOutputsWithTx
+  static depTables: {| GetUtxoTxOutputsWithTx: typeof GetUtxoTxOutputsWithTx |} = Object.freeze({
+    GetUtxoTxOutputsWithTx,
   });
 
-  static async markAs(
-    db: lf$Database,
-    tx: lf$Transaction,
-    request: MarkAsRequest,
-  ): Promise<MarkAsResponse> {
-    const output = await MarkUtxo.depTables.GetUtxoTxOutputsWithTx.getSingleOutput(
-      db, tx,
-      {
-        txId: request.txId,
-        outputIndex: request.outputIndex,
-        networkId: request.networkId,
-      },
-    );
+  static async markAs(db: lf$Database, tx: lf$Transaction, request: MarkAsRequest): Promise<MarkAsResponse> {
+    const output = await MarkUtxo.depTables.GetUtxoTxOutputsWithTx.getSingleOutput(db, tx, {
+      txId: request.txId,
+      outputIndex: request.outputIndex,
+      networkId: request.networkId,
+    });
     if (output === undefined) {
       return undefined;
     }
-    const outputTable = db.getSchema().table(
-      MarkUtxo.ownTables[Tables.UtxoTransactionOutputSchema.name].name
-    );
+    const outputTable = db.getSchema().table(MarkUtxo.ownTables[Tables.UtxoTransactionOutputSchema.name].name);
 
     const query = db
       .update(outputTable)
-      .set(
-        outputTable[Tables.UtxoTransactionOutputSchema.properties.IsUnspent],
-        request.isUnspent
-      )
-      .where(op.and(
-        outputTable[Tables.UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId].eq(
-          output.UtxoTransactionOutput.UtxoTransactionOutputId
-        ),
-      ));
+      .set(outputTable[Tables.UtxoTransactionOutputSchema.properties.IsUnspent], request.isUnspent)
+      .where(
+        op.and(
+          outputTable[Tables.UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId].eq(
+            output.UtxoTransactionOutput.UtxoTransactionOutputId
+          )
+        )
+      );
 
     await tx.attach(query);
 
@@ -92,7 +71,7 @@ export class MarkUtxo {
       UtxoTransactionOutput: {
         ...output.UtxoTransactionOutput,
         IsUnspent: false,
-      }
+      },
     };
   }
 }
@@ -113,22 +92,18 @@ export class ModifyUtxoTransaction {
     request: {|
       utxoInputs: Array<UtxoTransactionInputInsert>,
       utxoOutputs: Array<UtxoTransactionOutputInsert>,
-    |},
-  ): Promise<{| ...DbUtxoInputs, ...DbUtxoOutputs, |}> {
+    |}
+  ): Promise<{| ...DbUtxoInputs, ...DbUtxoOutputs |}> {
     const { utxoInputs, utxoOutputs } = request;
-    const newInputs = await addBatchToTable<
-      UtxoTransactionInputInsert,
-      UtxoTransactionInputRow
-    >(
-      db, tx,
+    const newInputs = await addBatchToTable<UtxoTransactionInputInsert, UtxoTransactionInputRow>(
+      db,
+      tx,
       utxoInputs,
       ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionInputSchema.name].name
     );
-    const newOutputs = await addBatchToTable<
-      UtxoTransactionOutputInsert,
-      UtxoTransactionOutputRow
-    >(
-      db, tx,
+    const newOutputs = await addBatchToTable<UtxoTransactionOutputInsert, UtxoTransactionOutputRow>(
+      db,
+      tx,
       utxoOutputs,
       ModifyUtxoTransaction.ownTables[Tables.UtxoTransactionOutputSchema.name].name
     );

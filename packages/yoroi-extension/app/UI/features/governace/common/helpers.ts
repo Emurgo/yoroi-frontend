@@ -7,8 +7,8 @@ export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   return vote.action === 'abstain'
     ? { kind: 'abstain' }
     : vote.action === 'no-confidence'
-    ? { kind: 'no-confidence' }
-    : { kind: 'delegate', drepID: vote.drepID };
+      ? { kind: 'no-confidence' }
+      : { kind: 'delegate', drepID: vote.drepID };
 };
 
 // <TODO:DEDUPLICATE> extract this and fix all places where it's duplicated

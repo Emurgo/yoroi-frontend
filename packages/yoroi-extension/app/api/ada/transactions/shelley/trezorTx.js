@@ -1,5 +1,5 @@
 // @flow
-import type { CardanoAddressedUtxo, } from '../types';
+import type { CardanoAddressedUtxo } from '../types';
 import { toDerivationPathString } from '../../lib/cardanoCrypto/keys/path';
 import type {
   CardanoAddressParameters,
@@ -30,7 +30,7 @@ import { transactionHexToHash } from '../../lib/cardanoCrypto/utils';
 
 function formatTrezorCertificates(
   certificates: RustModule.WalletV4.Certificates,
-  getPath: (stakeCredential: RustModule.WalletV4.Credential) => Array<number>,
+  getPath: (stakeCredential: RustModule.WalletV4.Credential) => Array<number>
 ): Array<CardanoCertificate> {
   const result = [];
   for (const cert of iterateLenGet(certificates)) {
@@ -64,30 +64,30 @@ function formatTrezorCertificates(
       const wasmDrep = voteDelegation.drep();
       let dRep;
       switch (wasmDrep.kind()) {
-      case RustModule.WalletV4.DRepKind.KeyHash:
-        dRep = {
-          type: CardanoDRepType.KEY_HASH,
-          keyHash: forceNonNull(voteDelegation.drep().to_key_hash()).to_hex(),
-        };
-        break;
-      case RustModule.WalletV4.DRepKind.ScriptHash:
-        dRep = {
-          type: CardanoDRepType.SCRIPT_HASH,
-          scriptHash: forceNonNull(voteDelegation.drep().to_script_hash()).to_hex(),
-        };
-        break;
-      case RustModule.WalletV4.DRepKind.AlwaysAbstain:
-        dRep = {
-          type: CardanoDRepType.ABSTAIN,
-        };
-        break;
-      case RustModule.WalletV4.DRepKind.AlwaysNoConfidence:
-        dRep = {
-          type: CardanoDRepType.NO_CONFIDENCE,
-        };
-        break;
-      default:
-        throw new Error('Trezor: Unsupported dRep kind: ' + wasmDrep.kind());
+        case RustModule.WalletV4.DRepKind.KeyHash:
+          dRep = {
+            type: CardanoDRepType.KEY_HASH,
+            keyHash: forceNonNull(voteDelegation.drep().to_key_hash()).to_hex(),
+          };
+          break;
+        case RustModule.WalletV4.DRepKind.ScriptHash:
+          dRep = {
+            type: CardanoDRepType.SCRIPT_HASH,
+            scriptHash: forceNonNull(voteDelegation.drep().to_script_hash()).to_hex(),
+          };
+          break;
+        case RustModule.WalletV4.DRepKind.AlwaysAbstain:
+          dRep = {
+            type: CardanoDRepType.ABSTAIN,
+          };
+          break;
+        case RustModule.WalletV4.DRepKind.AlwaysNoConfidence:
+          dRep = {
+            type: CardanoDRepType.NO_CONFIDENCE,
+          };
+          break;
+        default:
+          throw new Error('Trezor: Unsupported dRep kind: ' + wasmDrep.kind());
       }
       result.push({
         type: CardanoCertificateType.VOTE_DELEGATION,
@@ -102,9 +102,7 @@ function formatTrezorCertificates(
   return result;
 }
 
-function toTrezorTokenBundle(
-  assets: ?RustModule.WalletV4.MultiAsset
-): {|
+function toTrezorTokenBundle(assets: ?RustModule.WalletV4.MultiAsset): {|
   tokenBundle?: Array<CardanoAssetGroup>,
 |} {
   if (assets == null) return Object.freeze({});
@@ -112,7 +110,6 @@ function toTrezorTokenBundle(
   const tokenBundle: Array<CardanoAssetGroup> = iterateLenGetMap(assets)
     .nonNullValue()
     .map(([policyId, assetsForPolicy]) => {
-
       const tokenAmounts: Array<CardanoToken> = iterateLenGetMap(assetsForPolicy)
         .nonNullValue()
         .map(([assetName, amount]) => ({
@@ -125,17 +122,13 @@ function toTrezorTokenBundle(
         policyId: policyId.to_hex(),
         tokenAmounts,
       };
-
     })
     .toArray();
 
   return { tokenBundle };
 }
 
-export function toTrezorAddressParameters(
-  address: RustModule.WalletV4.Address,
-  path: Array<number>,
-): CardanoAddressParameters {
+export function toTrezorAddressParameters(address: RustModule.WalletV4.Address, path: Array<number>): CardanoAddressParameters {
   {
     const byronAddr = RustModule.WalletV4.ByronAddress.from_address(address);
     if (byronAddr) {
@@ -213,12 +206,13 @@ export function toTrezorSignRequest(
   // pass it in explicitly
   changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
   senderUtxos: Array<CardanoAddressedUtxo>,
-  catalystData?: TrezorTCatalystRegistrationTxSignData,
+  catalystData?: TrezorTCatalystRegistrationTxSignData
 ): $Exact<CardanoSignTransaction> {
-
-  const tagsState = RustModule.WasmScope(Module => Module.WalletV4.has_transaction_set_tag(
-    Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
-  ));
+  const tagsState = RustModule.WasmScope(Module =>
+    Module.WalletV4.has_transaction_set_tag(
+      Module.WalletV4.FixedTransaction.new_from_body_bytes(hexToBytes(txBodyHex)).to_bytes()
+    )
+  );
 
   if (tagsState === RustModule.WalletV4.TransactionSetsState.MixedSets) {
     throw new Error('Transaction with mixed sets cannot be signed by Ledger');
@@ -233,9 +227,7 @@ export function toTrezorSignRequest(
     for (const input of iterateLenGet(inputs)) {
       const hash = input.transaction_id().to_hex();
       const index = input.index();
-      const ownUtxo = senderUtxos.find(utxo =>
-        utxo.tx_hash === hash && utxo.tx_index === index
-      );
+      const ownUtxo = senderUtxos.find(utxo => utxo.tx_hash === hash && utxo.tx_index === index);
       const cardanoInput: CardanoInput = {
         prev_hash: hash,
         prev_index: index,
@@ -248,14 +240,10 @@ export function toTrezorSignRequest(
     return formatted;
   }
 
-  function formatOutput(
-    output: RustModule.WalletV4.TransactionOutput,
-  ): CardanoOutput {
+  function formatOutput(output: RustModule.WalletV4.TransactionOutput): CardanoOutput {
+    const isPostAlonzoTransactionOutput = output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
 
-    const isPostAlonzoTransactionOutput =
-      output.serialization_format() === RustModule.WalletV4.CborContainerType.Map;
-
-    const amount =  output.amount().coin().to_str();
+    const amount = output.amount().coin().to_str();
     const { tokenBundle } = toTrezorTokenBundle(output.amount().multiasset());
     const outputDataHash = output.data_hash();
 
@@ -293,18 +281,12 @@ export function toTrezorSignRequest(
 
     const baseAddr = RustModule.WalletV4.BaseAddress.from_address(addr);
     if (baseAddr) {
-      const paymentAddress = RustModule.WalletV4.EnterpriseAddress.new(
-        networkId,
-        baseAddr.payment_cred()
-      ).to_address().to_hex();
-      const ownPaymentPath = ownAddressMap(paymentAddress) ||
-        changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
+      const paymentAddress = RustModule.WalletV4.EnterpriseAddress.new(networkId, baseAddr.payment_cred()).to_address().to_hex();
+      const ownPaymentPath =
+        ownAddressMap(paymentAddress) || changeAddrs.find(({ address }) => address === addr.to_hex())?.addressing.path;
       if (ownPaymentPath) {
         const stake = baseAddr.stake_cred();
-        const stakeAddr = RustModule.WalletV4.RewardAddress.new(
-          networkId,
-          stake,
-        ).to_address().to_hex();
+        const stakeAddr = RustModule.WalletV4.RewardAddress.new(networkId, stake).to_address().to_hex();
         const ownStakePath = ownAddressMap(stakeAddr);
         if (ownStakePath) {
           // stake address is ours
@@ -345,7 +327,8 @@ export function toTrezorSignRequest(
         }
         // not having BASE_PAYMENT_SCRIPT_ because payment script is
         // treated as third party address
-      } else { // payment address is not ours
+      } else {
+        // payment address is not ours
         result = ({
           address: addr.to_bech32(),
           amount,
@@ -392,14 +375,14 @@ export function toTrezorSignRequest(
     for (const hash of iterateLenGet(requiredSigners)) {
       const enterpriseAddress = RustModule.WalletV4.EnterpriseAddress.new(
         networkId,
-        RustModule.WalletV4.Credential.from_keyhash(hash),
-      ).to_address().to_hex();
-      const stakeAddress = RustModule.WalletV4.RewardAddress.new(
-        networkId,
-        RustModule.WalletV4.Credential.from_keyhash(hash),
-      ).to_address().to_hex();
-      const ownAddressPath = ownAddressMap(enterpriseAddress)
-        || ownAddressMap(stakeAddress);
+        RustModule.WalletV4.Credential.from_keyhash(hash)
+      )
+        .to_address()
+        .to_hex();
+      const stakeAddress = RustModule.WalletV4.RewardAddress.new(networkId, RustModule.WalletV4.Credential.from_keyhash(hash))
+        .to_address()
+        .to_hex();
+      const ownAddressPath = ownAddressMap(enterpriseAddress) || ownAddressMap(stakeAddress);
       if (ownAddressPath) {
         formattedRequiredSigners.push({
           keyPath: ownAddressPath,
@@ -416,13 +399,8 @@ export function toTrezorSignRequest(
   let formattedCertificates = null;
   const certificates = txBody.certs();
   if (certificates) {
-    const getPath = (
-      stakeCredential: RustModule.WalletV4.Credential
-    ): Array<number> => {
-      const rewardAddr = RustModule.WalletV4.RewardAddress.new(
-        networkId,
-        stakeCredential
-      );
+    const getPath = (stakeCredential: RustModule.WalletV4.Credential): Array<number> => {
+      const rewardAddr = RustModule.WalletV4.RewardAddress.new(networkId, stakeCredential);
       const addressPayload = rewardAddr.to_address().to_hex();
       const addressing = ownAddressMap(addressPayload);
       if (addressing == null) {
@@ -470,7 +448,7 @@ export function toTrezorSignRequest(
           {
             votePublicKey: votingPublicKey.replace(/^0x/, ''),
             weight: 1,
-          }
+          },
         ],
         stakingPath: stakingKeyPath,
         paymentAddressParameters: {
@@ -495,9 +473,7 @@ export function toTrezorSignRequest(
   // temp workaround for buggy Mint.to_js_value()
   const formattedMint = JSON.parse(txBody.mint()?.to_json() ?? 'null')?.map(([policyId, assets]) => ({
     policyId,
-    tokenAmounts: Object.keys(assets).map(assetNameBytes => (
-      { assetNameBytes, mintAmount: assets[assetNameBytes] }
-    )),
+    tokenAmounts: Object.keys(assets).map(assetNameBytes => ({ assetNameBytes, mintAmount: assets[assetNameBytes] })),
   }));
 
   const scriptDataHash = txBody.script_data_hash()?.to_hex();
@@ -577,9 +553,8 @@ export function toTrezorSignRequest(
 export function buildConnectorSignedTransaction(
   rawTxHex: string,
   witnesses: Array<CardanoSignedTxWitness>,
-  metadata: ?RustModule.WalletV4.AuxiliaryData,
+  metadata: ?RustModule.WalletV4.AuxiliaryData
 ): {| txHex: string, txId: string |} {
-
   const fixedTx = RustModule.WalletV4.FixedTransaction.from_hex(rawTxHex);
   if (metadata) {
     fixedTx.set_auxiliary_data(metadata.to_bytes());
@@ -593,20 +568,16 @@ export function buildConnectorSignedTransaction(
       throw new Error('Byron wallet does not support connector API');
     } else if (witness.type === CardanoTxWitnessType.SHELLEY_WITNESS) {
       const vkeyWitness = RustModule.WalletV4.Vkeywitness.new(
-        RustModule.WalletV4.Vkey.new(
-          RustModule.WalletV4.PublicKey.from_hex(witness.pubKey)
-        ),
-        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature),
+        RustModule.WalletV4.Vkey.new(RustModule.WalletV4.PublicKey.from_hex(witness.pubKey)),
+        RustModule.WalletV4.Ed25519Signature.from_hex(witness.signature)
       );
 
       fixedTx.add_vkey_witness(vkeyWitness);
-
     } else {
       throw new Error('unexpected witness type');
     }
   }
 
-
   const txHex = fixedTx.to_hex();
-  return { txHex, txId: transactionHexToHash(txHex)};
+  return { txHex, txId: transactionHexToHash(txHex) };
 }

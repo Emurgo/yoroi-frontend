@@ -35,9 +35,7 @@ describe('Show more txs', function () {
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.loadMoreTxs(1);
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
-    expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(
-      testWallet3.minTxs
-    );
+    expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(testWallet3.minTxs);
   });
 
   afterEach(function (done) {

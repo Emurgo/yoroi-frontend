@@ -36,15 +36,18 @@ const dialogMessages = defineMessages({
   },
   cashbackWarning1: {
     id: 'wallet.settings.delete.warning1.cashback',
-    defaultMessage: '!!!Removing this wallet will not impact its balance, but as it is the rewards wallet, this may disrupt your cashback process. You can also use another wallet for connecting the cashback before removing this wallet.'
+    defaultMessage:
+      '!!!Removing this wallet will not impact its balance, but as it is the rewards wallet, this may disrupt your cashback process. You can also use another wallet for connecting the cashback before removing this wallet.',
   },
   cashbackWarning2: {
     id: 'wallet.settings.delete.warning2.cashback',
-    defaultMessage: '!!!This wallet can be restored again at any time, but double-check if you still have the means to restore access to it. If you cannot, removing the wallet may result in irreversible loss of funds.'
+    defaultMessage:
+      '!!!This wallet can be restored again at any time, but double-check if you still have the means to restore access to it. If you cannot, removing the wallet may result in irreversible loss of funds.',
   },
   cashbackAccept: {
     id: 'wallet.settings.delete.accept.cashback',
-    defaultMessage: '!!!I still have the means to restore this wallet and want to stop generating cashback rewards for this wallet.'
+    defaultMessage:
+      '!!!I still have the means to restore this wallet and want to stop generating cashback rewards for this wallet.',
   },
 });
 
@@ -54,16 +57,16 @@ export default class RemoveWalletDialogContainer extends Component<AllProps, Sta
     warning1Text: null,
     warning2Text: null,
     acceptText: null,
-  }
+  };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   componentWillUnmount() {
     this.props.stores.walletSettings.removeWalletRequest.reset();
   }
 
   async componentDidMount() {
     const { wallets } = this.props.stores;
-    if (await wallets.getCashbackWallet() === wallets.selected) {
+    if ((await wallets.getCashbackWallet()) === wallets.selected) {
       this.setState({
         warning1Text: dialogMessages.cashbackWarning1,
         warning2Text: dialogMessages.cashbackWarning2,

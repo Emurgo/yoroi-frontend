@@ -1,11 +1,7 @@
 // @flow
 import { observer } from 'mobx-react';
 import type { ComponentType } from 'react';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenStrictName,
-} from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import { Box } from '@mui/system';
 import TokenDetails from '../../components/wallet/assets/TokenDetails';
@@ -17,8 +13,7 @@ import { useParams } from 'react-router';
 function TokenDetailsPageRevamp(props: StoresProps) {
   const publicDeriver = props.stores.wallets.selected;
   // Guard against potential null values
-  if (!publicDeriver)
-    throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(TokenDetailsPageRevamp)}.`);
+  if (!publicDeriver) throw new Error(`Active wallet requiTokenDetails)}d for ${nameof(TokenDetailsPageRevamp)}.`);
   const spendableBalance = props.stores.transactions.balance;
   const getTokenInfo = genLookupOrFail(props.stores.tokenInfoStore.tokenInfo);
   const network = getNetworkById(publicDeriver.networkId);
@@ -55,12 +50,7 @@ function TokenDetailsPageRevamp(props: StoresProps) {
   const { tokenId } = useParams();
   const tokenInfo = assetsList.find(token => token.id === tokenId);
   return (
-    <Box
-      borderRadius="8px"
-      bgcolor="var(--yoroi-palette-common-white)"
-      height="content"
-      overflow="auto"
-    >
+    <Box borderRadius="8px" bgcolor="var(--yoroi-palette-common-white)" height="content" overflow="auto">
       <TokenDetails tokenInfo={tokenInfo} network={network} />
     </Box>
   );

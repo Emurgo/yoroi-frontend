@@ -32,7 +32,7 @@ import { CurrencyProvider } from '../../UI/context/CurrencyContext';
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   @observable showMemo: boolean = false;
   @observable showSupportedAddressDomainBanner: boolean = true;
 
@@ -218,10 +218,7 @@ export default class WalletSendPage extends Component<StoresProps> {
     return '';
   };
 
-  showMemoDialog: ({|
-    continuation: void => void,
-    dialog: any,
-  |}) => void = request => {
+  showMemoDialog: ({| continuation: void => void, dialog: any |}) => void = request => {
     if (this.props.stores.memos.hasSetSelectedExternalStorageProvider) {
       return request.continuation();
     }

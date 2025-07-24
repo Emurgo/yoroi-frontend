@@ -52,7 +52,7 @@ const messages: * = defineMessages({
 
 @observer
 class VotingPageContent extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   onClose: void => void = () => {
     this.props.stores.uiDialogs.closeActiveDialog();
@@ -85,10 +85,7 @@ class VotingPageContent extends Component<StoresProps> {
     }
 
     // keep enabled on the testnet
-    const {
-      catalystRoundInfo,
-      loadingCatalystRoundInfo,
-    } = this.props.stores.substores.ada.votingStore;
+    const { catalystRoundInfo, loadingCatalystRoundInfo } = this.props.stores.substores.ada.votingStore;
 
     if (loadingCatalystRoundInfo) {
       return (
@@ -118,12 +115,8 @@ class VotingPageContent extends Component<StoresProps> {
       });
       return (
         <InsufficientFundsPage
-          currentBalance={balance
-            .getDefaultEntry()
-            .amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
-          requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(
-            -tokenInfo.Metadata.numberOfDecimals
-          )}
+          currentBalance={balance.getDefaultEntry().amount.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
+          requiredBalance={CATALYST_MIN_AMOUNT.shiftedBy(-tokenInfo.Metadata.numberOfDecimals)}
           tokenName={getTokenName(tokenInfo)}
           shouldHideBalance={stores.profile.shouldHideBalance}
         />
@@ -131,11 +124,11 @@ class VotingPageContent extends Component<StoresProps> {
     }
 
     // todo: unify type tags
-    const walletType = ({
-      'mnemonic': 'mnemonic',
-      'ledger': 'ledgerNano',
-      'trezor': 'trezorT',
-    })[selected.type];
+    const walletType = {
+      mnemonic: 'mnemonic',
+      ledger: 'ledgerNano',
+      trezor: 'trezorT',
+    }[selected.type];
 
     // <TODO:display fund info to user>
     // const { currentFund, nextFund } = catalystRoundInfo;
@@ -147,13 +140,7 @@ class VotingPageContent extends Component<StoresProps> {
     // const isBetweenVoting = !isBeforeVoting && !isAfterVoting;
 
     if (uiDialogs.isOpen(VotingRegistrationDialogContainer)) {
-      activeDialog = (
-        <VotingRegistrationDialogContainer
-          stores={stores}
-          onClose={this.onClose}
-          walletType={walletType}
-        />
-      );
+      activeDialog = <VotingRegistrationDialogContainer stores={stores} onClose={this.onClose} walletType={walletType} />;
     }
 
     const publicDeriver = this.props.stores.wallets.selected;

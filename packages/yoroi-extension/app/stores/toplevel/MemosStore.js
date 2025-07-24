@@ -4,9 +4,7 @@ import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
 import WalletTransaction from '../../domain/WalletTransaction';
 import LocalizableError from '../../i18n/LocalizableError';
-import type {
-  TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey,
-} from '../../api/ada/lib/storage/bridge/memos';
+import type { TxMemoTableUpsert, TxMemoTablePreInsert, TxMemoPreLookupKey } from '../../api/ada/lib/storage/bridge/memos';
 import type { TxMemoTableRow } from '../../api/ada/lib/storage/database/memos/tables';
 import type { ProvidersType } from '../../api/externalStorage/index';
 import type {
@@ -15,20 +13,15 @@ import type {
   DownloadExternalTxMemoFunc,
   FetchFilenameExternalTxMemoFunc,
   FetchFolderExternalTxMemoFunc,
-  CreateFolderExternalTxMemoFunc
+  CreateFolderExternalTxMemoFunc,
 } from '../../api/externalStorage/providers/IProvider.types';
 import type { SelectedExternalStorageProvider } from '../../domain/ExternalStorage';
 import type { StoresMap } from '../index';
-import {
-  getAllTxMemos,
-  deleteTxMemo,
-  upsertTxMemo,
-} from '../../api/thunk';
+import { getAllTxMemos, deleteTxMemo, upsertTxMemo } from '../../api/thunk';
 
 export type MemosForWallet = Map<string, $ReadOnly<TxMemoTableRow>>;
 
 export default class MemosStore extends Store<StoresMap> {
-
   @computed get providers(): { [key: string]: ProvidersType, ... } {
     return this.api.externalStorage.getProviders();
   }
@@ -36,56 +29,61 @@ export default class MemosStore extends Store<StoresMap> {
   @observable error: ?LocalizableError = null;
   @observable selectedTransaction: void | WalletTransaction;
 
-  @observable getExternalStorageProviderRequest:
-    Request<void => Promise<?SelectedExternalStorageProvider>>
-    = new Request<void => Promise<?SelectedExternalStorageProvider>>(this.api.localStorage.getExternalStorage);
+  @observable getExternalStorageProviderRequest: Request<(void) => Promise<?SelectedExternalStorageProvider>> = new Request<
+    (void) => Promise<?SelectedExternalStorageProvider>,
+  >(this.api.localStorage.getExternalStorage);
 
   @observable
-  setExternalStorageProviderRequest: Request<SelectedExternalStorageProvider => Promise<void>>
-    = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.localStorage.setExternalStorage);
+  setExternalStorageProviderRequest: Request<(SelectedExternalStorageProvider) => Promise<void>> = new Request<
+    (SelectedExternalStorageProvider) => Promise<void>,
+  >(this.api.localStorage.setExternalStorage);
 
   @observable
-  unsetExternalStorageProviderRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.localStorage.unsetExternalStorage);
+  unsetExternalStorageProviderRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
+    this.api.localStorage.unsetExternalStorage
+  );
 
   @observable
-  setSelectedProviderRequest: Request<SelectedExternalStorageProvider => Promise<void>>
-    = new Request<SelectedExternalStorageProvider => Promise<void>>(this.api.externalStorage.setSelectedProvider);
+  setSelectedProviderRequest: Request<(SelectedExternalStorageProvider) => Promise<void>> = new Request<
+    (SelectedExternalStorageProvider) => Promise<void>,
+  >(this.api.externalStorage.setSelectedProvider);
 
-  @observable uploadExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>
-    = new Request<UploadExternalTxMemoFunc>(this.api.externalStorage.uploadFile);
+  @observable uploadExternalTxMemoRequest: Request<UploadExternalTxMemoFunc> = new Request<UploadExternalTxMemoFunc>(
+    this.api.externalStorage.uploadFile
+  );
 
-  @observable uploadAndOverwriteExternalTxMemoRequest: Request<UploadExternalTxMemoFunc>
-    = new Request<UploadExternalTxMemoFunc>(this.api.externalStorage.uploadAndOverwriteFile);
+  @observable uploadAndOverwriteExternalTxMemoRequest: Request<UploadExternalTxMemoFunc> = new Request<UploadExternalTxMemoFunc>(
+    this.api.externalStorage.uploadAndOverwriteFile
+  );
 
-  @observable deleteExternalTxMemoRequest: Request<DeleteExternalTxMemoFunc>
-    = new Request<DeleteExternalTxMemoFunc>(this.api.externalStorage.deleteFile);
+  @observable deleteExternalTxMemoRequest: Request<DeleteExternalTxMemoFunc> = new Request<DeleteExternalTxMemoFunc>(
+    this.api.externalStorage.deleteFile
+  );
 
-  @observable downloadExternalTxMemoRequest: Request<DownloadExternalTxMemoFunc>
-    = new Request<DownloadExternalTxMemoFunc>(this.api.externalStorage.downloadFile);
+  @observable downloadExternalTxMemoRequest: Request<DownloadExternalTxMemoFunc> = new Request<DownloadExternalTxMemoFunc>(
+    this.api.externalStorage.downloadFile
+  );
 
-  @observable fetchFilenamesExternalTxMemoRequest: Request<FetchFilenameExternalTxMemoFunc>
-    = new Request<FetchFilenameExternalTxMemoFunc>(this.api.externalStorage.fetchFilenames);
+  @observable fetchFilenamesExternalTxMemoRequest: Request<FetchFilenameExternalTxMemoFunc> =
+    new Request<FetchFilenameExternalTxMemoFunc>(this.api.externalStorage.fetchFilenames);
 
-  @observable fetchFolderExternalTxMemoRequest: Request<FetchFolderExternalTxMemoFunc>
-    = new Request<FetchFolderExternalTxMemoFunc>(this.api.externalStorage.fetchFolder);
+  @observable fetchFolderExternalTxMemoRequest: Request<FetchFolderExternalTxMemoFunc> =
+    new Request<FetchFolderExternalTxMemoFunc>(this.api.externalStorage.fetchFolder);
 
-  @observable createFolderExternalTxMemoRequest: Request<CreateFolderExternalTxMemoFunc>
-    = new Request<CreateFolderExternalTxMemoFunc>(this.api.externalStorage.createFolder);
+  @observable createFolderExternalTxMemoRequest: Request<CreateFolderExternalTxMemoFunc> =
+    new Request<CreateFolderExternalTxMemoFunc>(this.api.externalStorage.createFolder);
 
   @observable
-  revokeTokenStorageProvideRequest: Request<void => Promise<void>>
-    = new Request<void => Promise<void>>(this.api.externalStorage.revokeToken);
+  revokeTokenStorageProvideRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
+    this.api.externalStorage.revokeToken
+  );
 
   @observable
   txMemoMap: Map<string, MemosForWallet> = new Map();
 
   setup(): void {
     this.api.externalStorage.setup();
-    this.registerReactions([
-      this._setSelectedProvider,
-      this._initMemosForWallet,
-    ]);
+    this.registerReactions([this._setSelectedProvider, this._initMemosForWallet]);
   }
 
   teardown(): void {
@@ -105,7 +103,7 @@ export default class MemosStore extends Store<StoresMap> {
       this.txMemoMap.set(walletId, result);
     });
     return result;
-  }
+  };
 
   @action
   loadFromStorage: void => Promise<void> = async () => {
@@ -124,13 +122,11 @@ export default class MemosStore extends Store<StoresMap> {
         walletTxMemos.set(txMemo.TransactionHash, txMemo);
       });
     }
-  }
+  };
 
   // ========== Selected External Storage ========== //
 
-  @action setExternalStorageProvider: SelectedExternalStorageProvider => Promise<void> = async (
-    provider
-  ) => {
+  @action setExternalStorageProvider: SelectedExternalStorageProvider => Promise<void> = async provider => {
     await this.setExternalStorageProviderRequest.execute(provider);
     await this.getExternalStorageProviderRequest.execute(); // eagerly cache
   };
@@ -145,33 +141,27 @@ export default class MemosStore extends Store<StoresMap> {
   };
 
   @computed get hasLoadedExternalStorageProvider(): boolean {
-    return (
-      this.getExternalStorageProviderRequest.wasExecuted &&
-      this.getExternalStorageProviderRequest.result !== null
-    );
+    return this.getExternalStorageProviderRequest.wasExecuted && this.getExternalStorageProviderRequest.result !== null;
   }
 
   @computed get hasSetSelectedExternalStorageProvider(): boolean {
-    return (
-      this.setSelectedProviderRequest.wasExecuted &&
-      this.setSelectedProviderRequest.result !== null
-    );
+    return this.setSelectedProviderRequest.wasExecuted && this.setSelectedProviderRequest.result !== null;
   }
 
   @action closeMemoDialog: void => void = () => {
     this._setError(null);
     this.stores.uiDialogs.closeActiveDialog();
-  }
+  };
 
-  @action selectTransaction: {| tx: WalletTransaction |} => void = (params) => {
+  @action selectTransaction: ({| tx: WalletTransaction |}) => void = params => {
     this.selectedTransaction = params.tx;
-  }
+  };
 
-  @action _setError: ?LocalizableError => void = (error) => {
+  @action _setError: (?LocalizableError) => void = error => {
     this.error = error;
-  }
+  };
 
-  @action saveTxMemo: TxMemoTablePreInsert => Promise<void> = async (request) => {
+  @action saveTxMemo: TxMemoTablePreInsert => Promise<void> = async request => {
     const walletId = request.plateTextPart;
     const memo = {
       ...request.memo,
@@ -191,7 +181,7 @@ export default class MemosStore extends Store<StoresMap> {
     this.closeMemoDialog();
   };
 
-  @action updateTxMemo: TxMemoTableUpsert => Promise<void> = async (request) => {
+  @action updateTxMemo: TxMemoTableUpsert => Promise<void> = async request => {
     const walletId = request.plateTextPart;
     const memo = {
       ...request.memo,
@@ -211,7 +201,7 @@ export default class MemosStore extends Store<StoresMap> {
     this.closeMemoDialog();
   };
 
-  @action deleteTxMemo: TxMemoPreLookupKey => Promise<void> = async (request) => {
+  @action deleteTxMemo: TxMemoPreLookupKey => Promise<void> = async request => {
     const walletId = request.plateTextPart;
     const memoToDelete = {
       walletId,
@@ -250,5 +240,5 @@ export default class MemosStore extends Store<StoresMap> {
         await this.setSelectedProviderRequest.execute(selected);
       }
     }
-  }
+  };
 }

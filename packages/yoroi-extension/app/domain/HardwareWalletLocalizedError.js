@@ -22,18 +22,10 @@ const errors: * = defineMessages({
   },
 });
 
-export const transactionHashMismatchError: LocalizableError = new LocalizableError(
-  errors.transactionHashMismatchError
-);
+export const transactionHashMismatchError: LocalizableError = new LocalizableError(errors.transactionHashMismatchError);
 
-export const unsupportedTransactionError: LocalizableError = new LocalizableError(
-  errors.unsupportedTransactionError
-);
+export const unsupportedTransactionError: LocalizableError = new LocalizableError(errors.unsupportedTransactionError);
 
-export const trezorSignDataUnsupportedError: LocalizableError = new LocalizableError(
-  errors.trezorSignDataUnsupportedError
-);
+export const trezorSignDataUnsupportedError: LocalizableError = new LocalizableError(errors.trezorSignDataUnsupportedError);
 
-export const unknownAddressError: LocalizableError = new LocalizableError(
-  errors.unknownAddressError
-);
+export const unknownAddressError: LocalizableError = new LocalizableError(errors.unknownAddressError);

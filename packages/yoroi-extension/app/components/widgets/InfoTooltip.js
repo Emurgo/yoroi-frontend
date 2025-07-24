@@ -5,17 +5,17 @@ import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import { ReactComponent as Info } from '../../assets/images/revamp/icons/info.inline.svg';
 
-const STooltip = styled(({ className, ...props }: any) => (
-  <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme, width }) => ({
-  [`& .${tooltipClasses.tooltip}`]: {
-    backgroundColor: theme.palette.ds.el_gray_medium,
-    opacity: 0.8,
-    lineHeight: 18,
-    fontSize: 14,
-    maxWidth: width,
-  },
-}));
+const STooltip = styled(({ className, ...props }: any) => <Tooltip {...props} classes={{ popper: className }} />)(
+  ({ theme, width }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+      backgroundColor: theme.palette.ds.el_gray_medium,
+      opacity: 0.8,
+      lineHeight: 18,
+      fontSize: 14,
+      maxWidth: width,
+    },
+  })
+);
 
 type Props = {|
   +content: string | React$Node,
@@ -25,7 +25,13 @@ type Props = {|
 
 export const InfoTooltip = ({ content, width, children }: Props): React$Node => {
   const contentNode =
-    typeof content === 'string' ? <Typography variant="body2" color="ds.gray_min">{content}</Typography> : content;
+    typeof content === 'string' ? (
+      <Typography variant="body2" color="ds.gray_min">
+        {content}
+      </Typography>
+    ) : (
+      content
+    );
   return (
     <STooltip title={contentNode} placement="top" arrow width={width}>
       <Box component="span" color="ds.el_gray_medium" sx={{ p: 0, m: 0, height: '24px' }}>

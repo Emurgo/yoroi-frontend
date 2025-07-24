@@ -8,7 +8,7 @@ class LedgerEmulatorControllerError extends Error {}
 export const LedgerStates = Object.freeze({
   cardanoIsReady: 'Cardano is ready',
   confirmAddress: 'Confirm address?',
-  confirmExport: 'Confirm export 2 public keys?'
+  confirmExport: 'Confirm export 2 public keys?',
 });
 
 export class LedgerEmulatorController {
@@ -56,10 +56,10 @@ export class LedgerEmulatorController {
 
   /**
    * The function joins the screen title and the screen message
-   * @param {{screenTitle: string, screenText: string}} screenMsg 
+   * @param {{screenTitle: string, screenText: string}} screenMsg
    * @returns {string}
    */
-  _joinMsg = (screenMsg) => screenMsg.screenTitle + ' ' + screenMsg.screenText
+  _joinMsg = screenMsg => screenMsg.screenTitle + ' ' + screenMsg.screenText;
 
   /**
    * The function reads a text from the current ledger screen
@@ -70,22 +70,18 @@ export class LedgerEmulatorController {
     try {
       const eventsResponse = await fetch(`${this.speculosEndpoint}/events?currentscreenonly=true`);
       if (!eventsResponse.ok) {
-        this.logger.error(
-          `LedgerEmulator::readScreen Not able to receive events for the current screen`
-        );
-        throw new LedgerEmulatorControllerError(
-          'Not able to receive events for the current screen'
-        );
+        this.logger.error(`LedgerEmulator::readScreen Not able to receive events for the current screen`);
+        throw new LedgerEmulatorControllerError('Not able to receive events for the current screen');
       }
       const eventsObj = await eventsResponse.json();
       this.logger.info(`LedgerEmulator::readScreen The raw response:\n${JSON.stringify(eventsObj, null, 2)}`);
       if (eventsObj.events.length === 0) {
-        return {screenTitle: '', screenText: ''};
+        return { screenTitle: '', screenText: '' };
       }
       const screenTitle = eventsObj.events[0].text;
       const remaingPart = eventsObj.events.splice(1);
       const screenText = remaingPart.map(evt => evt.text).join('');
-      const result = {screenTitle, screenText};
+      const result = { screenTitle, screenText };
       this.logger.info(`LedgerEmulator::readScreen The current screen text:\n${JSON.stringify(result, null, 2)}`);
 
       return result;
@@ -109,12 +105,10 @@ export class LedgerEmulatorController {
         success = true;
         break;
       }
-      this.logger.info(
-        `LedgerEmulator::confirmExportPubKeys Ledger is not ready for export. Waiting for ${quarterSecond} ms`
-      );
+      this.logger.info(`LedgerEmulator::confirmExportPubKeys Ledger is not ready for export. Waiting for ${quarterSecond} ms`);
       await sleep(quarterSecond);
     }
-    if (!success){
+    if (!success) {
       throw new LedgerEmulatorControllerError('Emulator is not ready for export');
     }
   }
@@ -128,9 +122,7 @@ export class LedgerEmulatorController {
         this.logger.info(`LedgerEmulator::isReadyForSigning Ledger is ready.`);
         return true;
       }
-      this.logger.info(
-        `LedgerEmulator::isReadyForSigning Ledger is not ready. Waiting for ${repeatPeriodMilliSec} ms`
-      );
+      this.logger.info(`LedgerEmulator::isReadyForSigning Ledger is not ready. Waiting for ${repeatPeriodMilliSec} ms`);
       await sleep(repeatPeriodMilliSec);
     }
     return false;
@@ -145,9 +137,7 @@ export class LedgerEmulatorController {
         this.logger.info(`LedgerEmulator::isReadyForSigning Ledger is ready.`);
         return true;
       }
-      this.logger.info(
-        `LedgerEmulator::isReadyForSigning Ledger is not ready. Waiting for ${repeatPeriodMilliSec} ms`
-      );
+      this.logger.info(`LedgerEmulator::isReadyForSigning Ledger is not ready. Waiting for ${repeatPeriodMilliSec} ms`);
       await sleep(repeatPeriodMilliSec);
     }
     return false;
@@ -212,7 +202,7 @@ export class LedgerEmulatorController {
           }
           break;
         } else {
-          screenFullText = screenFullText + shiftedText[shiftedText.length - 1]
+          screenFullText = screenFullText + shiftedText[shiftedText.length - 1];
           continue;
         }
       }

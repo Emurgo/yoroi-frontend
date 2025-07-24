@@ -65,5 +65,4 @@ export const buildPortfolioTokenManagers = () => {
   return { tokenManagers, tokenStorages };
 };
 
-
 export const { tokenManagers } = buildPortfolioTokenManagers();

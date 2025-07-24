@@ -24,7 +24,7 @@ class NavBarRevamp extends Component<Props> {
     buyButton: void,
     menu: void,
     pageBanner: boolean,
-    isErrorPage: boolean
+    isErrorPage: boolean,
   |} = {
     children: undefined,
     goToNotifications: undefined,
@@ -66,7 +66,9 @@ class NavBarRevamp extends Component<Props> {
               }}
             >
               <Box flex="0 0 auto">
-                <Typography component="div" color="ds.el_gray_medium">{title}</Typography>
+                <Typography component="div" color="ds.el_gray_medium">
+                  {title}
+                </Typography>
               </Box>
               <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                 {children}

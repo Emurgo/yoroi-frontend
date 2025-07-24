@@ -14,26 +14,28 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  showText?: boolean
+  showText?: boolean,
 |};
 
 @observer
 export default class LoadingSpinner extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   root: ?HTMLElement;
 
   render(): Node {
     const intl = this.context;
     const { showText } = this.props;
-    const textComp = (
-      <div className={styles.text}>
-        {intl.formatMessage(messages.text)}
-      </div>);
+    const textComp = <div className={styles.text}>{intl.formatMessage(messages.text)}</div>;
 
     return (
       <div className={styles.component}>
-        <div className={styles.wrapper} ref={(div) => { this.root = div; }} />
+        <div
+          className={styles.wrapper}
+          ref={div => {
+            this.root = div;
+          }}
+        />
         {showText === true && textComp}
       </div>
     );

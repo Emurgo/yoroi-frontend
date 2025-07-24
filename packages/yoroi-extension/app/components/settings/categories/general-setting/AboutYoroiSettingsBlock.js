@@ -248,10 +248,7 @@ const AboutYoroiSettingsBlock = ({ wallet, onSwitchNetwork, fcmToken }: Props): 
 
         {(environment.isDev() || environment.isNightly()) && (
           <>
-            <LabelWithValue
-              label="FCM Token:"
-              value={fcmToken ?? ''}
-            />
+            <LabelWithValue label="FCM Token:" value={fcmToken ?? ''} />
           </>
         )}
       </Box>

@@ -75,7 +75,7 @@ type State = {|
 
 @observer
 export default class WalletListDialog extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   state: State = {
     selectedWalletId: null,
@@ -108,14 +108,8 @@ export default class WalletListDialog extends Component<Props, State> {
   render(): Node {
     const intl = this.context;
 
-    const {
-      shouldHideBalance,
-      onAddWallet,
-      onUpdateHideBalance,
-      cardanoWallets,
-      unitOfAccountSetting,
-      getCurrentPrice,
-    } = this.props;
+    const { shouldHideBalance, onAddWallet, onUpdateHideBalance, cardanoWallets, unitOfAccountSetting, getCurrentPrice } =
+      this.props;
 
     const walletsTotal = this.renderWalletsTotal();
 
@@ -226,9 +220,7 @@ export default class WalletListDialog extends Component<Props, State> {
     );
   }
 
-  sumWallets(
-    wallets: Array<WalletInfo>
-  ): {|
+  sumWallets(wallets: Array<WalletInfo>): {|
     sum: MultiToken | null,
     fiat: BigNumber | null,
   |} {
