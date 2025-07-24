@@ -15,7 +15,6 @@ type Props = {|
 const networkNames = Object.freeze({
   CardanoMainnet: globalMessages.mainnet,
   CardanoPreprodTestnet: globalMessages.preprod,
-  CardanoPreviewTestnet: globalMessages.preview,
 });
 
 @observer

@@ -24,10 +24,6 @@ class AddNewWallet extends WalletCommonBase {
     locator: 'connectHWWallet-selectPreprodNetwork-button',
     method: 'id',
   };
-  previewNetworkButtonLocator = {
-    locator: 'connectHWWallet-selectPreviewNetwork-button',
-    method: 'id',
-  };
   // ::start HW connect section
   trezorHWButtonLocator = {
     locator: '.WalletConnectHWOptionDialog_connectTrezor',
@@ -95,9 +91,6 @@ class AddNewWallet extends WalletCommonBase {
     switch (network) {
       case CardanoNetworks.PP:
         networkButtonLocator = this.preprodNetworkButtonLocator;
-        break;
-      case CardanoNetworks.PV:
-        networkButtonLocator = this.previewNetworkButtonLocator;
         break;
       default:
         networkButtonLocator = this.mainnetNetworkButtonLocator;
