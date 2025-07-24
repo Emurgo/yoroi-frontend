@@ -47,8 +47,8 @@ const TransactionTable = ({ history, tokenName }: { history: TransactionItemType
           new Date(title).getDate() === today.getDate()
             ? strings.today
             : new Date(title).getDate() === yesterday.getDate()
-            ? strings.yesterday
-            : moment(title).format('MMMM DD, YYYY'),
+              ? strings.yesterday
+              : moment(title).format('MMMM DD, YYYY'),
         data: _.chain(data)
           .sortBy(item => new Date(item.time).getTime())
           .reverse()
@@ -137,15 +137,15 @@ const TransactionHistoryItem = ({ index, row, theme, strings, unitOfAccount, hea
                 row.type === HistoryItemType.SENT || row.type === HistoryItemType.DELEGATE
                   ? theme.palette.ds.primary_100
                   : row.type === HistoryItemType.RECEIVED || row.type === HistoryItemType.WITHDRAW
-                  ? theme.palette.ds.secondary_100
-                  : theme.palette.ds.sys_magenta_100,
+                    ? theme.palette.ds.secondary_100
+                    : theme.palette.ds.sys_magenta_100,
               '&:hover': {
                 backgroundColor:
                   row.type === HistoryItemType.SENT || row.type === HistoryItemType.DELEGATE
                     ? theme.palette.ds.primary_100
                     : row.type === HistoryItemType.RECEIVED || row.type === HistoryItemType.WITHDRAW
-                    ? theme.palette.ds.secondary_100
-                    : theme.palette.ds.sys_magenta_100,
+                      ? theme.palette.ds.secondary_100
+                      : theme.palette.ds.sys_magenta_100,
               },
             }}
           >

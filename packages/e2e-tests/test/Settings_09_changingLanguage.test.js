@@ -25,9 +25,9 @@ describe('Changing language through the Settings', function () {
       lang: 'ja-JP',
       btnTransalation: '一般',
     },
-        {
+    {
       lang: 'ko-KR',
-      btnTransalation: '일반'
+      btnTransalation: '일반',
     },
     {
       lang: 'zh-Hans',
@@ -47,7 +47,7 @@ describe('Changing language through the Settings', function () {
     },
     {
       lang: 'fr-FR',
-      btnTransalation: 'Général'
+      btnTransalation: 'Général',
     },
     {
       lang: 'pt-BR',

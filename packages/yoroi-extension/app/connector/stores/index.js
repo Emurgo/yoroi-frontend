@@ -58,50 +58,44 @@ const stores: StoresMap = (observable({
   substores: null,
 }): any);
 
-function initializeSubstore<T: {...}>(
-  substore: T,
-): void {
-  Object
-    .keys(substore)
+function initializeSubstore<T: { ... }>(substore: T): void {
+  Object.keys(substore)
     .map(key => substore[key])
     .forEach(store => store.initialize());
 }
 
-export default (action(
-  (
-    api: Api,
-  ): Promise<StoresMap> => {
-    const storeNames = Object.keys(storeClasses);
-    storeNames.forEach(name => {
-      if (stores[name]) stores[name].teardown();
-    });
-    storeNames.forEach(name => {
-      stores[name] = (new storeClasses[name](stores, api): any);
-    });
-    storeNames.forEach(name => {
-      if (stores[name]) stores[name].initialize();
-    });
+export default (action((api: Api): Promise<StoresMap> => {
+  const storeNames = Object.keys(storeClasses);
+  storeNames.forEach(name => {
+    if (stores[name]) stores[name].teardown();
+  });
+  storeNames.forEach(name => {
+    stores[name] = (new storeClasses[name](stores, api): any);
+  });
+  storeNames.forEach(name => {
+    if (stores[name]) stores[name].initialize();
+  });
 
-    /** Add currency specific stores
-     * Note: we have to split up th setup and the initialization
-     * Because to make sure all substores are non-null we have to create the object
-     * But we only want to actually initialize it if it is the currency in use */
-    stores.substores = {
-      ada: setupAdaStores((stores: any), api),
-    };
+  /** Add currency specific stores
+   * Note: we have to split up th setup and the initialization
+   * Because to make sure all substores are non-null we have to create the object
+   * But we only want to actually initialize it if it is the currency in use */
+  stores.substores = {
+    ada: setupAdaStores((stores: any), api),
+  };
 
-    const loadedStores: StoresMap = (stores: any);
-    initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
+  const loadedStores: StoresMap = (stores: any);
+  initializeSubstore<AdaStoresMap>(loadedStores.substores.ada);
 
-    // Perform load after all setup is done to ensure migration can modify store state
-    return loadedStores.loading.load()
-      .then(() => console.debug('connector / loading store loaded'))
-      .catch(e => console.error('connector / loading store load failed', e))
-      .then(() => {
-        return loadedStores;
-      });
-  }
-): (Api) => Promise<StoresMap>);
+  // Perform load after all setup is done to ensure migration can modify store state
+  return loadedStores.loading
+    .load()
+    .then(() => console.debug('connector / loading store loaded'))
+    .catch(e => console.error('connector / loading store load failed', e))
+    .then(() => {
+      return loadedStores;
+    });
+}): Api => Promise<StoresMap>);
 
 export type ConnectorStoresProps = {|
   +stores: StoresMap,

@@ -4,9 +4,7 @@ import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
 import { ReactComponent as YoroiRevampLogo } from '../../../assets/images/yoroi-logo-revamp-blue.inline.svg';
-import {
-  ReactComponent as YoroiRevampNightlyLogo
-} from '../../../assets/images/yoroi-logo-revamp-nightly-blue.inline.svg';
+import { ReactComponent as YoroiRevampNightlyLogo } from '../../../assets/images/yoroi-logo-revamp-nightly-blue.inline.svg';
 import { Box, Typography } from '@mui/material';
 import globalMessages from '../../../i18n/global-messages';
 
@@ -16,7 +14,7 @@ type Props = {|
 
 @observer
 export default class IntroBanner extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   getRevampLogo: void => string = () => {
     if (this.props.isNightly) return YoroiRevampNightlyLogo;
     return YoroiRevampLogo;
@@ -36,7 +34,7 @@ export default class IntroBanner extends Component<Props> {
         }}
       >
         <Box mb="24px">
-          <RevampLogo/>
+          <RevampLogo />
         </Box>
 
         <Box textAlign="center">

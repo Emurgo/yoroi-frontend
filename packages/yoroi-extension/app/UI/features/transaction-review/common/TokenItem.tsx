@@ -10,20 +10,35 @@ interface TokenItemProps {
 }
 
 const getDecimals = (tokenInfo: any) => {
+  if (!tokenInfo) return 0;
+
   if (typeof tokenInfo.decimals === 'number') {
     return tokenInfo.decimals;
-  }
-  if (typeof tokenInfo.info?.numberOfDecimals === 'number') {
-    return tokenInfo.info.numberOfDecimals;
   }
   if (typeof tokenInfo.numberOfDecimals === 'number') {
     return tokenInfo.numberOfDecimals;
   }
+  if (tokenInfo.info && typeof tokenInfo.info.numberOfDecimals === 'number') {
+    return tokenInfo.info.numberOfDecimals;
+  }
   return 0;
+};
+
+const getTokenName = (tokenInfo: any): string => {
+  if (!tokenInfo) return '';
+  
+  if (typeof tokenInfo.name === 'string') return tokenInfo.name;
+
+  if (tokenInfo.info && typeof tokenInfo.info.name === 'string') {
+    return tokenInfo.info.name;
+  }
+  
+  return '';
 };
 
 export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, tokenInfo, quantity }: TokenItemProps) => {
   const decimals = getDecimals(tokenInfo);
+  const tokenName = getTokenName(tokenInfo);
 
   const value = new BigNumber(quantity).shiftedBy(-decimals).toString();
   if (isSent) {
@@ -32,7 +47,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, 
     return (
       <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
         <Typography variant="body1" color={primaryColor}>
-          {value} {tokenInfo.name || tokenInfo?.info.name}
+          {value} {tokenName}
         </Typography>
       </Box>
     );
@@ -43,7 +58,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, 
   return (
     <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
       <Typography variant="body1" color={primaryColor}>
-        {value} {tokenInfo.name || tokenInfo?.info.name}
+        {value} {tokenName}
       </Typography>
     </Box>
   );

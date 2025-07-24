@@ -84,10 +84,7 @@ describe('dApp, getUtxos, nested tests', function () {
       const getUtxosResponse = await mockedDApp.getUTXOs();
       expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
       expect(getUtxosResponse.retValue).to.be.an('array').that.is.not.empty;
-      const sumUtxosAmount = getUtxosResponse.retValue.reduce(
-        (accumulator, utxo) => accumulator + parseFloat(utxo.amount),
-        0
-      );
+      const sumUtxosAmount = getUtxosResponse.retValue.reduce((accumulator, utxo) => accumulator + parseFloat(utxo.amount), 0);
       const sumInAda = sumUtxosAmount / adaInLovelaces;
       expect(sumInAda).to.equal(testWallet1.balance);
     });

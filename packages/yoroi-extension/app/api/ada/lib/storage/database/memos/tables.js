@@ -1,6 +1,6 @@
 // @flow
 
-import { Type, } from 'lovefield';
+import { Type } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
 export type TxMemoTableInsertCommon = {|
@@ -32,12 +32,13 @@ export const TxMemoSchema: {|
     Content: 'Content',
     Digest: 'Digest',
     TransactionHash: 'TransactionHash',
-    LastUpdated: 'LastUpdated'
-  }
+    LastUpdated: 'LastUpdated',
+  },
 };
 
-export const populateMemoTransactionsDb: lf$schema$Builder => void = (schemaBuilder) => {
-  schemaBuilder.createTable(TxMemoSchema.name)
+export const populateMemoTransactionsDb: lf$schema$Builder => void = schemaBuilder => {
+  schemaBuilder
+    .createTable(TxMemoSchema.name)
     .addColumn(TxMemoSchema.properties.WalletId, Type.STRING)
     .addColumn(TxMemoSchema.properties.Content, Type.STRING)
     .addColumn(TxMemoSchema.properties.TransactionHash, Type.STRING)

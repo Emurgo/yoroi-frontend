@@ -10,7 +10,11 @@ interface NftCardProps {
 
 export default function NftCard({ ipfsUrl, name, onClick, nftPathId }: NftCardProps) {
   return (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer' }} onClick={onClick} id={`${nftPathId}-component-button`}>
+    <Box
+      sx={{ height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer' }}
+      onClick={onClick}
+      id={`${nftPathId}-component-button`}
+    >
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
         <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId} />
       </Box>

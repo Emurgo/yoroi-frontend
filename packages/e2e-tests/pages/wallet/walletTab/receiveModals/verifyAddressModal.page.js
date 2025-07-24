@@ -38,20 +38,9 @@ class VerifyAddressModal extends BasePage {
   // isDisplayed
   async isDisplayed() {
     this.logger.info(`ReceiveSubTab::VerifyAddressModal::isDisplayed is called.`);
-    const modalIsFoundPromise = this.customWaitIsPresented(
-      this.verifyAddressModalLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const titleIsFoundPromise = this.customWaitIsPresented(
-      this.verifyAddressModalTitleLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const [modalIsFound, titleIsFound] = await Promise.all([
-      modalIsFoundPromise,
-      titleIsFoundPromise,
-    ]);
+    const modalIsFoundPromise = this.customWaitIsPresented(this.verifyAddressModalLocator, fiveSeconds, quarterSecond);
+    const titleIsFoundPromise = this.customWaitIsPresented(this.verifyAddressModalTitleLocator, fiveSeconds, quarterSecond);
+    const [modalIsFound, titleIsFound] = await Promise.all([modalIsFoundPromise, titleIsFoundPromise]);
     return modalIsFound && titleIsFound;
   }
   // closeModal

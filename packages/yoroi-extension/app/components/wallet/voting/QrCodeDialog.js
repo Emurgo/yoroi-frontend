@@ -52,7 +52,7 @@ type Props = {|
 const QR_ID = 'qr-vote';
 @observer
 export default class QrCodeDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stepsList, progressInfo, submit, cancel, votingKey } = this.props;

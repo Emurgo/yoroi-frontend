@@ -9,19 +9,15 @@ import AnnotatedLoader from '../../transfer/AnnotatedLoader';
 
 import type { Node } from 'react';
 
-type Props = {|
-|};
+type Props = {||};
 
 @observer
 export default class CreateTxExecutingDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     return (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <AnnotatedLoader
           title={intl.formatMessage(globalMessages.processingLabel)}
           details={intl.formatMessage(globalMessages.txGeneration)}

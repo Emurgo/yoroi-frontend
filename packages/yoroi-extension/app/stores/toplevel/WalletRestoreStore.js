@@ -59,24 +59,17 @@ export async function isWalletExist(
   selectedNetwork: $ReadOnly<NetworkRow>
 ): Promise<WalletState | void> {
   const rootPk = cardanoGenerateWalletRootKey(recoveryPhrase);
-  const accountPublicKey = rootPk
-    .derive(WalletTypePurpose.CIP1852)
-    .derive(CoinTypes.CARDANO)
-    .derive(accountIndex)
-    .to_public();
+  const accountPublicKey = rootPk.derive(WalletTypePurpose.CIP1852).derive(CoinTypes.CARDANO).derive(accountIndex).to_public();
   const publicKey = bytesToHex(accountPublicKey.as_bytes());
 
   for (const wallet of wallets) {
     const existedPublicKey = wallet.publicKey;
-    const walletNetworkId = wallet.networkId
+    const walletNetworkId = wallet.networkId;
     /**
      * We will still allow to restore the wallet on a different networks even they are
      * sharing the same recovery phrase but we are treating them differently
      */
-    if (
-      publicKey === existedPublicKey &&
-      walletNetworkId === selectedNetwork.NetworkId
-    ) {
+    if (publicKey === existedPublicKey && walletNetworkId === selectedNetwork.NetworkId) {
       return wallet;
     }
   }
@@ -85,30 +78,30 @@ export async function isWalletExist(
 // <TODO:PENDING_REMOVAL> BIP44 , PAPER
 export type RestoreModeType =
   | {|
-  type: 'bip44',
-  extra: void,
-  length: typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
-|}
+      type: 'bip44',
+      extra: void,
+      length: typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT,
+    |}
   | {|
-  type: 'cip1852',
-  extra: void,
-  chain?: number,
-  length:
-    | typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
-    | typeof config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT,
-|}
+      type: 'cip1852',
+      extra: void,
+      chain?: number,
+      length:
+        | typeof config.wallets.WALLET_RECOVERY_PHRASE_WORD_COUNT
+        | typeof config.wallets.DAEDALUS_SHELLEY_RECOVERY_PHRASE_WORD_COUNT,
+    |}
   | {|
-  // note: we didn't allow paper wallet creation during the ITN
-  // but we did allow paper wallet restoration
-  type: 'bip44' | 'cip1852',
-  extra: 'paper',
-  length: typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
-  chain?: number,
-|}
+      // note: we didn't allow paper wallet creation during the ITN
+      // but we did allow paper wallet restoration
+      type: 'bip44' | 'cip1852',
+      extra: 'paper',
+      length: typeof config.wallets.YOROI_PAPER_RECOVERY_PHRASE_WORD_COUNT,
+      chain?: number,
+    |}
   | {|
-  type: 'bip44' | 'cip1852',
-  extra: 'ledger' | 'trezor',
-|};
+      type: 'bip44' | 'cip1852',
+      extra: 'ledger' | 'trezor',
+    |};
 
 export type WalletRestoreMeta = {|
   recoveryPhrase: string,
@@ -139,8 +132,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap> {
   @action
   verifyMnemonic: void => Promise<void> = async () => {
     const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null)
-      throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
+    if (selectedNetwork == null) throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
 
     await this.stores.substores.ada.walletRestore.startWalletRestore();
   };
@@ -152,14 +144,9 @@ export default class AdaWalletRestoreStore extends Store<StoresMap> {
     const resolvedRecoveryPhrase = restoreMeta.recoveryPhrase;
 
     const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null)
-      throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
+    if (selectedNetwork == null) throw new Error(`${nameof(this.submitWalletRestoringFields)} no network selected`);
 
-    const plates = generatePlates(
-      resolvedRecoveryPhrase,
-      this.selectedAccount,
-      selectedNetwork
-    );
+    const plates = generatePlates(resolvedRecoveryPhrase, this.selectedAccount, selectedNetwork);
 
     runInAction(() => {
       this.recoveryResult = {
@@ -171,12 +158,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap> {
     // Check for wallet duplication.
     const wallets = this.stores.wallets.wallets;
     const accountIndex = this.stores.walletRestore.selectedAccount;
-    const duplicatedWallet = await isWalletExist(
-      wallets,
-      resolvedRecoveryPhrase,
-      accountIndex,
-      selectedNetwork
-    );
+    const duplicatedWallet = await isWalletExist(wallets, resolvedRecoveryPhrase, accountIndex, selectedNetwork);
 
     runInAction(() => {
       this.step = duplicatedWallet ? RestoreSteps.WALLET_EXIST : RestoreSteps.VERIFY_MNEMONIC;
@@ -205,10 +187,7 @@ export default class AdaWalletRestoreStore extends Store<StoresMap> {
     this.selectedAccount = 0 + HARD_DERIVATION_START;
   }
 
-  isValidMnemonic: ({|
-    mnemonic: string,
-    mode: RestoreModeType,
-  |}) => boolean = request => {
+  isValidMnemonic: ({| mnemonic: string, mode: RestoreModeType |}) => boolean = request => {
     return AdaApi.isValidMnemonic({
       mnemonic: request.mnemonic,
       // $FlowIgnore[prop-missing]
@@ -228,9 +207,11 @@ export function generatePlates(
     NUMBER_OF_VERIFIED_ADDRESSES,
     Number.parseInt(network.BaseConfig[0].ChainNetworkId, 10)
   );
-  return [{
-    ...shelleyPlate,
-    checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
-    addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
-  }];
+  return [
+    {
+      ...shelleyPlate,
+      checksumTitle: messages.walletRestoreVerifyShelleyAccountIdLabel,
+      addressMessage: messages.walletRestoreVerifyShelleyAddressesLabel,
+    },
+  ];
 }

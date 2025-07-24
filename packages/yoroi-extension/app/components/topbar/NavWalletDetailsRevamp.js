@@ -60,7 +60,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
     showEyeIcon: true,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const {
       shouldHideBalance,
@@ -96,9 +96,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
       >
         <div className={styles.outerWrapper}>
           <button type="button" onClick={openWalletInfoDialog} className={styles.contentWrapper}>
-            <Box marginRight="8px">
-              {iconComponent}
-            </Box>
+            <Box marginRight="8px">{iconComponent}</Box>
             <div className={styles.content}>
               <div className={styles.walletInfo}>
                 <Typography component="div" variant="body2" fontWeight={500} sx={{ color: 'grayscale.900' }}>
@@ -116,7 +114,7 @@ export default class NavWalletDetailsRevamp extends Component<Props> {
                     '& .MuiTypography-root': {
                       mt: '0px',
                       mb: '0px',
-                    }
+                    },
                   }}
                   className={classnames([totalAmount ? styles.amount : styles.spinnerWrapper])}
                 >

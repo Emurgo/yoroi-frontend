@@ -17,10 +17,7 @@ export const mochaHooks = {
         break;
       } catch (error) {
         if (error.message.includes('Timeout') && attempts < maxAttempts - 1) {
-          console.warn(
-            `[beforeAll] Creating driver error (attempt ${attempts + 1}):`,
-            error.message
-          );
+          console.warn(`[beforeAll] Creating driver error (attempt ${attempts + 1}):`, error.message);
           const sleepPromise = new Promise(resolve => setTimeout(resolve, retryDelay));
           sleepPromise.then(() => console.log('[beforeAll] Waited for 2 seconds'));
           attempts++;
@@ -39,11 +36,7 @@ export const mochaHooks = {
       this.skip();
     }
     // Skip subsequent tests if the describe block failed
-    if (
-      this.currentTest.parent.tests.some(
-        test => test.state === 'failed' || test.state === 'pending'
-      )
-    ) {
+    if (this.currentTest.parent.tests.some(test => test.state === 'failed' || test.state === 'pending')) {
       this.skip();
     }
     done();

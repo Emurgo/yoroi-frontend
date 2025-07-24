@@ -25,7 +25,7 @@ describe('Changing language on the initial screen', function () {
     },
     {
       lang: 'ko-KR',
-      btnTransalation: '계속'
+      btnTransalation: '계속',
     },
     {
       lang: 'zh-Hans',
@@ -45,7 +45,7 @@ describe('Changing language on the initial screen', function () {
     },
     {
       lang: 'fr-FR',
-      btnTransalation: 'Continuer'
+      btnTransalation: 'Continuer',
     },
     {
       lang: 'pt-BR',

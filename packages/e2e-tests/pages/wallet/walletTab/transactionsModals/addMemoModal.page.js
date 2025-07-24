@@ -71,11 +71,7 @@ class AddMemoDialog extends BasePage {
   }
   async modalIsClosed() {
     this.logger.info(`AddMemoDialog::modalIsClosed is called.`);
-    return await this.customWaitIsNotPresented(
-      this.addMemoDialogWindowLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    return await this.customWaitIsNotPresented(this.addMemoDialogWindowLocator, fiveSeconds, quarterSecond);
   }
 }
 

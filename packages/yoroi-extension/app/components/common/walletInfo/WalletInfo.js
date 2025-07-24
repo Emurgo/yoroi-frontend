@@ -37,7 +37,7 @@ type Props = {|
 
 @observer
 export default class WalletInfo extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const { shouldHideBalance, onUpdateHideBalance, walletAmount, conceptualWalletName } = this.props;
 
@@ -78,10 +78,7 @@ export default class WalletInfo extends Component<Props> {
     );
   }
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| shouldHideBalance: boolean, amount: ?MultiToken |}) => Node = request => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }

@@ -20,7 +20,7 @@ type Props = {|
 |};
 
 export default class MaxAssetsError extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -33,10 +33,7 @@ export default class MaxAssetsError extends Component<Props> {
           </Typography>
         </Stack>
         <Typography component="div" variant="body1" color="grayscale.900">
-          <FormattedMessage
-            {...messages.maxNumberAllowed}
-            values={{ number: String(this.props.maxAssetsAllowed), strong }}
-          />
+          <FormattedMessage {...messages.maxNumberAllowed} values={{ number: String(this.props.maxAssetsAllowed), strong }} />
         </Typography>
       </Box>
     );

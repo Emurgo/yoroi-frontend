@@ -40,20 +40,22 @@ const initializeDappConnector: void => Promise<void> = async () => {
     throw new Error('Root element not found.');
   }
   const AMPLI_FLUSH_INTERVAL_MS = 5000;
-  const isAnalyticsAllowd = (new LocalStorageApi()).loadIsAnalyticsAllowed();
-  await ampli.load(({
-    environment: environment.isProduction() ? 'production' : 'development',
-    client: {
-      configuration: {
-        optOut: !isAnalyticsAllowd,
-        flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-        trackingOptions: {
-          ipAddress: false,
+  const isAnalyticsAllowd = new LocalStorageApi().loadIsAnalyticsAllowed();
+  await ampli.load(
+    ({
+      environment: environment.isProduction() ? 'production' : 'development',
+      client: {
+        configuration: {
+          optOut: !isAnalyticsAllowd,
+          flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
+          trackingOptions: {
+            ipAddress: false,
+          },
+          defaultTracking: false,
         },
-        defaultTracking: false,
       },
-    },
-  }: LoadOptionsWithEnvironment)).promise;
+    }: LoadOptionsWithEnvironment)
+  ).promise;
 
   const root = createRoot(container);
   root.render(<App stores={stores} />);

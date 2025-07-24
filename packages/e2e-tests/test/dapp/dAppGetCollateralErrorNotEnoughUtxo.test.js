@@ -60,9 +60,7 @@ describe('dApp, getCollateral, error, empty wallet', function () {
   it('Getting collateral for 1 ADA', async function () {
     const collateralResponse = await mockedDApp.getCollateral(String(1 * adaInLovelaces));
     expect(collateralResponse.success, 'The request getCollateral was successful').to.be.false;
-    expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(
-      ApiErrorCode.InternalError
-    );
+    expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(ApiErrorCode.InternalError);
     expect(collateralResponse.errMsg.info, 'Error message is empty').to.not.be.empty;
   });
 
