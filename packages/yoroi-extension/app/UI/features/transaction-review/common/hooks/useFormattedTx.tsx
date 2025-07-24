@@ -94,7 +94,7 @@ const formatOutputs = (
 
     const multiAssets = Object.entries(output.amount.multiasset ?? []).flatMap(([policyId, assets]: any) => {
       return Object.entries(assets).map(([assetId, amount]) => {
-        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`)?.info;
+        const tokenInfo: any = allAssetList?.find(asset => asset.info.id === `${policyId}.${assetId}`);
         const quantity: any = asQuantity(String(amount));
 
         const fallbackTokenInfo = {
