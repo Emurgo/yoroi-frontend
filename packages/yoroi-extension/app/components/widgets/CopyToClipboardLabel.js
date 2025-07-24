@@ -28,11 +28,7 @@ function CopyToClipboardLabel({ text, children, intl }: Props & Intl): Node {
   return (
     <CopyToClipboard text={text} onCopy={onCopyText}>
       <Tooltip
-        title={
-          isCopied
-            ? intl.formatMessage(copyableMessages.copied)
-            : intl.formatMessage(copyableMessages.copyTooltipMessage)
-        }
+        title={isCopied ? intl.formatMessage(copyableMessages.copied) : intl.formatMessage(copyableMessages.copyTooltipMessage)}
         placement="top"
       >
         <ButtonBase

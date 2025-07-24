@@ -25,10 +25,7 @@ const promisifyPbkdf2: (Uint8Array, Buffer) => Promise<Buffer> = (password, salt
   });
 };
 
-export async function encryptWithPassword(
-  passwordBuf: Uint8Array,
-  dataBytes: Uint8Array
-): Promise<string> {
+export async function encryptWithPassword(passwordBuf: Uint8Array, dataBytes: Uint8Array): Promise<string> {
   const salt = hexToBytes(cryptoRandomString({ length: 2 * 16 }));
   const nonce = hexToBytes(cryptoRandomString({ length: 2 * 12 }));
   const data = Buffer.from(dataBytes);

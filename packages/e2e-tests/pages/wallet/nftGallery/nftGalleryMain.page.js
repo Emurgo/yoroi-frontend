@@ -102,16 +102,8 @@ export default class NftGalleryTab extends WalletCommonBase {
   async isDisplayed() {
     this.logger.info(`NftGalleryTab::isDisplayed is called`);
     const titleIsCorrectPromise = this.titleIsCorrect(pageTitle.nfts);
-    const counterTitleIsDisplayedPromise = this.customWaitIsPresented(
-      this.nftsCountTextLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const searchIsDisplayedPromise = this.customWaitIsPresented(
-      this.searchInputLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const counterTitleIsDisplayedPromise = this.customWaitIsPresented(this.nftsCountTextLocator, fiveSeconds, quarterSecond);
+    const searchIsDisplayedPromise = this.customWaitIsPresented(this.searchInputLocator, fiveSeconds, quarterSecond);
     const [titleState, counterState, searchState] = await Promise.all([
       titleIsCorrectPromise,
       counterTitleIsDisplayedPromise,
@@ -129,11 +121,7 @@ export default class NftGalleryTab extends WalletCommonBase {
     const counterText = await this.getText(this.nftsCountTextLocator);
     const counterArray = counterText.split(' ');
     const noNftsText = await this.getText(this.noNftsTextLocator);
-    const noNftsImageIsDisplayed = await this.customWaitIsPresented(
-      this.noNftsFoundImageLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const noNftsImageIsDisplayed = await this.customWaitIsPresented(this.noNftsFoundImageLocator, fiveSeconds, quarterSecond);
 
     return counterArray.length === 1 && noNftsText === NO_NFTS_ADDED && noNftsImageIsDisplayed;
   }
@@ -144,11 +132,7 @@ export default class NftGalleryTab extends WalletCommonBase {
   async noNftsAreFoundIsDisplayed() {
     this.logger.info(`NftGalleryTab::noNftsAreFoundIsDisplayed is called`);
     const noNftsText = await this.getText(this.noNftsTextLocator);
-    const noNftsImageIsDisplayed = await this.customWaitIsPresented(
-      this.noNftsFoundImageLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const noNftsImageIsDisplayed = await this.customWaitIsPresented(this.noNftsFoundImageLocator, fiveSeconds, quarterSecond);
 
     return noNftsText === NO_NFTS_FOUND && noNftsImageIsDisplayed;
   }
@@ -178,13 +162,8 @@ export default class NftGalleryTab extends WalletCommonBase {
   }
   async fourColumnsViewIsSelected() {
     this.logger.info(`NftGalleryTab::fourColumnsViewIsSelected is called`);
-    const backgroundValue = await this.getCssValue(
-      this.fourColumnViewBtnLocator,
-      'background-color'
-    );
-    this.logger.info(
-      `NftGalleryTab::fourColumnsViewIsSelected. backgroundValue: ${backgroundValue}`
-    );
+    const backgroundValue = await this.getCssValue(this.fourColumnViewBtnLocator, 'background-color');
+    this.logger.info(`NftGalleryTab::fourColumnsViewIsSelected. backgroundValue: ${backgroundValue}`);
     return backgroundValue !== 'rgba(0, 0, 0, 0)';
   }
   /**
@@ -199,13 +178,8 @@ export default class NftGalleryTab extends WalletCommonBase {
   }
   async sixColumnsViewIsSelected() {
     this.logger.info(`NftGalleryTab::sixColumnsViewIsSelected is called`);
-    const backgroundValue = await this.getCssValue(
-      this.sixColumnViewBtnLocator,
-      'background-color'
-    );
-    this.logger.info(
-      `NftGalleryTab::sixColumnsViewIsSelected. backgroundValue: ${backgroundValue}`
-    );
+    const backgroundValue = await this.getCssValue(this.sixColumnViewBtnLocator, 'background-color');
+    this.logger.info(`NftGalleryTab::sixColumnsViewIsSelected. backgroundValue: ${backgroundValue}`);
     return backgroundValue !== 'rgba(0, 0, 0, 0)';
   }
   /**

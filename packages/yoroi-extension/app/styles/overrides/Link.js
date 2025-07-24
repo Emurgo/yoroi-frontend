@@ -33,10 +33,10 @@ export const LightLink = {
       },
       ':visited': {
         color: ltDs.primary_700,
-      }
+      },
     },
   },
-}
+};
 
 export const DarkLink = {
   styleOverrides: {
@@ -63,7 +63,7 @@ export const DarkLink = {
       },
       ':visited': {
         color: dtDs.primary_700,
-      }
+      },
     },
   },
-}
+};

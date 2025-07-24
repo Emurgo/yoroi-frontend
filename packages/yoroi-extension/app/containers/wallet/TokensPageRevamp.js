@@ -2,11 +2,7 @@
 import { observer } from 'mobx-react';
 import { Component } from 'react';
 import type { Node } from 'react';
-import {
-  genLookupOrFail,
-  getTokenIdentifierIfExists,
-  getTokenStrictName,
-} from '../../stores/stateless/tokenHelpers';
+import { genLookupOrFail, getTokenIdentifierIfExists, getTokenStrictName } from '../../stores/stateless/tokenHelpers';
 import { splitAmount, truncateToken } from '../../utils/formatters';
 import TokensPage from '../../components/wallet/assets/Tokens';
 import type { StoresProps } from '../../stores';
@@ -22,10 +18,7 @@ export default class TokensPageRevamp extends Component<StoresProps> {
 
     const assetsList = (() => {
       if (spendableBalance == null) return [];
-      return [
-        spendableBalance.getDefaultEntry() ,
-        ...spendableBalance.nonDefaultEntries()
-      ]
+      return [spendableBalance.getDefaultEntry(), ...spendableBalance.nonDefaultEntries()]
         .map(entry => ({
           entry,
           info: getTokenInfo(entry),
@@ -34,17 +27,14 @@ export default class TokensPageRevamp extends Component<StoresProps> {
         .map(token => {
           const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
           const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
-          const [beforeDecimal, afterDecimal] = splitAmount(
-            shiftedAmount,
-            numberOfDecimals
-          );
+          const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
 
           return {
             name: truncateToken(getTokenStrictName(token.info).name ?? '-'),
             id: getTokenIdentifierIfExists(token.info) ?? '-',
             amount: [beforeDecimal, afterDecimal].join(''),
             amountForSorting: shiftedAmount,
-          }
+          };
         });
     })();
 

@@ -88,9 +88,7 @@ class GenerateURIModal extends BasePage {
     );
     if (messageAppeared) {
       const errMsg = await this.getText(this.inputErrorMessageFieldLocator);
-      this.logger.info(
-        `ReceiveSubTab::GenerateURIModal::getAmountErrorMessage:errMsg - "${errMsg}"`
-      );
+      this.logger.info(`ReceiveSubTab::GenerateURIModal::getAmountErrorMessage:errMsg - "${errMsg}"`);
       return errMsg;
     } else {
       return '';

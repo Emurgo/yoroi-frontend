@@ -18,25 +18,16 @@ class LedgerConnect extends BasePage {
   // functions
   async selectNanoS() {
     this.logger.info(`LedgerConnect::selectNanoS is called`);
-    await this.waitPresentedAndAct(
-      this.nanoSButtonLocator,
-      async () => await this.click(this.nanoSButtonLocator)
-    );
+    await this.waitPresentedAndAct(this.nanoSButtonLocator, async () => await this.click(this.nanoSButtonLocator));
   }
   async selectNanoX() {
     this.logger.info(`LedgerConnect::selectNanoS is called`);
-    await this.waitPresentedAndAct(
-      this.nanoXButtonLocator,
-      async () => await this.click(this.nanoXButtonLocator)
-    );
+    await this.waitPresentedAndAct(this.nanoXButtonLocator, async () => await this.click(this.nanoXButtonLocator));
   }
 
   async continue() {
     this.logger.info(`LedgerConnect::selectNanoS is called`);
-    await this.waitPresentedAndAct(
-      this.continueButtonLocator,
-      async () => await this.click(this.continueButtonLocator)
-    );
+    await this.waitPresentedAndAct(this.continueButtonLocator, async () => await this.click(this.continueButtonLocator));
   }
 }
 

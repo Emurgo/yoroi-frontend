@@ -40,20 +40,18 @@ class CreateWalletStepTwo extends AddWalletBase {
     this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow is called`);
     await this.waitPresentedAndAct(
       this.tipsModalLocator,
-      async () => await this.waitPresentedAndAct(
-        this.tipModalContinueButtonLocator,
-        async () => await this.click(this.tipModalContinueButtonLocator)
-      )
+      async () =>
+        await this.waitPresentedAndAct(
+          this.tipModalContinueButtonLocator,
+          async () => await this.click(this.tipModalContinueButtonLocator)
+        )
     );
   }
   async recoveryPhraseIsBlurred() {
     this.logger.info(`CreateWalletStepTwo::recoveryPhraseIsBlurred is called`);
     const allWordsBlurValues = [];
     for (let wordIndex = 0; wordIndex < 15; wordIndex++) {
-      const blurValue = await this.getCssValue(
-        this._getRecoveryPhraseWordLocator(wordIndex),
-        'filter'
-      );
+      const blurValue = await this.getCssValue(this._getRecoveryPhraseWordLocator(wordIndex), 'filter');
       allWordsBlurValues.push(blurValue);
     }
     return allWordsBlurValues.every(word => word.includes('blur'));

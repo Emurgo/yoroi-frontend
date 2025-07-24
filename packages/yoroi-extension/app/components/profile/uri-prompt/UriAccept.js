@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { Button } from '@mui/material';
 import { defineMessages, IntlContext, FormattedMessage } from 'react-intl';
 import styles from './UriAccept.scss';
-import { ReactComponent as UriPrompt }  from '../../../assets/images/uri/uri-prompt.inline.svg';
+import { ReactComponent as UriPrompt } from '../../../assets/images/uri/uri-prompt.inline.svg';
 import globalMessages from '../../../i18n/global-messages';
 import { strong, em } from '../../../i18n/htmlEmbeddedMessageHelper';
 
@@ -23,7 +23,7 @@ type Props = {|
 
 @observer
 export default class UriAccept extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -35,7 +35,7 @@ export default class UriAccept extends Component<Props> {
           </span>
 
           <div className={styles.explanation}>
-            <FormattedMessage {...messages.seePrompt} values={{ strong, em }}/>
+            <FormattedMessage {...messages.seePrompt} values={{ strong, em }} />
           </div>
 
           <div className={styles.buttonsWrapper}>
@@ -43,12 +43,7 @@ export default class UriAccept extends Component<Props> {
               {intl.formatMessage(globalMessages.backButtonLabel)}
             </Button>
 
-            <Button
-              variant="primary"
-              className="finishButton"
-              onClick={this.props.onConfirm}
-              sx={{ width: '287px' }}
-            >
+            <Button variant="primary" className="finishButton" onClick={this.props.onConfirm} sx={{ width: '287px' }}>
               {intl.formatMessage(globalMessages.finish)}
             </Button>
           </div>

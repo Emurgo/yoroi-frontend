@@ -6,27 +6,16 @@ import {
   type LedgerNanoCatalystRegistrationTxSignData,
   type TrezorTCatalystRegistrationTxSignData,
 } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import {
-  signAndBroadcastTransaction,
-  signTransaction,
-  broadcastTransaction,
-} from '../../api/thunk';
+import { signAndBroadcastTransaction, signTransaction, broadcastTransaction } from '../../api/thunk';
 import { observable } from 'mobx';
 import Request from '../lib/LocalizedRequest';
 import { Logger, stringifyError, stringifyData, fullErrStr } from '../../utils/logging';
-import {
-  buildConnectorSignedTransaction as ledgerBuildConnectorSignedTransaction
-} from '../../api/ada/transactions/shelley/ledgerTx';
-import {
-  buildConnectorSignedTransaction as trezorBuildConnectorSignedTransaction
-} from '../../api/ada/transactions/shelley/trezorTx';
+import { buildConnectorSignedTransaction as ledgerBuildConnectorSignedTransaction } from '../../api/ada/transactions/shelley/ledgerTx';
+import { buildConnectorSignedTransaction as trezorBuildConnectorSignedTransaction } from '../../api/ada/transactions/shelley/trezorTx';
 import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import { convertToLocalizableError as ledgerConvertToLocalizableError } from '../../domain/LedgerLocalizedError';
 import type { Addressing, Address, Value } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import {
-  generateCip15RegistrationMetadata,
-  generateRegistrationMetadata,
-} from '../../api/ada/lib/cardanoCrypto/catalyst';
+import { generateCip15RegistrationMetadata, generateRegistrationMetadata } from '../../api/ada/lib/cardanoCrypto/catalyst';
 import { TxAuxiliaryDataSupplementType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { fail } from '../../coreUtils';
 import { transactionHexToBodyHex } from '../../api/ada/lib/cardanoCrypto/utils';
@@ -45,9 +34,7 @@ export type SendUsingTrezorParams = {|
 |};
 
 export default class TransactionProcessingStore extends Store<StoresMap> {
-  @observable sendMoneyRequest: SendMoneyRequest = new Request<
-    DeferredCall<{| txId: string |}>
-  >(request => request());
+  @observable sendMoneyRequest: SendMoneyRequest = new Request<DeferredCall<{| txId: string |}>>(request => request());
 
   sendAndRefresh: ({|
     publicDeriverId: void | number,
@@ -73,10 +60,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
               },
             });
           } catch (error) {
-            Logger.error(
-              `${nameof(TransactionProcessingStore)}::${nameof(this.sendAndRefresh)} error: ` +
-                stringifyError(error)
-            );
+            Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.sendAndRefresh)} error: ` + stringifyError(error));
             throw new Error('An error has ocurred when saving the transaction memo.');
           }
         }
@@ -128,10 +112,8 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         });
       };
     } else {
-      throw new Error(
-        `${nameof(TransactionProcessingStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`
-      );
-    };
+      throw new Error(`${nameof(TransactionProcessingStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`);
+    }
     await this.sendAndRefresh({
       publicDeriverId: wallet.publicDeriverId,
       broadcastRequest,
@@ -191,24 +173,26 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
   /*
     mnemonic
   */
-  mnemonicWalletSignAndBroadcast: {|
+  mnemonicWalletSignAndBroadcast: ({|
     signRequest: HaskellShelleyTxSignRequest,
     password: string,
     publicDeriverId: number,
-  |} => Promise<{| txId: string |}> = async (request) => {
+  |}) => Promise<{| txId: string |}> = async request => {
     try {
       const { txId } = await signAndBroadcastTransaction(request);
       return { txId };
     } catch (error) {
-      Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.mnemonicWalletSignAndBroadcast)} error: ${fullErrStr(error)}` );
+      Logger.error(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.mnemonicWalletSignAndBroadcast)} error: ${fullErrStr(error)}`
+      );
       throw error;
     }
-  }
+  };
 
   /*
     trezor
   */
-  trezorSignAndBroadcast: {|
+  trezorSignAndBroadcast: ({|
     signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
@@ -218,15 +202,17 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       stakingAddressing: Addressing,
       ...
     },
-  |} => Promise<{| txId: string |}> = async (request) => {
+  |}) => Promise<{| txId: string |}> = async request => {
     try {
-      Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignAndBroadcast)} called: ` + stringifyData(request));
+      Logger.debug(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignAndBroadcast)} called: ` + stringifyData(request)
+      );
 
       const { signedTxHex, txId, metadata } = await this.trezorSignRawTx({
         rawTxHex: request.signRequest.self().build_tx().to_hex(),
         wallet: request.wallet,
         catalystData: request.signRequest.trezorTCatalystRegistrationTxSignData,
-        changeAddrs: request.signRequest.changeAddr, 
+        changeAddrs: request.signRequest.changeAddr,
       });
 
       if (metadata) {
@@ -240,12 +226,14 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
 
       return { txId };
     } catch (error) {
-      Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignAndBroadcast)} error: ` + stringifyError(error));
+      Logger.error(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignAndBroadcast)} error: ` + stringifyError(error)
+      );
       throw new trezorConvertToLocalizableError(error);
     }
-  }
+  };
 
-  trezorSignRawTx: {|
+  trezorSignRawTx: ({|
     rawTxHex: string,
     +wallet: {
       publicDeriverId: number,
@@ -257,18 +245,15 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     },
     changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     catalystData?: TrezorTCatalystRegistrationTxSignData,
-  |} => Promise<{|
+  |}) => Promise<{|
     signedTxHex: string,
     txId: string,
-    metadata: ?RustModule.WalletV4.AuxiliaryData
-  |}> = async (request) => {
+    metadata: ?RustModule.WalletV4.AuxiliaryData,
+  |}> = async request => {
     try {
       Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} called: ` + stringifyData(request));
 
-      const addressingMap = genAddressingLookup(
-        request.wallet.networkId,
-        this.stores.addresses.addressSubgroupMap,
-      );
+      const addressingMap = genAddressingLookup(request.wallet.networkId, this.stores.addresses.addressSubgroupMap);
 
       const network = getNetworkById(request.wallet.networkId);
 
@@ -285,13 +270,13 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         changeAddrs: request.changeAddrs,
       });
 
-      const trezorSignTxPayload = response.hw === 'trezor' ? response.result.trezorSignTxPayload
-        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for trezor: ' + JSON.stringify(response));
+      const trezorSignTxPayload =
+        response.hw === 'trezor'
+          ? response.result.trezorSignTxPayload
+          : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for trezor: ' + JSON.stringify(response));
 
       const trezorSignTxResp = await wrapWithFrame(trezor => {
-        return trezor.cardanoSignTransaction(
-          JSON.parse(JSON.stringify({ ...trezorSignTxPayload }))
-        );
+        return trezor.cardanoSignTransaction(JSON.parse(JSON.stringify({ ...trezorSignTxPayload })));
       });
 
       if (trezorSignTxResp && trezorSignTxResp.payload && trezorSignTxResp.payload.error != null) {
@@ -307,33 +292,20 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       let metadata;
 
       if (request.catalystData) {
-        const {
-          votingPublicKey,
-          stakingKey: stakingKeyHex,
-          paymentAddress,
-          nonce,
-        } = request.catalystData;
+        const { votingPublicKey, stakingKey: stakingKeyHex, paymentAddress, nonce } = request.catalystData;
 
         const auxDataSupplement = trezorSignTxResp.payload.auxiliaryDataSupplement;
-        if (
-          !auxDataSupplement
-          || auxDataSupplement.type !== 1
-          || auxDataSupplement.governanceSignature == null
-        ) {
+        if (!auxDataSupplement || auxDataSupplement.type !== 1 || auxDataSupplement.governanceSignature == null) {
           // noinspection ExceptionCaughtLocallyJS
-          throw new Error(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} unexpected Trezor sign transaction response`);
+          throw new Error(
+            `${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} unexpected Trezor sign transaction response`
+          );
         }
         const catalystSignature = auxDataSupplement.governanceSignature;
 
-        metadata = generateRegistrationMetadata(
-          votingPublicKey,
-          stakingKeyHex,
-          paymentAddress,
-          nonce,
-          (_hashedMetadata) => {
-            return catalystSignature;
-          },
-        );
+        metadata = generateRegistrationMetadata(votingPublicKey, stakingKeyHex, paymentAddress, nonce, _hashedMetadata => {
+          return catalystSignature;
+        });
         // We can verify that
         //  Buffer.from(
         //    blake2b(256 / 8).update(metadata.to_bytes()).digest('binary')
@@ -344,7 +316,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       const { txHex, txId } = trezorBuildConnectorSignedTransaction(
         request.rawTxHex,
         trezorSignTxResp.payload.witnesses,
-        metadata,
+        metadata
       );
 
       return { signedTxHex: txHex, txId, metadata };
@@ -352,12 +324,12 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.trezorSignRawTx)} error: ` + stringifyError(error));
       throw new trezorConvertToLocalizableError(error);
     }
-  }
+  };
 
   /*
     ledger
   */
-  ledgerWalletSignAndBroadcast: {|
+  ledgerWalletSignAndBroadcast: ({|
     signRequest: HaskellShelleyTxSignRequest,
     +wallet: {
       publicDeriverId: number,
@@ -367,9 +339,11 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
       hardwareWalletDeviceId: ?string,
       ...
     },
-  |} => Promise<{| txId: string |}> = async (request) => {
+  |}) => Promise<{| txId: string |}> = async request => {
     try {
-      Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} called: ` + stringifyData(request));
+      Logger.debug(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} called: ` + stringifyData(request)
+      );
 
       // only when handling Byron wallet transfer this value is different from `request.wallet.networkId`
       const mainnetNetworkIdForByronTransfer = request.signRequest.networkSettingSnapshot.NetworkId;
@@ -397,12 +371,14 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
 
       return { txId };
     } catch (error) {
-      Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} error: ` + stringifyError(error));
+      Logger.error(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignAndBroadcast)} error: ` + stringifyError(error)
+      );
       throw new ledgerConvertToLocalizableError(error);
     }
   };
 
-  ledgerWalletSignRawTx: {|
+  ledgerWalletSignRawTx: ({|
     rawTxHex: string,
     +wallet: {
       publicDeriverId: number,
@@ -414,16 +390,18 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     },
     changeAddrs: Array<{| ...Address, ...Value, ...Addressing |}>,
     // The purpose of this parameter is to support transfering from Byron address when initializing
-   //  Ledger wallets. It is needed because the wallet's utxos property no longer contains Byron UTxOs.
+    //  Ledger wallets. It is needed because the wallet's utxos property no longer contains Byron UTxOs.
     additionalSenderUtxos?: Array<CardanoAddressedUtxo>,
     catalystData?: LedgerNanoCatalystRegistrationTxSignData,
-  |} => Promise<{|
+  |}) => Promise<{|
     signedTxHex: string,
     txId: string,
-    metadata: ?RustModule.WalletV4.AuxiliaryData
-  |}> = async (request) => {
+    metadata: ?RustModule.WalletV4.AuxiliaryData,
+  |}> = async request => {
     try {
-      Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} called: ` + stringifyData(request));
+      Logger.debug(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} called: ` + stringifyData(request)
+      );
 
       const publicKeyInfo = {
         key: RustModule.WalletV4.Bip32PublicKey.from_hex(request.wallet.publicKey),
@@ -435,12 +413,11 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
 
       const expectedSerial = request.wallet.hardwareWalletDeviceId || '';
 
-      const addressingMap = genAddressingLookup(
-        request.wallet.networkId,
-        this.stores.addresses.addressSubgroupMap,
-      );
+      const addressingMap = genAddressingLookup(request.wallet.networkId, this.stores.addresses.addressSubgroupMap);
 
-      Logger.debug(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} called: ` + stringifyData(request));
+      Logger.debug(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} called: ` + stringifyData(request)
+      );
 
       const ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
@@ -461,10 +438,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
 
       const txBodyHex = transactionHexToBodyHex(rawTxHex);
 
-      const addressedUtxos = [
-        ...await this.stores.wallets.getAddressedUtxos(),
-        ...(request.additionalSenderUtxos || [])
-      ];
+      const addressedUtxos = [...(await this.stores.wallets.getAddressedUtxos()), ...(request.additionalSenderUtxos || [])];
 
       const response = this.api.ada.createHwSignTxDataFromRawTx('ledger', {
         txBodyHex,
@@ -476,11 +450,13 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         changeAddrs: request.changeAddrs,
       });
 
-      const ledgerSignTxPayload = response.hw === 'ledger' ? response.result.ledgerSignTxPayload
-        : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for ledger: ' + JSON.stringify(response));
+      const ledgerSignTxPayload =
+        response.hw === 'ledger'
+          ? response.result.ledgerSignTxPayload
+          : fail('Unecpected response type from `createHwSignTxDataFromRawTx` for ledger: ' + JSON.stringify(response));
 
       let ledgerSignTxResp;
-      try{
+      try {
         ledgerSignTxResp = await ledgerConnect.signTransaction({
           serial: expectedSerial,
           params: ledgerSignTxPayload,
@@ -496,43 +472,26 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
 
       let metadata;
       if (request.catalystData) {
-        const {
-          votingPublicKey,
-          stakingKey,
-          paymentAddress,
-          nonce,
-        } = request.catalystData;
+        const { votingPublicKey, stakingKey, paymentAddress, nonce } = request.catalystData;
 
         if (
           !ledgerSignTxResp.auxiliaryDataSupplement ||
-            (ledgerSignTxResp.auxiliaryDataSupplement.type !==
-              TxAuxiliaryDataSupplementType.CIP36_REGISTRATION)
+          ledgerSignTxResp.auxiliaryDataSupplement.type !== TxAuxiliaryDataSupplementType.CIP36_REGISTRATION
         ) {
-          throw new Error(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} unexpected Ledger sign transaction response`);
+          throw new Error(
+            `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} unexpected Ledger sign transaction response`
+          );
         }
-        const { cip36VoteRegistrationSignatureHex } =
-          ledgerSignTxResp.auxiliaryDataSupplement;
+        const { cip36VoteRegistrationSignatureHex } = ledgerSignTxResp.auxiliaryDataSupplement;
 
         if (ledgerSupportsCip36) {
-          metadata = generateRegistrationMetadata(
-            votingPublicKey,
-            stakingKey,
-            paymentAddress,
-            nonce,
-            (_hashedMetadata) => {
-              return cip36VoteRegistrationSignatureHex;
-            },
-          );
+          metadata = generateRegistrationMetadata(votingPublicKey, stakingKey, paymentAddress, nonce, _hashedMetadata => {
+            return cip36VoteRegistrationSignatureHex;
+          });
         } else {
-          metadata = generateCip15RegistrationMetadata(
-            votingPublicKey,
-            stakingKey,
-            paymentAddress,
-            nonce,
-            (_hashedMetadata) => {
-              return cip36VoteRegistrationSignatureHex;
-            },
-          );
+          metadata = generateCip15RegistrationMetadata(votingPublicKey, stakingKey, paymentAddress, nonce, _hashedMetadata => {
+            return cip36VoteRegistrationSignatureHex;
+          });
         }
         // We can verify that
         //  Buffer.from(
@@ -546,15 +505,15 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
         ledgerSignTxResp.witnesses,
         publicKeyInfo,
         metadata,
-        new Map((request.additionalSenderUtxos || []).map(
-          ({ addressing, receiver }) => [addressing.path.join('/'), receiver]
-        )),
+        new Map((request.additionalSenderUtxos || []).map(({ addressing, receiver }) => [addressing.path.join('/'), receiver]))
       );
 
       return { signedTxHex: txHex, txId, metadata };
     } catch (error) {
-      Logger.error(`${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} error: ` + stringifyError(error));
+      Logger.error(
+        `${nameof(TransactionProcessingStore)}::${nameof(this.ledgerWalletSignRawTx)} error: ` + stringifyError(error)
+      );
       throw new ledgerConvertToLocalizableError(error);
     }
-  }
+  };
 }

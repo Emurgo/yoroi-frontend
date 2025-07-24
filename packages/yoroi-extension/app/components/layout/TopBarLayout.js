@@ -63,7 +63,7 @@ function TopBarLayout({
             overflow: 'scroll',
           }}
         >
-          {(
+          {
             <Box
               sx={{
                 bgcolor: bgcolor || 'ds.bg_color_max',
@@ -93,7 +93,7 @@ function TopBarLayout({
                 </Box>
               </Box>
             </Box>
-          )}
+          }
         </Box>
       </>
     );

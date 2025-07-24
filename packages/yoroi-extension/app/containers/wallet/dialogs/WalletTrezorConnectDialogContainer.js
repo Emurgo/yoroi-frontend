@@ -16,20 +16,19 @@ import type { StoresProps } from '../../../stores';
 import { ampli } from '../../../../ampli/index';
 
 type LocalProps = {|
-  +onClose: (void) => void,
+  +onClose: void => void,
   +onBack: void => void,
 |};
 
 @observer
 export default class WalletTrezorConnectDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-
   getSelectedNetwork: void => $ReadOnly<NetworkRow> = () => {
     const { selectedNetwork } = this.props.stores.profile;
     if (selectedNetwork === undefined) {
       throw new Error(`${nameof(WalletTrezorConnectDialogContainer)} no API selected`);
     }
     return selectedNetwork;
-  }
+  };
 
   cancel: void => void = () => {
     this.props.onClose();
@@ -55,7 +54,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             }}
             cancel={this.cancel}
             onBack={this.props.onBack}
-          />);
+          />
+        );
         break;
       case ProgressStep.CONNECT:
         component = (
@@ -64,13 +64,14 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             isActionProcessing={trezorConnectStore.isActionProcessing}
             error={trezorConnectStore.error}
             onExternalLinkClick={handleExternalLinkClick}
-            goBack={()=>{
+            goBack={() => {
               trezorConnectStore.goBackToCheck();
               ampli.connectWalletCheckPageViewed();
             }}
             submit={trezorConnectStore.submitConnect}
             cancel={this.cancel}
-          />);
+          />
+        );
         break;
       case ProgressStep.SAVE:
         component = (
@@ -82,7 +83,8 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             submit={trezorConnectStore.submitSave}
             cancel={this.cancel}
-          />);
+          />
+        );
         break;
       default:
         Logger.error(`${nameof(WalletTrezorConnectDialogContainer)}::render: something unexpected happened`);

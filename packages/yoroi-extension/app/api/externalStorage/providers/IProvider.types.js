@@ -8,25 +8,21 @@ export type UploadExternalTxMemoRequest = {|
   memo: TxMemoTableInsert,
 |};
 export type UploadExternalTxMemoResponse = boolean;
-export type UploadExternalTxMemoFunc = (
-  request: UploadExternalTxMemoRequest
-) => Promise<UploadExternalTxMemoResponse>;
+export type UploadExternalTxMemoFunc = (request: UploadExternalTxMemoRequest) => Promise<UploadExternalTxMemoResponse>;
 
 // Delete
 export type DeleteExternalTxMemoRequest = TxMemoLookupKey;
 export type DeleteExternalTxMemoResponse = boolean;
-export type DeleteExternalTxMemoFunc = (
-  request: DeleteExternalTxMemoRequest
-) => Promise<DeleteExternalTxMemoResponse>;
+export type DeleteExternalTxMemoFunc = (request: DeleteExternalTxMemoRequest) => Promise<DeleteExternalTxMemoResponse>;
 
 // Fetch Filenames
 export type FetchFilenameExternalTxMemoRequest = {|
   walletId: string,
 |};
 export type FetchFilenameExternalTxMemoResponse = Array<{|
-    tx: string,
-    deleted: boolean,
-    lastUpdated: Date
+  tx: string,
+  deleted: boolean,
+  lastUpdated: Date,
 |}>;
 export type FetchFilenameExternalTxMemoFunc = (
   request: FetchFilenameExternalTxMemoRequest
@@ -53,8 +49,8 @@ export type CreateFolderExternalTxMemoFunc = (
 // Get Metadata
 export type GetMetadataExternalTxMemoRequest = string;
 export type GetMetadataExternalTxMemoResponse = {|
-    tag: string,
-    lastUpdated: Date
+  tag: string,
+  lastUpdated: Date,
 |};
 export type GetMetadataExternalTxMemoFunc = (
   request: GetMetadataExternalTxMemoRequest
@@ -64,14 +60,12 @@ export type GetMetadataExternalTxMemoFunc = (
 export type DownloadExternalTxMemoRequest = TxMemoLookupKey;
 export type DownloadExternalTxMemoResponse = {|
   content: string,
-  lastUpdated: Date
+  lastUpdated: Date,
 |};
-export type DownloadExternalTxMemoFunc = (
-  request: DownloadExternalTxMemoRequest
-) => Promise<DownloadExternalTxMemoResponse>;
+export type DownloadExternalTxMemoFunc = (request: DownloadExternalTxMemoRequest) => Promise<DownloadExternalTxMemoResponse>;
 
 export interface IProvider {
-  setup(body:void): void;
+  setup(body: void): void;
 
   revokeToken(body: void): Promise<void>;
 
@@ -82,14 +76,12 @@ export interface IProvider {
    */
   fetchFolder(body: FetchFolderExternalTxMemoRequest): Promise<FetchFolderExternalTxMemoResponse>;
 
-  createFolder(body: CreateFolderExternalTxMemoRequest):
-    Promise<CreateFolderExternalTxMemoResponse>;
+  createFolder(body: CreateFolderExternalTxMemoRequest): Promise<CreateFolderExternalTxMemoResponse>;
 
   /**
    * Sync with external storage folder to catch up with changes (updated/deleted files)
    */
-  fetchFilenames(body: FetchFilenameExternalTxMemoRequest):
-    Promise<FetchFilenameExternalTxMemoResponse>;
+  fetchFilenames(body: FetchFilenameExternalTxMemoRequest): Promise<FetchFilenameExternalTxMemoResponse>;
 
   /**
    * Upload file without overwriting

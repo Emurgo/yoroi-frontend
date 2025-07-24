@@ -59,14 +59,14 @@ function getStyles(active: boolean): Object {
       ':hover': {
         borderBottomColor: 'ds.text_primary_max',
         color: 'ds.text_primary_max',
-      }
+      },
     };
   } else {
     componentStyles = {
       color: 'ds.text_gray_low',
       ':hover': {
         color: 'ds.text_gray_medium',
-      }
+      },
     };
   }
 

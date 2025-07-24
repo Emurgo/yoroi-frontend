@@ -20,7 +20,7 @@ export default class BaseCoinPriceStore<
       ...
     },
     ...
-  }
+  },
 > extends Store<TStores> {
   @observable currentPriceTickers: Array<{| From: string, To: string, Price: number |}> = [];
   @observable lastUpdateTimestamp: number | null = null;
@@ -84,10 +84,7 @@ export default class BaseCoinPriceStore<
     return String(price.Price);
   };
 
-  updateTransactionPriceData: ({|
-    timestamps: Array<number>,
-    defaultToken: string,
-  |}) => Promise<void> = async request => {
+  updateTransactionPriceData: ({| timestamps: Array<number>, defaultToken: string |}) => Promise<void> = async request => {
     const unitOfAccount = await this.stores.profile.getUnitOfAccountBlock();
     if (!unitOfAccount.enabled) return;
 

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { IntlContext, defineMessages, FormattedMessage } from 'react-intl';
 import styles from './TestnetWarningBanner.scss';
 import environment from '../../../environment';
-import { ReactComponent as ShelleyTestnetWarningSvg }  from '../../../assets/images/shelley-testnet-warning.inline.svg';
+import { ReactComponent as ShelleyTestnetWarningSvg } from '../../../assets/images/shelley-testnet-warning.inline.svg';
 
 const messages = defineMessages({
   testnetLabel: {
@@ -24,18 +24,16 @@ type Props = {|
 
 @observer
 export default class TestnetWarningBanner extends Component<Props> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): null | Node {
     if (environment.isNightly()) {
       return (
         <div className={styles.shelleyTestnetWarning}>
-          <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
+          <span key="0" className={styles.shelleyTestnetWarningIcon}>
+            <ShelleyTestnetWarningSvg />
+          </span>
           <div className={styles.text}>
-            <FormattedMessage
-              {...messages.nightlyLabel}
-              key="1"
-            />
+            <FormattedMessage {...messages.nightlyLabel} key="1" />
           </div>
         </div>
       );
@@ -43,12 +41,11 @@ export default class TestnetWarningBanner extends Component<Props> {
     if (this.props.isTestnet) {
       return (
         <div className={styles.shelleyTestnetWarning}>
-          <span key="0" className={styles.shelleyTestnetWarningIcon}><ShelleyTestnetWarningSvg /></span>
+          <span key="0" className={styles.shelleyTestnetWarningIcon}>
+            <ShelleyTestnetWarningSvg />
+          </span>
           <div className={styles.text}>
-            <FormattedMessage
-              {...messages.testnetLabel}
-              key="1"
-            />
+            <FormattedMessage {...messages.testnetLabel} key="1" />
           </div>
         </div>
       );

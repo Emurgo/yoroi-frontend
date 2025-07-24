@@ -11,7 +11,6 @@ type Props = {|
 
 @observer
 export default class ChangeWalletPasswordDialogContainer extends Component<{| ...Props, ...StoresProps |}> {
-
   render(): Node {
     const { stores } = this.props;
     const { uiDialogs, walletSettings } = stores;
@@ -24,12 +23,12 @@ export default class ChangeWalletPasswordDialogContainer extends Component<{| ..
           newPasswordValue: uiDialogs.getActiveData<string>('newPasswordValue'),
           repeatedPasswordValue: uiDialogs.getActiveData<string>('repeatedPasswordValue'),
         }}
-        onSave={async (values) => {
+        onSave={async values => {
           const { oldPassword, newPassword } = values;
           await stores.walletSettings.updateSigningPassword({
             publicDeriverId: this.props.publicDeriverId,
             oldPassword,
-            newPassword
+            newPassword,
           });
         }}
         onCancel={() => {

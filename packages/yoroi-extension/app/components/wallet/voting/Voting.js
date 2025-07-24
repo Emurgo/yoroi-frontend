@@ -48,8 +48,7 @@ const messages = defineMessages({
   },
   trezorTRequirement: {
     id: 'wallet.voting.trezorTRequirement',
-    defaultMessage:
-      '!!!<updateLink>Update</updateLink> your Trezor device firmware version to 2.4.1 or above.',
+    defaultMessage: '!!!<updateLink>Update</updateLink> your Trezor device firmware version to 2.4.1 or above.',
   },
   ledgerNanoRequirement: {
     id: 'wallet.voting.ledgerNanoRequirement',
@@ -86,7 +85,7 @@ const WarningWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class Voting extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     showDisclamer: true,
   };
@@ -172,7 +171,9 @@ export default class Voting extends Component<Props, State> {
                     <FormattedMessage
                       {...messages.ledgerNanoRequirement}
                       values={{
-                        updateLink: makeLink('https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/'),
+                        updateLink: makeLink(
+                          'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/catalyst/update-ledger-app/'
+                        ),
                         ledgerLiveLink: makeLink('https://www.ledger.com/ledger-live'),
                       }}
                     />
@@ -180,7 +181,7 @@ export default class Voting extends Component<Props, State> {
                     <FormattedMessage
                       {...messages.trezorTRequirement}
                       values={{
-                        updateLink:makeLink('https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware'),
+                        updateLink: makeLink('https://wiki.trezor.io/User_manual:Updating_the_Trezor_device_firmware'),
                       }}
                     />
                   )

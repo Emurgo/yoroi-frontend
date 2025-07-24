@@ -25,7 +25,7 @@ type Props = {|
 
 @observer
 export default class HelpLinkBlock extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { onExternalLinkClick } = this.props;

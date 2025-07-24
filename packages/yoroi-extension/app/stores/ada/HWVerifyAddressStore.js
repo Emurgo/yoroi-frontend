@@ -6,27 +6,15 @@ import { wrapWithFrame } from '../lib/TrezorWrapper';
 
 import LocalizableError from '../../i18n/LocalizableError';
 
-import type {
-  BIP32Path
-} from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import type { BIP32Path } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 
-import {
-  Logger,
-  stringifyError,
-} from '../../utils/logging';
+import { Logger, stringifyError } from '../../utils/logging';
 
-import {
-  convertToLocalizableError as ledgerErrorToLocalized
-} from '../../domain/LedgerLocalizedError';
-import {
-  convertToLocalizableError as trezorErrorToLocalized
-} from '../../domain/TrezorLocalizedError';
-import { normalizeToAddress, } from '../../api/ada/lib/storage/bridge/utils';
+import { convertToLocalizableError as ledgerErrorToLocalized } from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError as trezorErrorToLocalized } from '../../domain/TrezorLocalizedError';
+import { normalizeToAddress } from '../../api/ada/lib/storage/bridge/utils';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
-import {
-  getNetworkById,
-  getCardanoHaskellBaseConfig,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById, getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { toTrezorAddressParameters } from '../../api/ada/transactions/shelley/trezorTx';
 import { toLedgerAddressParameters } from '../../api/ada/transactions/shelley/ledgerTx';
 import type { StandardAddress } from '../../types/AddressFilterTypes';
@@ -44,9 +32,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
     super.setup();
   }
 
-  @action verifyAddress: (WalletState) => Promise<void> = async (
-    wallet,
-  ) => {
+  @action verifyAddress: WalletState => Promise<void> = async wallet => {
     Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.verifyAddress)} called`);
 
     if (!this.selectedAddress) {
@@ -74,41 +60,36 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
     }
 
     this._setActionProcessing(false);
-  }
+  };
 
   trezorVerifyAddress: (BIP32Path, string, $ReadOnly<NetworkRow>) => Promise<void> = async (
     path,
     address,
-    network,
+    network
   ): Promise<void> => {
-    const config = getCardanoHaskellBaseConfig(network)
-      .reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
 
     const wasmAddr = normalizeToAddress(address);
-    if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)} invalid address ${address}`);
-    const addressParams = toTrezorAddressParameters(
-      wasmAddr,
-      path,
-    );
+    if (wasmAddr == null)
+      throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)} invalid address ${address}`);
+    const addressParams = toTrezorAddressParameters(wasmAddr, path);
     try {
-      await wrapWithFrame(trezor => trezor.cardanoGetAddress({
-        protocolMagic: config.ByronNetworkId,
-        networkId: Number.parseInt(config.ChainNetworkId, 10),
-        addressParameters: addressParams,
-      }));
+      await wrapWithFrame(trezor =>
+        trezor.cardanoGetAddress({
+          protocolMagic: config.ByronNetworkId,
+          networkId: Number.parseInt(config.ChainNetworkId, 10),
+          addressParameters: addressParams,
+        })
+      );
     } catch (error) {
       Logger.error(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)}::error: ` + stringifyError(error));
       this._setError(trezorErrorToLocalized(error));
     } finally {
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.trezorVerifyAddress)} finalized`);
     }
-  }
+  };
 
-  ledgerVerifyAddress: (BIP32Path, string, WalletState) => Promise<void> = async (
-    path,
-    expectedAddr,
-    wallet,
-  ) => {
+  ledgerVerifyAddress: (BIP32Path, string, WalletState) => Promise<void> = async (path, expectedAddr, wallet) => {
     try {
       this.ledgerConnect = new LedgerConnect({
         locale: this.stores.profile.currentLocale,
@@ -116,12 +97,14 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
 
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} show path ` + JSON.stringify(path));
 
-      const config = getCardanoHaskellBaseConfig(
-        getNetworkById(wallet.networkId)
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const config = getCardanoHaskellBaseConfig(getNetworkById(wallet.networkId)).reduce(
+        (acc, next) => Object.assign(acc, next),
+        {}
+      );
 
       const wasmAddr = normalizeToAddress(expectedAddr);
-      if (wasmAddr == null) throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${expectedAddr}`);
+      if (wasmAddr == null)
+        throw new Error(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} invalid address ${expectedAddr}`);
       const addressParams = toLedgerAddressParameters({
         address: wasmAddr,
         path,
@@ -138,7 +121,7 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
             network: {
               networkId: Number.parseInt(config.ChainNetworkId, 10),
               protocolMagic: config.ByronNetworkId,
-            }
+            },
           },
           serial: expectedSerial,
         });
@@ -152,20 +135,20 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
       this.ledgerConnect = undefined;
       Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.ledgerVerifyAddress)} finalized`);
     }
-  }
+  };
 
-  @action selectAddress: $ReadOnly<StandardAddress> => Promise<void> = async (params) => {
+  @action selectAddress: ($ReadOnly<StandardAddress>) => Promise<void> = async params => {
     Logger.info(`${nameof(HWVerifyAddressStore)}::${nameof(this.selectAddress)} called: ` + params.address);
     this.selectedAddress = params;
-  }
+  };
 
-  @action _setActionProcessing: boolean => void = (processing) => {
+  @action _setActionProcessing: boolean => void = processing => {
     this.isActionProcessing = processing;
-  }
+  };
 
-  @action _setError: ?LocalizableError => void = (error) => {
+  @action _setError: (?LocalizableError) => void = error => {
     this.error = error;
-  }
+  };
 
   @action closeAddressDetailDialog: void => void = () => {
     if (this.ledgerConnect != null) {
@@ -176,5 +159,5 @@ export default class HWVerifyAddressStore extends Store<StoresMap> {
     this._setError(null);
     this._setActionProcessing(false);
     this.stores.uiDialogs.closeActiveDialog();
-  }
+  };
 }
