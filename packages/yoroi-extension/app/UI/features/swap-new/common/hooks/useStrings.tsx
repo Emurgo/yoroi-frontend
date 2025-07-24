@@ -90,7 +90,8 @@ export const messages = Object.freeze(
     },
     slippageToleranceHigh: {
       id: 'swap.actions.slippageToleranceHigh',
-      defaultMessage: '!!!When the slippage tolerance is set really high, it allows the transaction to still complete despite large price swings. This can open the door to front-running and sandwich attacks.',
+      defaultMessage:
+        '!!!When the slippage tolerance is set really high, it allows the transaction to still complete despite large price swings. This can open the door to front-running and sandwich attacks.',
     },
   })
 );

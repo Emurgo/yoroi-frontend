@@ -56,7 +56,7 @@ type Props = {|
 
 @observer
 export default class WalletTransactionsListRevamp extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   // eslint-disable-next-line camelcase
   UNSAFE_componentWillMount(): void {
     this.localizedDateFormat = moment.localeData().longDateFormat('LL');
@@ -69,9 +69,7 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
   loadingSpinner: ?LoadingSpinner;
   localizedDateFormat: 'MM/DD/YYYY';
 
-  groupTransactionsByDay(
-    transactions: Array<WalletTransaction>
-  ): Array<{|
+  groupTransactionsByDay(transactions: Array<WalletTransaction>): Array<{|
     date: string,
     transactions: Array<WalletTransaction>,
   |}> {

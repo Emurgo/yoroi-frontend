@@ -42,7 +42,7 @@ type Props = {|
   +currentValue: ?number,
   +error?: ?LocalizableError,
   +isUseSandbox: ?boolean,
-  +onSetUseSandbox: null | (boolean) => *,
+  +onSetUseSandbox: null | (boolean => *),
 |};
 
 @observer
@@ -51,7 +51,7 @@ class BringCashbackSettings extends Component<Props> {
     error: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       cashbackWalletId: {
@@ -95,8 +95,7 @@ class BringCashbackSettings extends Component<Props> {
       </Dialog>
     ) : null;
 
-    const mainnetWallets =
-      cardanoWallets.filter(({ isTestnet }) => !isTestnet);
+    const mainnetWallets = cardanoWallets.filter(({ isTestnet }) => !isTestnet);
 
     return (
       <Box

@@ -1,8 +1,4 @@
-import {
-  defaultWaitTimeout,
-  fiveSeconds,
-  quarterSecond,
-} from '../../../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, quarterSecond } from '../../../../helpers/timeConstants.js';
 import BasePage from '../../../basepage.js';
 
 class DeleteMemoModal extends BasePage {
@@ -31,16 +27,8 @@ class DeleteMemoModal extends BasePage {
   // * isDisplayed
   async isDisplayed() {
     this.logger.info(`DeleteMemoModal::isDisplayed is called`);
-    const windowState = await this.customWaitIsPresented(
-      this.deleteDialogWindowLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const titleState = await this.customWaitIsPresented(
-      this.deleteDialogTitleLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const windowState = await this.customWaitIsPresented(this.deleteDialogWindowLocator, fiveSeconds, quarterSecond);
+    const titleState = await this.customWaitIsPresented(this.deleteDialogTitleLocator, fiveSeconds, quarterSecond);
     return windowState && titleState;
   }
   // * modal is not displayed

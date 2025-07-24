@@ -7,10 +7,7 @@ import { Logger } from '../../utils/logging';
 import { encryptWithPassword } from '../../utils/catalystCipher';
 import LocalizedRequest from '../lib/LocalizedRequest';
 import type { CreateVotingRegTxFunc } from '../../api/ada';
-import {
-  getCardanoHaskellBaseConfig,
-  getNetworkById,
-} from '../../api/ada/lib/storage/database/prepackaged/networks';
+import { getCardanoHaskellBaseConfig, getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import { generatePrivateKeyForCatalyst } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -21,15 +18,15 @@ import LocalizableError, { UnexpectedError } from '../../i18n/LocalizableError';
 import cryptoRandomString from 'crypto-random-string';
 import type { StoresMap } from '../index';
 import { generateRegistration } from '../../api/ada/lib/cardanoCrypto/catalyst';
-import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types'
-import { loadCatalystRoundInfo, saveCatalystRoundInfo, } from '../../api/localStorage';
+import type { CatalystRoundInfoResponse } from '../../api/ada/lib/state-fetch/types';
+import { loadCatalystRoundInfo, saveCatalystRoundInfo } from '../../api/localStorage';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { derivePublicByAddressing } from '../../api/ada/lib/cardanoCrypto/deriveByAddressing';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { getPrivateStakingKey, getProtocolParameters } from '../../api/thunk';
 import { bytesToHex, noop } from '../../coreUtils';
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
-import { IncorrectWalletPasswordError } from '../../api/common/errors'
+import { IncorrectWalletPasswordError } from '../../api/common/errors';
 
 export const ProgressStep = Object.freeze({
   GENERATE: 0,
@@ -40,12 +37,12 @@ export const ProgressStep = Object.freeze({
 });
 export type ProgressStepEnum = $Values<typeof ProgressStep>;
 export interface ProgressInfo {
-  currentStep: ProgressStepEnum,
-  stepState: StepStateEnum,
+  currentStep: ProgressStepEnum;
+  stepState: StepStateEnum;
 }
 
 export default class VotingStore extends Store<StoresMap> {
-  @observable progressInfo: ProgressInfo
+  @observable progressInfo: ProgressInfo;
   @observable encryptedKey: string | null = null;
   @observable catalystPrivateKey: RustModule.WalletV4.PrivateKey | void;
   @observable pin: Array<number>;
@@ -53,10 +50,9 @@ export default class VotingStore extends Store<StoresMap> {
   @observable catalystRoundInfo: ?CatalystRoundInfoResponse;
   @observable loadingCatalystRoundInfo: boolean = false;
   @observable
-  createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc>
-    = new LocalizedRequest<CreateVotingRegTxFunc>(
-      this.api.ada.createVotingRegTx
-    );
+  createVotingRegTx: LocalizedRequest<CreateVotingRegTxFunc> = new LocalizedRequest<CreateVotingRegTxFunc>(
+    this.api.ada.createVotingRegTx
+  );
 
   /** tracks if wallet balance changed during confirmation screen */
   @observable isStale: boolean = false;
@@ -96,30 +92,29 @@ export default class VotingStore extends Store<StoresMap> {
     runInAction(() => {
       this.catalystRoundInfo = data;
     });
-  }
+  };
 
   @action updateCatalystRoundInfo: void => Promise<void> = async () => {
     runInAction(() => {
-      this.loadingCatalystRoundInfo = true
-    })
+      this.loadingCatalystRoundInfo = true;
+    });
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) {
       runInAction(() => {
-        this.loadingCatalystRoundInfo = false
-      })
+        this.loadingCatalystRoundInfo = false;
+      });
       return;
     }
     const network = getNetworkById(publicDeriver.networkId);
-    const res = await this.stores.substores.ada.stateFetchStore.fetcher
-                .getCatalystRoundInfo({ network })
+    const res = await this.stores.substores.ada.stateFetchStore.fetcher.getCatalystRoundInfo({ network });
     runInAction(() => {
-      this.catalystRoundInfo = res
-      this.loadingCatalystRoundInfo = false
-    })
+      this.catalystRoundInfo = res;
+      this.loadingCatalystRoundInfo = false;
+    });
     if (res) {
       await saveCatalystRoundInfo(res);
     }
-  }
+  };
 
   @action goBackToRegister: void => void = () => {
     this.createVotingRegTx.reset();
@@ -144,9 +139,7 @@ export default class VotingStore extends Store<StoresMap> {
       throw new Error(`${nameof(this.submitConfirm)} no public deriver. Should never happen`);
     }
     let nextStep;
-    if (
-      selected.type !== 'mnemonic'
-    ) {
+    if (selected.type !== 'mnemonic') {
       await this.createTransaction(null);
       nextStep = ProgressStep.TRANSACTION;
     } else {
@@ -155,7 +148,7 @@ export default class VotingStore extends Store<StoresMap> {
     runInAction(() => {
       this.progressInfo.currentStep = nextStep;
       this.progressInfo.stepState = StepState.LOAD;
-    })
+    });
   };
 
   @action submitConfirmError: void => void = () => {
@@ -170,25 +163,24 @@ export default class VotingStore extends Store<StoresMap> {
     this.progressInfo.stepState = StepState.LOAD;
   };
 
-
   @action finishQRCode: void => void = () => {
     this.stores.uiDialogs.closeActiveDialog();
     this.stores.routing.goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS });
     this.reset({ justTransaction: false });
-  }
+  };
 
   @action submitRegister: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.TRANSACTION;
     this.progressInfo.stepState = StepState.LOAD;
   };
 
-  @action submitRegisterError: Error => void = (error) => {
+  @action submitRegisterError: Error => void = error => {
     this.error = convertToLocalizableError(error);
     this.progressInfo.currentStep = ProgressStep.REGISTER;
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  @action submitTransactionError: Error => void = (error) => {
+  @action submitTransactionError: Error => void = error => {
     this.error = convertToLocalizableError(error);
     this.progressInfo.currentStep = ProgressStep.TRANSACTION;
     this.progressInfo.stepState = StepState.ERROR;
@@ -212,7 +204,7 @@ export default class VotingStore extends Store<StoresMap> {
     const absSlotNumber = new BigNumber(currentAbsoluteSlot);
 
     const catalystPrivateKey = this.catalystPrivateKey;
-    if(catalystPrivateKey === undefined){
+    if (catalystPrivateKey === undefined) {
       throw new Error(`${nameof(this.createTransaction)} should never happen`);
     }
 
@@ -234,7 +226,6 @@ export default class VotingStore extends Store<StoresMap> {
           key: publicKey,
         },
       }).to_raw_key();
-
 
       if (publicDeriver.type === 'trezor') {
         votingRegTxPromise = this.createVotingRegTx.execute({
@@ -267,7 +258,6 @@ export default class VotingStore extends Store<StoresMap> {
       } else {
         throw new Error(`${nameof(this.createTransaction)} unexpected hardware wallet type`);
       }
-
     } else {
       if (spendingPassword === null) {
         throw new Error(`${nameof(this.createTransaction)} expect a password`);
@@ -303,10 +293,7 @@ export default class VotingStore extends Store<StoresMap> {
   };
 
   @action
-  signTransaction: ({|
-    password?: string,
-    wallet: WalletState,
-  |}) => Promise<void> = async request => {
+  signTransaction: ({| password?: string, wallet: WalletState |}) => Promise<void> = async request => {
     const signRequest = this.createVotingRegTx.result;
     if (signRequest == null) {
       throw new Error(`${nameof(this.signTransaction)} no tx to broadcast`);
@@ -320,9 +307,7 @@ export default class VotingStore extends Store<StoresMap> {
   };
 
   @action generateCatalystKey: void => Promise<void> = async () => {
-    Logger.info(
-      `${nameof(VotingStore)}::${nameof(this.generateCatalystKey)} called`
-    );
+    Logger.info(`${nameof(VotingStore)}::${nameof(this.generateCatalystKey)} called`);
 
     const pin = cryptoRandomString({ length: 4, type: 'numeric' });
     const pinArray = pin.split('').map(Number);
@@ -333,15 +318,13 @@ export default class VotingStore extends Store<StoresMap> {
     runInAction(() => {
       this.encryptedKey = key;
       this.pin = pinArray;
-      this.catalystPrivateKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(
-        rootKey.to_raw_key().as_bytes()
-      );
+      this.catalystPrivateKey = RustModule.WalletV4.PrivateKey.from_extended_bytes(rootKey.to_raw_key().as_bytes());
     });
   };
 
   @action cancel: void => void = () => {
     this.reset({ justTransaction: false });
-  }
+  };
   @action.bound
   reset(request: {| justTransaction: boolean |}): void {
     this.progressInfo = {

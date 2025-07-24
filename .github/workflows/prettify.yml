@@ -1,0 +1,43 @@
+name: Check formatting
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, ready_for_review]
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  Prettier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        id: node-cache
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ steps.nvm.outputs.NVMRC }}-modules-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ steps.nvm.outputs.NVMRC }}-modules-
+            ${{ runner.os }}-node-modules-
+
+      - name: Install packages
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: |
+          . install-all.sh
+
+      - name: Check code standards
+        run: npm run fmt:check

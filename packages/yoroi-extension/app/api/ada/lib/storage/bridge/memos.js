@@ -1,10 +1,7 @@
 // @flow
 
 import type { lf$Database } from 'lovefield';
-import {
-  getAllSchemaTables,
-  raii,
-} from '../database/utils';
+import { getAllSchemaTables, raii } from '../database/utils';
 import type { TxMemoTableInsertCommon, TxMemoTableInsert, TxMemoTableRow } from '../database/memos/tables';
 import { GetTxMemo } from '../database/memos/api/read';
 import { ModifyTxMemo } from '../database/memos/api/write';
@@ -31,8 +28,7 @@ export type TxMemoTablePreInsert = {|
   publicDeriverId: number,
   plateTextPart: string,
   memo: TxMemoTableInsertCommon,
-|}
-
+|};
 
 export type TxMemoTableUpsert = {|
   /*
@@ -42,7 +38,7 @@ export type TxMemoTableUpsert = {|
   publicDeriverId: number,
   plateTextPart: string,
   memo: TxMemoTableInsertCommon,
-|}
+|};
 
 // upsertTxMemo
 
@@ -51,9 +47,7 @@ export type UpsertTxMemoRequest = {|
   memo: TxMemoTableInsert | TxMemoTableRow,
 |};
 export type UpsertTxMemoResponse = $ReadOnly<TxMemoTableRow>;
-export type UpsertTxMemoFunc = (
-  request: UpsertTxMemoRequest
-) => Promise<UpsertTxMemoResponse>;
+export type UpsertTxMemoFunc = (request: UpsertTxMemoRequest) => Promise<UpsertTxMemoResponse>;
 
 // deleteTxMemo
 
@@ -62,9 +56,7 @@ export type DeleteTxMemoRequest = {|
   key: TxMemoLookupKey,
 |};
 export type DeleteTxMemoResponse = void;
-export type DeleteTxMemoFunc = (
-  request: DeleteTxMemoRequest
-) => Promise<DeleteTxMemoResponse>;
+export type DeleteTxMemoFunc = (request: DeleteTxMemoRequest) => Promise<DeleteTxMemoResponse>;
 
 // getAllTxMemo
 
@@ -72,65 +64,38 @@ export type GetAllTxMemoRequest = {|
   db: lf$Database,
 |};
 export type GetAllTxMemoResponse = $ReadOnlyArray<$ReadOnly<TxMemoTableRow>>;
-export type GetAllTxMemoFunc = (
-  request: GetAllTxMemoRequest
-) => Promise<GetAllTxMemoResponse>;
+export type GetAllTxMemoFunc = (request: GetAllTxMemoRequest) => Promise<GetAllTxMemoResponse>;
 
-export async function upsertTxMemo(
-  request: UpsertTxMemoRequest
-): Promise<UpsertTxMemoResponse> {
+export async function upsertTxMemo(request: UpsertTxMemoRequest): Promise<UpsertTxMemoResponse> {
   const deps = Object.freeze({
-    ModifyTxMemo
+    ModifyTxMemo,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii<UpsertTxMemoResponse>(
-    request.db,
-    depTables,
-    async tx => deps.ModifyTxMemo.upsertMemo(
-      request.db, tx,
-      request.memo
-    )
+  return await raii<UpsertTxMemoResponse>(request.db, depTables, async tx =>
+    deps.ModifyTxMemo.upsertMemo(request.db, tx, request.memo)
   );
 }
 
-export async function deleteTxMemo(
-  request: DeleteTxMemoRequest
-): Promise<DeleteTxMemoResponse> {
+export async function deleteTxMemo(request: DeleteTxMemoRequest): Promise<DeleteTxMemoResponse> {
   const deps = Object.freeze({
-    ModifyTxMemo
+    ModifyTxMemo,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii<DeleteTxMemoResponse>(
-    request.db,
-    depTables,
-    async tx => deps.ModifyTxMemo.deleteMemo(
-      request.db, tx,
-      request.key
-    )
+  return await raii<DeleteTxMemoResponse>(request.db, depTables, async tx =>
+    deps.ModifyTxMemo.deleteMemo(request.db, tx, request.key)
   );
 }
 
-export async function getAllTxMemo(
-  request: GetAllTxMemoRequest
-): Promise<GetAllTxMemoResponse> {
+export async function getAllTxMemo(request: GetAllTxMemoRequest): Promise<GetAllTxMemoResponse> {
   const deps = Object.freeze({
-    GetTxMemo
+    GetTxMemo,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.db, table));
-  return await raii<GetAllTxMemoResponse>(
-    request.db,
-    depTables,
-    async tx => deps.GetTxMemo.getAllMemos(
-      request.db, tx,
-    )
-  );
+  return await raii<GetAllTxMemoResponse>(request.db, depTables, async tx => deps.GetTxMemo.getAllMemos(request.db, tx));
 }

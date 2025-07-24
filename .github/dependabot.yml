@@ -1,15 +1,15 @@
 version: 2
 updates:
-- package-ecosystem: npm
-  directory: "/packages/e2e-tests"
-  schedule:
-    interval: weekly
-    day: friday
-    time: "03:00"
-    timezone: "Europe/London"
-  open-pull-requests-limit: 1
-  allow:
-    - dependency-name: "chromedriver"
-  assignees:
-    - "emurgo-rnd"
-  rebase-strategy: disabled
+  - package-ecosystem: npm
+    directory: '/packages/e2e-tests'
+    schedule:
+      interval: weekly
+      day: friday
+      time: '03:00'
+      timezone: 'Europe/London'
+    open-pull-requests-limit: 1
+    allow:
+      - dependency-name: 'chromedriver'
+    assignees:
+      - 'emurgo-rnd'
+    rebase-strategy: disabled

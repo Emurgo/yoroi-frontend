@@ -1,15 +1,10 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
-import {
-  op,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
+import { op } from 'lovefield';
 import * as Tables from '../tables';
 import type { TxMemoTableRow, TxMemoTableInsert } from '../tables';
-import { addOrReplaceRow, } from '../../utils';
+import { addOrReplaceRow } from '../../utils';
 import { GetEncryptionMeta } from '../../primitives/api/read';
 import { digestForHash } from '../../primitives/api/utils';
 
@@ -19,14 +14,14 @@ export class ModifyTxMemo {
   |} = Object.freeze({
     [Tables.TxMemoSchema.name]: Tables.TxMemoSchema,
   });
-  static depTables: {|GetEncryptionMeta: typeof GetEncryptionMeta|} = Object.freeze({
-    GetEncryptionMeta
+  static depTables: {| GetEncryptionMeta: typeof GetEncryptionMeta |} = Object.freeze({
+    GetEncryptionMeta,
   });
 
   static async upsertMemo(
     db: lf$Database,
     dbTx: lf$Transaction,
-    memo: TxMemoTableInsert | TxMemoTableRow,
+    memo: TxMemoTableInsert | TxMemoTableRow
   ): Promise<$ReadOnly<TxMemoTableRow>> {
     const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
     const digest = digestForHash(memo.TransactionHash, TransactionSeed);
@@ -35,9 +30,10 @@ export class ModifyTxMemo {
       Digest: digest,
     };
     return await addOrReplaceRow<{ ...TxMemoTableInsert, ... }, TxMemoTableRow>(
-      db, dbTx,
+      db,
+      dbTx,
       memoWithDigest,
-      ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name,
+      ModifyTxMemo.ownTables[Tables.TxMemoSchema.name].name
     );
   }
 
@@ -47,7 +43,7 @@ export class ModifyTxMemo {
     request: {|
       walletId: string,
       txHash: string,
-    |},
+    |}
   ): Promise<void> {
     const { TransactionSeed } = await ModifyTxMemo.depTables.GetEncryptionMeta.get(db, dbTx);
     const digest = digestForHash(request.txHash, TransactionSeed);
@@ -59,10 +55,7 @@ export class ModifyTxMemo {
       db
         .delete()
         .from(table)
-        .where(op.and(
-          table[properties.Digest].eq(digest),
-          table[properties.WalletId].eq(request.walletId),
-        ))
+        .where(op.and(table[properties.Digest].eq(digest), table[properties.WalletId].eq(request.walletId)))
     );
   }
 }

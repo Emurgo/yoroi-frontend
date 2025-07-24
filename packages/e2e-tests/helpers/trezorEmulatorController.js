@@ -26,9 +26,7 @@ export class TrezorEmulatorController {
       this._send(json, functionName);
       this.ws.onmessage = event => {
         const dataObject = this.handleMessage(event);
-        this.logger.info(
-          `${functionName}: The response is received: ${JSON.stringify(dataObject)}`
-        );
+        this.logger.info(`${functionName}: The response is received: ${JSON.stringify(dataObject)}`);
         resolve(dataObject);
       };
       this.ws.onerror = err => {
@@ -62,9 +60,7 @@ export class TrezorEmulatorController {
   handleMessage(event) {
     if (!event.data || typeof event.data !== 'string') {
       this.logger.error(`handleMessage: Response received without proper data: ${event.data}`);
-      throw new TrezorEmulatorControllerError(
-        `Response received without proper data: ${event.data}`
-      );
+      throw new TrezorEmulatorControllerError(`Response received without proper data: ${event.data}`);
     }
 
     const dataObject = JSON.parse(event.data);
@@ -147,9 +143,7 @@ export class TrezorEmulatorController {
     this.label = this.isModelT() ? 'Homescreen' : 'Emulator';
     const requestJson = {
       type: 'emulator-setup',
-      mnemonic:
-        mnemonic ||
-        'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
+      mnemonic: mnemonic || 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
       pin: '',
       passphrase_protection: false,
       label: 'Emulator',

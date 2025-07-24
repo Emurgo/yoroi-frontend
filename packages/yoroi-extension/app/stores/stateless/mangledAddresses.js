@@ -10,16 +10,10 @@ import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { genFilterSmallUtxo } from '../../api/ada/transactions/shelley/transactions';
 import type { IGetAllUtxosResponse } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { BASE_MANGLED } from './addressStores';
-import {
-  unwrapStakingKey as CardanoUnwrapStakingKey,
-} from '../../api/ada/lib/storage/bridge/utils';
+import { unwrapStakingKey as CardanoUnwrapStakingKey } from '../../api/ada/lib/storage/bridge/utils';
 import { asAddressedUtxo } from '../../api/ada/transactions/utils';
-import {
-  addrContainsAccountKey,
-} from '../../api/ada/lib/storage/bridge/delegationUtils';
-import {
-  MultiToken,
-} from '../../api/common/lib/MultiToken';
+import { addrContainsAccountKey } from '../../api/ada/lib/storage/bridge/delegationUtils';
+import { MultiToken } from '../../api/common/lib/MultiToken';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 export type MangledAmountsRequest = {|
@@ -31,9 +25,7 @@ export type MangledAmountsResponse = {|
 |};
 export type MangledAmountFunc = MangledAmountsRequest => Promise<MangledAmountsResponse>;
 
-export async function getUnmangleAmounts(
-  request: MangledAmountsRequest
-): Promise<MangledAmountsResponse> {
+export async function getUnmangleAmounts(request: MangledAmountsRequest): Promise<MangledAmountsResponse> {
   // note: keep track of arrays so we know the # of UTXO entries included
   const canUnmangle: Array<MultiToken> = [];
   const cannotUnmangle: Array<MultiToken> = [];
@@ -60,15 +52,13 @@ export async function getUnmangleAmounts(
 
   const network = getNetworkById(request.wallet.networkId);
   if (isCardanoHaskell(network)) {
-    const config = getCardanoHaskellBaseConfig(
-      network
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
 
     const filter = genFilterSmallUtxo({
       protocolParams: {
         linearFee: RustModule.WalletV4.LinearFee.new(
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant)
         ),
       },
     });
@@ -78,11 +68,7 @@ export async function getUnmangleAmounts(
     for (const utxo of utxos) {
       // filter out addresses that contain your staking key
       // since if it contains your key, it's not mangled
-      if (addrContainsAccountKey(
-        utxo.address,
-        stakingKey,
-        false,
-      )) {
+      if (addrContainsAccountKey(utxo.address, stakingKey, false)) {
         continue;
       }
 
@@ -105,10 +91,8 @@ export async function getUnmangleAmounts(
     }
   }
 
-  const flattenAmount = (list: Array<MultiToken>): MultiToken => list.reduce(
-    (total, next) => total.joinAddMutable(next),
-    new MultiToken([], defaultToken)
-  );
+  const flattenAmount = (list: Array<MultiToken>): MultiToken =>
+    list.reduce((total, next) => total.joinAddMutable(next), new MultiToken([], defaultToken));
 
   return {
     canUnmangle: flattenAmount(canUnmangle),
@@ -117,27 +101,25 @@ export async function getUnmangleAmounts(
 }
 
 export function getMangledFilter(
-  getAddresses: Class<any> => Set<string>,
-  networkId: number,
-): (ElementOf<IGetAllUtxosResponse> => boolean) {
+  getAddresses: (Class<any>) => Set<string>,
+  networkId: number
+): (ElementOf<IGetAllUtxosResponse>) => boolean {
   const network = getNetworkById(networkId);
   if (isCardanoHaskell(network)) {
     const relevantAddresses = getAddresses(BASE_MANGLED.class);
 
-    const config = getCardanoHaskellBaseConfig(
-      network,
-    ).reduce((acc, next) => Object.assign(acc, next), {});
+    const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
 
     const filter = genFilterSmallUtxo({
       protocolParams: {
         linearFee: RustModule.WalletV4.LinearFee.new(
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant)
         ),
       },
     });
 
-    return (utxo) => {
+    return utxo => {
       if (!relevantAddresses.has(utxo.address)) {
         return false;
       }

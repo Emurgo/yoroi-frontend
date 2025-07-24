@@ -25,12 +25,12 @@ const messages = defineMessages({
   faqAbbreviation: {
     id: 'settings.support.faq.abbreviation',
     defaultMessage: '!!!FAQ',
-  }
+  },
 });
 
 @observer
 export default class TransferTypeSelect extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const faqLink = (

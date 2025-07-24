@@ -11,14 +11,12 @@ type Props = {|
 
 @observer
 export default class FlagLabel extends Component<Props> {
-
   render(): Node {
-    const { svg, label, } = this.props;
+    const { svg, label } = this.props;
     const SvgElem = svg;
     return (
-
       <div className={styles.wrapper}>
-        <span className={styles.flag}>{ typeof svg === 'string' ? svg : (<SvgElem />)}</span>
+        <span className={styles.flag}>{typeof svg === 'string' ? svg : <SvgElem />}</span>
         <span>{label}</span>
       </div>
     );

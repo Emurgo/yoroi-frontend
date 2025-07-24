@@ -167,7 +167,7 @@ export const VoteDelegationOperation = ({
 }) => {
   const strings = useStrings();
   const normalizedDrep = hash == null || hash === '' ? null : dRepNormalize(hash);
-  const drepTitle = normalizedDrep ? drepNames[normalizedDrep] ?? normalizedDrep : '-';
+  const drepTitle = normalizedDrep ? (drepNames[normalizedDrep] ?? normalizedDrep) : '-';
 
   return (
     <Stack direction="column" spacing={16}>

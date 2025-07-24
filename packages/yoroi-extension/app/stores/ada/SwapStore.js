@@ -201,10 +201,10 @@ export default class SwapStore extends Store<StoresMap> {
     });
   };
 
-  executeTransactionHexes: ({|
-    wallet: WalletState,
-    signedTransactionHexes: Array<string>,
-  |}) => Promise<void> = async ({ wallet, signedTransactionHexes }) => {
+  executeTransactionHexes: ({| wallet: WalletState, signedTransactionHexes: Array<string> |}) => Promise<void> = async ({
+    wallet,
+    signedTransactionHexes,
+  }) => {
     await broadcastTransaction({
       publicDeriverId: wallet.publicDeriverId,
       signedTxHexArray: signedTransactionHexes,
@@ -214,17 +214,16 @@ export default class SwapStore extends Store<StoresMap> {
     noop(this.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId));
   };
 
-  fetchTransactionTimestamps: ({|
-    wallet: WalletState,
-    txHashes: Array<string>,
-  |}) => Promise<{ [string]: Date }> = async ({ wallet, txHashes }) => {
+  fetchTransactionTimestamps: ({| wallet: WalletState, txHashes: Array<string> |}) => Promise<{ [string]: Date }> = async ({
+    wallet,
+    txHashes,
+  }) => {
     if (txHashes.length === 0) {
       return {};
     }
     const network = getNetworkById(wallet.networkId);
-    const globalSlotMap: {
-      [string]: string,
-    } = await this.stores.substores.ada.stateFetchStore.fetcher.getTransactionSlotsByHashes({ network, txHashes });
+    const globalSlotMap: { [string]: string } =
+      await this.stores.substores.ada.stateFetchStore.fetcher.getTransactionSlotsByHashes({ network, txHashes });
     const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(wallet);
     const { toRealTime } = timeCalcRequests.requests;
     const slotToTimestamp: string => Date = s => toRealTime({ absoluteSlotNum: Number(s) });

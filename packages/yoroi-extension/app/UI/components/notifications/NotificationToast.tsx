@@ -116,7 +116,16 @@ const NotificationBody = ({ toastProps }: any) => {
   );
 };
 
-export function createToast({ timeout, title, subtitle, type, id, onClick = noop, onClose = noop, theme = 'light' }: NotificationProps) {
+export function createToast({
+  timeout,
+  title,
+  subtitle,
+  type,
+  id,
+  onClick = noop,
+  onClose = noop,
+  theme = 'light',
+}: NotificationProps) {
   return toast(props => <NotificationBody {...props} />, {
     theme,
     toastId: id,

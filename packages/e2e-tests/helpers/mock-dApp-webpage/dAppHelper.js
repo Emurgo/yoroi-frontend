@@ -22,14 +22,7 @@ import {
  * @param {boolean} checkBalance
  * @returns {Promise<void>}
  */
-export const connectNonAuth = async (
-  webdriver,
-  logger,
-  windowManager,
-  mockedDApp,
-  testWalettObj,
-  checkBalance = true
-) => {
+export const connectNonAuth = async (webdriver, logger, windowManager, mockedDApp, testWalettObj, checkBalance = true) => {
   await mockedDApp.requestAccess();
   const dappConnectPage = new DAppConnectWallet(webdriver, logger);
   // the window focus is switched to the pop-up here
@@ -40,23 +33,16 @@ export const connectNonAuth = async (
   expect(allWallets.length).to.equal(1);
   const walletInfo = await dappConnectPage.getWalletInfo(testWalettObj.plate);
   if (checkBalance) {
-    expect(walletInfo.walletBalance, 'The wallet balance is different').to.equal(
-      testWalettObj.balance
-    );
+    expect(walletInfo.walletBalance, 'The wallet balance is different').to.equal(testWalettObj.balance);
   }
-  expect(walletInfo.walletName, `The wallet name should be "${testWalettObj.name}"`).to.equal(
-    testWalettObj.name
-  );
-  expect(walletInfo.walletPlate, `The wallet plate should be "${testWalettObj.plate}"`).to.equal(
-    testWalettObj.plate
-  );
+  expect(walletInfo.walletName, `The wallet name should be "${testWalettObj.name}"`).to.equal(testWalettObj.name);
+  expect(walletInfo.walletPlate, `The wallet plate should be "${testWalettObj.plate}"`).to.equal(testWalettObj.plate);
   await dappConnectPage.selectWallet(testWalettObj.plate);
   const result = await windowManager.isClosed(popupConnectorName);
   expect(result, 'The window|tab is still opened').to.be.true;
   await windowManager.switchTo(mockDAppName);
   const requestAccessResult = await mockedDApp.checkAccessRequest();
-  expect(requestAccessResult.success, `Request access failed: ${requestAccessResult.errMsg}`).to.be
-    .true;
+  expect(requestAccessResult.success, `Request access failed: ${requestAccessResult.errMsg}`).to.be.true;
 };
 
 /**

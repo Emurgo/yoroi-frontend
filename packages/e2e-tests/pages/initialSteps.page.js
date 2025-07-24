@@ -1,12 +1,6 @@
 import BasePage from './basepage.js';
 import { isChrome } from '../utils/utils.js';
-import {
-  defaultWaitTimeout,
-  halfSecond,
-  oneSecond,
-  quarterSecond,
-  twoSeconds,
-} from '../helpers/timeConstants.js';
+import { defaultWaitTimeout, halfSecond, oneSecond, quarterSecond, twoSeconds } from '../helpers/timeConstants.js';
 
 class InitialStepsPage extends BasePage {
   // locators

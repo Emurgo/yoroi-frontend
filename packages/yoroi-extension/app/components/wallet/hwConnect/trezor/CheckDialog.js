@@ -31,15 +31,15 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1ModelTName: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.modelT',
-    defaultMessage: '!!!Model T'
+    defaultMessage: '!!!Model T',
   },
   aboutPrerequisite1Part1Safe3Name: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.safe3',
-    defaultMessage: '!!!Safe 3'
+    defaultMessage: '!!!Safe 3',
   },
   aboutPrerequisite1Part1Safe5Name: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.safe5',
-    defaultMessage: '!!!Safe 5'
+    defaultMessage: '!!!Safe 5',
   },
   aboutPrerequisite1Part1LinkModelT: {
     id: 'wallet.connect.trezor.dialog.step.about.prerequisite.1.part1.link',
@@ -87,14 +87,14 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 
 @observer
 export default class CheckDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { progressInfo, isActionProcessing, error, onExternalLinkClick, submit, cancel } = this.props;
 
     const middleBlock = (
       <div className={classnames([styles.middleBlock, styles.component])}>
-        <AboutTrezorSvg/>
+        <AboutTrezorSvg />
 
         <div className={styles.prerequisiteBlock}>
           <Stack direction="row" gap="8px">
@@ -110,10 +110,11 @@ export default class CheckDialog extends Component<Props> {
               <Typography color="ds.text_gray_low">
                 &#x2022; {intl.formatMessage(messages.aboutPrerequisite1Part1Text) + ' '}
               </Typography>
-              <Typography color="ds.text_gray_low">
-                {intl.formatMessage(messages.aboutPrerequisite1Part1ModelTName)}
-              </Typography>
-              <Link href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkModelT)} onClick={event => onExternalLinkClick(event)}>
+              <Typography color="ds.text_gray_low">{intl.formatMessage(messages.aboutPrerequisite1Part1ModelTName)}</Typography>
+              <Link
+                href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkModelT)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 <IconWrapper>
                   <ExternalLinkSVG />
                 </IconWrapper>
@@ -121,7 +122,10 @@ export default class CheckDialog extends Component<Props> {
               <Typography color="ds.text_gray_low">
                 {', ' + intl.formatMessage(messages.aboutPrerequisite1Part1Safe3Name)}
               </Typography>
-              <Link href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkSafe3)} onClick={event => onExternalLinkClick(event)}>
+              <Link
+                href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkSafe3)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 <IconWrapper>
                   <ExternalLinkSVG />
                 </IconWrapper>
@@ -129,7 +133,10 @@ export default class CheckDialog extends Component<Props> {
               <Typography color="ds.text_gray_low">
                 {', ' + intl.formatMessage(messages.aboutPrerequisite1Part1Safe5Name)}
               </Typography>
-              <Link href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkSafe5)} onClick={event => onExternalLinkClick(event)}>
+              <Link
+                href={intl.formatMessage(messages.aboutPrerequisite1Part1LinkSafe5)}
+                onClick={event => onExternalLinkClick(event)}
+              >
                 <IconWrapper>
                   <ExternalLinkSVG />
                 </IconWrapper>
@@ -167,9 +174,7 @@ export default class CheckDialog extends Component<Props> {
       >
         <ProgressStepBlock progressInfo={progressInfo} />
         {middleBlock}
-        {error &&
-          <HWErrorBlock progressInfo={progressInfo} error={error} />
-        }
+        {error && <HWErrorBlock progressInfo={progressInfo} error={error} />}
         <HelpLinkBlock onExternalLinkClick={onExternalLinkClick} />
       </Dialog>
     );

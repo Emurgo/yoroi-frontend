@@ -79,8 +79,7 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
     expect(noWalletNameErrors, 'The wallet name has an error').to.be.true;
     const noWalletPasswordError = await walletDetailsPage.checkWalletPaswordHasNoError();
     expect(noWalletPasswordError, 'The wallet password has an error').to.be.true;
-    const noWalletRepeatPasswordError =
-      await walletDetailsPage.checkWalletRepeatPasswordHasNoError();
+    const noWalletRepeatPasswordError = await walletDetailsPage.checkWalletRepeatPasswordHasNoError();
     expect(noWalletRepeatPasswordError, 'The wallet repeat password has an error').to.be.true;
     await walletDetailsPage.continue();
   });
@@ -96,9 +95,7 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
     const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
     expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);
-    expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(
-      expWalletPlate
-    );
+    expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(expWalletPlate);
   });
 
   afterEach(function (done) {

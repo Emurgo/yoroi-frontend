@@ -6,7 +6,7 @@ export class UserAgentInfo {
   // Refer: https://www.npmjs.com/package/ua-parser-js
   ua: { ... };
   constructor() {
-    this.ua = (new UAParser()).getResult();
+    this.ua = new UAParser().getResult();
   }
 }
 

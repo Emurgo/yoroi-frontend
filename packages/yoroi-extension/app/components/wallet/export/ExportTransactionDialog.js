@@ -45,7 +45,7 @@ type State = {|
 
 @observer
 export default class ExportTransactionDialog extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     startDate: null,
     endDate: null,
@@ -115,7 +115,7 @@ export default class ExportTransactionDialog extends Component<Props, State> {
             initialId={parentLocationId}
           />
 
-          {(
+          {
             <FormControlLabel
               sx={{
                 ml: '-1px',
@@ -124,11 +124,11 @@ export default class ExportTransactionDialog extends Component<Props, State> {
                 },
                 color: 'ds.text_gray_medium',
               }}
-              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds}/>}
+              control={<Checkbox checked={shouldIncludeTxIds} onChange={toggleIncludeTxIds} />}
               label={intl.formatMessage(messages.includeTxIds)}
               id={`${parentLocationId}-includeTxIds-checkbox`}
             />
-          )}
+          }
 
           {error && <ErrorBlock error={error} parentId={parentLocationId} />}
         </Box>

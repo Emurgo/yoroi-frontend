@@ -66,7 +66,7 @@ type State = {|
 
 @observer
 class AddCollateralPage extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -115,11 +115,7 @@ class AddCollateralPage extends Component<Props, State> {
             })
             .catch(error => {
               if (error instanceof WrongPassphraseError) {
-                this.form
-                  .$('walletPassword')
-                  .invalidate(
-                    this.context.formatMessage(messages.incorrectWalletPasswordError)
-                  );
+                this.form.$('walletPassword').invalidate(this.context.formatMessage(messages.incorrectWalletPasswordError));
               } else {
                 throw error;
               }
@@ -162,9 +158,7 @@ class AddCollateralPage extends Component<Props, State> {
     return this.props.getTokenInfo(tokenEntry);
   };
 
-  renderAmountDisplay: ({|
-    entry: TokenEntry,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| entry: TokenEntry |}) => Node = request => {
     const tokenInfo = this._resolveTokenInfo(request.entry);
     if (!tokenInfo) {
       throw new Error('missing token info');

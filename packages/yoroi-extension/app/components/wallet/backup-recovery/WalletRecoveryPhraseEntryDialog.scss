@@ -1,6 +1,5 @@
 @import '../../../themes/mixins/loading-spinner';
 
-
 .component {
   .checkbox {
     margin-top: 30px;
@@ -44,7 +43,7 @@
   }
 
   .isSubmitting {
-    @include loading-spinner("../../../assets/images/spinner-light.svg");
+    @include loading-spinner('../../../assets/images/spinner-light.svg');
   }
 }
 
@@ -56,7 +55,8 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
   .component {
     text-align: left;
   }
