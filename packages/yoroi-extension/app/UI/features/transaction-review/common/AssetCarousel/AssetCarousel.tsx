@@ -43,8 +43,9 @@ export const AssetCarousel = ({ data }) => {
             right: '16px',
             borderRadius: '8px',
             transition: 'background-color 0.3s ease',
+            height: '24px',
           },
-          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.gray_200),
           onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>
@@ -62,8 +63,9 @@ export const AssetCarousel = ({ data }) => {
             right: '50px',
             transition: 'background-color 0.3s ease',
             borderRadius: '8px',
+            height: '24px',
           },
-          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.gray_200),
           onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>

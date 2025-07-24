@@ -101,8 +101,9 @@ export default class BaseCoinPriceStore<
 
     try {
       const rows = await getHistoricalCoinPrices({ from, timestamps: missingTimestamps });
-
-      rows.forEach(row => this.priceMap.set(getPriceKey(row.From, row.To, row.Time), row));
+      runInAction(() => {
+        rows.forEach(row => this.priceMap.set(getPriceKey(row.From, row.To, row.Time), row));
+      });
     } catch (error) {
       Logger.error(`${nameof(BaseCoinPriceStore)}::${nameof(this.updateTransactionPriceData)}: ` + stringifyError(error));
     }
