@@ -2,45 +2,57 @@ import React from 'react';
 import { IHeadCell, TableSortType } from '../types/table';
 
 export interface ISortState {
-  order: string | null;
+  order: 'asc' | 'desc' | null;
   orderBy: string | null;
 }
 
 interface Props {
-  order: string | null;
+  order: 'asc' | 'desc' | null;
   orderBy: string | null;
   setSortState: React.Dispatch<React.SetStateAction<ISortState>>;
   headCells: IHeadCell[];
   data: any[];
 }
+
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
   const handleRequestSort = (property: string) => {
-    let direction: string | null = 'asc';
-    if (property === orderBy) {
-      if (order === 'asc') {
-        direction = 'desc';
-      } else if (order === 'desc') {
-        direction = 'asc';
-      }
-    }
-    setSortState({
-      order: direction,
-      orderBy: property,
-    });
+    const sortColumn = headCells.find(cell => cell.id === property);
+    const isNumeric = sortColumn?.sortType === 'numeric';
+
+    const direction = property !== orderBy ? (isNumeric ? 'desc' : 'asc') : order === 'asc' ? 'desc' : 'asc';
+
+    setSortState({ order: direction, orderBy: property });
   };
 
-  const descendingComparator = (a: any, b: any, sortType: TableSortType) => {
-    if (!orderBy || !order) return 0;
+  const compareValues = (a: any, b: any, sortType: TableSortType): number => {
+    if (!orderBy) return 0;
+
+    if (orderBy === 'price') {
+      const aPrice = Number(a.price);
+      const bPrice = Number(b.price);
+
+      if (aPrice === 0 && bPrice === 0) return 0;
+      if (aPrice === 0) return 1;
+      if (bPrice === 0) return -1;
+    }
+
+    let comparison = 0;
+
     switch (sortType) {
-      case 'numeric':
+      case 'numeric': {
         const aValue = Number(a[orderBy]);
         const bValue = Number(b[orderBy]);
-        return bValue === aValue ? 0 : bValue < aValue ? -1 : 1;
+        comparison = aValue === bValue ? 0 : aValue < bValue ? -1 : 1;
+        break;
+      }
       case 'character':
-        return String(b.info[orderBy]).localeCompare(a.info[orderBy]);
+        comparison = String(a.info[orderBy]).localeCompare(String(b.info[orderBy]));
+        break;
       default:
-        return b[orderBy] === a[orderBy] ? 0 : b[orderBy] < a[orderBy] ? -1 : 1;
+        comparison = a[orderBy] === b[orderBy] ? 0 : a[orderBy] < b[orderBy] ? -1 : 1;
     }
+
+    return order === 'desc' ? -comparison : comparison;
   };
 
   const getSortedData = React.useCallback(
@@ -48,9 +60,8 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
       if (!orderBy || !order) return data;
       const sortColumn = headCells.find(cell => cell.id === orderBy);
       const sortType = sortColumn?.sortType ?? 'character';
-      return [...arr].sort((a, b) => {
-        return order === 'desc' ? descendingComparator(a, b, sortType) : -descendingComparator(a, b, sortType);
-      });
+
+      return [...arr].sort((a, b) => compareValues(a, b, sortType));
     },
     [order, orderBy, headCells, data]
   );

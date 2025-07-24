@@ -78,7 +78,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
           ...token,
           percentage,
           totalAmount: totalValue,
-          price: unitPrice,
+          price: totalValue === 0 ? 0 : unitPrice,
           '24h': changePercent24,
           '1W': isPrimaryToken ? ptTokenDataInterval7d?.[167]?.changePercent : changePercent7d,
           '1M': isPrimaryToken ? ptTokenDataInterval1M?.[179]?.changePercent : changePercent30d,
