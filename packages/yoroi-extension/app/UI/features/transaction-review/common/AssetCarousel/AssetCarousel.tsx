@@ -27,7 +27,7 @@ export const AssetCarousel = ({ data }) => {
             display: 'flex',
             justifyContent: 'flex-start',
             width: '100%',
-          }
+          },
         }}
         activeSlideIndex={activeSlideIndex}
         onRequestChange={setActiveSlideIndex}
@@ -43,8 +43,9 @@ export const AssetCarousel = ({ data }) => {
             right: '16px',
             borderRadius: '8px',
             transition: 'background-color 0.3s ease',
+            height: '24px',
           },
-          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.gray_200),
           onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>
@@ -62,8 +63,9 @@ export const AssetCarousel = ({ data }) => {
             right: '50px',
             transition: 'background-color 0.3s ease',
             borderRadius: '8px',
+            height: '24px',
           },
-          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.el_gray_min),
+          onMouseEnter: e => (e.currentTarget.style.backgroundColor = palette.ds.gray_200),
           onMouseLeave: e => (e.currentTarget.style.backgroundColor = 'transparent'),
           children: (
             <IconWrapper>
@@ -89,14 +91,14 @@ export const AssetCarousel = ({ data }) => {
                 <img
                   width="40px"
                   height="40px"
-                  style={{borderRadius: '8px'}}
+                  style={{ borderRadius: '8px' }}
                   src={token.info.image}
                   onError={(e: any) => {
                     e.target.src = defaultImage;
                   }}
                 />
               </Box>
-              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%'}} />
+              <Box zIndex={20} sx={{ position: 'absolute', width: '100%', height: '100%' }} />
             </Box>
           ))}
       </Carousel>
