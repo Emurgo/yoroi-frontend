@@ -3,11 +3,7 @@ import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import { TrezorEmulatorController } from '../../helpers/trezorEmulatorController.js';
 import { runAndPrepareTrezor, TrezorModels } from '../../helpers/trezorHelper.js';
-import {
-  WindowManager,
-  extensionTabName,
-  trezorConnectTabName,
-} from '../../helpers/windowManager.js';
+import { WindowManager, extensionTabName, trezorConnectTabName } from '../../helpers/windowManager.js';
 import { testWalletTrezor } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
@@ -78,15 +74,9 @@ for (const model in TrezorModels) {
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
       const walletInfo = await transactionsPage.getSelectedWalletInfo();
-      expect(walletInfo.balance, 'The wallet balance is different').to.equal(
-        testWalletTrezor.balance
-      );
-      expect(walletInfo.name, `The wallet name should be "${testWalletTrezor.name}"`).to.equal(
-        testWalletTrezor.name
-      );
-      expect(walletInfo.plate, `The wallet plate should be "${testWalletTrezor.plate}"`).to.equal(
-        testWalletTrezor.plate
-      );
+      expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWalletTrezor.balance);
+      expect(walletInfo.name, `The wallet name should be "${testWalletTrezor.name}"`).to.equal(testWalletTrezor.name);
+      expect(walletInfo.plate, `The wallet plate should be "${testWalletTrezor.plate}"`).to.equal(testWalletTrezor.plate);
     });
 
     afterEach(function (done) {

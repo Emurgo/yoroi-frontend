@@ -57,9 +57,9 @@ export type SignedBatchRequest = {|
   txs: Array<{|
     id: string,
     encodedTx: Uint8Array,
-  |}>
+  |}>,
 |};
-export type SignedResponse = {| txId: string, |};
+export type SignedResponse = {| txId: string |};
 export type SendFunc = (body: SignedRequest) => Promise<SignedResponse>;
 
 /* Backend service data types */
@@ -137,14 +137,16 @@ export type RemoteTxInfo = {|
   // these will be ordered by transaction index asc.
   +outputs: Array<RemoteTransactionOutput>,
 |};
-export type RemoteTransaction = {|
-  +type?: $PropertyType<RemoteTransactionTypeT, 'byron'>,
-  ...RemoteTransactionBase,
-|} | {|
-  +type: $PropertyType<RemoteTransactionTypeT, 'shelley'>,
-  ...RemoteTransactionBase,
-  ...RemoteTransactionShelley,
-|};
+export type RemoteTransaction =
+  | {|
+      +type?: $PropertyType<RemoteTransactionTypeT, 'byron'>,
+      ...RemoteTransactionBase,
+    |}
+  | {|
+      +type: $PropertyType<RemoteTransactionTypeT, 'shelley'>,
+      ...RemoteTransactionBase,
+      ...RemoteTransactionShelley,
+    |};
 
 export type RemoteUnspentOutput = {|
   +utxo_id: string, // concat tx_hash and tx_index
@@ -263,7 +265,7 @@ export type VoteRegistrationDelegationCert = {|
   +addrKeyHash: string | null,
   +scriptHash: string | null,
   +drep: Drep,
-  +coin: string
+  +coin: string,
 |};
 export type Drep = {|
   +type: 'addr_keyhash' | 'scripthash' | 'abstain' | 'no_confidence',
@@ -295,7 +297,7 @@ export type RegisterDrepCert = {|
   +drepAddrKeyHash: string | null,
   +drepScriptHash: string | null,
   +coin: string,
-  +anchor: Anchor | null
+  +anchor: Anchor | null,
 |};
 export type UnregisterDrepCert = {|
   +drepAddrKeyHash: string | null,
@@ -309,71 +311,90 @@ export type UpdateDrepCert = {|
 |};
 export type RemoteCertificate = {|
   certIndex: number,
-  ...({|
-    +kind: typeof ShelleyCertificateTypes.StakeRegistration,
-    ...RemoteStakeRegistrationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.StakeDeregistration,
-    ...RemoteStakeDeregistrationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.StakeDelegation,
-    ...RemoteStakeDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.PoolRegistration,
-    ...RemotePoolRegistrationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.PoolRetirement,
-    ...RemotePoolRetirementCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
-    ...RemoteGenesisKeyDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
-    ...RemoteMoveInstantaneousRewardsCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.Registration,
-    ...RegistrationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.Unregistration,
-    ...UnregistrationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.VoteDelegation,
-    ...VoteDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.StakeVoteDelegation,
-    ...StakeVoteDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.StakeRegistrationDelegation,
-    ...StakeRegistrationDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.VoteRegistrationDelegation,
-    ...VoteRegistrationDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.StakeVoteRegistrationDelegation,
-    ...StakeVoteRegistrationDelegationCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.AuthCommitteeHot,
-    ...AuthCommitteeHotCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.ResignCommitteeCold,
-    ...ResignCommitteeColdCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.RegisterDrep,
-    ...RegisterDrepCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.UnregisterDrep,
-    ...UnregisterDrepCert,
-  |} | {|
-    +kind: typeof ShelleyCertificateTypes.UpdateDrep,
-    ...UpdateDrepCert,
-  |})
+  ...
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeRegistration,
+        ...RemoteStakeRegistrationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeDeregistration,
+        ...RemoteStakeDeregistrationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeDelegation,
+        ...RemoteStakeDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.PoolRegistration,
+        ...RemotePoolRegistrationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.PoolRetirement,
+        ...RemotePoolRetirementCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.GenesisKeyDelegation,
+        ...RemoteGenesisKeyDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.MoveInstantaneousRewardsCert,
+        ...RemoteMoveInstantaneousRewardsCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.Registration,
+        ...RegistrationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.Unregistration,
+        ...UnregistrationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.VoteDelegation,
+        ...VoteDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeVoteDelegation,
+        ...StakeVoteDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeRegistrationDelegation,
+        ...StakeRegistrationDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.VoteRegistrationDelegation,
+        ...VoteRegistrationDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.StakeVoteRegistrationDelegation,
+        ...StakeVoteRegistrationDelegationCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.AuthCommitteeHot,
+        ...AuthCommitteeHotCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.ResignCommitteeCold,
+        ...ResignCommitteeColdCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.RegisterDrep,
+        ...RegisterDrepCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.UnregisterDrep,
+        ...UnregisterDrepCert,
+      |}
+    | {|
+        +kind: typeof ShelleyCertificateTypes.UpdateDrep,
+        ...UpdateDrepCert,
+      |},
 |};
 
 // getAccountState
 
 export type AccountStateRequest = {|
   ...BackendNetworkInfo,
-  addresses: Array<string>
+  addresses: Array<string>,
 |};
 export type RemoteAccountState = {|
   poolOperator: null, // not implemented yet
@@ -404,11 +425,11 @@ export type RewardHistoryFunc = (body: RewardHistoryRequest) => Promise<RewardHi
 
 export type PoolInfoRequest = {|
   ...BackendNetworkInfo,
-  poolIds: Array<string>
+  poolIds: Array<string>,
 |};
 export type TokenInfoRequest = {|
   ...BackendNetworkInfo,
-  tokenIds: Array<string>
+  tokenIds: Array<string>,
 |};
 export type RemotePoolInfo = {|
   // from pool metadata (off chain)
@@ -428,7 +449,7 @@ export type RemotePool = {|
   |}>,
 |};
 export type PoolInfoResponse = {|
-  [key: string]: (RemotePool | null),
+  [key: string]: RemotePool | null,
 |};
 
 export type RemoteTokenInfo = {|
@@ -439,14 +460,14 @@ export type RemoteTokenInfo = {|
   +logo?: string,
 |};
 export type TokenInfoResponse = {|
-  [key: string]: (RemoteTokenInfo | null),
+  [key: string]: RemoteTokenInfo | null,
 |};
 export type PoolInfoFunc = (body: PoolInfoRequest) => Promise<PoolInfoResponse>;
 export type TokenInfoFunc = (body: TokenInfoRequest) => Promise<TokenInfoResponse>;
 
 export type CatalystRoundInfoRequest = {|
-  ...BackendNetworkInfo
-  |};
+  ...BackendNetworkInfo,
+|};
 
 export type CatalystRound = {|
   +id: number,
@@ -460,50 +481,47 @@ export type CatalystRound = {|
 
 export type CatalystRoundInfoResponse = {|
   currentFund?: CatalystRound,
-  nextFund?: CatalystRound
+  nextFund?: CatalystRound,
 |};
 
-export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest)
-                                      => Promise<CatalystRoundInfoResponse>;
+export type CatalystRoundInfoFunc = (body: CatalystRoundInfoRequest) => Promise<CatalystRoundInfoResponse>;
 
 // Multi Asset Mint Metadata
 
-export type MultiAssetMintMetadataFunc = (body: MultiAssetRequest)
-  => Promise<MultiAssetMintMetadataResponse>;
+export type MultiAssetMintMetadataFunc = (body: MultiAssetRequest) => Promise<MultiAssetMintMetadataResponse>;
 
-export type MultiAssetSupplyFunc = (body: MultiAssetRequest)
-  => Promise<MultiAssetSupplyResponse>;
+export type MultiAssetSupplyFunc = (body: MultiAssetRequest) => Promise<MultiAssetSupplyResponse>;
 
 export type MultiAssetRequest = {|
   ...BackendNetworkInfo,
-  assets: MultiAssetRequestAsset[]
+  assets: MultiAssetRequestAsset[],
 |};
 
 export type MultiAssetRequestAsset = {|
   nameHex: string,
-  policy: string
-|}
+  policy: string,
+|};
 
 export type MultiAssetMintMetadataResponse = {|
-  ...{[key: string]: MultiAssetMintMetadataResponseAsset[]}
-|}
+  ...{ [key: string]: MultiAssetMintMetadataResponseAsset[] },
+|};
 
 export type MultiAssetSupplyResponse = {|
-  ...{[key: string]: string}
-|}
+  ...{ [key: string]: string },
+|};
 
 export type MultiAssetMintMetadataResponseAsset = {|
   key: string,
-  metadata: {[key: string]: any}
-|}
+  metadata: { [key: string]: any },
+|};
 
 export type GetUtxoDataRequest = {|
   ...BackendNetworkInfo,
   utxos: Array<{|
     txHash: string,
     txIndex: number,
-  |}>
-|}
+  |}>,
+|};
 
 export type UtxoData = {|
   output: {|
@@ -536,10 +554,9 @@ export type GetLatestBlockBySlotReq = {|
 export type GetLatestBlockBySlotRes = {|
   blockHashes: {|
     [key: RelativeSlot]: string | null,
-  |}
-|}
-export type GetLatestBlockBySlotFunc =
-  (body: GetLatestBlockBySlotReq) => Promise<GetLatestBlockBySlotRes>
+  |},
+|};
+export type GetLatestBlockBySlotFunc = (body: GetLatestBlockBySlotReq) => Promise<GetLatestBlockBySlotRes>;
 
 export type GetRecentTransactionHashesRequest = {|
   ...BackendNetworkInfo,
@@ -558,7 +575,7 @@ export type TxSummary = {|
   slot: number,
 |};
 export type GetRecentTransactionHashesResponse = {|
-  [address: string]: Array<TxSummary>
+  [address: string]: Array<TxSummary>,
 |};
 
 export type GetRecentTransactionHashesFunc = (
@@ -572,9 +589,7 @@ export type GetTransactionsByHashesRequest = {|
 
 export type GetTransactionsByHashesResponse = Array<RemoteTransaction>;
 
-export type GetTransactionsByHashesFunc = (
-  body: GetTransactionsByHashesRequest
-) => Promise<GetTransactionsByHashesResponse>;
+export type GetTransactionsByHashesFunc = (body: GetTransactionsByHashesRequest) => Promise<GetTransactionsByHashesResponse>;
 
 export type GetTransactionSlotsByHashesResponse = { [string]: string };
 
@@ -593,6 +608,4 @@ export type GetSwapFeeTiersRequest = BackendNetworkInfo;
 
 export type GetSwapFeeTiersResponse = { [string]: any };
 
-export type GetSwapFeeTiersFunc = (
-  body: GetSwapFeeTiersRequest
-) => Promise<GetSwapFeeTiersResponse>;
+export type GetSwapFeeTiersFunc = (body: GetSwapFeeTiersRequest) => Promise<GetSwapFeeTiersResponse>;

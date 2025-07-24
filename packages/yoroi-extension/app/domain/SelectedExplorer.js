@@ -1,18 +1,13 @@
 // @flow
 
-import type {
-  ExplorerRow, LinkType
-} from '../api/ada/lib/storage/database/explorers/tables';
+import type { ExplorerRow, LinkType } from '../api/ada/lib/storage/database/explorers/tables';
 import { prepackagedDefaultExplorers } from '../api/ada/lib/storage/database/prepackaged/explorers';
 
 export class SelectedExplorer {
   selected: $ReadOnly<ExplorerRow>;
   backup: $ReadOnly<ExplorerRow>;
 
-  constructor(data: {|
-    selected?: $ReadOnly<ExplorerRow>,
-    backup: $ReadOnly<ExplorerRow>,
-  |}) {
+  constructor(data: {| selected?: $ReadOnly<ExplorerRow>, backup: $ReadOnly<ExplorerRow> |}) {
     this.selected = data.selected ?? data.backup;
     this.backup = data.backup;
   }
@@ -20,7 +15,7 @@ export class SelectedExplorer {
   getOrDefault: LinkType => void | {|
     name: string,
     baseUrl: string,
-  |} = (type) => {
+  |} = type => {
     const selectedLink = this.selected.Endpoints[type];
     if (selectedLink != null) {
       return {
@@ -36,7 +31,7 @@ export class SelectedExplorer {
       };
     }
     return undefined;
-  }
+  };
 }
 
 export function defaultToSelectedExplorer(): Map<number, SelectedExplorer> {

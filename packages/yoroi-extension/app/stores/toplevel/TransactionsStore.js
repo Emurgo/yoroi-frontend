@@ -67,7 +67,7 @@ export default class TransactionsStore extends Store<StoresMap> {
   @observable _processedWithdrawals: Set<number> = new Set();
 
   getTransactionRowsToExportRequest: LocalizedRequest<((void) => Promise<void>) => Promise<void>> = new LocalizedRequest<
-    ((void) => Promise<void>) => Promise<void>
+    ((void) => Promise<void>) => Promise<void>,
   >(func => func());
   exportTransactions: LocalizedRequest<ExportTransactionsFunc> = new LocalizedRequest<ExportTransactionsFunc>(
     this.api.export.exportTransactions

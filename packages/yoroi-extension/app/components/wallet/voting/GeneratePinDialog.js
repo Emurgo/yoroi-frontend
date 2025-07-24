@@ -38,7 +38,7 @@ type Props = {|
 
 @observer
 export default class GeneratePinDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stepsList, progressInfo, next, cancel, pin } = this.props;
@@ -88,29 +88,21 @@ export default class GeneratePinDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={this.props.onBack} />}
         onClose={cancel}
       >
-        {(
+        {
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
               steps={stepsList.map(step => ({
                 message: step.message,
-                stepId: String(step.step)
+                stepId: String(step.step),
               }))}
-              setCurrentStep={() => {
-              }}
+              setCurrentStep={() => {}}
             />
-            <Typography
-              component="div"
-              textAlign="center"
-              pt="24px"
-              pb="40px"
-              variant="body1"
-              color="ds.text_gray_medium"
-            >
-              <FormattedMessage {...messages.line1} values={{ strong }}/>
+            <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="ds.text_gray_medium">
+              <FormattedMessage {...messages.line1} values={{ strong }} />
             </Typography>
           </>
-        )}
+        }
         {pinCards}
       </Dialog>
     );

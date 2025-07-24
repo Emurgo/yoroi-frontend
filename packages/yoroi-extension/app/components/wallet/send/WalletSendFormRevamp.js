@@ -182,11 +182,7 @@ type Props = {|
   +onAddMemo: void => void,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +defaultToken: $ReadOnly<TokenRow>, // need since no guarantee input in non-null
-  +onAddToken: ({|
-    token?: $ReadOnly<TokenRow>,
-    shouldSendAll?: boolean,
-    shouldReset?: boolean,
-  |}) => void,
+  +onAddToken: ({| token?: $ReadOnly<TokenRow>, shouldSendAll?: boolean, shouldReset?: boolean |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +spendableBalance: ?MultiToken,
   +selectedToken: void | $ReadOnly<TokenRow>,
@@ -216,10 +212,11 @@ const SMemoTextField = styled(MemoTextField)(({ theme }) => ({
 }));
 
 const STextField = styled(TextField)(({ theme }) => ({
-  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected': {
-    WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
-    '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
-  },
+  'input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus,input:-webkit-autofill:active,input:-webkit-autofill:selected':
+    {
+      WebkitBoxShadow: `0 0 0 30px ${theme.palette.ds.bg_color_max} inset !important`,
+      '-webkit-text-fill-color': `${theme.palette.ds.text_gray_medium}`,
+    },
   '& .MuiFormHelperText-root': {
     marginInline: 0,
     mt: 0.5,
@@ -245,7 +242,7 @@ type State = {|
 
 @observer
 export default class WalletSendFormRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     invalidMemo: false,
     currentStep: SEND_FORM_STEP.RECEIVER,
@@ -320,9 +317,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     }
   }
 
-  @action async resolveDomainAddress(
-    handle: string
-  ): Promise<{|
+  @action async resolveDomainAddress(handle: string): Promise<{|
     isDomainResolvable: boolean,
     domainResolverMessage: ?string,
     resolvedAddress: ?string,
@@ -350,13 +345,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
             nameServer: res.nameServer,
           };
         } else if (res.error === 'forbidden') {
-          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
-            messages.receiverFieldLabelForbiddenAccess
-          )}`;
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(messages.receiverFieldLabelForbiddenAccess)}`;
         } else {
-          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(
-            messages.receiverFieldLabelUnexpectedError
-          )}`;
+          domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(messages.receiverFieldLabelUnexpectedError)}`;
         }
       }
       this.setState({
@@ -474,7 +465,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         showErrorsOnInit: this.props.uriParams,
         validateOnBlur: false,
         validateOnChange: true,
-        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT_LONGER,
       },
       plugins: {
         vjf: vjf(),
@@ -557,15 +548,8 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     const { form } = this;
     const intl = this.context;
     const { invalidMemo } = this.state;
-    const {
-      shouldSendAll,
-      isCalculatingFee,
-      getTokenInfo,
-      isDefaultIncluded,
-      maxSendableAmount,
-      spendableBalance,
-      memo,
-    } = this.props;
+    const { shouldSendAll, isCalculatingFee, getTokenInfo, isDefaultIncluded, maxSendableAmount, spendableBalance, memo } =
+      this.props;
 
     const amountField = form.$('amount');
     const receiverField = form.$('receiver');

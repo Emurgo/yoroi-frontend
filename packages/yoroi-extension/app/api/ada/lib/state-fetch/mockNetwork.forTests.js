@@ -36,12 +36,12 @@ import type {
   TokenInfoFunc,
 } from './types';
 import { ShelleyCertificateTypes } from './types';
-import { RollbackApiError, } from '../../../common/errors';
+import { RollbackApiError } from '../../../common/errors';
 import { addressToKind, toEnterprise, toHexOrBase58 } from '../storage/bridge/utils';
 import type { CoreAddressT } from '../storage/database/primitives/enums';
 import { CoreAddressTypes } from '../storage/database/primitives/enums';
 import { mnemonicToEntropy } from 'bip39';
-import { WalletTypePurpose, } from '../../../../config/numbersConfig';
+import { WalletTypePurpose } from '../../../../config/numbersConfig';
 import type { NetworkRow } from '../storage/database/primitives/tables';
 
 import { RustModule } from '../cardanoCrypto/rustLoader';
@@ -59,9 +59,9 @@ import type {
   UtxoAtPointRequest,
   UtxoDiff,
   UtxoDiffItem,
-  UtxoDiffSincePointRequest
+  UtxoDiffSincePointRequest,
 } from '@emurgo/yoroi-lib/dist/utxo/models';
-import { UtxoApiResult, } from '@emurgo/yoroi-lib/dist/utxo/models';
+import { UtxoApiResult } from '@emurgo/yoroi-lib/dist/utxo/models';
 import { bytesToHex, forceNonNull, hexToBytes, iterateLenGet, last } from '../../../../coreUtils';
 
 function byronAddressToHex(byronAddrOrHex: string): string {
@@ -72,22 +72,15 @@ function byronAddressToHex(byronAddrOrHex: string): string {
 }
 
 /** convert bech32 address to bytes */
-function fixAddresses(
-  address: string,
-  network: $ReadOnly<NetworkRow>,
-): string {
+function fixAddresses(address: string, network: $ReadOnly<NetworkRow>): string {
   try {
     const bech32Info = bech32.decode(address, 1000);
     if (bech32Info.prefix === Bech32Prefix.PAYMENT_KEY_HASH) {
-      const config = getCardanoHaskellBaseConfig(
-        network
-      ).reduce((acc, next) => Object.assign(acc, next), {});
+      const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
 
       const enterpriseAddr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(config.ChainNetworkId, 10),
-        RustModule.WalletV4.Credential.from_keyhash(
-          RustModule.WalletV4.Ed25519KeyHash.from_bech32(address)
-        )
+        RustModule.WalletV4.Credential.from_keyhash(RustModule.WalletV4.Ed25519KeyHash.from_bech32(address))
       );
       return enterpriseAddr.to_address().to_hex();
     }
@@ -96,14 +89,9 @@ function fixAddresses(
     return address;
   }
 }
-export function genCheckAddressesInUse(
-  blockchain: Array<RemoteTransaction>,
-  network: $ReadOnly<NetworkRow>,
-): FilterFunc {
-  return async (
-    body: FilterUsedRequest,
-  ): Promise<FilterUsedResponse> => {
-    const mapToOriginal = {}
+export function genCheckAddressesInUse(blockchain: Array<RemoteTransaction>, network: $ReadOnly<NetworkRow>): FilterFunc {
+  return async (body: FilterUsedRequest): Promise<FilterUsedResponse> => {
+    const mapToOriginal = {};
     const addresses = body.addresses.map(addr => {
       const fixed = fixAddresses(addr, network);
       mapToOriginal[fixed] = addr;
@@ -141,10 +129,7 @@ export function genCheckAddressesInUse(
   };
 }
 
-function isOurAddress(
-  address: string,
-  ownAddresses: Set<string>,
-): boolean {
+function isOurAddress(address: string, ownAddresses: Set<string>): boolean {
   if (ownAddresses.has(address)) {
     return true;
   }
@@ -158,14 +143,8 @@ function isOurAddress(
   return false;
 }
 
-function ourAddressesInTx(
-  tx: RemoteTransaction,
-  ownAddresses: Set<string>,
-): Set<string> {
-  const addresses = [
-    ...tx.inputs.map(input => input.address),
-    ...tx.outputs.map(output => output.address),
-  ];
+function ourAddressesInTx(tx: RemoteTransaction, ownAddresses: Set<string>): Set<string> {
+  const addresses = [...tx.inputs.map(input => input.address), ...tx.outputs.map(output => output.address)];
   if (tx.type === 'shelley') {
     addresses.push(...tx.withdrawals.map(withdrawal => withdrawal.address));
   }
@@ -181,7 +160,7 @@ function ourAddressesInTx(
 function filterForOwn(
   txs: Array<RemoteTransaction>,
   ownAddresses: Set<string>,
-  _network: $ReadOnly<NetworkRow>,
+  _network: $ReadOnly<NetworkRow>
 ): Array<RemoteTransaction> {
   const ownTxs = [];
   for (const tx of txs) {
@@ -195,11 +174,9 @@ function filterForOwn(
 
 export function genGetTransactionsHistoryForAddresses(
   blockchain: Array<RemoteTransaction>,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): HistoryFunc {
-  return async (
-    body: HistoryRequest,
-  ): Promise<HistoryResponse> => {
+  return async (body: HistoryRequest): Promise<HistoryResponse> => {
     const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const untilBlockIndex = blockchain.map(tx => tx.block_hash).lastIndexOf(body.untilBlock);
     if (untilBlockIndex === -1) {
@@ -213,7 +190,7 @@ export function genGetTransactionsHistoryForAddresses(
       }
     }
     const ownAddresses = new Set(addresses);
-    if (body.after == null)  {
+    if (body.after == null) {
       const filtered = filterForOwn(subChain, ownAddresses, network);
       return filtered;
     }
@@ -221,10 +198,7 @@ export function genGetTransactionsHistoryForAddresses(
 
     let cutoffTx = undefined;
     for (let i = 0; i < subChain.length; i++) {
-      if (
-        subChain[i].hash === after.tx &&
-        subChain[i].block_hash === after.block
-      ) {
+      if (subChain[i].hash === after.tx && subChain[i].block_hash === after.block) {
         cutoffTx = subChain[i];
         break;
       }
@@ -261,21 +235,12 @@ export function genGetTransactionsHistoryForAddresses(
   };
 }
 
-export function genGetBestBlock(
-  blockchain: Array<RemoteTransaction>,
-): BestBlockFunc {
-  return async (
-    _body: BestBlockRequest,
-  ): Promise<BestBlockResponse> => {
+export function genGetBestBlock(blockchain: Array<RemoteTransaction>): BestBlockFunc {
+  return async (_body: BestBlockRequest): Promise<BestBlockResponse> => {
     let bestInNetwork: void | BestBlockResponse = undefined;
     for (let i = blockchain.length - 1; i >= 0; i--) {
       const block = blockchain[i];
-      if (
-        block.height != null &&
-        block.epoch != null &&
-        block.slot != null &&
-        block.block_hash != null
-      ) {
+      if (block.height != null && block.epoch != null && block.slot != null && block.block_hash != null) {
         bestInNetwork = {
           epoch: block.epoch,
           slot: block.slot,
@@ -300,11 +265,9 @@ export function genGetBestBlock(
 export function genUtxoForAddresses(
   getHistory: HistoryFunc,
   getBestBlock: BestBlockFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): AddressUtxoFunc {
-  return async (
-    body: AddressUtxoRequest,
-  ): Promise<AddressUtxoResponse> => {
+  return async (body: AddressUtxoRequest): Promise<AddressUtxoResponse> => {
     const addresses = body.addresses.map(addr => fixAddresses(addr, network));
     const bestBlock = await getBestBlock({
       network,
@@ -327,14 +290,12 @@ export function genUtxoForAddresses(
         const address = tx.outputs[j].address;
         if (isOurAddress(address, ourAddressSet)) {
           const kind = addressToKind(address, 'bytes', networks.CardanoMainnet);
-          if (
-            kind === CoreAddressTypes.CARDANO_REWARD
-          ) {
+          if (kind === CoreAddressTypes.CARDANO_REWARD) {
             throw new Error(`${nameof(genUtxoForAddresses)} non-utxo address in utxo endpoint`);
           }
           const key = JSON.stringify({
             id: tx.hash,
-            index: j
+            index: j,
           });
           utxoMap.set(key, {
             utxo_id: tx.hash + j,
@@ -362,27 +323,17 @@ export function genUtxoForAddresses(
   };
 }
 
-export function getSingleAddressString(
-  mnemonic: string,
-  path: Array<number>,
-  isLedger: boolean = false,
-): string {
+export function getSingleAddressString(mnemonic: string, path: Array<number>, isLedger: boolean = false): string {
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
-    : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      hexToBytes(mnemonicToEntropy(mnemonic)),
-      EMPTY_PASSWORD
-    );
+    : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(hexToBytes(mnemonicToEntropy(mnemonic)), EMPTY_PASSWORD);
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce((acc, next) => Object.assign(acc, next), {});
 
   if (path[0] === WalletTypePurpose.BIP44) {
-    const v2Key = RustModule.WalletV2.PublicKey.from_hex(
-      bytesToHex(derivedKey.to_public().as_bytes())
-    );
+    const v2Key = RustModule.WalletV2.PublicKey.from_hex(bytesToHex(derivedKey.to_public().as_bytes()));
     const settings = RustModule.WalletV2.BlockchainSettings.from_json({
       protocol_magic: baseConfig.ByronNetworkId,
     });
@@ -393,9 +344,7 @@ export function getSingleAddressString(
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.EnterpriseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.Credential.from_keyhash(
-        derivedKey.to_public().to_raw_key().hash()
-      ),
+      RustModule.WalletV4.Credential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
     );
     return addr.to_address().to_hex();
   }
@@ -406,51 +355,33 @@ export function getMangledAddressString(
   mnemonic: string,
   path: Array<number>,
   stakingKey: Buffer,
-  isLedger: boolean = false,
+  isLedger: boolean = false
 ): string {
   const EMPTY_PASSWORD = Buffer.from('');
   const rootKey = isLedger
     ? generateLedgerWalletRootKey(mnemonic)
-    : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-      hexToBytes(mnemonicToEntropy(mnemonic)),
-      EMPTY_PASSWORD
-    );
+    : RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(hexToBytes(mnemonicToEntropy(mnemonic)), EMPTY_PASSWORD);
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce((acc, next) => Object.assign(acc, next), {});
 
   if (path[0] === WalletTypePurpose.CIP1852) {
     const addr = RustModule.WalletV4.BaseAddress.new(
       Number.parseInt(baseConfig.ChainNetworkId, 10),
-      RustModule.WalletV4.Credential.from_keyhash(
-        derivedKey.to_public().to_raw_key().hash()
-      ),
-      RustModule.WalletV4.Credential.from_keyhash(
-        RustModule.WalletV4.Ed25519KeyHash.from_bytes(
-          stakingKey
-        )
-      )
+      RustModule.WalletV4.Credential.from_keyhash(derivedKey.to_public().to_raw_key().hash()),
+      RustModule.WalletV4.Credential.from_keyhash(RustModule.WalletV4.Ed25519KeyHash.from_bytes(stakingKey))
     );
     return addr.to_address().to_hex();
   }
   throw new Error('Unexpected purpose');
 }
 
-export function getAddressForType(
-  mnemonic: string,
-  path: Array<number>,
-  type: CoreAddressT,
-): string {
+export function getAddressForType(mnemonic: string, path: Array<number>, type: CoreAddressT): string {
   const EMPTY_PASSWORD = Buffer.from('');
-  const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(
-    hexToBytes(mnemonicToEntropy(mnemonic)),
-    EMPTY_PASSWORD
-  );
+  const rootKey = RustModule.WalletV4.Bip32PrivateKey.from_bip39_entropy(hexToBytes(mnemonicToEntropy(mnemonic)), EMPTY_PASSWORD);
   const derivedKey = derivePath(rootKey, path);
 
-  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet)
-    .reduce((acc, next) => Object.assign(acc, next), {});
+  const baseConfig = getCardanoHaskellBaseConfig(networks.CardanoMainnet).reduce((acc, next) => Object.assign(acc, next), {});
 
   switch (type) {
     case CoreAddressTypes.CARDANO_BASE: {
@@ -463,12 +394,8 @@ export function getAddressForType(
       const stakingKey = derivePath(rootKey, newPath);
       const addr = RustModule.WalletV4.BaseAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.Credential.from_keyhash(
-          derivedKey.to_public().to_raw_key().hash()
-        ),
-        RustModule.WalletV4.Credential.from_keyhash(
-          stakingKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.Credential.from_keyhash(derivedKey.to_public().to_raw_key().hash()),
+        RustModule.WalletV4.Credential.from_keyhash(stakingKey.to_public().to_raw_key().hash())
       );
       return addr.to_address().to_hex();
     }
@@ -478,29 +405,23 @@ export function getAddressForType(
     case CoreAddressTypes.CARDANO_ENTERPRISE: {
       const addr = RustModule.WalletV4.EnterpriseAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.Credential.from_keyhash(
-          derivedKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.Credential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
       );
       return addr.to_address().to_hex();
     }
     case CoreAddressTypes.CARDANO_REWARD: {
       const addr = RustModule.WalletV4.RewardAddress.new(
         Number.parseInt(baseConfig.ChainNetworkId, 10),
-        RustModule.WalletV4.Credential.from_keyhash(
-          derivedKey.to_public().to_raw_key().hash()
-        ),
+        RustModule.WalletV4.Credential.from_keyhash(derivedKey.to_public().to_raw_key().hash())
       );
       return addr.to_address().to_hex();
     }
-    default: throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
+    default:
+      throw new Error(`${nameof(getAddressForType)} unknown type ` + type);
   }
 }
 
-function derivePath(
-  startKey: RustModule.WalletV4.Bip32PrivateKey,
-  path: Array<number>
-): RustModule.WalletV4.Bip32PrivateKey {
+function derivePath(startKey: RustModule.WalletV4.Bip32PrivateKey, path: Array<number>): RustModule.WalletV4.Bip32PrivateKey {
   let currKey = startKey;
   for (let i = 0; i < path.length; i++) {
     currKey = currKey.derive(path[i]);
@@ -508,10 +429,7 @@ function derivePath(
   return currKey;
 }
 
-function getByronInputs(
-  blockchain: Array<RemoteTransaction>,
-  inputs: Array<TxoPointerType>
-): Array<RemoteTransactionInput> {
+function getByronInputs(blockchain: Array<RemoteTransaction>, inputs: Array<TxoPointerType>): Array<RemoteTransactionInput> {
   const result: Array<RemoteTransactionInput> = [];
   for (const input of inputs) {
     const pointedTx = blockchain.find(tx => tx.hash === input.id);
@@ -541,10 +459,7 @@ function getByronInputs(
   return result;
 }
 
-export function toRemoteByronTx(
-  blockchain: Array<RemoteTransaction>,
-  request: SignedRequestInternal,
-): RemoteTransaction {
+export function toRemoteByronTx(blockchain: Array<RemoteTransaction>, request: SignedRequestInternal): RemoteTransaction {
   const tx = Array.isArray(request.signedTx) ? forceNonNull(last(request.signedTx)) : request.signedTx;
   const txBytes = Buffer.from(tx, 'base64');
   const signedTx = RustModule.WalletV4.Transaction.from_bytes(txBytes);
@@ -552,16 +467,20 @@ export function toRemoteByronTx(
   const body = signedTx.body();
   const hash = RustModule.WalletV4.FixedTransaction.from_bytes(txBytes).transaction_hash().to_hex();
 
-  const outputs = iterateLenGet(body.outputs()).map(output => ({
-    address: toHexOrBase58(output.address()),
-    amount: output.amount().coin().to_str(),
-    assets: parseTokenList(output.amount().multiasset())
-  })).toArray();
+  const outputs = iterateLenGet(body.outputs())
+    .map(output => ({
+      address: toHexOrBase58(output.address()),
+      amount: output.amount().coin().to_str(),
+      assets: parseTokenList(output.amount().multiasset()),
+    }))
+    .toArray();
 
-  const inputs = iterateLenGet(body.inputs()).map(input => ({
-    id: input.transaction_id().to_hex(),
-    index: input.index(),
-  })).toArray();
+  const inputs = iterateLenGet(body.inputs())
+    .map(input => ({
+      id: input.transaction_id().to_hex(),
+      index: input.index(),
+    }))
+    .toArray();
 
   const base = {
     hash,
@@ -582,22 +501,20 @@ export function toRemoteByronTx(
   };
 }
 
-export function genGetAccountState(
-  blockchain: Array<RemoteTransaction>,
-  getRewardHistory: RewardHistoryFunc,
-): AccountStateFunc {
-  return async (
-    body: AccountStateRequest,
-  ): Promise<AccountStateResponse> => {
+export function genGetAccountState(blockchain: Array<RemoteTransaction>, getRewardHistory: RewardHistoryFunc): AccountStateFunc {
+  return async (body: AccountStateRequest): Promise<AccountStateResponse> => {
     const rewardHistory = await getRewardHistory(body);
 
     // 1) calculate the reward for each address
-    const resultMap = new Map<string, {|
-      rewards: BigNumber,
-      withdrawals: BigNumber,
-    |}>();
+    const resultMap = new Map<
+      string,
+      {|
+        rewards: BigNumber,
+        withdrawals: BigNumber,
+      |},
+    >();
     for (const key of Object.keys(rewardHistory)) {
-      for (const reward of (rewardHistory[key] ?? [])) {
+      for (const reward of rewardHistory[key] ?? []) {
         const currVal = resultMap.get(key) ?? {
           rewards: new BigNumber(0),
           withdrawals: new BigNumber(0),
@@ -650,11 +567,8 @@ export function genGetAccountState(
   };
 }
 
-export function genGetPoolInfo(
-): PoolInfoFunc {
-  return async (
-    body: PoolInfoRequest,
-  ): Promise<PoolInfoResponse> => {
+export function genGetPoolInfo(): PoolInfoFunc {
+  return async (body: PoolInfoRequest): Promise<PoolInfoResponse> => {
     // TODO: scan the chain properly for this information
     const mockPoolId = 'df1750df9b2df285fcfb50f4740657a18ee3af42727d410c37b86207';
     const result: PoolInfoResponse = {};
@@ -675,29 +589,23 @@ export function genGetPoolInfo(
   };
 }
 
-export function genGetTokenInfo(
-): TokenInfoFunc {
-  return async (_) => ({});
+export function genGetTokenInfo(): TokenInfoFunc {
+  return async _ => ({});
 }
 
-export function genGetMultiAssetMetadata(
-): MultiAssetMintMetadataFunc {
-  return async (_) => ({});
+export function genGetMultiAssetMetadata(): MultiAssetMintMetadataFunc {
+  return async _ => ({});
 }
 
-export function genGetMultiAssetSupply(
-): MultiAssetSupplyFunc {
-  return async (_) => ({});
+export function genGetMultiAssetSupply(): MultiAssetSupplyFunc {
+  return async _ => ({});
 }
 
 export class MockUtxoApi implements UtxoApiContract {
   blockchain: Array<RemoteTransaction>;
   safeConfirmations: number;
 
-  constructor(
-    blockchain: Array<RemoteTransaction>,
-    safeConfirmations: number,
-  ) {
+  constructor(blockchain: Array<RemoteTransaction>, safeConfirmations: number) {
     this.blockchain = blockchain;
     this.safeConfirmations = safeConfirmations;
   }
@@ -705,7 +613,7 @@ export class MockUtxoApi implements UtxoApiContract {
   _getLastSafeBlockTxIndex(): number {
     let lastHeight = null;
     let i;
-    for (i = this.blockchain.length - 1; i >= 0; i --) {
+    for (i = this.blockchain.length - 1; i >= 0; i--) {
       if (this.blockchain[i].tx_state === 'Successful') {
         lastHeight = this.blockchain[i].height;
         break;
@@ -714,12 +622,9 @@ export class MockUtxoApi implements UtxoApiContract {
     if (lastHeight == null) {
       throw new Error('no successful tx');
     }
-    for (; i >= 0; i --) {
+    for (; i >= 0; i--) {
       const currentHeight = this.blockchain[i].height;
-      if (
-        currentHeight != null &&
-          lastHeight - currentHeight >= this.safeConfirmations
-      ) {
+      if (currentHeight != null && lastHeight - currentHeight >= this.safeConfirmations) {
         break;
       }
     }
@@ -731,7 +636,7 @@ export class MockUtxoApi implements UtxoApiContract {
   }
 
   async getBestBlock(): Promise<string> {
-    for (let i = this.blockchain.length - 1; i >= 0; i --) {
+    for (let i = this.blockchain.length - 1; i >= 0; i--) {
       if (this.blockchain[i].tx_state === 'Successful') {
         const hash = this.blockchain[i].block_hash;
         if (!hash) {
@@ -744,29 +649,28 @@ export class MockUtxoApi implements UtxoApiContract {
   }
 
   async getSafeBlock(): Promise<string> {
-    const hash =  this.blockchain[this._getLastSafeBlockTxIndex()].block_hash;
+    const hash = this.blockchain[this._getLastSafeBlockTxIndex()].block_hash;
     if (!hash) {
       throw new Error('expect hash');
     }
     return hash;
   }
 
-  async getTipStatusWithReference(
-    bestBlocks: string[]
-  ): Promise<UtxoApiResponse<TipStatusReference>> {
-    const blocks = bestBlocks.map(
-      hash => {
+  async getTipStatusWithReference(bestBlocks: string[]): Promise<UtxoApiResponse<TipStatusReference>> {
+    const blocks = bestBlocks
+      .map(hash => {
         const index = this.blockchain.findIndex(tx => tx.block_hash === hash);
         if (index === -1) {
           return { index, height: null, hash };
         }
         const height = this.blockchain[index].height;
         return { index, height, hash };
-      }
-    ).filter(b => b.index !== -1).sort((b1, b2) => b1.index - b2.index);
+      })
+      .filter(b => b.index !== -1)
+      .sort((b1, b2) => b1.index - b2.index);
     if (blocks.length === 0) {
       return {
-        result: UtxoApiResult.SAFEBLOCK_ROLLBACK
+        result: UtxoApiResult.SAFEBLOCK_ROLLBACK,
       };
     }
 
@@ -776,8 +680,8 @@ export class MockUtxoApi implements UtxoApiContract {
         reference: {
           lastFoundBestBlock: blocks[blocks.length - 1].hash,
           lastFoundSafeBlock: blocks[0].hash,
-        }
-      }
+        },
+      },
     };
   }
 
@@ -808,18 +712,16 @@ export class MockUtxoApi implements UtxoApiContract {
         continue;
       }
       // remove spent
-      utxos = utxos.filter(
-        utxo => !tx.inputs.some(
-          input => input.txHash === utxo.txHash && input.index === utxo.txIndex
-        )
-      );
+      utxos = utxos.filter(utxo => !tx.inputs.some(input => input.txHash === utxo.txHash && input.index === utxo.txIndex));
       // add new
       for (let outputIndex = 0; outputIndex < tx.outputs.length; outputIndex++) {
         const output = tx.outputs[outputIndex];
-        if (!(
-          hexAddresses.includes(byronAddressToHex(output.address)) ||
+        if (
+          !(
+            hexAddresses.includes(byronAddressToHex(output.address)) ||
             hexAddresses.includes(toEnterprise(output.address)?.to_address().to_hex() ?? '')
-        )) {
+          )
+        ) {
           continue;
         }
 
@@ -841,7 +743,7 @@ export class MockUtxoApi implements UtxoApiContract {
           })),
           blockNum: height,
         });
-      };
+      }
     }
     return {
       result: UtxoApiResult.SUCCESS,
@@ -850,7 +752,7 @@ export class MockUtxoApi implements UtxoApiContract {
   }
 
   async getUtxoDiffSincePoint(req: UtxoDiffSincePointRequest): Promise<UtxoApiResponse<UtxoDiff>> {
-    const { addresses, untilBlockHash, afterBestBlocks, } = req;
+    const { addresses, untilBlockHash, afterBestBlocks } = req;
 
     const hexAddresses = addresses.map(a => {
       const hex = fixAddresses(a, networks.CardanoMainnet);
@@ -888,52 +790,55 @@ export class MockUtxoApi implements UtxoApiContract {
         }
 
         tx.outputs.forEach((output, outputIndex) => {
-          if (!(
-            hexAddresses.includes(byronAddressToHex(output.address)) ||
+          if (
+            !(
+              hexAddresses.includes(byronAddressToHex(output.address)) ||
               hexAddresses.includes(toEnterprise(output.address)?.to_address().to_hex() ?? '')
-          )) {
+            )
+          ) {
             return;
           }
-          const utxoId = `${tx.hash}${outputIndex}`
-          utxoDiffItems.push(
-            {
-              type: 'output',
-              id: utxoId,
+          const utxoId = `${tx.hash}${outputIndex}`;
+          utxoDiffItems.push({
+            type: 'output',
+            id: utxoId,
+            amount: new BigNumber(output.amount),
+            utxo: {
+              utxoId,
+              txHash: tx.hash,
+              txIndex: outputIndex,
+              receiver: output.address,
               amount: new BigNumber(output.amount),
-              utxo: {
-                utxoId,
-                txHash: tx.hash,
-                txIndex: outputIndex,
-                receiver: output.address,
-                amount: new BigNumber(output.amount),
-                assets: output.assets.map(asset => ({
-                  assetId: asset.assetId,
-                  policyId: asset.policyId,
-                  name: asset.name,
-                  amount: asset.amount,
-                })),
-                blockNum: tx.height,
-              }
-            }
-          );
+              assets: output.assets.map(asset => ({
+                assetId: asset.assetId,
+                policyId: asset.policyId,
+                name: asset.name,
+                amount: asset.amount,
+              })),
+              blockNum: tx.height,
+            },
+          });
         });
-        tx.inputs.filter(input =>
-          hexAddresses.includes(byronAddressToHex(input.address)) ||
-          hexAddresses.includes(toEnterprise(input.address)?.to_address().to_hex() ?? '')
-        ).forEach(input => {
-          utxoDiffItems.push(
-            ({
-              type: 'input',
-              id: input.id,
-              amount: new BigNumber(input.amount),
-            }: UtxoDiffItem)
-          );
-        });
+        tx.inputs
+          .filter(
+            input =>
+              hexAddresses.includes(byronAddressToHex(input.address)) ||
+              hexAddresses.includes(toEnterprise(input.address)?.to_address().to_hex() ?? '')
+          )
+          .forEach(input => {
+            utxoDiffItems.push(
+              ({
+                type: 'input',
+                id: input.id,
+                amount: new BigNumber(input.amount),
+              }: UtxoDiffItem)
+            );
+          });
       }
     }
     if (!seenUntilBlock || lastFoundBestBlock == null) {
       return {
-        result: UtxoApiResult.BESTBLOCK_ROLLBACK
+        result: UtxoApiResult.BESTBLOCK_ROLLBACK,
       };
     }
     return {
@@ -943,18 +848,14 @@ export class MockUtxoApi implements UtxoApiContract {
         reference: {
           lastFoundBestBlock,
           ...(lastFoundSafeBlock == null ? {} : { lastFoundSafeBlock }),
-        }
+        },
       },
     };
   }
 }
 
-export function genGetTransactionsByHashes(
-  transactions: Array<RemoteTransaction>
-): GetTransactionsByHashesFunc {
-  return async (
-    body: GetTransactionsByHashesRequest
-  ): Promise<GetTransactionsByHashesResponse> => {
+export function genGetTransactionsByHashes(transactions: Array<RemoteTransaction>): GetTransactionsByHashesFunc {
+  return async (body: GetTransactionsByHashesRequest): Promise<GetTransactionsByHashesResponse> => {
     const txByHash = {};
     for (const tx of transactions) {
       txByHash[tx.hash] = tx;
@@ -963,12 +864,8 @@ export function genGetTransactionsByHashes(
   };
 }
 
-export function genGetRecentTransactionHashes(
-  transactions: Array<RemoteTransaction>
-): GetRecentTransactionHashesFunc {
-  return async (
-    body: GetRecentTransactionHashesRequest
-  ): Promise<GetRecentTransactionHashesResponse> => {
+export function genGetRecentTransactionHashes(transactions: Array<RemoteTransaction>): GetRecentTransactionHashesFunc {
+  return async (body: GetRecentTransactionHashesRequest): Promise<GetRecentTransactionHashesResponse> => {
     const fixedAddresses = body.addresses.map(a => {
       return fixAddresses(a, networks.CardanoMainnet);
     });

@@ -15,14 +15,14 @@ export const ProgressStep = Object.freeze({
 type ProgressStepEnum = $Values<typeof ProgressStep>;
 
 export interface ProgressInfo {
-  currentStep: ProgressStepEnum,
-  stepState: StepStateEnum,
+  currentStep: ProgressStepEnum;
+  stepState: StepStateEnum;
 }
 
 export interface HWDeviceInfo {
-  publicMasterKey: string,
-  hwFeatures: HWFeatures,
-  defaultName: string,
+  publicMasterKey: string;
+  hwFeatures: HWFeatures;
+  defaultName: string;
 }
 
 export interface HWConnectStoreTypes<ConnectionResponse> {
@@ -37,27 +37,26 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   error: ?LocalizableError;
 
   /** device info which will be used to create wallet (except wallet name)
-    * it also holds hardware device label which can used as default wallet name
-    * although final wallet name will be fetched from the user */
+   * it also holds hardware device label which can used as default wallet name
+   * although final wallet name will be fetched from the user */
   hwDeviceInfo: ?HWDeviceInfo;
 
   /** Hardware device label to be used as default wallet name
-    * although user can opt to use user give name */
+   * although user can opt to use user give name */
   get defaultWalletName(): string;
 
   get isActionProcessing(): boolean;
   // =================== VIEW RELATED =================== //
 
-
   /** While hardware wallet creation is taking place, we need to block users from starting a
-    * hardware wallet creation on a separate wallet and explain to them why the action is blocked */
+   * hardware wallet creation on a separate wallet and explain to them why the action is blocked */
   isCreateHWActive: boolean;
   // =================== API RELATED =================== //
 
   setup(): void;
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dialog is about to show */
+   * _init() is called when connect dialog is about to show */
   init(): void;
 
   teardown(): void;
@@ -86,7 +85,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _validateHWResponse(resp: ConnectionResponse): boolean;
 
   /** Converts a valid hardware wallet response to a common storable format
-    * later the same format will be used to create wallet */
+   * later the same format will be used to create wallet */
   _normalizeHWResponse(resp: ConnectionResponse): HWDeviceInfo;
   // =================== CONNECT =================== //
 
@@ -99,9 +98,7 @@ export interface HWConnectStoreTypes<ConnectionResponse> {
   _goToSaveError(): void;
 
   /** creates new wallet and loads it */
-  _saveHW(
-    walletName: string,
-  ): Promise<void>;
+  _saveHW(walletName: string): Promise<void>;
 
   _onSaveSuccess(wallet: WalletState): Promise<void>;
   // =================== SAVE =================== //

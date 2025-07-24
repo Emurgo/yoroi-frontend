@@ -8,11 +8,7 @@ import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mock
 import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { getTestWalletName } from '../../helpers/constants.js';
-import {
-  collectInfo,
-  createWallet,
-  preloadBrowserStorage,
-} from '../../helpers/restoreWalletHelper.js';
+import { collectInfo, createWallet, preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 
 describe('dApp, getUtxos, empty wallet', function () {

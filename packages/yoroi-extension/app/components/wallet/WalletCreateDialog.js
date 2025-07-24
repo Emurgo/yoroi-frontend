@@ -42,7 +42,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onSubmit: {| name: string, password: string |} => PossiblyAsync<void>,
+  +onSubmit: ({| name: string, password: string |}) => PossiblyAsync<void>,
   +onCancel: void => void,
 |};
 
@@ -52,74 +52,77 @@ type State = {|
 
 @observer
 export default class WalletCreateDialog extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
 
   componentDidMount(): void {
-    setTimeout(() => { this.walletNameInput.focus(); });
+    setTimeout(() => {
+      this.walletNameInput.focus();
+    });
   }
 
   // $FlowFixMe[value-as-type]
   walletNameInput: TextField;
 
-  form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
-    fields: {
-      walletName: {
-        label: this.context.formatMessage(messages.walletName),
-        placeholder: '',
-        value: '',
-        validators: [({ field }) => (
-          [
-            isValidWalletName(field.value),
-            this.context.formatMessage(globalMessages.invalidWalletName)
-          ]
-        )],
+  form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
+    {
+      fields: {
+        walletName: {
+          label: this.context.formatMessage(messages.walletName),
+          placeholder: '',
+          value: '',
+          validators: [
+            ({ field }) => [isValidWalletName(field.value), this.context.formatMessage(globalMessages.invalidWalletName)],
+          ],
+        },
+        walletPassword: {
+          type: 'password',
+          label: this.context.formatMessage(globalMessages.walletPasswordLabel),
+          placeholder: '',
+          value: '',
+          validators: [
+            ({ field, form }) => {
+              const repeatPasswordField = form.$('repeatPassword');
+              if (repeatPasswordField.value.length > 0) {
+                repeatPasswordField.validate({ showErrors: true });
+              }
+              return [isValidWalletPassword(field.value), this.context.formatMessage(globalMessages.invalidWalletPassword)];
+            },
+          ],
+        },
+        repeatPassword: {
+          type: 'password',
+          label: this.context.formatMessage(messages.repeatPasswordLabel),
+          placeholder: '',
+          value: '',
+          validators: [
+            ({ field, form }) => {
+              const walletPassword = form.$('walletPassword').value;
+              return [
+                isValidRepeatPassword(walletPassword, field.value),
+                this.context.formatMessage(globalMessages.invalidRepeatPassword),
+              ];
+            },
+          ],
+        },
       },
-      walletPassword: {
-        type: 'password',
-        label: this.context.formatMessage(globalMessages.walletPasswordLabel),
-        placeholder: '',
-        value: '',
-        validators: [({ field, form }) => {
-          const repeatPasswordField = form.$('repeatPassword');
-          if (repeatPasswordField.value.length > 0) {
-            repeatPasswordField.validate({ showErrors: true });
-          }
-          return [
-            isValidWalletPassword(field.value),
-            this.context.formatMessage(globalMessages.invalidWalletPassword)
-          ];
-        }],
+    },
+    {
+      options: {
+        validateOnChange: true,
+        validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
       },
-      repeatPassword: {
-        type: 'password',
-        label: this.context.formatMessage(messages.repeatPasswordLabel),
-        placeholder: '',
-        value: '',
-        validators: [({ field, form }) => {
-          const walletPassword = form.$('walletPassword').value;
-          return [
-            isValidRepeatPassword(walletPassword, field.value),
-            this.context.formatMessage(globalMessages.invalidRepeatPassword)
-          ];
-        }],
+      plugins: {
+        vjf: vjf(),
       },
     }
-  }, {
-    options: {
-      validateOnChange: true,
-      validationDebounceWait: config.forms.FORM_VALIDATION_DEBOUNCE_WAIT,
-    },
-    plugins: {
-      vjf: vjf()
-    },
-  });
+  );
 
-  submit: (() => void) = () => {
+  submit: () => void = () => {
     this.form.submit({
-      onSuccess: async (form) => {
+      onSuccess: async form => {
         this.setState({ isSubmitting: true });
         const { walletName, walletPassword } = form.values();
         const walletData = {
@@ -144,21 +147,15 @@ export default class WalletCreateDialog extends Component<Props, State> {
     const { form } = this;
     const { walletName, walletPassword, repeatPassword } = form.values();
     const intl = this.context;
-    const { onCancel, } = this.props;
+    const { onCancel } = this.props;
     const { isSubmitting } = this.state;
-    const dialogClasses = classnames([
-      styles.component,
-      'WalletCreateDialog',
-    ]);
-    const walletPasswordFieldsClasses = classnames([
-      styles.walletPasswordFields,
-      styles.show,
-    ]);
+    const dialogClasses = classnames([styles.component, 'WalletCreateDialog']);
+    const walletPasswordFieldsClasses = classnames([styles.walletPasswordFields, styles.show]);
 
     const disabledCondition = !(
-      isValidWalletName(walletName)
-      && isValidWalletPassword(walletPassword)
-      && isValidRepeatPassword(walletPassword, repeatPassword)
+      isValidWalletName(walletName) &&
+      isValidWalletPassword(walletPassword) &&
+      isValidRepeatPassword(walletPassword, repeatPassword)
     );
 
     const actions = [
@@ -167,7 +164,7 @@ export default class WalletCreateDialog extends Component<Props, State> {
         label: this.context.formatMessage(messages.createPersonalWallet),
         primary: true,
         onClick: this.submit,
-        disabled: isSubmitting || disabledCondition
+        disabled: isSubmitting || disabledCondition,
       },
     ];
 

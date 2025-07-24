@@ -1,22 +1,20 @@
 // @flow
 import BigNumber from 'bignumber.js';
 import { MAX_MEMO_SIZE } from '../config/externalStorageConfig';
-import type { $npm$ReactIntl$IntlFormat, } from 'react-intl';
-import { defineMessages, } from 'react-intl';
+import type { $npm$ReactIntl$IntlFormat } from 'react-intl';
+import { defineMessages } from 'react-intl';
 import type { TokenRow } from '../api/ada/lib/storage/database/primitives/tables';
 import { getTokenName } from '../stores/stateless/tokenHelpers';
 import { truncateToken } from './formatters';
 
-export const isValidWalletName: string => boolean = (walletName) => {
+export const isValidWalletName: string => boolean = walletName => {
   const nameLength = walletName.length;
   return nameLength >= 1 && nameLength <= 40;
 };
 
-export const isValidPaperPassword: string => boolean = (paperPassword) => (
-  isValidWalletPassword(paperPassword)
-);
+export const isValidPaperPassword: string => boolean = paperPassword => isValidWalletPassword(paperPassword);
 
-export const isValidWalletPassword: string => boolean = (walletPassword) => (
+export const isValidWalletPassword: string => boolean = walletPassword =>
   /**
    * No special character requirement: https://xkcd.com/936/
    *
@@ -30,35 +28,25 @@ export const isValidWalletPassword: string => boolean = (walletPassword) => (
    * many users may have the same wallet in both Daedalus and Yoroi
    * It's easier if we allow them to also have the same password in this case.
    */
-  walletPassword.length >= 10
-);
+  walletPassword.length >= 10;
 
-export const isValidRepeatPassword: (string, string) => boolean = (
-  walletPassword,
-  repeatPassword
-) => walletPassword === repeatPassword;
+export const isValidRepeatPassword: (string, string) => boolean = (walletPassword, repeatPassword) =>
+  walletPassword === repeatPassword;
 
-export const isValidMemo: string => boolean = (memo) => (
-  memo !== ''
-  && memo.length <= MAX_MEMO_SIZE
-);
+export const isValidMemo: string => boolean = memo => memo !== '' && memo.length <= MAX_MEMO_SIZE;
 
-export const isValidMemoOptional: string => boolean = (memo) => (
-  memo.length <= MAX_MEMO_SIZE
-);
+export const isValidMemoOptional: string => boolean = memo => memo.length <= MAX_MEMO_SIZE;
 
 export const isWithinSupply: (string, BigNumber) => boolean = (value, totalSupply) => {
   const numericValue = new BigNumber(value);
-  return numericValue.isFinite()
-    && numericValue.gte(1)
-    && numericValue.lte(totalSupply);
+  return numericValue.isFinite() && numericValue.gte(1) && numericValue.lte(totalSupply);
 };
 
 export async function validateAmount(
   amount: BigNumber,
   tokenRow: $ReadOnly<TokenRow>,
   minAmount: BigNumber,
-  formatter: $npm$ReactIntl$IntlFormat,
+  formatter: $npm$ReactIntl$IntlFormat
 ): Promise<[boolean, void | string]> {
   const messages = defineMessages({
     invalidAmount: {
@@ -73,7 +61,7 @@ export async function validateAmount(
 
   // some Rust stuff could overflow after 2^63 - 1
   if (amount.gt(new BigNumber(2).pow(63).minus(1))) {
-    return [false, formatter.formatMessage(messages.invalidAmount)]
+    return [false, formatter.formatMessage(messages.invalidAmount)];
   }
 
   // don't validate this for tokens since they have no minimum
@@ -85,7 +73,7 @@ export async function validateAmount(
       formatter.formatMessage(messages.tooSmallUtxo, {
         minUtxo: minAmount.div(new BigNumber(10).pow(tokenRow.Metadata.numberOfDecimals)),
         ticker: truncateToken(getTokenName(tokenRow)),
-      })
+      }),
     ];
   }
   return [true, undefined];

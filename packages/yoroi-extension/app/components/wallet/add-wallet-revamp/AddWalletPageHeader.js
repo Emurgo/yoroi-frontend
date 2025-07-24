@@ -23,8 +23,8 @@ const LogoIconWrapper = styled(Box)(({ theme }) => ({
       '& linearGradient': {
         '& stop': {
           'stop-color': theme.palette.ds.el_primary_medium,
-        }
-      }
+        },
+      },
     },
   },
 }));
@@ -43,7 +43,7 @@ type Props = {|
 
 @observer
 export default class AddWalletPageHeader extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { goToCurrentWallet, hasAnyWallets } = this.props;

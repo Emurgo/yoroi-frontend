@@ -49,9 +49,7 @@ describe('Verify addresses', function () {
       expect(modalIsDisplayed, 'Verify address modal is not displayed').to.be.true;
       const verifyInfo = await verifyAddresModalPage.getVerifyAddressInfo();
       expect(verifyInfo.addressFull, 'Full address is different').to.equal(addressInfo.addressFull);
-      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(
-        /m\/1852'\/1815'\/0'\/0\/\d+/gi
-      );
+      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(/m\/1852'\/1815'\/0'\/0\/\d+/gi);
       expect(verifyInfo.stakingKeyHash, 'Staking key hash is different').to.equal(stakingKeyHexExp);
       await verifyAddresModalPage.closeModal();
     }
@@ -68,9 +66,7 @@ describe('Verify addresses', function () {
       expect(modalIsDisplayed, 'Verify address modal is not displayed').to.be.true;
       const verifyInfo = await verifyAddresModalPage.getVerifyAddressInfo();
       expect(verifyInfo.addressFull, 'Full address is different').to.equal(addressInfo.addressFull);
-      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(
-        /m\/1852'\/1815'\/0'\/1\/\d+/gi
-      );
+      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(/m\/1852'\/1815'\/0'\/1\/\d+/gi);
       expect(verifyInfo.stakingKeyHash, 'Staking key hash is different').to.equal(stakingKeyHexExp);
       await verifyAddresModalPage.closeModal();
     }
@@ -87,9 +83,7 @@ describe('Verify addresses', function () {
       expect(modalIsDisplayed, 'Verify address modal is not displayed').to.be.true;
       const verifyInfo = await verifyAddresModalPage.getVerifyAddressInfo(true);
       expect(verifyInfo.addressFull, 'Full address is different').to.equal(addressInfo.addressFull);
-      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(
-        /m\/1852'\/1815'\/0'\/2\/\d+/gi
-      );
+      expect(verifyInfo.derivationPath, 'Derivation path is diffirent').to.match(/m\/1852'\/1815'\/0'\/2\/\d+/gi);
     }
   });
 

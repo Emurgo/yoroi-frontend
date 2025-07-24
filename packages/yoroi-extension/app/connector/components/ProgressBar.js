@@ -14,12 +14,7 @@ const ProgressBar = (props: Props): Node => {
 
   return (
     <div className={styles.component}>
-      <LinearProgress
-        color="secondary"
-        sx={{ height: '8px' }}
-        value={(step * 100) / max}
-        variant="determinate"
-      />
+      <LinearProgress color="secondary" sx={{ height: '8px' }} value={(step * 100) / max} variant="determinate" />
     </div>
   );
 };

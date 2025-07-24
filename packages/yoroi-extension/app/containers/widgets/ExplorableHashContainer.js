@@ -32,7 +32,7 @@ export default class ExplorableHashContainer extends Component<Props> {
     light: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -41,8 +41,7 @@ export default class ExplorableHashContainer extends Component<Props> {
       return this.props.children ?? null;
     }
 
-    const displayName =
-      explorerInfo.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer);
+    const displayName = explorerInfo.name + ' ' + intl.formatMessage(globalMessages.blockchainExplorer);
 
     return (
       <ExplorableHash

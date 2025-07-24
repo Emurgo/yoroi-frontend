@@ -17,7 +17,7 @@ const VotingPageContent = lazy(VotingPageContentPromise);
 
 @observer
 export default class VotingPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   render(): Node {
     const { stores } = this.props;
@@ -31,12 +31,12 @@ export default class VotingPage extends Component<StoresProps> {
 
     return (
       <TopBarLayout
-        banner={<BannerContainer stores={stores}/>}
-        sidebar={<SidebarContainer stores={stores}/>}
+        banner={<BannerContainer stores={stores} />}
+        sidebar={<SidebarContainer stores={stores} />}
         navbar={
           <NavBarContainerRevamp
             stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarVoting)}/>}
+            title={<NavBarTitle title={intl.formatMessage(globalMessages.sidebarVoting)} />}
           />
         }
         showInContainer

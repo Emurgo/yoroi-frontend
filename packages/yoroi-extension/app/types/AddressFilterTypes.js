@@ -1,15 +1,13 @@
 // @flow
 
-import type {
-  Address, AddressType, Addressing, UsedStatus, Value,
-} from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Address, AddressType, Addressing, UsedStatus, Value } from '../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { defineMessages } from 'react-intl';
 import type { $npm$ReactIntl$MessageDescriptor } from 'react-intl';
 import globalMessages from '../i18n/global-messages';
 
 type Label = {|
   +label: string,
-|}
+|};
 
 type ToMessage = <K>(K) => $Exact<$npm$ReactIntl$MessageDescriptor>;
 
@@ -52,7 +50,6 @@ export type AddressTypeName = {|
   subgroup: AddressSubgroupKind,
 |};
 
-
 export const AddressGroupTypes = Object.freeze({
   base: 'base',
   enterprise: 'enterprise',
@@ -90,34 +87,33 @@ export const addressGroupsTooltip: $ObjMap<typeof AddressGroupTypes, ToMessage> 
       id: 'wallet.address.category.addressBook',
       defaultMessage: '!!!Addresses that do not belong to you, but are relevant to your wallet',
     },
-  })
+  }),
 });
 export const addressGroupName: $ObjMap<typeof AddressGroupTypes, ToMessage> = Object.freeze({
   byron: globalMessages.byronLabel,
   ...defineMessages({
     base: {
       id: 'wallet.receive.navigation.baseLabel',
-      defaultMessage: '!!!Base'
+      defaultMessage: '!!!Base',
     },
     enterprise: {
       id: 'wallet.receive.navigation.enterpriseLabel',
-      defaultMessage: '!!!Enterprise'
+      defaultMessage: '!!!Enterprise',
     },
     reward: {
       id: 'wallet.receive.navigation.rewardLabel',
-      defaultMessage: '!!!Reward'
+      defaultMessage: '!!!Reward',
     },
     group: {
       id: 'wallet.receive.navigation.groupLabel',
-      defaultMessage: '!!!Group'
+      defaultMessage: '!!!Group',
     },
     addressBook: {
       id: 'wallet.receive.navigation.AddressBook',
-      defaultMessage: '!!!Address book'
+      defaultMessage: '!!!Address book',
     },
-  })
+  }),
 });
-
 
 export const AddressFilter = Object.freeze({
   None: 'None',
@@ -131,15 +127,15 @@ export const addressFilter: $ObjMap<typeof AddressFilter, ToMessage> = Object.fr
   ...defineMessages({
     Used: {
       id: 'wallet.receive.navigation.usedLabel',
-      defaultMessage: '!!!Used'
+      defaultMessage: '!!!Used',
     },
     Unused: {
       id: 'wallet.receive.navigation.unusedLabel',
-      defaultMessage: '!!!Unused'
+      defaultMessage: '!!!Unused',
     },
     HasBalance: {
       id: 'wallet.receive.navigation.hasBalanceLabel',
-      defaultMessage: '!!!Has Balance'
+      defaultMessage: '!!!Has Balance',
     },
-  })
+  }),
 });

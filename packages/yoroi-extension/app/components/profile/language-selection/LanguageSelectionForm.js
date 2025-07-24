@@ -39,7 +39,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     error: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   selectLanguage: string => void = locale => {
     this.props.onSelectLanguage({ locale });
   };
@@ -106,11 +106,13 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     }));
 
     return (
-      <Box sx={{
-        maxWidth: '530px',
-        mx: 'auto',
-        mt: '48px'
-      }}>
+      <Box
+        sx={{
+          maxWidth: '530px',
+          mx: 'auto',
+          mt: '48px',
+        }}
+      >
         <div className={styles.centeredBox}>
           <Typography component="div" variant="h5" fontWeight={500} mb="24px" textAlign="center">
             {this.context.formatMessage(globalMessages.languageSelectLabelShort)}
@@ -138,7 +140,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
           >
             {languageOptions.map(option => (
               <MenuItem key={option.value} value={option.value} id={'selectLanguage-' + option.value + '-menuItem'}>
-                <FlagLabel svg={option.svg} label={option.label}/>
+                <FlagLabel svg={option.svg} label={option.label} />
               </MenuItem>
             ))}
           </Select>
@@ -158,8 +160,16 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                 <FormattedMessage
                   {...globalMessages.tosAgreement}
                   values={{
-                    tosLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="tosLink">{chunks}</a>),
-                    privacyLink: chunks => (<a href="." style={{textDecoration: 'none'}} id="privacyLink">{chunks}</a>),
+                    tosLink: chunks => (
+                      <a href="." style={{ textDecoration: 'none' }} id="tosLink">
+                        {chunks}
+                      </a>
+                    ),
+                    privacyLink: chunks => (
+                      <a href="." style={{ textDecoration: 'none' }} id="privacyLink">
+                        {chunks}
+                      </a>
+                    ),
                   }}
                 />
               </Box>
@@ -170,7 +180,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                 onChange={event => {
                   tosAgreement.value = event.target.checked;
                 }}
-                id='initialPage-tosAgreement-checkbox'
+                id="initialPage-tosAgreement-checkbox"
               />
             }
             sx={{
@@ -199,7 +209,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
                   padding: '13px 24px',
                 },
               }}
-              id='initialPage-continue-button'
+              id="initialPage-continue-button"
             >
               {intl.formatMessage(globalMessages.continue)}
             </LoadingButton>
@@ -229,7 +239,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
         <Box mt="48px" maxWidth="648px" mx="auto" pb="20px">
           <div className={styles.tosBox}>
             <div className={tosStyles.terms}>
-              <ReactMarkdown source={markdown} escapeHtml={false}/>
+              <ReactMarkdown source={markdown} escapeHtml={false} />
             </div>
           </div>
         </Box>
@@ -240,7 +250,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
             top: '24px',
             left: '24px',
           }}
-          startIcon={<BackIcon/>}
+          startIcon={<BackIcon />}
           onClick={this.onClickBack}
         >
           {intl.formatMessage(globalMessages.backButtonLabel)}

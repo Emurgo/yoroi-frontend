@@ -180,12 +180,11 @@ export default class DelegationStore extends Store<StoresMap> {
     return this.getDelegationRequests(publicDeriverId)?.getDelegatedBalance.wasExecuted === true;
   };
 
-  getRewardBalanceOrZero: ({
-    publicDeriverId: number,
-    networkId: number,
-    defaultTokenId: string,
-    ...
-  }) => MultiToken = ({ publicDeriverId, networkId, defaultTokenId }) => {
+  getRewardBalanceOrZero: ({ publicDeriverId: number, networkId: number, defaultTokenId: string, ... }) => MultiToken = ({
+    publicDeriverId,
+    networkId,
+    defaultTokenId,
+  }) => {
     const defaultMultiToken = new MultiToken([], {
       defaultNetworkId: networkId,
       defaultIdentifier: defaultTokenId,
@@ -308,11 +307,7 @@ export default class DelegationStore extends Store<StoresMap> {
     });
   };
 
-  checkGovernanceStatus: ({
-    stakingAddress: string,
-    networkId: number,
-    ...
-  }) => Promise<void> = async publicDeriver => {
+  checkGovernanceStatus: ({ stakingAddress: string, networkId: number, ... }) => Promise<void> = async publicDeriver => {
     try {
       const skey = unwrapStakingKey(publicDeriver.stakingAddress).to_keyhash()?.to_hex();
       if (skey == null) {

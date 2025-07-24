@@ -29,7 +29,7 @@ describe('Generating URL-link', function () {
   it('Generate payment URI', async function () {
     const receivePage = new ReceiveSubTab(webdriver, logger);
     const amountToSend = '5';
-    
+
     const genURIInfo = await receivePage.geneneratePaymentURI(0, amountToSend);
     const latestReceiverAddr = await receivePage.getCurrentReceiveAddr();
     expect(latestReceiverAddr).to.equal(genURIInfo.address);

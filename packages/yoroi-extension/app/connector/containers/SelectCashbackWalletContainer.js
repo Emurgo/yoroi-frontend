@@ -44,4 +44,3 @@ export default class SelectCashbackWalletContainer extends Component<ConnectorSt
     );
   }
 }
-

@@ -43,8 +43,7 @@ describe('dApp, Yoroi object in Cardano', function () {
   it('Check Yoroi object in Cardano', async function () {
     const yoroiObjectResponse = await mockedDApp.getYoroiObject();
     expect(yoroiObjectResponse.success, 'Error happened while receiving "yoroi" object').to.be.true;
-    expect(yoroiObjectResponse.retValue, 'An empty object is returned').to.be.an('object').that.is
-      .not.empty;
+    expect(yoroiObjectResponse.retValue, 'An empty object is returned').to.be.an('object').that.is.not.empty;
     expect(yoroiObjectResponse.retValue.name).to.equal(yoroiObject.name);
     expect(yoroiObjectResponse.retValue.apiVersion).to.equal(yoroiObject.apiVersion);
     expect(yoroiObjectResponse.retValue.icon).to.equal(yoroiObject.icon);
