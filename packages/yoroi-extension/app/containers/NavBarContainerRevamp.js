@@ -24,10 +24,6 @@ export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} =
     color: 'rgba(236, 186, 9, 1)',
     text: 'Preprod',
   },
-  [networks.CardanoPreviewTestnet.NetworkId]: {
-    color: 'rgba(143, 201, 246, 1)',
-    text: 'Preview',
-  },
 });
 
 type LocalProps = {|
