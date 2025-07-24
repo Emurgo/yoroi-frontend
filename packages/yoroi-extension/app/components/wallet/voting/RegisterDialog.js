@@ -22,8 +22,7 @@ import ErrorBlock from '../../widgets/ErrorBlock';
 const messages = defineMessages({
   line1: {
     id: 'wallet.voting.dialog.step.register.line1',
-    defaultMessage:
-      '!!!Enter your password to be able to generate the required certificate for voting.',
+    defaultMessage: '!!!Enter your password to be able to generate the required certificate for voting.',
   },
 });
 
@@ -39,7 +38,7 @@ type Props = {|
 
 @observer
 export default class RegisterDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
@@ -71,34 +70,23 @@ export default class RegisterDialog extends Component<Props> {
         backButton={<DialogBackButton onBack={goBack} />}
         onClose={cancel}
       >
-        {(
+        {
           <>
             <Stepper
               currentStep={String(progressInfo.currentStep)}
               steps={stepsList.map(step => ({
                 message: step.message,
-                stepId: String(step.step)
+                stepId: String(step.step),
               }))}
-              setCurrentStep={() => {
-              }}
+              setCurrentStep={() => {}}
             />
-            <Typography
-              component="div"
-              textAlign="center"
-              pt="24px"
-              pb="40px"
-              variant="body1"
-              color="grayscale.900"
-            >
+            <Typography component="div" textAlign="center" pt="24px" pb="40px" variant="body1" color="grayscale.900">
               {intl.formatMessage(messages.line1)}
             </Typography>
           </>
-        )}
+        }
         <div className={styles.spendingPassword}>
-          <SpendingPasswordInput
-            setForm={form => this.setSpendingPasswordForm(form)}
-            isSubmitting={isProcessing}
-          />
+          <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={isProcessing} />
           <ErrorBlock error={error} />
         </div>
       </Dialog>

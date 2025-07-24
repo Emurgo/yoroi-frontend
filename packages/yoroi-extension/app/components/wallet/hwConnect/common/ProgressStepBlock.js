@@ -21,8 +21,7 @@ type Props = {|
 
 @observer
 export default class ProgressStepBlock extends Component<Props> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { progressInfo } = this.props;
@@ -32,10 +31,11 @@ export default class ProgressStepBlock extends Component<Props> {
         stepsList={[
           intl.formatMessage(globalMessages.checkLabel),
           intl.formatMessage(globalMessages.connectLabel),
-          intl.formatMessage(messages.stepSaveLabel)
+          intl.formatMessage(messages.stepSaveLabel),
         ]}
         currentStep={progressInfo.currentStep}
         stepState={progressInfo.stepState}
-      />);
+      />
+    );
   }
 }

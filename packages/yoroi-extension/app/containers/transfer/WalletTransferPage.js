@@ -12,7 +12,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class WalletTransferPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   onClose: void => void = () => {
     this.props.stores.uiDialogs.closeActiveDialog();
   };
@@ -33,10 +33,7 @@ export default class WalletTransferPage extends Component<StoresProps> {
 
     return (
       <>
-        <TransferTypeSelect
-          onByron={this.startTransferYoroiPaperFunds}
-          ticker={truncateToken(getTokenName(defaultTokenInfo))}
-        />
+        <TransferTypeSelect onByron={this.startTransferYoroiPaperFunds} ticker={truncateToken(getTokenName(defaultTokenInfo))} />
         <YoroiTransferPage stores={stores} />
       </>
     );

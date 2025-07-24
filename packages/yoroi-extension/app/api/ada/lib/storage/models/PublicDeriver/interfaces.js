@@ -1,18 +1,12 @@
 // @flow
 
-import type {
-  lf$Database,
-} from 'lovefield';
+import type { lf$Database } from 'lovefield';
 
 import { ConceptualWallet } from '../ConceptualWallet/index';
 import type { IConceptualWallet } from '../ConceptualWallet/interfaces';
 
-import {
-  GetUtxoTxOutputsWithTx,
-} from '../../database/transactionModels/utxo/api/read';
-import type {
-  ErgoFields,
-} from '../../database/transactionModels/utxo/tables';
+import { GetUtxoTxOutputsWithTx } from '../../database/transactionModels/utxo/api/read';
+import type { ErgoFields } from '../../database/transactionModels/utxo/tables';
 import type {
   TokenRow,
   AddressRow,
@@ -22,18 +16,10 @@ import type {
   KeyDerivationRow,
 } from '../../database/primitives/tables';
 
-import type { PublicDeriverRow, LastSyncInfoRow, } from '../../database/walletTypes/core/tables';
+import type { PublicDeriverRow, LastSyncInfoRow } from '../../database/walletTypes/core/tables';
 
-import type {
-  IChangePasswordRequestFunc, IChangePasswordRequest,
-  RawVariation,
-  RawTableVariation,
-} from '../common/interfaces';
-import {
-  GetPublicDeriver,
-  GetKeyForPublicDeriver,
-  GetLastSyncForPublicDeriver,
-} from '../../database/walletTypes/core/api/read';
+import type { IChangePasswordRequestFunc, IChangePasswordRequest, RawVariation, RawTableVariation } from '../common/interfaces';
+import { GetPublicDeriver, GetKeyForPublicDeriver, GetLastSyncForPublicDeriver } from '../../database/walletTypes/core/api/read';
 import {
   GetPathWithSpecific,
   GetDerivationsByPath,
@@ -42,33 +28,19 @@ import {
   GetAddress,
   GetToken,
 } from '../../database/primitives/api/read';
-import type {
-  CoreAddressT,
-} from '../../database/primitives/enums';
-import {
-  ModifyDisplayCutoff,
-} from '../../database/walletTypes/bip44/api/write';
-import {
-  AddDerivationTree,
-} from '../../database/walletTypes/common/api/write';
+import type { CoreAddressT } from '../../database/primitives/enums';
+import { ModifyDisplayCutoff } from '../../database/walletTypes/bip44/api/write';
+import { AddDerivationTree } from '../../database/walletTypes/common/api/write';
 import { GetDerivationSpecific } from '../../database/walletTypes/common/api/read';
-import { ModifyKey, ModifyAddress, } from '../../database/primitives/api/write';
-import {
-  ChainDerivations,
-} from '../../../../../../config/numbersConfig';
-import type {
-  TreeInsert,
-} from '../../database/walletTypes/common/utils.types';
+import { ModifyKey, ModifyAddress } from '../../database/primitives/api/write';
+import { ChainDerivations } from '../../../../../../config/numbersConfig';
+import type { TreeInsert } from '../../database/walletTypes/common/utils.types';
 import type { Bip44ChainInsert } from '../../database/walletTypes/common/tables';
 import { MultiToken } from '../../../../../common/lib/MultiToken';
-import type {
-  GetUtxoAtSafePoint,
-  GetUtxoDiffToBestBlock,
-} from '../../database/utxo/api/read';
+import type { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from '../../database/utxo/api/read';
 import { UtxoService } from '@emurgo/yoroi-lib/dist/utxo';
-import { UtxoStorageApi, } from '../utils';
+import { UtxoStorageApi } from '../utils';
 import type { FilterFunc } from '../../../state-fetch/types';
-
 
 export type Address = {|
   +address: string,
@@ -81,7 +53,7 @@ export type Addressing = {|
   +addressing: {|
     +path: Array<number>,
     +startLevel: number,
-  |}
+  |},
 |};
 
 export type UsedStatus = {|
@@ -91,7 +63,6 @@ export type UsedStatus = {|
 export type AddressType = {|
   type: CoreAddressT,
 |};
-
 
 export type IPublicDeriverConstructor<+Parent: IConceptualWallet> = {
   publicDeriverId: number,
@@ -129,23 +100,17 @@ export type UtxoAddressPath = {|
 
 export type IGetPublicRequest = void;
 export type IGetPublicResponse = $ReadOnly<KeyRow>;
-export type IGetPublicFunc = (
-  body: IGetPublicRequest
-) => Promise<IGetPublicResponse>;
+export type IGetPublicFunc = (body: IGetPublicRequest) => Promise<IGetPublicResponse>;
 export interface IGetPublic {
-  +rawGetPublicKey: RawVariation<
-  IGetPublicFunc,
-    {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
-    IGetPublicRequest
-  >;
+  +rawGetPublicKey: RawVariation<IGetPublicFunc, {| GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |}, IGetPublicRequest>;
   +getPublicKey: IGetPublicFunc;
 
   +rawChangePubDeriverPassword: RawVariation<
     IChangePasswordRequestFunc,
     {| ModifyKey: Class<ModifyKey>, GetKeyForPublicDeriver: Class<GetKeyForPublicDeriver> |},
-    IChangePasswordRequest
+    IChangePasswordRequest,
   >;
-  +changePubDeriverPassword: IChangePasswordRequestFunc,
+  +changePubDeriverPassword: IChangePasswordRequestFunc;
 }
 
 type GetAllUtxosOutput = {|
@@ -155,27 +120,25 @@ type GetAllUtxosOutput = {|
     ...WithNullableFields<ErgoFields>,
     ...
   }>,
-  +tokens: $ReadOnlyArray<$ReadOnly<{|
-    +TokenList: $ReadOnly<{ +Amount: string, ... }>,
-    +Token: $ReadOnly<TokenRow>,
-  |}>>
+  +tokens: $ReadOnlyArray<
+    $ReadOnly<{|
+      +TokenList: $ReadOnly<{ +Amount: string, ... }>,
+      +Token: $ReadOnly<TokenRow>,
+    |}>,
+  >,
 |};
 
 export type IGetAllUtxoAddressesRequest = PathRequest;
 export type IGetAllUtxoAddressesResponse = Array<UtxoAddressPath>;
-export type IGetAllUtxoAddressesFunc = (
-  body: IGetAllUtxoAddressesRequest
-) => Promise<IGetAllUtxoAddressesResponse>;
+export type IGetAllUtxoAddressesFunc = (body: IGetAllUtxoAddressesRequest) => Promise<IGetAllUtxoAddressesResponse>;
 export type IGetAllUtxosRequest = void;
 export type QueriedUtxo = {|
-  output: $ReadOnly<GetAllUtxosOutput>;
+  output: $ReadOnly<GetAllUtxosOutput>,
   ...Addressing,
   ...Address,
 |};
 export type IGetAllUtxosResponse = Array<QueriedUtxo>;
-export type IGetAllUtxosFunc = (
-  body: IGetAllUtxosRequest
-) => Promise<IGetAllUtxosResponse>;
+export type IGetAllUtxosFunc = (body: IGetAllUtxosRequest) => Promise<IGetAllUtxosResponse>;
 export interface IGetAllUtxos {
   +rawGetAllUtxos: RawTableVariation<
     IGetAllUtxosFunc,
@@ -188,7 +151,7 @@ export interface IGetAllUtxos {
       GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetAllUtxosRequest
+    IGetAllUtxosRequest,
   >;
   +getAllUtxos: IGetAllUtxosFunc;
   +getAllUtxosFromOldDb: IGetAllUtxosFunc;
@@ -200,9 +163,9 @@ export interface IGetAllUtxos {
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetAllUtxoAddressesRequest
+    IGetAllUtxoAddressesRequest,
   >;
-  +getAllUtxoAddresses: IGetAllUtxoAddressesFunc
+  +getAllUtxoAddresses: IGetAllUtxoAddressesFunc;
 }
 
 export type IDisplayCutoffPopRequest = void;
@@ -211,21 +174,15 @@ export type IDisplayCutoffPopResponse = {|
   row: $ReadOnly<CanonicalAddressRow>,
   addrs: $ReadOnlyArray<$ReadOnly<AddressRow>>,
 |};
-export type IDisplayCutoffPopFunc = (
-  body: IDisplayCutoffPopRequest
-) => Promise<IDisplayCutoffPopResponse>;
+export type IDisplayCutoffPopFunc = (body: IDisplayCutoffPopRequest) => Promise<IDisplayCutoffPopResponse>;
 
 export type IDisplayCutoffGetRequest = void;
 export type IDisplayCutoffGetResponse = number;
-export type IDisplayCutoffGetFunc = (
-  body: IDisplayCutoffGetRequest
-) => Promise<IDisplayCutoffGetResponse>;
+export type IDisplayCutoffGetFunc = (body: IDisplayCutoffGetRequest) => Promise<IDisplayCutoffGetResponse>;
 
-export type IDisplayCutoffSetRequest = {| newIndex: number, |};
+export type IDisplayCutoffSetRequest = {| newIndex: number |};
 export type IDisplayCutoffSetResponse = void;
-export type IDisplayCutoffSetFunc = (
-  body: IDisplayCutoffSetRequest
-) => Promise<IDisplayCutoffSetResponse>;
+export type IDisplayCutoffSetFunc = (body: IDisplayCutoffSetRequest) => Promise<IDisplayCutoffSetResponse>;
 
 export interface IDisplayCutoff {
   +rawPopAddress: RawTableVariation<
@@ -234,7 +191,7 @@ export interface IDisplayCutoff {
       ModifyDisplayCutoff: Class<ModifyDisplayCutoff>,
       GetAddress: Class<GetAddress>,
     |},
-    IDisplayCutoffPopRequest
+    IDisplayCutoffPopRequest,
   >;
   /**
    * Throws exception if there are no addresses to pop
@@ -246,11 +203,11 @@ export interface IDisplayCutoff {
     IDisplayCutoffGetFunc,
     {|
       GetDerivationSpecific: Class<GetDerivationSpecific>,
-      GetPathWithSpecific: Class<GetPathWithSpecific>
+      GetPathWithSpecific: Class<GetPathWithSpecific>,
     |},
-    IDisplayCutoffGetRequest
+    IDisplayCutoffGetRequest,
   >;
-  +getCutoff: IDisplayCutoffGetFunc,
+  +getCutoff: IDisplayCutoffGetFunc;
 
   +rawSetCutoff: RawVariation<
     IDisplayCutoffSetFunc,
@@ -259,9 +216,9 @@ export interface IDisplayCutoff {
       GetDerivationsByPath: Class<GetDerivationsByPath>,
       GetKeyDerivation: Class<GetKeyDerivation>,
     |},
-    IDisplayCutoffSetRequest
+    IDisplayCutoffSetRequest,
   >;
-  +setCutoff: IDisplayCutoffSetFunc,
+  +setCutoff: IDisplayCutoffSetFunc;
 }
 
 export type IGetNextUnusedForChainRequest = void;
@@ -269,16 +226,12 @@ export type IGetNextUnusedForChainResponse = {|
   addressInfo: void | BaseSingleAddressPath,
   index: number,
 |};
-export type IGetNextUnusedForChainFunc = (
-  body: IGetNextUnusedForChainRequest
-) => Promise<IGetNextUnusedForChainResponse>;
+export type IGetNextUnusedForChainFunc = (body: IGetNextUnusedForChainRequest) => Promise<IGetNextUnusedForChainResponse>;
 export type IHasUtxoChainsRequest = {|
   chainId: typeof ChainDerivations.EXTERNAL | typeof ChainDerivations.INTERNAL,
 |};
 export type IHasUtxoChainsResponse = Array<UtxoAddressPath>;
-export type IHasUtxoChainsGetAddressesFunc = (
-  body: IHasUtxoChainsRequest
-) => Promise<IHasUtxoChainsResponse>;
+export type IHasUtxoChainsGetAddressesFunc = (body: IHasUtxoChainsRequest) => Promise<IHasUtxoChainsResponse>;
 export interface IHasUtxoChains {
   +rawGetAddressesForChain: RawTableVariation<
     IHasUtxoChainsGetAddressesFunc,
@@ -287,7 +240,7 @@ export interface IHasUtxoChains {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IHasUtxoChainsRequest
+    IHasUtxoChainsRequest,
   >;
   +getAddressesForChain: IHasUtxoChainsGetAddressesFunc;
 
@@ -299,16 +252,14 @@ export interface IHasUtxoChains {
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetNextUnusedForChainRequest
+    IGetNextUnusedForChainRequest,
   >;
   +nextInternal: IGetNextUnusedForChainFunc;
 }
 
 export type IGetUtxoBalanceRequest = void;
 export type IGetUtxoBalanceResponse = MultiToken;
-export type IGetUtxoBalanceFunc = (
-  body: IGetUtxoBalanceRequest
-) => Promise<IGetUtxoBalanceResponse>;
+export type IGetUtxoBalanceFunc = (body: IGetUtxoBalanceRequest) => Promise<IGetUtxoBalanceResponse>;
 export interface IGetUtxoBalance {
   +rawGetUtxoBalance: RawTableVariation<
     IGetUtxoBalanceFunc,
@@ -321,7 +272,7 @@ export interface IGetUtxoBalance {
       GetToken: Class<GetToken>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetUtxoBalanceRequest
+    IGetUtxoBalanceRequest,
   >;
   +getUtxoBalance: IGetUtxoBalanceFunc;
 }
@@ -332,17 +283,13 @@ export type IGetSigningKeyResponse = {|
   path: $ReadOnlyArray<$ReadOnly<KeyDerivationRow>>,
   row: $ReadOnly<KeyRow>,
 |};
-export type IGetSigningKeyFunc = (
-  body: IGetSigningKeyRequest
-) => Promise<IGetSigningKeyResponse>;
-export type INormalizeKeyRequest = {| ...IGetSigningKeyResponse, password: string, |};
+export type IGetSigningKeyFunc = (body: IGetSigningKeyRequest) => Promise<IGetSigningKeyResponse>;
+export type INormalizeKeyRequest = {| ...IGetSigningKeyResponse, password: string |};
 export type INormalizeKeyResponse = {|
   prvKeyHex: string,
   pubKeyHex: string,
 |};
-export type INormalizeKeyFunc = (
-  body: INormalizeKeyRequest
-) => Promise<INormalizeKeyResponse>;
+export type INormalizeKeyFunc = (body: INormalizeKeyRequest) => Promise<INormalizeKeyResponse>;
 export interface IGetSigningKey {
   +rawGetSigningKey: RawVariation<
     IGetSigningKeyFunc,
@@ -352,7 +299,7 @@ export interface IGetSigningKey {
       GetKeyDerivation: Class<GetKeyDerivation>,
       GetKey: Class<GetKey>,
     |},
-    IGetSigningKeyRequest
+    IGetSigningKeyRequest,
   >;
   +getSigningKey: IGetSigningKeyFunc;
 
@@ -371,33 +318,28 @@ export interface IGetSigningKey {
       GetKey: Class<GetKey>,
       ModifyKey: Class<ModifyKey>,
     |},
-    IChangePasswordRequest
+    IChangePasswordRequest,
   >;
-  +changeSigningKeyPassword: IChangePasswordRequestFunc,
+  +changeSigningKeyPassword: IChangePasswordRequestFunc;
 }
 
 export type IGetLastSyncInfoRequest = void;
 export type IGetLastSyncInfoResponse = $ReadOnly<LastSyncInfoRow>;
-export type IGetLastSyncInfoFunc = (
-  body: IGetLastSyncInfoRequest
-) => Promise<IGetLastSyncInfoResponse>;
+export type IGetLastSyncInfoFunc = (body: IGetLastSyncInfoRequest) => Promise<IGetLastSyncInfoResponse>;
 export interface IGetLastSyncInfo {
   +rawGetLastSyncInfo: RawVariation<
     IGetLastSyncInfoFunc,
     {|
       GetLastSyncForPublicDeriver: Class<GetLastSyncForPublicDeriver>,
     |},
-    IGetLastSyncInfoRequest
+    IGetLastSyncInfoRequest,
   >;
   +getLastSyncInfo: IGetLastSyncInfoFunc;
 }
 
-
-export type IScanAddressesRequest = {| checkAddressesInUse: FilterFunc, |};
+export type IScanAddressesRequest = {| checkAddressesInUse: FilterFunc |};
 export type IScanAddressesResponse = void;
-export type IScanAddressesFunc = (
-  body: IScanAddressesRequest
-) => Promise<IScanAddressesResponse>;
+export type IScanAddressesFunc = (body: IScanAddressesRequest) => Promise<IScanAddressesResponse>;
 export interface IScanAddresses {
   +rawScanAddresses: RawTableVariation<
     IScanAddressesFunc,
@@ -414,16 +356,14 @@ export interface IScanAddresses {
       GetDerivationSpecific: Class<GetDerivationSpecific>,
       GetKeyDerivation: Class<GetKeyDerivation>,
     |},
-    IScanAddressesRequest
+    IScanAddressesRequest,
   >;
   +scanAddresses: IScanAddressesFunc;
 }
 
 export type IGetBalanceRequest = void;
 export type IGetBalanceResponse = MultiToken;
-export type IGetBalanceFunc = (
-  body: IGetBalanceRequest
-) => Promise<IGetBalanceResponse>;
+export type IGetBalanceFunc = (body: IGetBalanceRequest) => Promise<IGetBalanceResponse>;
 export interface IGetBalance {
   +getBalance: IGetBalanceFunc;
 }
@@ -437,9 +377,7 @@ export type IScanAccountRequest = {|
   checkAddressesInUse: FilterFunc,
 |};
 export type IScanAccountResponse = TreeInsert<Bip44ChainInsert>;
-export type IScanAccountFunc = (
-  body: IScanAccountRequest
-) => Promise<IScanAccountResponse>;
+export type IScanAccountFunc = (body: IScanAccountRequest) => Promise<IScanAccountResponse>;
 
 export interface IScanAccountUtxo {
   +rawScanAccount: RawTableVariation<
@@ -449,7 +387,7 @@ export interface IScanAccountUtxo {
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IScanAccountRequest
+    IScanAccountRequest,
   >;
 }
 
@@ -460,9 +398,7 @@ export type IScanChainRequest = {|
   checkAddressesInUse: FilterFunc,
 |};
 export type IScanChainResponse = TreeInsert<CanonicalAddressInsert>;
-export type IScanChainFunc = (
-  body: IScanChainRequest
-) => Promise<IScanChainResponse>;
+export type IScanChainFunc = (body: IScanChainRequest) => Promise<IScanChainResponse>;
 export interface IScanChainUtxo {
   +rawScanChain: RawTableVariation<
     IScanChainFunc,
@@ -471,7 +407,7 @@ export interface IScanChainUtxo {
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IScanChainRequest
+    IScanChainRequest,
   >;
 }
 
@@ -481,24 +417,21 @@ export type AccountingAddressPath = {|
 
 export type IGetStakingKeyRequest = void;
 export type IGetStakingKeyResponse = BaseSingleAddressPath;
-export type IGetStakingKeyFunc = (
-  body: IGetStakingKeyRequest
-) => Promise<IGetStakingKeyResponse>;
+export type IGetStakingKeyFunc = (body: IGetStakingKeyRequest) => Promise<IGetStakingKeyResponse>;
 
 export interface IGetStakingKey {
   +rawGetStakingKey: RawTableVariation<
-  IGetStakingKeyFunc,
+    IGetStakingKeyFunc,
     {|
       GetPathWithSpecific: Class<GetPathWithSpecific>,
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetStakingKeyRequest
+    IGetStakingKeyRequest,
   >;
 
-  +getStakingKey: IGetStakingKeyFunc
+  +getStakingKey: IGetStakingKeyFunc;
 }
-
 
 export type IGetAllAccountingAddressesRequest = void;
 export type IGetAllAccountingAddressesResponse = Array<AccountingAddressPath>;
@@ -513,18 +446,16 @@ export interface IGetAllAccounting {
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IGetAllAccountingAddressesRequest
+    IGetAllAccountingAddressesRequest,
   >;
-  +getAllAccountingAddresses: IGetAllAccountingAddressesFunc
+  +getAllAccountingAddresses: IGetAllAccountingAddressesFunc;
 }
 
 export type IAddBip44FromPublicRequest = {|
   tree: TreeInsert<any>,
 |};
 export type IAddBip44FromPublicResponse = void;
-export type IAddBip44FromPublicFunc = (
-  body: IAddBip44FromPublicRequest
-) => Promise<IAddBip44FromPublicResponse>;
+export type IAddBip44FromPublicFunc = (body: IAddBip44FromPublicRequest) => Promise<IAddBip44FromPublicResponse>;
 export interface IAddBip44FromPublic {
   +rawAddBip44FromPublic: RawTableVariation<
     IAddBip44FromPublicFunc,
@@ -537,16 +468,14 @@ export interface IAddBip44FromPublic {
       GetDerivationSpecific: Class<GetDerivationSpecific>,
       GetKeyDerivation: Class<GetKeyDerivation>,
     |},
-    IAddBip44FromPublicRequest
+    IAddBip44FromPublicRequest,
   >;
   +addBip44FromPublic: IAddBip44FromPublicFunc;
 }
 
 export type IPickReceiveRequest = BaseAddressPath;
 export type IPickReceiveResponse = BaseSingleAddressPath;
-export type IPickReceiveFunc = (
-  body: IPickReceiveRequest
-) => Promise<IPickReceiveResponse>;
+export type IPickReceiveFunc = (body: IPickReceiveRequest) => Promise<IPickReceiveResponse>;
 export interface IPickReceive {
   +rawPickReceive: RawTableVariation<
     IPickReceiveFunc,
@@ -555,7 +484,7 @@ export interface IPickReceive {
       GetAddress: Class<GetAddress>,
       GetDerivationSpecific: Class<GetDerivationSpecific>,
     |},
-    IPickReceiveRequest
+    IPickReceiveRequest,
   >;
 
   +pickReceive: IPickReceiveFunc;

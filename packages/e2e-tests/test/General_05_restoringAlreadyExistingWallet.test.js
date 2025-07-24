@@ -50,24 +50,17 @@ describe('Restoring already existing wallet', function () {
   it('Check duplicated info', async function () {
     const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     // the window is displayed
-    const duplicatedWindowIsDisplayed =
-      await restoreWalletStepTwoPage.duplicatedWalletDialogIsDisplayed();
+    const duplicatedWindowIsDisplayed = await restoreWalletStepTwoPage.duplicatedWalletDialogIsDisplayed();
     expect(duplicatedWindowIsDisplayed, 'The duplicated wallet dialog is not displayed').to.be.true;
     // the wallet name is correct
     const duplicatedWalletName = await restoreWalletStepTwoPage.getDuplicatedWalletName();
-    expect(duplicatedWalletName, 'The duplicated wallet name is different').to.equal(
-      testWallet1.name
-    );
+    expect(duplicatedWalletName, 'The duplicated wallet name is different').to.equal(testWallet1.name);
     // the wallet plate is correct
     const duplicatedWalletPlate = await restoreWalletStepTwoPage.getDuplicatedWalletPlate();
-    expect(duplicatedWalletPlate, 'The duplicated wallet plate is different').to.equal(
-      testWallet1.plate
-    );
+    expect(duplicatedWalletPlate, 'The duplicated wallet plate is different').to.equal(testWallet1.plate);
     // the balance is correct
     const duplicatedWalletBalance = await restoreWalletStepTwoPage.getDuplicatedWalletBalance();
-    expect(duplicatedWalletBalance, 'The duplicated wallet balance is different').to.equal(
-      testWallet1.balance
-    );
+    expect(duplicatedWalletBalance, 'The duplicated wallet balance is different').to.equal(testWallet1.balance);
   });
 
   it('Check opening existing wallet', async function () {
@@ -78,12 +71,8 @@ describe('Restoring already existing wallet', function () {
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
     expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet1.balance);
-    expect(walletInfo.name, `The wallet name should be "${testWallet1.name}"`).to.equal(
-      testWallet1.name
-    );
-    expect(walletInfo.plate, `The wallet plate should be "${testWallet1.plate}"`).to.equal(
-      testWallet1.plate
-    );
+    expect(walletInfo.name, `The wallet name should be "${testWallet1.name}"`).to.equal(testWallet1.name);
+    expect(walletInfo.plate, `The wallet plate should be "${testWallet1.plate}"`).to.equal(testWallet1.plate);
   });
 
   afterEach(function (done) {

@@ -19,7 +19,8 @@ const messages = defineMessages({
   },
   dialogText: {
     id: 'settings.general.switchNetwork.dialog.text',
-    defaultMessage: '!!!The Cardano network is a technical infrastructure combining Cardano nodes and their interactions in one unified system. It consists of a collection of nodes that communicate with each other to maintain the distributed ledger.',
+    defaultMessage:
+      '!!!The Cardano network is a technical infrastructure combining Cardano nodes and their interactions in one unified system. It consists of a collection of nodes that communicate with each other to maintain the distributed ledger.',
   },
   applyButton: {
     id: 'settings.general.switchNetwork.dialog.button.apply',
@@ -37,13 +38,13 @@ type Props = {|
     id: number,
     name: $npm$ReactIntl$MessageDescriptor,
   |}>,
-  +onApply: (number) => Promise<void>,
+  +onApply: number => Promise<void>,
   +currentNetworkId: number,
 |};
 
 @observer
 export default class Switch extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm({
     fields: {
       selectedNetwork: {
@@ -77,7 +78,7 @@ export default class Switch extends Component<Props> {
             onClick: () => onApply(this.form.$('selectedNetwork').value),
             primary: true,
           },
-        ]}          
+        ]}
       >
         <Typography variant="body1" color="ds.text_gray_medium">
           {intl.formatMessage(messages.dialogText)}

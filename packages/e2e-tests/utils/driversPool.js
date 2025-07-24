@@ -32,16 +32,12 @@ class DriversManager {
     };
     poolOfDrivers.push(driverObject);
 
-    this.logger.info(
-      `DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${driverGlobalCounter}`
-    );
+    this.logger.info(`DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${driverGlobalCounter}`);
     return driverObject;
   }
 
   createPoolOfDrivers(driversAmount) {
-    this.logger.info(
-      `DriversManager::createPoolOfDrivers. Creating pool of driver. Drivers amount ${driversAmount}`
-    );
+    this.logger.info(`DriversManager::createPoolOfDrivers. Creating pool of driver. Drivers amount ${driversAmount}`);
     for (let index = 0; index < driversAmount; index++) {
       this.addNewDriverToPool();
     }

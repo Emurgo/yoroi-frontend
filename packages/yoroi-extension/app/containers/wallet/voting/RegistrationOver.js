@@ -13,12 +13,6 @@ type Props = {|
 @observer
 export default class RegistrationOver extends Component<Props> {
   render(): Node {
-    return (
-      <FullscreenMessage
-        image={<RegistrationNotAvailable />}
-        title={this.props.title}
-        subtitle={this.props.subtitle}
-      />
-    );
+    return <FullscreenMessage image={<RegistrationNotAvailable />} title={this.props.title} subtitle={this.props.subtitle} />;
   }
 }

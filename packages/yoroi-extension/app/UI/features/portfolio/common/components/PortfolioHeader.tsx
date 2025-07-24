@@ -43,138 +43,136 @@ interface Props {
   stores: any;
 }
 
-const PortfolioHeader = observer(
-  ({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
-    const [loading, setLoading] = React.useState(false);
-    const strings = useStrings();
-    const theme: any = useTheme();
-    const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
-    const { tokenActivity } = usePortfolioTokenActivity();
-    const localStorageApi = new LocalStorageApi();
-    const {
-      ptActivity: { open, close: ptPrice },
-      config,
-    } = useCurrencyPairing();
+const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
+  const [loading, setLoading] = React.useState(false);
+  const strings = useStrings();
+  const theme: any = useTheme();
+  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const { tokenActivity } = usePortfolioTokenActivity();
+  const localStorageApi = new LocalStorageApi();
+  const {
+    ptActivity: { open, close: ptPrice },
+    config,
+  } = useCurrencyPairing();
 
-    // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
-    const { wallets, delegation } = stores;
-    const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
-    const networkId = selectedWallet.networkId;
-    const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
-    const balance = selectedWallet.balance;
-    const totalBalanceAmount = getTotalAmount(balance, rewards);
-    const defaultEntry = totalBalanceAmount?.getDefaultEntry();
-    const primaryBalance = defaultEntry.amount.shiftedBy(-primaryTokenInfo.decimals);
-    // End of total Ada balance calculation
+  // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
+  const { wallets, delegation } = stores;
+  const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
+  const networkId = selectedWallet.networkId;
+  const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
+  const balance = selectedWallet.balance;
+  const totalBalanceAmount = getTotalAmount(balance, rewards);
+  const defaultEntry = totalBalanceAmount?.getDefaultEntry();
+  const primaryBalance = defaultEntry.amount.shiftedBy(-primaryTokenInfo.decimals);
+  // End of total Ada balance calculation
 
-    const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
+  const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
 
-    const showADA = accountPair?.from.name === primaryTokenInfo.name;
+  const showADA = accountPair?.from.name === primaryTokenInfo.name;
 
-    const totalTokenPrice = React.useMemo(() => {
-      const showingAda = accountPair?.from.name !== primaryTokenInfo.name;
-      const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
+  const totalTokenPrice = React.useMemo(() => {
+    const showingAda = accountPair?.from.name !== primaryTokenInfo.name;
+    const currency = showingAda ? primaryTokenInfo.ticker : unitOfAccount;
 
-      if (ptPrice == null) return `... ${currency}`;
+    if (ptPrice == null) return `... ${currency}`;
 
-      const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
+    const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
 
-      return totalAmount;
-    }, [tokenActivity, config.decimals, ptPrice]);
+    return totalAmount;
+  }, [tokenActivity, config.decimals, ptPrice]);
 
-    const handleCurrencyChange = async () => {
-      const pair = {
-        from: {
-          name: showADA ? unitOfAccount ?? DEFAULT_FIAT_PAIR : primaryTokenInfo.name,
-          value: showADA ? totalTokenPrice ?? '0' : walletBalance.ada,
-        },
-        to: {
-          name: showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR,
-          value: showADA ? walletBalance.ada : totalTokenPrice,
-        },
-      };
-      localStorageApi.setSetPortfolioFiatPair(networkId, pair);
-      changeUnitOfAccountPair(pair);
+  const handleCurrencyChange = async () => {
+    const pair = {
+      from: {
+        name: showADA ? (unitOfAccount ?? DEFAULT_FIAT_PAIR) : primaryTokenInfo.name,
+        value: showADA ? (totalTokenPrice ?? '0') : walletBalance.ada,
+      },
+      to: {
+        name: showADA ? primaryTokenInfo.name : (unitOfAccount ?? DEFAULT_FIAT_PAIR),
+        value: showADA ? walletBalance.ada : totalTokenPrice,
+      },
+    };
+    localStorageApi.setSetPortfolioFiatPair(networkId, pair);
+    changeUnitOfAccountPair(pair);
+  };
+
+  React.useEffect(() => {
+    const setFiatPair = async () => {
+      setLoading(true);
+      try {
+        const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair(networkId);
+        const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
+        if (portfolioStoragePairObj !== undefined) {
+          changeUnitOfAccountPair({
+            from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
+            to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
+          });
+        } else {
+          const pair = {
+            from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
+            to: {
+              name: unitOfAccount || DEFAULT_FIAT_PAIR,
+              value: !showADA ? walletBalance.ada : totalTokenPrice || '0',
+            },
+          };
+          changeUnitOfAccountPair(pair);
+          localStorageApi.setSetPortfolioFiatPair(networkId, pair);
+        }
+      } finally {
+        setLoading(false);
+      }
     };
 
-    React.useEffect(() => {
-      const setFiatPair = async () => {
-        setLoading(true);
-        try {
-          const portfolioStoragePair = await localStorageApi.getPortfolioFiatPair(networkId);
-          const portfolioStoragePairObj = portfolioStoragePair && JSON.parse(portfolioStoragePair);
-          if (portfolioStoragePairObj !== undefined) {
-            changeUnitOfAccountPair({
-              from: { name: portfolioStoragePairObj.from.name, value: portfolioStoragePairObj.from.value },
-              to: { name: portfolioStoragePairObj.to.name, value: !showADA ? walletBalance.ada : totalTokenPrice },
-            });
-          } else {
-            const pair = {
-              from: { name: primaryTokenInfo.name, value: walletBalance?.ada || '0' },
-              to: {
-                name: unitOfAccount || DEFAULT_FIAT_PAIR,
-                value: !showADA ? walletBalance.ada : totalTokenPrice || '0',
-              },
-            };
-            changeUnitOfAccountPair(pair);
-            localStorageApi.setSetPortfolioFiatPair(networkId, pair);
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
+    setFiatPair();
+  }, [totalTokenPrice, walletBalance, showADA, networkId]);
 
-      setFiatPair();
-    }, [totalTokenPrice, walletBalance, showADA, networkId]);
+  if (!accountPair) {
+    return <LoadingSkeleton />;
+  }
 
-    if (!accountPair) {
-      return <LoadingSkeleton />;
-    }
-
-    return (
-      <Stack direction="row" justifyContent="space-between">
-        <Stack direction="column">
-          <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end">
-            {isLoading ? (
-              <Skeleton width="146px" height="24px" />
-            ) : (
-              <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
-                <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
-                  {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
-                </HiddenAmount>
-              </Typography>
-            )}
-            <CurrencyDisplay
-              from={showADA ? primaryTokenInfo.name : unitOfAccount ?? DEFAULT_FIAT_PAIR}
-              handleCurrencyChange={handleCurrencyChange}
-            />
-          </Stack>
-
-          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }}>
-            {loading || isLoading ? (
-              <Skeleton width="64px" height="13px" />
-            ) : (
-              <HeaderPrice isLoading={tokenActivity === null} isHiddenAmount={stores.profile.shouldHideBalance} />
-            )}
-            {isLoading || loading ? (
-              <Skeletons theme={theme} />
-            ) : (
-              <PriceChangeDisplay
-                variantPnl={variantPnl}
-                changePercent={changePercent}
-                changeValue={changeValue}
-                config={config}
-                tooltipTitle={tooltipTitle}
-              />
-            )}
-          </Stack>
+  return (
+    <Stack direction="row" justifyContent="space-between">
+      <Stack direction="column">
+        <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end">
+          {isLoading ? (
+            <Skeleton width="146px" height="24px" />
+          ) : (
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+              <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
+                {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
+              </HiddenAmount>
+            </Typography>
+          )}
+          <CurrencyDisplay
+            from={showADA ? primaryTokenInfo.name : (unitOfAccount ?? DEFAULT_FIAT_PAIR)}
+            handleCurrencyChange={handleCurrencyChange}
+          />
         </Stack>
 
-        <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }}>
+          {loading || isLoading ? (
+            <Skeleton width="64px" height="13px" />
+          ) : (
+            <HeaderPrice isLoading={tokenActivity === null} isHiddenAmount={stores.profile.shouldHideBalance} />
+          )}
+          {isLoading || loading ? (
+            <Skeletons theme={theme} />
+          ) : (
+            <PriceChangeDisplay
+              variantPnl={variantPnl}
+              changePercent={changePercent}
+              changeValue={changeValue}
+              config={config}
+              tooltipTitle={tooltipTitle}
+            />
+          )}
+        </Stack>
       </Stack>
-    );
-  }
-);
+
+      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
+    </Stack>
+  );
+});
 
 const LoadingSkeleton = () => (
   <Stack direction="column">
@@ -209,7 +207,7 @@ const Skeletons = ({ theme }) => (
 );
 
 const PriceChangeDisplay = ({ variantPnl, changePercent, changeValue, config, tooltipTitle }) => (
-  <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} place='right' positionStrategy="fixed">
+  <Tooltip title={<Box minWidth="158px">{tooltipTitle}</Box>} place="right" positionStrategy="fixed">
     <Stack direction="row" alignItems="center" spacing={1}>
       <PnlPercentChange variantPnl={variantPnl} changePercent={formatPriceChange(changePercent)} />
       <PnlPairedChange variantPnl={variantPnl} changeValue={formatPriceChange(changeValue, config.decimals)} />

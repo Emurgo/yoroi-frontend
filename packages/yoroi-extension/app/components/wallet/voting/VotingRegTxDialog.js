@@ -64,7 +64,7 @@ type Props = {|
 export default class VotingRegTxDialog extends Component<Props> {
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
     this.spendingPasswordForm = form;
@@ -129,10 +129,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     const spendingPasswordForm =
       this.props.walletType === 'mnemonic' ? (
-        <SpendingPasswordInput
-          setForm={form => this.setSpendingPasswordForm(form)}
-          isSubmitting={this.props.isSubmitting}
-        />
+        <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={this.props.isSubmitting} />
       ) : undefined; // hardware wallet
 
     const staleTxWarning = (
@@ -173,7 +170,7 @@ export default class VotingRegTxDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
-        {(
+        {
           <Stepper
             currentStep={String(this.props.progressInfo.currentStep)}
             steps={this.props.stepsList.map(step => ({
@@ -182,7 +179,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             }))}
             setCurrentStep={() => {}}
           />
-        )}
+        }
         {this.props.staleTx && staleTxWarning}
 
         {this.renderInfoBlock()}

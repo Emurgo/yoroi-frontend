@@ -36,7 +36,8 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
   .component {
     padding: 30px;
     .poolIdInput {
@@ -45,5 +46,5 @@
     .nextButton {
       margin: 20px auto 0;
     }
-  } 
+  }
 }

@@ -179,11 +179,7 @@ export function PriceImpactAlert({ onContinue, onCancel }: {| onContinue: () => 
         <Button fullWidth variant="secondary" onClick={onCancel}>
           {strings.cancel}
         </Button>
-        <Button
-          fullWidth
-          variant="destructive"
-          onClick={onContinue}
-        >
+        <Button fullWidth variant="destructive" onClick={onContinue}>
           {strings.continue}
         </Button>
       </Box>

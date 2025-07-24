@@ -9,8 +9,6 @@ type Props = {||};
 @observer
 export default class HintGap extends React.Component<Props> {
   render(): Node {
-    return (
-      <div className={styles.component} />
-    );
+    return <div className={styles.component} />;
   }
 }

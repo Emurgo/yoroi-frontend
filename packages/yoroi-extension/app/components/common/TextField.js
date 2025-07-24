@@ -144,9 +144,7 @@ function TextField({
           </InputAdornment>
         ) : (
           <InputAdornment position="end">
-            {(done === true && !isRevampTheme) || greenCheck ? (
-              <DoneIcon id="input-done-icon" />
-            ) : null}
+            {(done === true && !isRevampTheme) || greenCheck ? <DoneIcon id="input-done-icon" /> : null}
           </InputAdornment>
         ),
         placeholder: placeholder != null ? placeholder : '',

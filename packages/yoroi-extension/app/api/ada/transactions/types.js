@@ -2,12 +2,8 @@
 
 import { RustModule } from '../lib/cardanoCrypto/rustLoader';
 
-import type {
-  Address, Value, Addressing,
-} from '../lib/storage/models/PublicDeriver/interfaces';
-import {
-  MultiToken,
-} from '../../common/lib/MultiToken';
+import type { Address, Value, Addressing } from '../lib/storage/models/PublicDeriver/interfaces';
+import { MultiToken } from '../../common/lib/MultiToken';
 
 import type { RemoteUnspentOutput } from '../lib/state-fetch/types';
 
@@ -28,13 +24,15 @@ export type UserAnnotation = {|
   +fee: MultiToken,
 |};
 
-export type CardanoUtxoScriptWitness = {|
-  nativeScript: string,
-|} | {|
-  plutusScript: string,
-  datum: string,
-  redeemer: string,
-|}
+export type CardanoUtxoScriptWitness =
+  | {|
+      nativeScript: string,
+    |}
+  | {|
+      plutusScript: string,
+      datum: string,
+      redeemer: string,
+    |};
 
 export type CardanoAddressedUtxo = {|
   ...RemoteUnspentOutput,

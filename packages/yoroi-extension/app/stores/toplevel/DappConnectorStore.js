@@ -3,38 +3,23 @@
 import { observable, computed } from 'mobx';
 import Request from '../lib/LocalizedRequest';
 import Store from '../base/Store';
-import type {
-  WhitelistEntry,
-  ConnectedSites,
-} from '../../../chrome/extension/connector/types';
+import type { WhitelistEntry, ConnectedSites } from '../../../chrome/extension/connector/types';
 import type { StoresMap } from '../index';
 import { noop } from '../../coreUtils';
-import {
-  getConnectedSites,
-  notifyDAppConnectionRemoved,
-} from '../../api/thunk';
+import { getConnectedSites, notifyDAppConnectionRemoved } from '../../api/thunk';
 
 type GetWhitelistFunc = void => Promise<?Array<WhitelistEntry>>;
-type SetWhitelistFunc = {|
-  whitelist: Array<WhitelistEntry> | void,
-|} => Promise<void>;
+type SetWhitelistFunc = ({| whitelist: Array<WhitelistEntry> | void |}) => Promise<void>;
 
 export default class ConnectorStore extends Store<StoresMap> {
-  @observable getConnectorWhitelistRequest: Request<
-    GetWhitelistFunc
-  > = new Request<GetWhitelistFunc>(
+  @observable getConnectorWhitelistRequest: Request<GetWhitelistFunc> = new Request<GetWhitelistFunc>(
     this.api.localStorage.getWhitelist
   );
-  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<
-    SetWhitelistFunc
-  >(({ whitelist }) => this.api.localStorage.setWhitelist(whitelist));
-
-  @observable getConnectedSites: Request<
-    typeof getConnectedSites
-  > = new Request<typeof getConnectedSites>(
-    getConnectedSites
+  @observable setConnectorWhitelist: Request<SetWhitelistFunc> = new Request<SetWhitelistFunc>(({ whitelist }) =>
+    this.api.localStorage.setWhitelist(whitelist)
   );
 
+  @observable getConnectedSites: Request<typeof getConnectedSites> = new Request<typeof getConnectedSites>(getConnectedSites);
 
   setup(): void {
     super.setup();
@@ -57,16 +42,12 @@ export default class ConnectorStore extends Store<StoresMap> {
   getConnectorWhitelist: void => Promise<void> = async () => {
     await this.getConnectorWhitelistRequest.execute();
   };
-  removeWalletFromWhitelist1: (
-    request: {| url: string |}
-  ) => Promise<void> = async request => {
-    const currentNetworkWalletIdSet = new Set(
-      this.stores.wallets.wallets.map(w => w.publicDeriverId)
-    );
+  removeWalletFromWhitelist1: (request: {| url: string |}) => Promise<void> = async request => {
+    const currentNetworkWalletIdSet = new Set(this.stores.wallets.wallets.map(w => w.publicDeriverId));
 
-    const filter = this.currentConnectorWhitelist.filter(e => !(
-      e.url === request.url && currentNetworkWalletIdSet.has(e.publicDeriverId)
-    ));
+    const filter = this.currentConnectorWhitelist.filter(
+      e => !(e.url === request.url && currentNetworkWalletIdSet.has(e.publicDeriverId))
+    );
     await this.setConnectorWhitelist.execute({
       whitelist: filter,
     });
@@ -76,7 +57,7 @@ export default class ConnectorStore extends Store<StoresMap> {
 
   refreshActiveSites: void => Promise<void> = async () => {
     await this.getConnectedSites.execute();
-  }
+  };
 
   // ========== active websites ========== //
   @computed get activeSites(): ConnectedSites {

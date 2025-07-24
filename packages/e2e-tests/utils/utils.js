@@ -173,20 +173,8 @@ export const parseExportedCSV = fileContent => {
     }
     const rowData = lines[lineIndex].split(',');
     const cleanRowData = rowData.map(rowDatum => rowDatum.slice(1, -1));
-    const [
-      txType,
-      inAmountString,
-      ,
-      outAmountString,
-      ,
-      feeAmountString,
-      ,
-      exchange,
-      tradeGroup,
-      comment,
-      date,
-      txHashId,
-    ] = cleanRowData;
+    const [txType, inAmountString, , outAmountString, , feeAmountString, , exchange, tradeGroup, comment, date, txHashId] =
+      cleanRowData;
     if (comment.includes('Staking Reward Epoch')) {
       continue;
     }
@@ -292,9 +280,7 @@ export const getSnapshotObjectFromJSON = (dbSnapshotName, useGeneralStorageInfo)
 
 export const getCurrenciesPrices = async () => {
   try {
-    const reqResponse = await axios.get(
-      'https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current'
-    );
+    const reqResponse = await axios.get('https://iohk-mainnet.yoroiwallet.com/api/price/ADA/current');
     return reqResponse.data.ticker.prices;
   } catch (error) {
     throw new Error(`Error happen while getting currencies prices. Error: ${error}`);

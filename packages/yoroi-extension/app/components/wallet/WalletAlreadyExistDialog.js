@@ -21,7 +21,7 @@ const messages = defineMessages({
   explanation: {
     id: 'wallet.restore.dialog.walletExist.explanation',
     defaultMessage: '!!!The wallet you are trying to restore already exists.',
-  }
+  },
 });
 
 type Props = {|
@@ -33,16 +33,10 @@ type Props = {|
 
 @observer
 export default class WalletAlreadyExistDialog extends Component<Props> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
-    const {
-      onCancel,
-      openWallet,
-      walletPlate,
-      walletSumDetails
-    } = this.props;
+    const { onCancel, openWallet, walletPlate, walletSumDetails } = this.props;
 
     const dialogClasses = classnames([styles.component, styles.dialog]);
 
@@ -75,5 +69,4 @@ export default class WalletAlreadyExistDialog extends Component<Props> {
       </Dialog>
     );
   }
-
 }

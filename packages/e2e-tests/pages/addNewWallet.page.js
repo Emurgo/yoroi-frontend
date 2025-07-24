@@ -62,24 +62,10 @@ class AddNewWallet extends WalletCommonBase {
   // functions
   async isDisplayed() {
     this.logger.info(`AddNewWallet::selectCreateNewWallet is called`);
-    const createBtnDisplayed = this.customWaitIsPresented(
-      this.createWalletButtonLocator,
-      halfMinute,
-      quarterSecond
-    );
-    const restoreBtnDisplayed = this.customWaitIsPresented(
-      this.restoreWalletButtonLocator,
-      halfMinute,
-      quarterSecond
-    );
-    const connectHWBtnDisplayed = this.customWaitIsPresented(
-      this.connectHwButtonLocator,
-      halfMinute,
-      quarterSecond
-    );
-    return (
-      (await createBtnDisplayed) && (await restoreBtnDisplayed) && (await connectHWBtnDisplayed)
-    );
+    const createBtnDisplayed = this.customWaitIsPresented(this.createWalletButtonLocator, halfMinute, quarterSecond);
+    const restoreBtnDisplayed = this.customWaitIsPresented(this.restoreWalletButtonLocator, halfMinute, quarterSecond);
+    const connectHWBtnDisplayed = this.customWaitIsPresented(this.connectHwButtonLocator, halfMinute, quarterSecond);
+    return (await createBtnDisplayed) && (await restoreBtnDisplayed) && (await connectHWBtnDisplayed);
   }
   async selectCreateNewWallet() {
     this.logger.info(`AddNewWallet::selectCreateNewWallet is called`);

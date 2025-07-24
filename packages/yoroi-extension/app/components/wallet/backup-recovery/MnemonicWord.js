@@ -10,7 +10,7 @@ type Props = {|
   +word: string,
   +index: number,
   +isActive: boolean,
-  +onClick: {| index: number, word: string |} => void,
+  +onClick: ({| index: number, word: string |}) => void,
 |};
 
 @observer
@@ -19,17 +19,10 @@ export default class MnemonicWord extends Component<Props> {
     const { word, index, isActive, onClick } = this.props;
     const handleClick = onClick.bind(null, { word, index });
 
-    const componentClasses = classnames([
-      styles.component
-    ]);
+    const componentClasses = classnames([styles.component]);
 
     return (
-      <Button
-        variant={'primary'}
-        className={componentClasses}
-        disabled={!isActive}
-        onClick={handleClick}
-      >
+      <Button variant={'primary'} className={componentClasses} disabled={!isActive} onClick={handleClick}>
         {word}
       </Button>
     );
