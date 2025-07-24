@@ -13,11 +13,7 @@ export const TrezorModels = Object.freeze({
  * @param {TrezorEmulatorController} trezorController Trezor emulator controller object
  * @param {string} trezorMnemonic 12-word mnemonic seed phrase of a wallet
  */
-export const runAndPrepareTrezor = async (
-  trezorController,
-  trezorMnemonic,
-  trezorModel = TrezorModels.ModelT
-) => {
+export const runAndPrepareTrezor = async (trezorController, trezorMnemonic, trezorModel = TrezorModels.ModelT) => {
   await trezorController.connect();
   const result = await trezorController.getLastEvent();
   expect(result.type).to.be.equal('client', 'Something is wrong with connection');
@@ -44,10 +40,7 @@ export const runAndPrepareTrezor = async (
  * @returns {{addressFull: string, derivationPath: string, stakingKeyHash: string}}
  */
 export const convertExportResponse = trezorScreensContent => {
-  expect(
-    trezorScreensContent.length,
-    'Trezor screens contents amount is different from expected'
-  ).to.equal(3);
+  expect(trezorScreensContent.length, 'Trezor screens contents amount is different from expected').to.equal(3);
   const derivationPath = trezorScreensContent[0].split(':')[1].trim().replace(/ /g, '');
   const stakingKeyHash = trezorScreensContent[1].split(':')[1].trim().replace(/ /g, '');
   const addressFull = trezorScreensContent[2].trim().replace(/ /g, '');
@@ -58,5 +51,4 @@ export const convertExportResponse = trezorScreensContent => {
   };
 };
 
-export const getStakeBeck32KeyFromKeyHash = stakeKeyHash =>
-  CSL.Ed25519KeyHash.from_hex(stakeKeyHash).to_bech32('stake_vkh');
+export const getStakeBeck32KeyFromKeyHash = stakeKeyHash => CSL.Ed25519KeyHash.from_hex(stakeKeyHash).to_bech32('stake_vkh');

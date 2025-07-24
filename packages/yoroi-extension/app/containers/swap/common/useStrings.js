@@ -344,8 +344,7 @@ export const messages = Object.freeze(
     },
     pleaseNote: {
       id: 'buySell.disclaimer.pleaseNote',
-      defaultMessage:
-        '!!!Please note:',
+      defaultMessage: '!!!Please note:',
     },
     note1: {
       id: 'buySell.disclaimer.note1',
@@ -424,8 +423,8 @@ export const useStrings = () => {
     marketPriceTooltip: intl.formatMessage(messages.marketPriceTooltip),
     priceImpact: intl.formatMessage(messages.priceImpact),
     priceImpactTooltip: intl.formatMessage(messages.priceImpactTooltip),
-    priceImpactSevere: <FormattedMessage {...messages.priceImpactSevere} values={{ strong }}/>,
-    priceImpactNotSevere: <FormattedMessage {...messages.priceImpactNotSevere} values={{ strong }}/>,
+    priceImpactSevere: <FormattedMessage {...messages.priceImpactSevere} values={{ strong }} />,
+    priceImpactNotSevere: <FormattedMessage {...messages.priceImpactNotSevere} values={{ strong }} />,
     numAssetsFound: num => intl.formatMessage(messages.numAssetsFound, { num }),
     numAssetsAvailable: num => intl.formatMessage(messages.numAssetsAvailable, { num }),
     noAssetFoundWithTerm: term => intl.formatMessage(messages.noAssetFoundWithTerm, { searchTerm: term }),

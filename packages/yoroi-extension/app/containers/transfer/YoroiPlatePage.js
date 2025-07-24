@@ -20,14 +20,9 @@ type Props = {|
 
 @observer
 export default class YoroiPlatePage extends Component<Props> {
-
   async componentDidMount() {
     const { yoroiTransfer } = this.props.stores;
-    const plates = generatePlates(
-      yoroiTransfer.recoveryPhrase,
-      this.props.accountIndex,
-      this.getSelectedNetwork(),
-    );
+    const plates = generatePlates(yoroiTransfer.recoveryPhrase, this.props.accountIndex, this.getSelectedNetwork());
     runInAction(() => {
       this.plates = plates;
     });
@@ -43,7 +38,7 @@ export default class YoroiPlatePage extends Component<Props> {
       throw new Error(`${nameof(YoroiPlatePage)} no API selected`);
     }
     return selectedNetwork;
-  }
+  };
 
   render(): null | Node {
     if (this.plates == null) return null;
@@ -56,8 +51,11 @@ export default class YoroiPlatePage extends Component<Props> {
     return (
       <WalletRestoreVerifyDialog
         plates={this.plates}
-        selectedExplorer={this.props.stores.explorers.selectedExplorer
-          .get(this.getSelectedNetwork().NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        selectedExplorer={
+          this.props.stores.explorers.selectedExplorer.get(this.getSelectedNetwork().NetworkId) ??
+          (() => {
+            throw new Error('No explorer for wallet network');
+          })()
         }
         onCopyAddressTooltip={(address, elementId) => {
           if (!uiNotifications.isOpen(elementId)) {
@@ -71,9 +69,7 @@ export default class YoroiPlatePage extends Component<Props> {
             });
           }
         }}
-        notification={uiNotifications.getTooltipActiveNotification(
-          this.notificationElementId
-        )}
+        notification={uiNotifications.getTooltipActiveNotification(this.notificationElementId)}
         onNext={this.props.onNext}
         onCancel={this.props.onCancel}
         isSubmitting={false}

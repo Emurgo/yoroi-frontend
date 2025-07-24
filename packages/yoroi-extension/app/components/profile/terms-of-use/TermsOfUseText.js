@@ -13,15 +13,12 @@ type Props = {|
 
 @observer
 export default class TermsOfUseText extends Component<Props> {
-  static defaultProps: {|fixedHeight: boolean|} = {
-    fixedHeight: false
-  }
+  static defaultProps: {| fixedHeight: boolean |} = {
+    fixedHeight: false,
+  };
 
   render(): Node {
-    const termsClassNames = classNames([
-      styles.terms,
-      this.props.fixedHeight === true ? styles.fixedHeight : null,
-    ]);
+    const termsClassNames = classNames([styles.terms, this.props.fixedHeight === true ? styles.fixedHeight : null]);
 
     return (
       <div className={termsClassNames}>
@@ -29,5 +26,4 @@ export default class TermsOfUseText extends Component<Props> {
       </div>
     );
   }
-
 }

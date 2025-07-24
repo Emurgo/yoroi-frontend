@@ -18,7 +18,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
 
       - name: Install dependencies
         run: |
@@ -71,12 +71,12 @@ jobs:
       - name: Upload to Chrome Web Store
         uses: mobilefirstllc/cws-publish@latest
         with:
-          action: "publish" # one of: upload, publish, testers
+          action: 'publish' # one of: upload, publish, testers
           client_id: ${{ secrets.NIGHTLY_CLIENT_ID }}
           client_secret: ${{ secrets.NIGHTLY_CLIENT_SECRET }}
           refresh_token: ${{ secrets.NIGHTLY_TOKEN }}
-          extension_id: "poonlenmfdfbjfeeballhiibknlknepo"
-          zip_file: "./packages/yoroi-extension/Yoroi Nightly.zip"
+          extension_id: 'poonlenmfdfbjfeeballhiibknlknepo'
+          zip_file: './packages/yoroi-extension/Yoroi Nightly.zip'
 
       - name: Configure Git
         run: |
@@ -106,7 +106,7 @@ jobs:
         uses: peter-evans/create-pull-request@v7.0.8
         with:
           token: ${{ secrets.RND_GITHUB_TOKEN }}
-          commit-message: "Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)"
-          title: "[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}"
+          commit-message: 'Version bump: ${{ steps.package-version.outputs.new_version }} (nightly)'
+          title: '[Bump] Nightly Version: ${{ steps.package-version.outputs.new_version }}'
           body: "This PR was created automatically using GitHub Actions.\nUpdating the version after publishing the new nightly version from branch `${{ steps.vars.outputs.base-branch-name }}`"
           branch: ${{ steps.vars.outputs.branch-name }}

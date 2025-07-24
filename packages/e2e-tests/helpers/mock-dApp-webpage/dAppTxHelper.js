@@ -40,11 +40,7 @@ export const getTxBuilder = () => {
       )
       .pool_deposit(CSL.BigNum.from_str(protocolParams.poolDeposit))
       .key_deposit(CSL.BigNum.from_str(protocolParams.keyDeposit))
-      .coins_per_utxo_byte(
-        CSL.BigNum.from_str(
-          Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)
-        )
-      )
+      .coins_per_utxo_byte(CSL.BigNum.from_str(Math.floor(parseFloat(protocolParams.coinsPerUtxoWord) / 8).toString(10)))
       .max_value_size(protocolParams.maxValueSize)
       .max_tx_size(protocolParams.maxTxSize)
       .ex_unit_prices(
@@ -76,50 +72,34 @@ export const getAmountInHex = amount => CSL.Value.new(CSL.BigNum.from_str(amount
 export const getLargestFirstMultiAsset = () => CSL.CoinSelectionStrategyCIP2.LargestFirstMultiAsset;
 
 export const getTransactionOutput = (cslOutputAddress, buildTransactionInput) =>
-  CSL.TransactionOutput.new(
-    cslOutputAddress,
-    CSL.Value.new(CSL.BigNum.from_str(buildTransactionInput.amount))
-  );
+  CSL.TransactionOutput.new(cslOutputAddress, CSL.Value.new(CSL.BigNum.from_str(buildTransactionInput.amount)));
 
-export const getAddressFromBytes = changeAddress =>
-  CSL.Address.from_bytes(hexToBytes(changeAddress));
+export const getAddressFromBytes = changeAddress => CSL.Address.from_bytes(hexToBytes(changeAddress));
 
 export const getAddressFromBech32 = addressBech32 => CSL.Address.from_bech32(addressBech32);
 
 export const getRewarKeyHashFromBech32 = rewardAddressBech32 =>
-  CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAddressBech32))
-    .payment_cred()
-    .to_keyhash()
-    .to_hex();
+  CSL.RewardAddress.from_address(CSL.Address.from_bech32(rewardAddressBech32)).payment_cred().to_keyhash().to_hex();
 
 export const getTransactionFromBytes = txHex => CSL.Transaction.from_bytes(hexToBytes(txHex));
 
-export const getTransactionWitnessSetFromBytes = witnessHex =>
-  CSL.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex));
+export const getTransactionWitnessSetFromBytes = witnessHex => CSL.TransactionWitnessSet.from_bytes(hexToBytes(witnessHex));
 
 export const getSignedTransaction = (cslUnsignedTransaction, cslWitnessSet) =>
-  CSL.Transaction.new(
-    cslUnsignedTransaction.body(),
-    cslWitnessSet,
-    cslUnsignedTransaction.auxiliary_data()
-  );
+  CSL.Transaction.new(cslUnsignedTransaction.body(), cslWitnessSet, cslUnsignedTransaction.auxiliary_data());
 
-export const getPubKeyHash = usedAddress =>
-  CSL.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash();
+export const getPubKeyHash = usedAddress => CSL.BaseAddress.from_address(usedAddress).payment_cred().to_keyhash();
 
-export const getNativeScript = pubKeyHash =>
-  CSL.NativeScript.new_script_pubkey(CSL.ScriptPubkey.new(pubKeyHash));
+export const getNativeScript = pubKeyHash => CSL.NativeScript.new_script_pubkey(CSL.ScriptPubkey.new(pubKeyHash));
 
 export const getTransactionOutputBuilder = cslChangeAddress =>
   CSL.TransactionOutputBuilder.new().with_address(cslChangeAddress).next();
 
-export const getAssetName = assetNameString =>
-  CSL.AssetName.new(Buffer.from(assetNameString, 'utf8'));
+export const getAssetName = assetNameString => CSL.AssetName.new(Buffer.from(assetNameString, 'utf8'));
 
 export const addressToCbor = address => bytesToHex(CSL.Address.from_bech32(address).to_bytes());
 
-export const addressesFromCborIfNeeded = addresses =>
-  addresses.map(a => CSL.Address.from_bytes(hexToBytes(a)).to_bech32());
+export const addressesFromCborIfNeeded = addresses => addresses.map(a => CSL.Address.from_bytes(hexToBytes(a)).to_bech32());
 
 const reduceWasmMultiAsset = (multiAsset, reducer, initValue) => {
   let result = initValue;

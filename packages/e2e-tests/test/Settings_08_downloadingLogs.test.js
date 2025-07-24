@@ -2,12 +2,7 @@ import BasePage from '../pages/basepage.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
-import {
-  cleanDownloads,
-  getDownloadedFileContent,
-  getListOfDownloadedFiles,
-  getTestLogger,
-} from '../utils/utils.js';
+import { cleanDownloads, getDownloadedFileContent, getListOfDownloadedFiles, getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
 import SupportSubTab from '../pages/wallet/settingsTab/supportSubTab.page.js';

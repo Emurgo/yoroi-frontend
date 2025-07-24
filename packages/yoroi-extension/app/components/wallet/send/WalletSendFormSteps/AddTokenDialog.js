@@ -44,11 +44,7 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +updateAmount: (?BigNumber) => void,
   +selectedNetwork: $ReadOnly<NetworkRow>,
-  +onAddToken: ({|
-    token: void | $ReadOnly<TokenRow>,
-    shouldSendAll?: boolean,
-    shouldReset?: boolean,
-  |}) => void,
+  +onAddToken: ({| token: void | $ReadOnly<TokenRow>, shouldSendAll?: boolean, shouldReset?: boolean |}) => void,
   +onRemoveTokens: (Array<$ReadOnly<TokenRow>>) => void,
   +plannedTxInfoMap: Array<{|
     token: $ReadOnly<TokenRow>,
@@ -122,7 +118,7 @@ export const messages: Object = defineMessages({
 
 @observer
 export default class AddTokenDialog extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     currentTokensList: [],
     fullTokensList: [],
@@ -174,9 +170,7 @@ export default class AddTokenDialog extends Component<Props, State> {
     return tokenEntry?.amount;
   };
 
-  getSelectedToken: (
-    $ReadOnly<TokenRow>
-  ) => {|
+  getSelectedToken: ($ReadOnly<TokenRow>) => {|
     token: $ReadOnly<TokenRow>,
     amount: BigNumber | null,
     included: boolean,

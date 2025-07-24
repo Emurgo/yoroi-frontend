@@ -32,7 +32,7 @@ export const getMockServer = settings => {
       resolve(mockServer);
     });
 
-    mockServer.on('error', (err) => {
+    mockServer.on('error', err => {
       reject(err);
     });
   });

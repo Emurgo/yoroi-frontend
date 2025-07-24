@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { RegistrationStepper } from '../RegistrationStepper';
-import {Button, Box, Typography, Stack, Link} from '@mui/material';
+import { Button, Box, Typography, Stack, Link } from '@mui/material';
 import { useStrings } from '../../hooks/useStrings';
 import { PasswordInput } from '../../../../../components';
 import { useVoting } from '../../hooks/useVoting';
@@ -22,7 +22,6 @@ export const PasswordStep = () => {
       return intl.formatMessage(error);
     }
     if (error) {
-
       const supportRequestLink = (
         <Link
           href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"

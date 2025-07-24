@@ -65,8 +65,8 @@ const initializeYoroi: void => Promise<void> = async () => {
     }
   }
 
-  const root = createRoot(container)
-  root.render(<App stores={stores}/>);
+  const root = createRoot(container);
+  root.render(<App stores={stores} />);
 };
 
 addCloseListener(TabIdKeys.Primary);

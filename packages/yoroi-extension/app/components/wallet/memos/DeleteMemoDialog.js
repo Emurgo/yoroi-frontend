@@ -10,7 +10,7 @@ import DialogCloseButton from '../../widgets/DialogCloseButton';
 import ErrorBlock from '../../widgets/ErrorBlock';
 import LocalizableError from '../../../i18n/LocalizableError';
 import WalletTransaction from '../../../domain/WalletTransaction';
-import globalMessages, { memoMessages, } from '../../../i18n/global-messages';
+import globalMessages, { memoMessages } from '../../../i18n/global-messages';
 import styles from './MemoDialogCommon.scss';
 
 const messages = defineMessages({
@@ -38,8 +38,7 @@ type State = {|
 
 @observer
 export default class DeleteMemoDialog extends Component<Props, State> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -47,13 +46,7 @@ export default class DeleteMemoDialog extends Component<Props, State> {
   render(): Node {
     const intl = this.context;
     const { isSubmitting } = this.state;
-    const {
-      error,
-      selectedTransaction,
-      onCancel,
-      onClose,
-      onDelete,
-    } = this.props;
+    const { error, selectedTransaction, onCancel, onClose, onDelete } = this.props;
 
     const actions = [
       {
@@ -79,12 +72,13 @@ export default class DeleteMemoDialog extends Component<Props, State> {
         closeOnOverlayClick={false}
         closeButton={<DialogCloseButton />}
         onClose={onClose}
-        id='deleteMemoDialog'
+        id="deleteMemoDialog"
       >
         <div className={styles.content}>
-          { error ? (<ErrorBlock error={error} />) : null }
+          {error ? <ErrorBlock error={error} /> : null}
           <FormattedMessage {...messages.deleteMemoContent} />
         </div>
-      </Dialog>);
+      </Dialog>
+    );
   }
 }

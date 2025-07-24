@@ -1,9 +1,7 @@
 // @flow
 
-import {
-  ConceptualWalletSchema,
-} from '../core/tables';
-import { Type, ConstraintAction, } from 'lovefield';
+import { ConceptualWalletSchema } from '../core/tables';
+import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 import { KeyDerivationSchema } from '../../primitives/tables';
 
@@ -31,12 +29,13 @@ export const Cip1852WrapperSchema: {|
     PrivateDeriverLevel: 'PrivateDeriverLevel',
     PrivateDeriverKeyDerivationId: 'PrivateDeriverKeyDerivationId',
     RootKeyDerivationId: 'RootKeyDerivationId',
-  }
+  },
 };
 
 export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
   // Cip1852Wrapper Table
-  schemaBuilder.createTable(Cip1852WrapperSchema.name)
+  schemaBuilder
+    .createTable(Cip1852WrapperSchema.name)
     .addColumn(Cip1852WrapperSchema.properties.ConceptualWalletId, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.SignerLevel, Type.INTEGER)
     .addColumn(Cip1852WrapperSchema.properties.PublicDeriverLevel, Type.INTEGER)
@@ -56,9 +55,7 @@ export const populateCip1852Db = (schemaBuilder: lf$schema$Builder) => {
       ref: `${KeyDerivationSchema.name}.${KeyDerivationSchema.properties.KeyDerivationId}`,
       action: ConstraintAction.CASCADE,
     })
-    .addUnique('Cip1852Wrapper_ConceptualWallet_Unique', [
-      Cip1852WrapperSchema.properties.ConceptualWalletId,
-    ])
+    .addUnique('Cip1852Wrapper_ConceptualWallet_Unique', [Cip1852WrapperSchema.properties.ConceptualWalletId])
     .addNullable([
       Cip1852WrapperSchema.properties.SignerLevel,
       Cip1852WrapperSchema.properties.PrivateDeriverLevel,

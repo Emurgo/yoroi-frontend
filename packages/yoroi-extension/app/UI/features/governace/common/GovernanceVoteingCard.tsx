@@ -32,11 +32,12 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, blocked, smal
   minHeight: '126px',
   borderRadius: '8px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
-  ...(selected && !pending && {
-    backgroundImage: theme.palette.ds.bg_gradient_2,
-    border: '2px solid transparent',
-    backgroundOrigin: 'border-box',
-  }),
+  ...(selected &&
+    !pending && {
+      backgroundImage: theme.palette.ds.bg_gradient_2,
+      border: '2px solid transparent',
+      backgroundOrigin: 'border-box',
+    }),
   cursor: 'pointer',
   ...(pending && {
     opacity: 0.5,
@@ -44,9 +45,9 @@ const StyledCard: any = styled(Stack)(({ theme, selected, pending, blocked, smal
   }),
   '&:hover': {
     backgroundImage: !blocked ? theme.palette.ds.bg_gradient_1 : undefined,
-    border: !blocked ?  '2px solid transparent' : undefined,
+    border: !blocked ? '2px solid transparent' : undefined,
     backgroundOrigin: !blocked ? 'border-box' : undefined,
-    transition: !blocked ? 'opacity 1s ease-in-out': undefined,
+    transition: !blocked ? 'opacity 1s ease-in-out' : undefined,
   },
 }));
 
@@ -102,7 +103,12 @@ export const GovernanceVoteingCard = ({
           <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px">
             {hover && titleHover ? titleHover : title}
           </Typography>
-          <Description variant="body2" color="ds.gray_800"  whiteSpace="pre-line" style={{ wordWrap: 'break-word', maxWidth: '580px' }}>
+          <Description
+            variant="body2"
+            color="ds.gray_800"
+            whiteSpace="pre-line"
+            style={{ wordWrap: 'break-word', maxWidth: '580px' }}
+          >
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </Stack>

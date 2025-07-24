@@ -71,7 +71,7 @@ type Props = {|
 
 @observer
 export default class ExchangeEndPageContent extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     return (
@@ -81,20 +81,14 @@ export default class ExchangeEndPageContent extends Component<Props> {
         <Congrats>{intl.formatMessage(messages.congrats)}</Congrats>
 
         <ProviderRow>
-          <ProviderLabel>
-            {intl.formatMessage(globalMessages.provider)}
-          </ProviderLabel>
+          <ProviderLabel>{intl.formatMessage(globalMessages.provider)}</ProviderLabel>
           <ProviderInfo>
             <img style={{ verticalAlign: 'bottom' }} src={banxaPng} alt="" />
             Banxa
           </ProviderInfo>
         </ProviderRow>
 
-        <Button
-          variant="contained"
-          onClick={this.props.onConfirm}
-          sx={{ margin: 'auto', display: 'block' }}
-        >
+        <Button variant="contained" onClick={this.props.onConfirm} sx={{ margin: 'auto', display: 'block' }}>
           {intl.formatMessage(globalMessages.goToTransactions)}
         </Button>
       </PageContent>

@@ -13,7 +13,7 @@ import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
 import NftDetails from '../pages/wallet/nftGallery/nftDetails.page.js';
 
-describe('Check the Overview tab', function () {
+describe('Switch between NFTs', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
@@ -42,57 +42,34 @@ describe('Check the Overview tab', function () {
     expect(detailsIsDisplayed, 'NFT details page is not displayed').to.be.true;
   });
 
-  it('Check overview details', async function () {
+  it('Switch right', async function () {
     const nftDetailsPage = new NftDetails(webdriver, logger);
     await nftDetailsPage.selectOverview();
-
-    const displayedNftName = await nftDetailsPage.getName();
-    expect(displayedNftName, 'A wrong name is displayed on NFT details page').to.equal(
-      testNFT.title
-    );
-    const nftDescription = await nftDetailsPage.getDescription();
-    expect(nftDescription, 'A wrong description is displayed on NFT details page').to.equal(
-      testNFT.description
-    );
-    const nftFingerprint = await nftDetailsPage.getFingerprint();
-    expect(nftFingerprint, 'A wrong fingerprint is displayed on NFT details page').to.equal(
-      testNFT.fingerprint
-    );
-    const nftPolicyId = await nftDetailsPage.getPolicyId();
-    expect(nftPolicyId, 'A wrong policyId is displayed on NFT details page').to.equal(
-      testNFT.policyId
-    );
+    await nftDetailsPage.switchToNextNft();
+    const nextNftName = await nftDetailsPage.getName();
+    expect(nextNftName !== testNFT.title, 'The same name is displayed').to.be.true;
+    const nextNftFingerprint = await nftDetailsPage.getFingerprint();
+    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be.true;
   });
 
-  it('Check copying fingerprint', async function () {
+  it('Switch left', async function () {
     const nftDetailsPage = new NftDetails(webdriver, logger);
     await nftDetailsPage.selectOverview();
-    await nftDetailsPage.copyFingerprint();
-    const copiedFingerprint = await nftDetailsPage.getClipboardData();
-    expect(copiedFingerprint, 'A wrong fingerprint is copied on NFT details page').to.equal(
-      testNFT.fingerprint
-    );
+    await nftDetailsPage.switchToPreviousNft();
+    const nftName = await nftDetailsPage.getName();
+    expect(nftName, 'A wrong nft name is displayed').to.equal(testNFT.title);
+    const fingerprint = await nftDetailsPage.getFingerprint();
+    expect(fingerprint, 'A wrong nft fingerprint is displayed').to.equal(testNFT.fingerprint);
   });
 
-  it('Check copying policyId', async function () {
+  it('Switch left again', async function () {
     const nftDetailsPage = new NftDetails(webdriver, logger);
     await nftDetailsPage.selectOverview();
-    await nftDetailsPage.copyPolicyId();
-    const copiedPolicyId = await nftDetailsPage.getClipboardData();
-    expect(copiedPolicyId, 'A wrong policyId is copied on NFT details page').to.equal(
-      testNFT.policyId
-    );
-  });
-
-  it('Check explorer URL', async function () {
-    const nftDetailsPage = new NftDetails(webdriver, logger);
-    await nftDetailsPage.selectOverview();
-    const explorerLink = await nftDetailsPage.getExplorerLink();
-    const [domain, tokenRoute, policyAndName] = explorerLink.slice(8).split('/');
-    expect(domain, 'Wrong domain is displayed').to.equal('preprod.cardanoscan.io');
-    expect(tokenRoute, 'Wrong route is displayed').to.equal('token');
-    const combinedPolicyAndName = testNFT.policyId + testNFT.nameHex;
-    expect(policyAndName, 'Wrong NFT link is displayed').to.equal(combinedPolicyAndName);
+    await nftDetailsPage.switchToPreviousNft();
+    const nextNftName = await nftDetailsPage.getName();
+    expect(nextNftName !== testNFT.title, 'The same name is displayed').to.be.true;
+    const nextNftFingerprint = await nftDetailsPage.getFingerprint();
+    expect(nextNftFingerprint !== testNFT.fingerprint, 'The same fingerprint is displayed').to.be.true;
   });
 
   afterEach(async function () {

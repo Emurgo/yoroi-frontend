@@ -12,14 +12,9 @@ type Props = {|
 
 @observer
 export default class WalletConnectHWOptionDialogContainer extends Component<Props> {
-
   render(): Node {
     return (
-      <WalletConnectHWOptionDialog
-        onCancel={this.props.onClose}
-        onTrezor={this.props.onTrezor}
-        onLedger={this.props.onLedger}
-      />
+      <WalletConnectHWOptionDialog onCancel={this.props.onClose} onTrezor={this.props.onTrezor} onLedger={this.props.onLedger} />
     );
   }
 }

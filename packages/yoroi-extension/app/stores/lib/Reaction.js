@@ -3,7 +3,6 @@ import { autorun } from 'mobx';
 
 /** Wrapper to create startable/stoppable autoruns */
 export default class Reaction {
-
   reaction: () => void;
   hasBeenStarted: boolean;
   dispose: () => void;

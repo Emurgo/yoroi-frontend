@@ -1,10 +1,7 @@
 // @flow //
 import ProfileStore from './ProfileStore';
 import ConnectStore from './ConnectStore';
-import {
-  DEFAULT_TRANSPORT_PROTOCOL,
-  DEFAULT_LOCALE
-} from '../const';
+import { DEFAULT_TRANSPORT_PROTOCOL, DEFAULT_LOCALE } from '../const';
 import { SUPPORTED_LOCALS } from '../i18n/translations';
 import type { URLParams } from '../types/cmn';
 import type { TransportIdType } from '../types/enum';
@@ -40,23 +37,21 @@ export default class RootStore {
     } else {
       const urlTransportId = urlParams.get('transport') || DEFAULT_TRANSPORT_PROTOCOL;
       switch (urlTransportId) {
-      case TRANSPORT_ID.U2F:
-        transportId = TRANSPORT_ID.U2F;
-        break;
-      case TRANSPORT_ID.WEB_USB:
-        transportId = TRANSPORT_ID.WEB_USB;
-        break;
-      default:
-        transportId = DEFAULT_TRANSPORT_PROTOCOL;
-        break;
+        case TRANSPORT_ID.U2F:
+          transportId = TRANSPORT_ID.U2F;
+          break;
+        case TRANSPORT_ID.WEB_USB:
+          transportId = TRANSPORT_ID.WEB_USB;
+          break;
+        default:
+          transportId = DEFAULT_TRANSPORT_PROTOCOL;
+          break;
       }
     }
 
     // Parse Locale
     let locale = urlParams.get('locale');
-    if (locale == null ||
-      locale === '' ||
-      !SUPPORTED_LOCALS.includes(locale)) {
+    if (locale == null || locale === '' || !SUPPORTED_LOCALS.includes(locale)) {
       locale = DEFAULT_LOCALE;
     }
 
@@ -64,5 +59,5 @@ export default class RootStore {
       transportId,
       locale,
     };
-  }
+  };
 }

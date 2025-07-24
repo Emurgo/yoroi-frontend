@@ -54,7 +54,7 @@ async function compress(isCrxBuild) {
     `${name}.zip`,
     `${name}.xpi`,
     0, // flag
-    (err) => {
+    err => {
       if (err) throw err;
     }
   );

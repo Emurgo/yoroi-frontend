@@ -21,9 +21,7 @@ class StakingTab extends WalletCommonBase {
    */
   async walletIsEmpty() {
     this.logger.info(`StakingTab::walletIsEmpty is called`);
-    const emptyBannerIsDisplayed = await (
-      await this.findElement(this.walletEmptyBannerLocator)
-    ).isDisplayed();
+    const emptyBannerIsDisplayed = await (await this.findElement(this.walletEmptyBannerLocator)).isDisplayed();
     return emptyBannerIsDisplayed;
   }
   /**
@@ -31,11 +29,7 @@ class StakingTab extends WalletCommonBase {
    */
   async walletIsNotDelegated() {
     this.logger.info(`StakingTab::walletIsNotDelegated is called`);
-    const bannerState = await this.customWaitIsPresented(
-      this.walletIsNotDelegatedBannerLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const bannerState = await this.customWaitIsPresented(this.walletIsNotDelegatedBannerLocator, fiveSeconds, quarterSecond);
     return bannerState;
   }
 }

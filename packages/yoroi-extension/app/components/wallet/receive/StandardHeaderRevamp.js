@@ -52,7 +52,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
     error: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   submit: void => Promise<void> = async () => {
     await this.props.onGenerateAddress();
   };
@@ -143,7 +143,7 @@ export default class StandardHeaderRevamp extends Component<Props> {
             </Box>
 
             <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
-              <FormattedMessage {...messages.walletReceiveInstructions} values={{ newLine: (<br/>) }}/>
+              <FormattedMessage {...messages.walletReceiveInstructions} values={{ newLine: <br /> }} />
             </Typography>
 
             {generateAddressForm}

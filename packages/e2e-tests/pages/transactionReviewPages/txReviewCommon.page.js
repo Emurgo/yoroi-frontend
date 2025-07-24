@@ -42,16 +42,8 @@ class TxReviewCommon extends BasePage {
   //* isDisplayed
   async txReviewIsDisplayed() {
     this.logger.info(`TxReviewCommon::txReviewIsDisplayed is called`);
-    const componentLayoutPromise = this.customWaitIsPresented(
-      this.layoutLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
-    const titlePromise = this.customWaitIsPresented(
-      this.titleLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
+    const componentLayoutPromise = this.customWaitIsPresented(this.layoutLocator, defaultWaitTimeout, quarterSecond);
+    const titlePromise = this.customWaitIsPresented(this.titleLocator, defaultWaitTimeout, quarterSecond);
     const [layoutState, titleState] = await Promise.all([componentLayoutPromise, titlePromise]);
 
     return layoutState && titleState;
