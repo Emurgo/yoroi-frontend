@@ -103,16 +103,14 @@ export function compareNumbers(x: string, y: string, newSortDirection: string): 
 }
 @observer
 export default class AssetsList extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     assetsList: [...this.props.assetsList],
     sortingDirection: null,
     sortingColumn: '',
   };
 
-  search: (e: SyntheticEvent<HTMLInputElement>) => void = (
-    event: SyntheticEvent<HTMLInputElement>
-  ) => {
+  search: (e: SyntheticEvent<HTMLInputElement>) => void = (event: SyntheticEvent<HTMLInputElement>) => {
     const keyword = event.currentTarget.value;
     this.setState({ assetsList: this.props.assetsList });
     if (!keyword) return;
@@ -176,10 +174,7 @@ export default class AssetsList extends Component<Props, State> {
     if (this.props.shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>
@@ -211,19 +206,13 @@ export default class AssetsList extends Component<Props, State> {
             </h1>
             <div className={styles.search}>
               <Search />
-              <input
-                onChange={this.search}
-                type="text"
-                placeholder={intl.formatMessage(assetsMessage.search)}
-              />
+              <input onChange={this.search} type="text" placeholder={intl.formatMessage(assetsMessage.search)} />
             </div>
           </div>
           {assetDeposit && (
             <div className={styles.lockedAssets}>
               <div className={styles.lockedAssetsAmount}>
-                <div className={styles.label}>
-                  {intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;
-                </div>
+                <div className={styles.label}>{intl.formatMessage(globalMessages.assetDepositLabel)} &nbsp;</div>
                 {this.renderAmountDisplay()}
               </div>
             </div>
@@ -238,9 +227,7 @@ export default class AssetsList extends Component<Props, State> {
             <ul className={styles.columns}>
               <li>
                 <button type="button" onClick={() => this.sortAssets(SORTING_COLUMNS.NAME)}>
-                  <div className={styles.headerText}>
-                    {intl.formatMessage(assetsMessage.nameAndTicker)}
-                  </div>
+                  <div className={styles.headerText}>{intl.formatMessage(assetsMessage.nameAndTicker)}</div>
                   {this.displayColumnLogo(SORTING_COLUMNS.NAME)}
                 </button>
               </li>

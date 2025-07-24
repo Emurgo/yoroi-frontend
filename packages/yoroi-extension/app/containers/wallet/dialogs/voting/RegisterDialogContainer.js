@@ -19,7 +19,7 @@ type AllProps = {| ...Props, ...StoresProps |};
 
 @observer
 export default class RegisterDialogContainer extends Component<AllProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const { submit, cancel, onError, stepsList, stores, goBack } = this.props;
     const votingStore = this.props.stores.substores.ada.votingStore;
@@ -43,5 +43,4 @@ export default class RegisterDialogContainer extends Component<AllProps> {
       />
     );
   }
-
 }

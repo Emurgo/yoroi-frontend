@@ -1,12 +1,9 @@
 // @flow
 
-import { Type, ConstraintAction, } from 'lovefield';
+import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
-import {
-  TransactionSchema,
-  AddressSchema,
-} from '../../primitives/tables';
+import { TransactionSchema, AddressSchema } from '../../primitives/tables';
 
 export type AccountingTransactionInputInsert = {|
   TransactionId: number,
@@ -31,7 +28,7 @@ export const AccountingTransactionInputSchema: {|
     SpendingCounter: 'SpendingCounter',
     IndexInOwnTx: 'IndexInOwnTx',
     TokenListId: 'TokenListId',
-  }
+  },
 };
 
 export type AccountingTransactionOutputInsert = {|
@@ -60,32 +57,27 @@ export const AccountingTransactionOutputSchema: {|
     AddressId: 'AddressId',
     OutputIndex: 'OutputIndex',
     TokenListId: 'TokenListId',
-  }
+  },
 };
 
 export type DbAccountingInputs = {|
-  +accountingInputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>;
+  +accountingInputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionInputRow>>,
 |};
 export type DbAccountingOutputs = {|
-  +accountingOutputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>;
+  +accountingOutputs: $ReadOnlyArray<$ReadOnly<AccountingTransactionOutputRow>>,
 |};
 
 export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // AccountingTransactionInput Table
-  schemaBuilder.createTable(AccountingTransactionInputSchema.name)
-    .addColumn(
-      AccountingTransactionInputSchema.properties.AccountingTransactionInputId,
-      Type.INTEGER
-    )
+  schemaBuilder
+    .createTable(AccountingTransactionInputSchema.name)
+    .addColumn(AccountingTransactionInputSchema.properties.AccountingTransactionInputId, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.SpendingCounter, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.IndexInOwnTx, Type.INTEGER)
     .addColumn(AccountingTransactionInputSchema.properties.TokenListId, Type.INTEGER)
-    .addPrimaryKey(
-      ([AccountingTransactionInputSchema.properties.AccountingTransactionInputId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([AccountingTransactionInputSchema.properties.AccountingTransactionInputId]: Array<string>), true)
     .addForeignKey('AccountingTransactionInput_Transaction', {
       local: AccountingTransactionInputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
@@ -97,19 +89,14 @@ export const populateAccountingTransactionsDb = (schemaBuilder: lf$schema$Builde
     });
 
   // AccountingTransactionOutput Table
-  schemaBuilder.createTable(AccountingTransactionOutputSchema.name)
-    .addColumn(
-      AccountingTransactionOutputSchema.properties.AccountingTransactionOutputId,
-      Type.INTEGER
-    )
+  schemaBuilder
+    .createTable(AccountingTransactionOutputSchema.name)
+    .addColumn(AccountingTransactionOutputSchema.properties.AccountingTransactionOutputId, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.AddressId, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.OutputIndex, Type.INTEGER)
     .addColumn(AccountingTransactionOutputSchema.properties.TokenListId, Type.INTEGER)
-    .addPrimaryKey(
-      ([AccountingTransactionOutputSchema.properties.AccountingTransactionOutputId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([AccountingTransactionOutputSchema.properties.AccountingTransactionOutputId]: Array<string>), true)
     .addForeignKey('AccountingTransactionOutput_Transaction', {
       local: AccountingTransactionOutputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,

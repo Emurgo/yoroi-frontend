@@ -33,17 +33,13 @@ export class MultiToken {
     try {
       return new MultiToken(
         multiTokenData.values.map(({ identifier, networkId, amount }) => {
-          const fixedAmount = new BigNumber(
-            typeof amount === 'object'
-              ? { ...amount, _isBigNumber: true }
-              : amount
-          );
-          return ({
+          const fixedAmount = new BigNumber(typeof amount === 'object' ? { ...amount, _isBigNumber: true } : amount);
+          return {
             identifier,
             networkId,
             // $FlowIgnore
             amount: fixedAmount,
-          });
+          };
         }),
         multiTokenData.defaults
       );
@@ -90,14 +86,14 @@ export class MultiToken {
       identifier,
       amount,
     };
-  }
+  };
 
   /**
    * Creates a token entry with the network and the identifier of the default token
    */
-  createDefaultEntry: (BigNumber) => TokenEntry = (amount) => {
+  createDefaultEntry: BigNumber => TokenEntry = amount => {
     return this.createEntry(this.getDefaults().defaultIdentifier, amount);
-  }
+  };
 
   add: TokenEntry => MultiToken = entry => {
     this._checkNetworkId(entry.networkId);
@@ -232,19 +228,13 @@ export class MultiToken {
 
   getDefaultEntry: void => TokenEntry = () => {
     return this.values.filter(
-      value =>
-        value.networkId === this.defaults.defaultNetworkId &&
-        value.identifier === this.defaults.defaultIdentifier
+      value => value.networkId === this.defaults.defaultNetworkId && value.identifier === this.defaults.defaultIdentifier
     )[0];
   };
 
   nonDefaultEntries: void => Array<TokenEntry> = () => {
     return this.values.filter(
-      value =>
-        !(
-          value.networkId === this.defaults.defaultNetworkId &&
-          value.identifier === this.defaults.defaultIdentifier
-        )
+      value => !(value.networkId === this.defaults.defaultNetworkId && value.identifier === this.defaults.defaultIdentifier)
     );
   };
 
@@ -254,7 +244,7 @@ export class MultiToken {
 
   entries: void => Array<TokenEntry> = () => {
     return [...this.values];
-  }
+  };
 
   isEqualTo: MultiToken => boolean = tokens => {
     const remainingTokens = this.asMap();
@@ -279,10 +269,7 @@ export class MultiToken {
 
   toString: () => string = () => {
     const defAmount = this.getDefault().toString();
-    const assetMap = this.nonDefaultEntries().reduce(
-      (acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }),
-      {}
-    );
+    const assetMap = this.nonDefaultEntries().reduce((acc, { identifier, amount }) => ({ ...acc, [identifier]: amount }), {});
     return `${nameof(MultiToken)}{amount=${defAmount}, assets=${JSON.stringify(assetMap)}}`;
   };
 }

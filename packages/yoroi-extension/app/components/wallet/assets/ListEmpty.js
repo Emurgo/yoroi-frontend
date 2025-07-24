@@ -1,7 +1,7 @@
 // @flow
 import type { Node } from 'react';
 import { Stack, Typography } from '@mui/material';
-import { ReactComponent as NoTransactionModernSvg }  from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
+import { ReactComponent as NoTransactionModernSvg } from '../../../assets/images/transaction/no-transactions-yet.modern.inline.svg';
 
 type Props = {|
   message: string,
@@ -13,7 +13,7 @@ export const ListEmpty = ({ message }: Props): Node => {
         height: '30vh',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '30px'
+        padding: '30px',
       }}
       spacing={2}
     >

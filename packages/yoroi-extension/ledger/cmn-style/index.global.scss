@@ -4,66 +4,147 @@
 
 @font-face {
   font-family: 'Rubik-Light';
-  src: url("../assets/fonts/Rubik-Light.ttf") format("truetype");
+  src: url('../assets/fonts/Rubik-Light.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Rubik-Regular';
-  src: url("../assets/fonts/Rubik-Regular.ttf") format("truetype");
+  src: url('../assets/fonts/Rubik-Regular.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Rubik-Medium';
-  src: url("../assets/fonts/Rubik-Medium.ttf") format("truetype");
+  src: url('../assets/fonts/Rubik-Medium.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Rubik-Bold';
-  src: url("../assets/fonts/Rubik-Bold.ttf") format("truetype");
+  src: url('../assets/fonts/Rubik-Bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Rubik-Black';
-  src: url("../assets/fonts/Rubik-Black.ttf") format("truetype");
+  src: url('../assets/fonts/Rubik-Black.ttf') format('truetype');
 }
 
 // ============ RESET HTML TAGS ===========
 // http://meyerweb.com/eric/tools/css/reset
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed,
-figure, figcaption, footer, header, hgroup,
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
   margin: 0;
   padding: 0;
   border: 0;
   font-size: 100%;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
   display: block;
 }
 body {
   line-height: 1;
 }
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
-blockquote, q {
+blockquote,
+q {
   quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
   content: '';
   content: none;
 }
@@ -72,10 +153,12 @@ table {
   border-spacing: 0;
 }
 
-
 // ============ CUTOMIZATION ===========
 
-html, body, #root, #root > [data-reactroot] {
+html,
+body,
+#root,
+#root > [data-reactroot] {
   // Make the default font ugly so we immediately see when something
   // is not yet defined correctly in our UI
   font-family: var(--default-font), serif;
@@ -109,8 +192,12 @@ html, body, #root, #root > [data-reactroot] {
 // ======= RE-USABLE ANIMATIONS =======
 
 @keyframes loading-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 // ======= IntlProvider Default div height =======

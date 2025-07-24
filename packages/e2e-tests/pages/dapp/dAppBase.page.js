@@ -30,12 +30,8 @@ class DAppBase extends BasePage {
       quarterSecond
     );
     if (!state) {
-      this.logger.error(
-        `DAppBase::connectorIsReady The loader on the connector is still displayed`
-      );
-      throw new Error(
-        `The loader on the connector is still displayed after ${defaultWaitTimeout} milliseconds`
-      );
+      this.logger.error(`DAppBase::connectorIsReady The loader on the connector is still displayed`);
+      throw new Error(`The loader on the connector is still displayed after ${defaultWaitTimeout} milliseconds`);
     }
   }
 }

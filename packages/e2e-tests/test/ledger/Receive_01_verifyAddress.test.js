@@ -1,22 +1,13 @@
 import { expect } from 'chai';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
-import {
-  WindowManager,
-  extensionTabName,
-  ledgerConnectTabName,
-} from '../../helpers/windowManager.js';
+import { WindowManager, extensionTabName, ledgerConnectTabName } from '../../helpers/windowManager.js';
 import { testWalletLedger } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
-import {
-  threeSeconds,
-  oneMinute,
-  quarterSecond,
-  fiveSeconds,
-} from '../../helpers/timeConstants.js';
+import { threeSeconds, oneMinute, quarterSecond, fiveSeconds } from '../../helpers/timeConstants.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
@@ -132,12 +123,8 @@ for (const model in LedgerModels) {
 
       const cleanedLedgerData = convertVerifiedAddressesInfo(fullData);
 
-      expect(cleanedLedgerData.addressFull, 'Receive address is different').to.equal(
-        verifyModalInfo.addressFull
-      );
-      expect(cleanedLedgerData.addressDerivationPath, 'Derivation path is different').to.equal(
-        verifyModalInfo.derivationPath
-      );
+      expect(cleanedLedgerData.addressFull, 'Receive address is different').to.equal(verifyModalInfo.addressFull);
+      expect(cleanedLedgerData.addressDerivationPath, 'Derivation path is different').to.equal(verifyModalInfo.derivationPath);
     });
 
     afterEach(function (done) {

@@ -46,7 +46,7 @@ const SListItem = styled(ListItem)(({ theme }) => ({
 
 @observer
 export default class ExportPublicKeyDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -72,7 +72,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
         >
           <Box marginBottom="20px">
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedMessage {...messages.publicKeyExplanationLine1} values={{ strong }}/>
+              <FormattedMessage {...messages.publicKeyExplanationLine1} values={{ strong }} />
             </Typography>
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
               <FormattedMessage {...globalMessages.publicKeyExplanation} />
@@ -101,10 +101,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
     );
   }
 
-  renderQrCode: ({|
-    publicKeyHex: string,
-    path: Array<number>,
-  |}) => Node = walletInfo => {
+  renderQrCode: ({| publicKeyHex: string, path: Array<number> |}) => Node = walletInfo => {
     return (
       <>
         <Box display="flex" justifyContent="center" marginBottom="16px">

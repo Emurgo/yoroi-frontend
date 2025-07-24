@@ -32,7 +32,9 @@ import type {
   MultiAssetSupplyResponse,
   FilterUsedRequest,
   FilterUsedResponse,
-  GetSwapFeeTiersFunc, GetTransactionSlotsByHashesResponse, SignedBatchRequest,
+  GetSwapFeeTiersFunc,
+  GetTransactionSlotsByHashesResponse,
+  SignedBatchRequest,
 } from './types';
 
 export interface IFetcher {
@@ -46,18 +48,12 @@ export interface IFetcher {
   getCatalystRoundInfo(body: CatalystRoundInfoRequest): Promise<CatalystRoundInfoResponse>;
   getTokenInfo(body: TokenInfoRequest): Promise<TokenInfoResponse>;
   checkAddressesInUse(body: FilterUsedRequest): Promise<FilterUsedResponse>;
-  getMultiAssetMintMetadata(body: MultiAssetRequest)
-    : Promise<MultiAssetMintMetadataResponse>;
-  getMultiAssetSupply(body: MultiAssetRequest)
-    : Promise<MultiAssetSupplyResponse>;
+  getMultiAssetMintMetadata(body: MultiAssetRequest): Promise<MultiAssetMintMetadataResponse>;
+  getMultiAssetSupply(body: MultiAssetRequest): Promise<MultiAssetSupplyResponse>;
   getUtxoData(body: GetUtxoDataRequest): Promise<GetUtxoDataResponse>;
   getLatestBlockBySlot(body: GetLatestBlockBySlotReq): Promise<GetLatestBlockBySlotRes>;
-  getRecentTransactionHashes
-    : GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
-  getTransactionsByHashes
-    : GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
-  getTransactionSlotsByHashes
-    : GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>;
-  getSwapFeeTiers
-    : GetSwapFeeTiersFunc;
+  getRecentTransactionHashes: GetRecentTransactionHashesRequest => Promise<GetRecentTransactionHashesResponse>;
+  getTransactionsByHashes: GetTransactionsByHashesRequest => Promise<GetTransactionsByHashesResponse>;
+  getTransactionSlotsByHashes: GetTransactionsByHashesRequest => Promise<GetTransactionSlotsByHashesResponse>;
+  getSwapFeeTiers: GetSwapFeeTiersFunc;
 }

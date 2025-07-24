@@ -12,10 +12,7 @@ export const LedgerModels = Object.freeze({
  * @returns {{addressDerivationPath: string, addressFull: string, stakeKeyPath: string}}
  */
 export const convertVerifiedAddressesInfo = ledgerScreensContent => {
-  expect(
-    ledgerScreensContent.length,
-    'Ledger screens contents amount is different from expected'
-  ).to.equal(3);
+  expect(ledgerScreensContent.length, 'Ledger screens contents amount is different from expected').to.equal(3);
 
   const addressDerivationPath = ledgerScreensContent[0];
   const stakeKeyPath = ledgerScreensContent[1];

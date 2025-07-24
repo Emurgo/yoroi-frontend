@@ -44,8 +44,7 @@ describe('Changing NFTs grid appearance', function () {
     await nftsMainPage.setSixColumnsView();
     const newNftCardSize = await nftsMainPage.getNftCardSize(nftIndex);
     expect(
-      newNftCardSize.height < initialNFTCardSize.height &&
-        newNftCardSize.width < initialNFTCardSize.width,
+      newNftCardSize.height < initialNFTCardSize.height && newNftCardSize.width < initialNFTCardSize.width,
       'NFT card width is different'
     ).to.be.true;
     const sixColumnsViewIsSelected = await nftsMainPage.sixColumnsViewIsSelected();
@@ -56,12 +55,8 @@ describe('Changing NFTs grid appearance', function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.setFourColumnsView();
     const newNftCardSize = await nftsMainPage.getNftCardSize(nftIndex);
-    expect(newNftCardSize.width, 'NFT card width is different').to.be.equal(
-      initialNFTCardSize.width
-    );
-    expect(newNftCardSize.height, 'NFT card height is different').to.be.equal(
-      initialNFTCardSize.height
-    );
+    expect(newNftCardSize.width, 'NFT card width is different').to.be.equal(initialNFTCardSize.width);
+    expect(newNftCardSize.height, 'NFT card height is different').to.be.equal(initialNFTCardSize.height);
     const fourColumnsViewIsSelected = await nftsMainPage.fourColumnsViewIsSelected();
     expect(fourColumnsViewIsSelected, 'Four columns view is not selected').to.be.true;
   });

@@ -1,11 +1,5 @@
 import WalletTab from './walletTab.page.js';
-import {
-  quarterSecond,
-  fiveSeconds,
-  halfSecond,
-  defaultWaitTimeout,
-  oneMinute,
-} from '../../../helpers/timeConstants.js';
+import { quarterSecond, fiveSeconds, halfSecond, defaultWaitTimeout, oneMinute } from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -115,16 +109,8 @@ class SendSubTab extends WalletTab {
   // functions
   async stepOneIsDisplayed() {
     this.logger.info(`SendSubTab::stepOneIsDisplayed is called.`);
-    const receiverState = await this.customWaitIsPresented(
-      this.receiverAddressInputLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const memoState = await this.customWaitIsPresented(
-      this.memoInputLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    const receiverState = await this.customWaitIsPresented(this.receiverAddressInputLocator, fiveSeconds, quarterSecond);
+    const memoState = await this.customWaitIsPresented(this.memoInputLocator, fiveSeconds, quarterSecond);
     return receiverState && memoState;
   }
   async enterReceiver(receiver) {
@@ -135,19 +121,11 @@ class SendSubTab extends WalletTab {
   }
   async receiverIsGood() {
     this.logger.info(`SendSubTab::receiverIsGood is called.`);
-    return await this.customWaitIsPresented(
-      this.receiverDoneIcon,
-      defaultWaitTimeout,
-      quarterSecond
-    );
+    return await this.customWaitIsPresented(this.receiverDoneIcon, defaultWaitTimeout, quarterSecond);
   }
   async getReceiverHelperText() {
     this.logger.info(`SendSubTab::getReceiverHelperText is called.`);
-    const isPresented = await this.customWaitIsPresented(
-      this.receiverHelperTextLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
+    const isPresented = await this.customWaitIsPresented(this.receiverHelperTextLocator, defaultWaitTimeout, quarterSecond);
     if (isPresented) {
       return await this.getText(this.receiverHelperTextLocator);
     }
@@ -184,9 +162,7 @@ class SendSubTab extends WalletTab {
     }
   }
   async enterReceiverAndMemo(receiver, memo = '', confirm = true) {
-    this.logger.info(
-      `SendSubTab::enterReceiverAndMemo is called. ` + `Receiver: ${receiver}, memo: ${memo}`
-    );
+    this.logger.info(`SendSubTab::enterReceiverAndMemo is called. ` + `Receiver: ${receiver}, memo: ${memo}`);
     await this.enterReceiver(receiver);
     if (memo) {
       await this.enterMemo(memo);

@@ -28,5 +28,3 @@ export const useCurrencyPairing = () => React.useContext(CurrencyContext) || mis
 const missingProvider = () => {
   throw new Error('CurrencyProvider is missing');
 };
-
-

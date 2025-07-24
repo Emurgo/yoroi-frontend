@@ -208,9 +208,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       // just response with an error "Not suitable data is sent"
       const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const errorMessage = await dappSingTxPage.getErrorMessage();
-      expect(errorMessage, 'Something wrong with the error message').to.equal(
-        'Unable to parse input transaction.'
-      );
+      expect(errorMessage, 'Something wrong with the error message').to.equal('Unable to parse input transaction.');
 
       await windowManager.closeTabWindow(popupConnectorName, mockDAppName);
     });

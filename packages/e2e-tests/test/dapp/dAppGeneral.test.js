@@ -173,8 +173,7 @@ describe('dApp, general functions, without pop-up', function () {
 
     it('Request getRegisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getRegisteredPubStakeKeys();
-      expect(extensionsResponse.success, 'The request getRegisteredPubStakeKeys failed').to.be
-        .true;
+      expect(extensionsResponse.success, 'The request getRegisteredPubStakeKeys failed').to.be.true;
       // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array');
     });
@@ -187,8 +186,7 @@ describe('dApp, general functions, without pop-up', function () {
 
     it('Request getUnregisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getUnregisteredPubStakeKeys();
-      expect(extensionsResponse.success, 'The request getUnregisteredPubStakeKeys failed').to.be
-        .true;
+      expect(extensionsResponse.success, 'The request getUnregisteredPubStakeKeys failed').to.be.true;
       // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array').that.is.not.empty;
       expect(extensionsResponse.retValue.length).to.equal(1);

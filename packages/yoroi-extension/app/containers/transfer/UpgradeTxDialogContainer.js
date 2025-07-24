@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
 import globalMessages from '../../i18n/global-messages';
-import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import type { TransferTx } from '../../types/TransferTypes';
 import { genAddressLookup, allAddressSubgroups } from '../../stores/stateless/addressStores';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -14,9 +14,7 @@ import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import type {
-  Addressing,
-} from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
+import type { Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -30,15 +28,15 @@ type LocalProps = {|
 const messages = defineMessages({
   explanation: {
     id: 'upgradetx.explanation',
-    defaultMessage: '!!!We found some {ticker} in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
+    defaultMessage:
+      '!!!We found some {ticker} in your Byron-era wallet. Would you like to transfer it to your new Shelley wallet?',
   },
 });
 
 // TODO: probably a lot of this can be de-duplicated with TransferSendPage
 @observer
 export default class UpgradeTxDialogContainer extends Component<{| ...StoresProps, ...LocalProps |}> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   render(): Node {
     const { transferRequest } = this.props.stores.substores.ada.yoroiTransfer;
@@ -68,10 +66,7 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
   getSpinner: void => Node = () => {
     const intl = this.context;
     return (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <LegacyTransferLayout>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -79,11 +74,9 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
         </LegacyTransferLayout>
       </Dialog>
     );
-  }
+  };
 
-  toTransferTx: HaskellShelleyTxSignRequest => TransferTx = (
-    tentativeTx
-  ) => {
+  toTransferTx: HaskellShelleyTxSignRequest => TransferTx = tentativeTx => {
     if (!(tentativeTx instanceof HaskellShelleyTxSignRequest)) {
       throw new Error(`${nameof(UpgradeTxDialogContainer)} incorrect tx type`);
     }
@@ -91,22 +84,18 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
     return {
       recoveredBalance: tentativeTx.totalOutput().joinAddCopy(tentativeTx.fee()),
       fee: tentativeTx.fee(),
-      senders: tentativeTx
-        .uniqueSenderAddresses(),
-      receivers: tentativeTx
-        .receivers(true),
+      senders: tentativeTx.uniqueSenderAddresses(),
+      receivers: tentativeTx.receivers(true),
     };
   };
 
-  getContent: {|
+  getContent: ({|
     signRequest: HaskellShelleyTxSignRequest,
     publicKey: {|
       key: RustModule.WalletV4.Bip32PublicKey,
       ...Addressing,
-    |}
-  |} => Node = (
-    tentativeTx
-  ) => {
+    |},
+  |}) => Node = tentativeTx => {
     const transferTx = this.toTransferTx(tentativeTx.signRequest);
 
     const selected = this.props.stores.wallets.selected;
@@ -135,8 +124,11 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
       <TransferSummaryPage
         header={header}
         form={undefined}
-        selectedExplorer={this.props.stores.explorers.selectedExplorer
-          .get(network.NetworkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        selectedExplorer={
+          this.props.stores.explorers.selectedExplorer.get(network.NetworkId) ??
+          (() => {
+            throw new Error('No explorer for wallet network');
+          })()
         }
         transferTx={transferTx}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -148,11 +140,11 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
             await this.props.stores.transactionProcessingStore.adaSendAndRefresh({
               signRequest: tentativeTx.signRequest,
               wallet: {
-                 ...selected,
-                 // when transfering ledger wallet Byron Utxos to Shelley, we should use the
-                 // Byron public key
-                 publicKey: tentativeTx.publicKey.key.to_hex(),
-                 pathToPublic: tentativeTx.publicKey.addressing.path,
+                ...selected,
+                // when transfering ledger wallet Byron Utxos to Shelley, we should use the
+                // Byron public key
+                publicKey: tentativeTx.publicKey.key.to_hex(),
+                pathToPublic: tentativeTx.publicKey.addressing.path,
               },
               password: null,
               callback: async () => {},
@@ -174,12 +166,10 @@ export default class UpgradeTxDialogContainer extends Component<{| ...StoresProp
           selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
-          this.props.stores.addresses.addressSubgroupMap,
+          this.props.stores.addresses.addressSubgroupMap
         )}
-        addressToDisplayString={
-          addr => addressToDisplayString(addr, network)
-        }
+        addressToDisplayString={addr => addressToDisplayString(addr, network)}
       />
     );
-  }
+  };
 }

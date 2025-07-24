@@ -57,9 +57,7 @@ export default class ReceiveNavButtonRevamp extends Component<Props> {
           <Typography component="div" variant="body1" fontWeight={this.props.isActive ? 500 : 400}>
             {this.props.label}
           </Typography>
-          <Box component="span">
-            {this.props.tooltip}
-          </Box>
+          <Box component="span">{this.props.tooltip}</Box>
         </Box>
       </Box>
     );

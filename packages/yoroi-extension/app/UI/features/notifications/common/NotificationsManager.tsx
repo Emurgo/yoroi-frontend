@@ -1,4 +1,4 @@
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer } from 'react-toastify';
 import NotificationsStyles, { FadeInOut } from './NotificationsStyles';
 /* import { useNotifications } from '../module/NotificationsProvider';
 import { Box, Button } from '@mui/material';
@@ -32,5 +32,5 @@ export default function NotificationsManager() {
       </Box>
       )} */}
     </>
-  )
+  );
 }

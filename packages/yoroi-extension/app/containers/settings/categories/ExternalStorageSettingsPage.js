@@ -8,8 +8,7 @@ import type { StoresProps } from '../../../stores';
 
 @observer
 export default class ExternalStorageSettingsPage extends Component<StoresProps> {
-
-  onConnect: string => void = (authorizeUrl) => {
+  onConnect: string => void = authorizeUrl => {
     // Open authorize url
     handleExternalClick(authorizeUrl);
   };
@@ -19,10 +18,7 @@ export default class ExternalStorageSettingsPage extends Component<StoresProps> 
   };
 
   render(): Node {
-    const {
-      providers,
-      selectedProvider
-    } = this.props.stores.memos;
+    const { providers, selectedProvider } = this.props.stores.memos;
 
     return (
       <ExternalStorageSettings

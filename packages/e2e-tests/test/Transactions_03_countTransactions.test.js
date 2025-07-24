@@ -40,9 +40,7 @@ for (const testDatum of testData) {
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
       const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
-      expect(displayedTxsAmount, 'Incorrect amount of txs is displayed').to.equal(
-        testDatum.expectedTxsAmount
-      );
+      expect(displayedTxsAmount, 'Incorrect amount of txs is displayed').to.equal(testDatum.expectedTxsAmount);
     });
 
     afterEach(function (done) {

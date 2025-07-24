@@ -9,19 +9,19 @@ module.exports = {
         excludeArrowFunctions: true,
         annotateUndefined: 'always-enforce',
         excludeMatching: ['constructor'],
-      }
+      },
     ],
     'flowtype/require-parameter-type': [
       2,
       {
-        excludeArrowFunctions: true
-      }
+        excludeArrowFunctions: true,
+      },
     ],
     'no-restricted-syntax': [
       'error',
       {
         selector: 'ClassProperty:not([typeAnnotation])[key.name!=/_.*/]',
-        message: 'Missing type annotation of class property. This has unexpected cross-module behavior.'
+        message: 'Missing type annotation of class property. This has unexpected cross-module behavior.',
       },
     ],
   },

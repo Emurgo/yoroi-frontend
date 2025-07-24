@@ -1,38 +1,18 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
 
-import {
-  AddDerivation,
-  GetOrAddDerivation,
-  ModifyAddress,
-} from '../../../primitives/api/write';
-import type {
-  AddDerivationRequest,
-  DerivationQueryResult,
-} from '../../../primitives/api/write';
-import type {
-  KeyRow,
-} from '../../../primitives/tables';
-import type {
-  HwWalletMetaInsert, HwWalletMetaRow,
-} from '../../core/tables';
-import { StaleStateError, } from '../../../utils';
-import {
-  GetKeyForDerivation,
-} from '../../../primitives/api/read';
-import { AddPublicDeriver, ModifyHwWalletMeta, } from '../../core/api/write';
+import { AddDerivation, GetOrAddDerivation, ModifyAddress } from '../../../primitives/api/write';
+import type { AddDerivationRequest, DerivationQueryResult } from '../../../primitives/api/write';
+import type { KeyRow } from '../../../primitives/tables';
+import type { HwWalletMetaInsert, HwWalletMetaRow } from '../../core/tables';
+import { StaleStateError } from '../../../utils';
+import { GetKeyForDerivation } from '../../../primitives/api/read';
+import { AddPublicDeriver, ModifyHwWalletMeta } from '../../core/api/write';
 import { GetPublicDeriver } from '../../core/api/read';
 import type { AddPublicDeriverResponse } from '../../core/api/write';
 
-import type {
-  TreeInsertStart, TreeInsert,
-  TreeResultStart, TreeResult,
-  InsertPath,
-} from '../utils.types';
+import type { TreeInsertStart, TreeInsert, TreeResultStart, TreeResult, InsertPath } from '../utils.types';
 
 export class AddDerivationTree {
   static ownTables: {||} = Object.freeze({});
@@ -49,7 +29,7 @@ export class AddDerivationTree {
     tx: lf$Transaction,
     tree: TreeInsertStart,
     derivationTables: Map<number, string>,
-    level: number,
+    level: number
   ): Promise<TreeResult<any>> {
     const parentId = tree.derivationId;
 
@@ -60,7 +40,8 @@ export class AddDerivationTree {
         throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.excludingParent)} Unknown table queried`);
       }
       const child = await AddDerivationTree.depTables.GetOrAddDerivation.getOrAdd(
-        db, tx,
+        db,
+        tx,
         parentId,
         tree.children[i].index,
         {
@@ -75,23 +56,25 @@ export class AddDerivationTree {
           levelInfo: insertRequest => tree.children[i].insert(insertRequest),
         },
         Array.from(derivationTables.values()),
-        tableName,
+        tableName
       );
       if (tree.children[i].isUsed) {
         await ModifyAddress.markAsUsed(db, tx, [child.KeyDerivation.KeyDerivationId]);
       }
       // recursively call down to the next level
-      const children = tree.children[i].children == null
-        ? undefined
-        : await AddDerivationTree.excludingParent(
-          db, tx,
-          {
-            derivationId: child.KeyDerivation.KeyDerivationId,
-            children: tree.children[i].children,
-          },
-          derivationTables,
-          level + 1,
-        );
+      const children =
+        tree.children[i].children == null
+          ? undefined
+          : await AddDerivationTree.excludingParent(
+              db,
+              tx,
+              {
+                derivationId: child.KeyDerivation.KeyDerivationId,
+                children: tree.children[i].children,
+              },
+              derivationTables,
+              level + 1
+            );
       result.push({
         index: tree.children[i].index,
         result: child,
@@ -110,23 +93,25 @@ export class AddDerivationTree {
     rootInsert: AddDerivationRequest<Insert>,
     derivationTables: Map<number, string>,
     startingLevel: number,
-    tree: number => TreeInsertStart,
+    tree: number => TreeInsertStart
   ): Promise<TreeResultStart<Row>> {
     const tableName = derivationTables.get(startingLevel);
     if (tableName == null) {
       throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.includingParent)} Unknown table queried`);
     }
     const root = await AddDerivationTree.depTables.AddDerivation.add(
-      db, tx,
+      db,
+      tx,
       rootInsert,
       Array.from(derivationTables.values()),
-      tableName,
+      tableName
     );
     const children = await AddDerivationTree.excludingParent(
-      db, tx,
+      db,
+      tx,
       tree(root.KeyDerivation.KeyDerivationId),
       derivationTables,
-      startingLevel + 1,
+      startingLevel + 1
     );
     return {
       root,
@@ -143,7 +128,7 @@ export class AddDerivationTree {
       path: InsertPath<Insert>,
       pathStartLevel: number,
     |},
-    derivationTables: Map<number, string>,
+    derivationTables: Map<number, string>
   ): Promise<Array<DerivationQueryResult<Row>>> {
     let parentId = request.parentDerivationId;
     const result = [];
@@ -153,7 +138,8 @@ export class AddDerivationTree {
         throw new Error(`${nameof(AddDerivationTree)}::${nameof(AddDerivationTree.fromSinglePath)} Unknown table queried`);
       }
       const levelResult = await AddDerivationTree.depTables.GetOrAddDerivation.getOrAdd(
-        db, tx,
+        db,
+        tx,
         parentId,
         request.path[i].index,
         {
@@ -165,12 +151,12 @@ export class AddDerivationTree {
             PrivateKeyId: keyInfo.public,
             Parent: parentId,
             // explicitly ignore index for ROOT since it has no index
-            Index: request.pathStartLevel + i === 0  ? null : request.path[i].index,
+            Index: request.pathStartLevel + i === 0 ? null : request.path[i].index,
           }),
           levelInfo: insertRequest => request.path[i].insert(insertRequest),
         },
         Array.from(derivationTables.values()),
-        tableName,
+        tableName
       );
       parentId = levelResult.KeyDerivation.KeyDerivationId;
       result.push(levelResult);
@@ -191,9 +177,7 @@ export type DerivePublicDeriverFromKeyRequest<Insert> = {|
    *
    * Note: path should NOT include parent (if one exists)
    */
-  pathToPublic: (
-    privateKeyRow: $ReadOnly<KeyRow>,
-  ) => InsertPath<Insert>,
+  pathToPublic: (privateKeyRow: $ReadOnly<KeyRow>) => InsertPath<Insert>,
   initialDerivations: TreeInsert<any>,
 |};
 export class DerivePublicDeriverFromKey {
@@ -219,85 +203,79 @@ export class DerivePublicDeriverFromKey {
     privateDeriverKeyDerivationId: number,
     privateDeriverLevel: number,
     conceptualWalletId: number,
-    derivationTables: Map<number, string>,
+    derivationTables: Map<number, string>
   ): Promise<AddPublicDeriverResponse<Row>> {
     const derivationAndKey = await DerivePublicDeriverFromKey.depTables.GetKeyForDerivation.get(
-      db, tx,
+      db,
+      tx,
       privateDeriverKeyDerivationId,
       false,
-      true,
+      true
     );
     if (derivationAndKey.privateKey == null) {
       throw new StaleStateError(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} privateKey`);
     }
-    const derivedPath = body.pathToPublic(
-      derivationAndKey.privateKey,
-    );
+    const derivedPath = body.pathToPublic(derivationAndKey.privateKey);
 
     // TODO: refactor to use fromSinglePathWithKey ?
     if (derivedPath.length === 0) {
       throw new Error(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} derivedPath`);
     }
     const pathResult = await DerivePublicDeriverFromKey.depTables.AddDerivationTree.fromSinglePath(
-      db, tx,
+      db,
+      tx,
       {
         parentDerivationId: privateDeriverKeyDerivationId,
         path: derivedPath.slice(0, derivedPath.length - 1),
         pathStartLevel: privateDeriverLevel + 1, // +1 since private deriver isn't included in path
       },
-      derivationTables,
+      derivationTables
     );
 
-    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(
-      db, tx,
-      conceptualWalletId,
-    );
+    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(db, tx, conceptualWalletId);
 
     let pubDeriver;
     {
-      const tableName = derivationTables.get(
-        privateDeriverLevel + derivedPath.length
-      );
+      const tableName = derivationTables.get(privateDeriverLevel + derivedPath.length);
       if (tableName == null) {
         throw new Error(`${nameof(DerivePublicDeriverFromKey)}::${nameof(DerivePublicDeriverFromKey.add)} Unknown table queried`);
       }
-      pubDeriver = await DerivePublicDeriverFromKey.depTables.AddPublicDeriver.add(
-        db, tx,
-        {
-          addLevelRequest: {
-            privateKeyInfo: derivedPath[derivedPath.length - 1].privateKey,
-            publicKeyInfo: derivedPath[derivedPath.length - 1].publicKey,
-            derivationInfo: keys => ({
-              PublicKeyId: keys.public,
-              PrivateKeyId: keys.private,
-              Parent: pathResult.length === 0
+      pubDeriver = await DerivePublicDeriverFromKey.depTables.AddPublicDeriver.add(db, tx, {
+        addLevelRequest: {
+          privateKeyInfo: derivedPath[derivedPath.length - 1].privateKey,
+          publicKeyInfo: derivedPath[derivedPath.length - 1].publicKey,
+          derivationInfo: keys => ({
+            PublicKeyId: keys.public,
+            PrivateKeyId: keys.private,
+            Parent:
+              pathResult.length === 0
                 ? privateDeriverKeyDerivationId
                 : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
-              Index: derivedPath[derivedPath.length - 1].index,
-            }),
-            levelInfo: insertRequest => derivedPath[derivedPath.length - 1].insert(insertRequest),
-          },
-          derivationTables,
-          levelSpecificTableName: tableName,
-          addPublicDeriverRequest: ids => ({
-            ConceptualWalletId: conceptualWalletId,
-            KeyDerivationId: ids.derivationId,
-            Name: body.publicDeriverMeta.name,
-            Index: existingWallets.length,
-            LastSyncInfoId: ids.lastSyncInfoId,
+            Index: derivedPath[derivedPath.length - 1].index,
           }),
-        }
-      );
+          levelInfo: insertRequest => derivedPath[derivedPath.length - 1].insert(insertRequest),
+        },
+        derivationTables,
+        levelSpecificTableName: tableName,
+        addPublicDeriverRequest: ids => ({
+          ConceptualWalletId: conceptualWalletId,
+          KeyDerivationId: ids.derivationId,
+          Name: body.publicDeriverMeta.name,
+          Index: existingWallets.length,
+          LastSyncInfoId: ids.lastSyncInfoId,
+        }),
+      });
     }
 
     await DerivePublicDeriverFromKey.depTables.AddDerivationTree.excludingParent(
-      db, tx,
+      db,
+      tx,
       {
         derivationId: pubDeriver.publicDeriverResult.KeyDerivationId,
         children: body.initialDerivations,
       },
       derivationTables,
-      privateDeriverLevel + derivedPath.length,
+      privateDeriverLevel + derivedPath.length
     );
 
     return pubDeriver;
@@ -320,11 +298,11 @@ export type AddAdhocPublicDeriverRequest<Insert> = {|
   |},
   initialDerivations: TreeInsert<any>,
   hwWalletMetaInsert?: HwWalletMetaInsert,
-|}
+|};
 export type AddAdhocPublicDeriverResponse<Row> = {|
   publicDeriver: AddPublicDeriverResponse<Row>,
   hwWalletMeta: void | $ReadOnly<HwWalletMetaRow>,
-|}
+|};
 export class AddAdhocPublicDeriver {
   static ownTables: {||} = Object.freeze({});
   static depTables: {|
@@ -346,16 +324,17 @@ export class AddAdhocPublicDeriver {
     tx: lf$Transaction,
     request: AddAdhocPublicDeriverRequest<Insert>,
     conceptualWalletId: number,
-    derivationTables: Map<number, string>,
+    derivationTables: Map<number, string>
   ): Promise<AddAdhocPublicDeriverResponse<Row>> {
     const pathResult = await AddAdhocPublicDeriver.depTables.AddDerivationTree.fromSinglePath(
-      db, tx,
+      db,
+      tx,
       {
         parentDerivationId: request.parentDerivationId,
         path: request.pathToPublic.slice(0, request.pathToPublic.length - 1),
         pathStartLevel: request.pathStartLevel,
       },
-      derivationTables,
+      derivationTables
     );
 
     const tableName = derivationTables.get(
@@ -366,59 +345,51 @@ export class AddAdhocPublicDeriver {
       throw new Error(`${nameof(AddAdhocPublicDeriver)}::${nameof(DerivePublicDeriverFromKey.add)} Unknown table queried`);
     }
 
-    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(
-      db, tx,
-      conceptualWalletId,
-    );
+    const existingWallets = await AddAdhocPublicDeriver.depTables.GetPublicDeriver.forWallet(db, tx, conceptualWalletId);
 
     // TODO: refactor to use fromSinglePathWithKey ?
-    const publicDeriver = await AddAdhocPublicDeriver.depTables.AddPublicDeriver.add(
-      db, tx,
-      {
-        addLevelRequest: {
-          privateKeyInfo: request.pathToPublic[request.pathToPublic.length - 1].privateKey,
-          publicKeyInfo: request.pathToPublic[request.pathToPublic.length - 1].publicKey,
-          derivationInfo: keys => ({
-            PublicKeyId: keys.public,
-            PrivateKeyId: keys.private,
-            Parent: pathResult.length === 0
+    const publicDeriver = await AddAdhocPublicDeriver.depTables.AddPublicDeriver.add(db, tx, {
+      addLevelRequest: {
+        privateKeyInfo: request.pathToPublic[request.pathToPublic.length - 1].privateKey,
+        publicKeyInfo: request.pathToPublic[request.pathToPublic.length - 1].publicKey,
+        derivationInfo: keys => ({
+          PublicKeyId: keys.public,
+          PrivateKeyId: keys.private,
+          Parent:
+            pathResult.length === 0
               ? request.parentDerivationId
               : pathResult[pathResult.length - 1].KeyDerivation.KeyDerivationId,
-            Index: request.pathToPublic[request.pathToPublic.length - 1].index,
-          }),
-          levelInfo: insertRequest => request.pathToPublic[request.pathToPublic.length - 1].insert(
-            insertRequest
-          )
-        },
-        derivationTables,
-        levelSpecificTableName: tableName,
-        addPublicDeriverRequest: ids => ({
-          ConceptualWalletId: conceptualWalletId,
-          KeyDerivationId: ids.derivationId,
-          Name: request.publicDeriverMeta.name,
-          Index: existingWallets.length,
-          LastSyncInfoId: ids.lastSyncInfoId,
+          Index: request.pathToPublic[request.pathToPublic.length - 1].index,
         }),
-      }
-    );
+        levelInfo: insertRequest => request.pathToPublic[request.pathToPublic.length - 1].insert(insertRequest),
+      },
+      derivationTables,
+      levelSpecificTableName: tableName,
+      addPublicDeriverRequest: ids => ({
+        ConceptualWalletId: conceptualWalletId,
+        KeyDerivationId: ids.derivationId,
+        Name: request.publicDeriverMeta.name,
+        Index: existingWallets.length,
+        LastSyncInfoId: ids.lastSyncInfoId,
+      }),
+    });
 
     await AddAdhocPublicDeriver.depTables.AddDerivationTree.excludingParent(
-      db, tx,
+      db,
+      tx,
       {
         derivationId: publicDeriver.publicDeriverResult.KeyDerivationId,
         children: request.initialDerivations,
       },
       derivationTables,
       // -1 since pathStartLevel is included in pathToPublic
-      request.pathStartLevel + request.pathToPublic.length - 1,
+      request.pathStartLevel + request.pathToPublic.length - 1
     );
 
-    const hwWalletMeta = request.hwWalletMetaInsert == null
-      ? undefined
-      : await AddAdhocPublicDeriver.depTables.ModifyHwWalletMeta.add(
-        db, tx,
-        request.hwWalletMetaInsert
-      );
+    const hwWalletMeta =
+      request.hwWalletMetaInsert == null
+        ? undefined
+        : await AddAdhocPublicDeriver.depTables.ModifyHwWalletMeta.add(db, tx, request.hwWalletMetaInsert);
 
     return {
       publicDeriver,
