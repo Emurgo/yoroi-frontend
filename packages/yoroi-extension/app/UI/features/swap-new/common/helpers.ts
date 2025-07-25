@@ -80,6 +80,7 @@ export const useGetInputs = (walletUtxos: any[]) => {
       return inputs;
     } catch {
       console.warn('Failed to get inputs');
+      return [];
     }
   };
 
