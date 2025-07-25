@@ -126,6 +126,7 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
                 selectedPoolId={this.state.selectedPoolId}
                 poolName={selectedPoolInfo?.info?.name ?? intl.formatMessage(globalMessages.unknownPoolLabel)}
                 stores={this.props.stores}
+                isTestnet={selectedWallet.isTestnet}
               />
               {this._displayPoolInfo()}
               <br />
