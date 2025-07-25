@@ -1,4 +1,15 @@
-import { useMemo, useReducer, useContext, useRef, useState, useEffect, createContext, RefObject, Dispatch } from 'react';
+import {
+  useMemo,
+  useReducer,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+  createContext,
+  RefObject,
+  Dispatch,
+  useCallback,
+} from 'react';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
@@ -10,7 +21,7 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { normalizeTokenId } from '../common/helpers';
+import { useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN } from '../common/constants';
 import { AssetDirectionType } from '../common/types';
 
@@ -28,6 +39,8 @@ export const useAddressHex = address => {
 
 export const SwapContextProvider = ({ children, currentWallet, stores }: any) => {
   const { ftAssetList, primaryTokenInfo, walletAddresses, selectedWallet, explorer } = currentWallet;
+  const [isCreateOrderLoading, setIsCreateOrderLoading] = useState(false);
+  const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
   const { partners, excludedTokens } = useSwapConfig();
@@ -35,6 +48,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
+
+  const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
 
   const [state, action] = useReducer(swapReducer, defaultState);
 
@@ -120,10 +135,12 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     state.selectedProtocol.isTouched,
     state.selectedProtocol.value,
   ]);
-
   useEffect(() => {
-    const tokenAmount = ftAssetList.find(asset => normalizeTokenId(asset.info.id) === state.tokenInInput.tokenId);
-    const hasEnoughBalance = Number(tokenAmount.formatedAmount) >= Number(state.tokenInInput.value);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+
+    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+
+    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
 
     if (!hasEnoughBalance) {
       action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
@@ -134,6 +151,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   useEffect(() => {
     if (!state.needsNewEstimate) return;
+    action({ type: SwapAction.EstimateError, value: { message: '', status: 0, responseData: null } });
 
     if (
       state.tokenInInput.tokenId === undefined ||
@@ -141,7 +159,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       (state.tokenInInput.value === '' && state.tokenOutInput.value === '')
     )
       return;
-
+    setIsEstimateOrderLoading(true);
     swapManager.api
       .estimate({
         slippage: state.slippageInput.value,
@@ -164,8 +182,56 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         } else {
           action({ type: SwapAction.EstimateResponse, value: response.value.data });
         }
+      })
+      .finally(() => {
+        setIsEstimateOrderLoading(false);
       });
   }, [state, swapManager.api]);
+
+  const create = useCallback(async () => {
+    if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
+
+    setIsCreateOrderLoading(true);
+
+    const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
+    const quantityIn =
+      Number(state.tokenInInput.value) *
+      10 ** (state.tokenInInput.tokenId === '.' ? primaryTokenInfo.decimals : tokenInInfo?.decimals);
+    const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
+    const inputs = await getInputs(amountsIn);
+
+    swapManager.api
+      .create({
+        tokenIn: state.tokenInInput.tokenId,
+        tokenOut: state.tokenOutInput.tokenId,
+        amountIn: Number(state.tokenInInput.value),
+        ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
+        blockedProtocols: [],
+        protocol: state.selectedProtocol.value,
+        inputs,
+      })
+      .then(response => {
+        setIsCreateOrderLoading(false);
+        if (isLeft(response)) {
+          action({ type: SwapAction.CreateError, value: response.error });
+        } else {
+          action({ type: SwapAction.CreateResponse, value: response.value.data });
+        }
+      });
+  }, [
+    state.estimate?.splits,
+    state.estimate?.totalFee,
+    state.orderType,
+    state.selectedProtocol.value,
+    state.slippageInput.value,
+    state.tokenInInput.tokenId,
+    state.tokenInInput.value,
+    state.tokenOutInput.tokenId,
+    state.tokenOutInput.value,
+    state.wantedPrice,
+    swapManager.api,
+    tokenInfos,
+  ]);
 
   const context: any = useMemo(
     () => ({
@@ -180,6 +246,10 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       tokenManager,
       loadingTokenList,
       explorer,
+      createOrder: create,
+      isCreateOrderLoading,
+      isEstimateOrderLoading,
+      stores,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
@@ -477,7 +547,7 @@ export type SwapContext = SwapState & {
   wantedPriceInputRef: RefObject<any> | undefined;
   orders?: Array<Swap.Order>;
   action: Dispatch<SwapAction>;
-  create: () => void;
+  createOrder: () => void;
   cancel: Swap.Api['cancel'];
   managerSettings: Swap.ManagerSettings;
   assignManagerSettings: Swap.Manager['assignSettings'];
@@ -485,8 +555,11 @@ export type SwapContext = SwapState & {
   ftAssetList: any;
   tokenInfoList: any;
   swapForm: any;
+  stores: any;
   primaryTokenInfo: any;
   loadingTokenList: boolean;
+  isCreateOrderLoading: boolean;
+  isEstimateOrderLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
 };
 
@@ -499,7 +572,7 @@ const SwapContext = createContext<SwapContext>({
   wantedPriceInputRef: undefined,
   orders: undefined,
   action: () => null,
-  create: () => null,
+  createOrder: () => new Promise(res => res),
   cancel: () => new Promise(res => res),
   managerSettings: { routingPreference: 'auto', slippage: 1 },
   assignManagerSettings: () => ({ routingPreference: 'auto', slippage: 1 }),
@@ -507,8 +580,11 @@ const SwapContext = createContext<SwapContext>({
   ftAssetList: [],
   tokenInfoList: [],
   swapForm: {},
+  stores: undefined,
   primaryTokenInfo: {},
   loadingTokenList: false,
+  isCreateOrderLoading: false,
+  isEstimateOrderLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
 });
 
