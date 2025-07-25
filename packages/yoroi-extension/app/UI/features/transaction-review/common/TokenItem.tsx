@@ -26,13 +26,13 @@ const getDecimals = (tokenInfo: any) => {
 
 const getTokenName = (tokenInfo: any): string => {
   if (!tokenInfo) return '';
-  
+
   if (typeof tokenInfo.name === 'string') return tokenInfo.name;
 
   if (tokenInfo.info && typeof tokenInfo.info.name === 'string') {
     return tokenInfo.info.name;
   }
-  
+
   return '';
 };
 
