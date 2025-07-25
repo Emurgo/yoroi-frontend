@@ -241,7 +241,7 @@ export default class SwapStore extends Store<StoresMap> {
     const buyTokenId = swapState.tokenOutInput.tokenId;
     console.log('sellTokenId', sellTokenId);
     const sell = {
-      tokenId: "",
+      tokenId: '',
       quantity: String(Number(swapState.tokenInInput.value * 1000000)), // assumes ADA for now
     };
 
