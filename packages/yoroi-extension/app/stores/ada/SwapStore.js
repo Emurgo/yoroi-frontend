@@ -239,9 +239,8 @@ export default class SwapStore extends Store<StoresMap> {
   |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, tokenInfos }) => {
     const sellTokenId = swapState.tokenInInput.tokenId;
     const buyTokenId = swapState.tokenOutInput.tokenId;
-    console.log('sellTokenId', sellTokenId);
     const sell = {
-      tokenId: '',
+      tokenId: sellTokenId,
       quantity: String(Number(swapState.tokenInInput.value * 1000000)), // assumes ADA for now
     };
 
