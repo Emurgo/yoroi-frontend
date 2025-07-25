@@ -155,7 +155,7 @@ const contentScriptConfig = (
     rules: [
       ...commonConfig.rules(false),
       {
-        test: /\.js$/,
+        test: /\.(js|ts)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
