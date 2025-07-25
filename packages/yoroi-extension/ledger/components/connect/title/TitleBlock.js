@@ -42,7 +42,7 @@ type Props = {|
 
 @observer
 export default class TitleBlock extends React.Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { currentOperationName } = this.props;
@@ -71,7 +71,7 @@ export default class TitleBlock extends React.Component<Props> {
         title = messages.titleDeriveAddress;
         break;
       default:
-        return (null);
+        return null;
     }
 
     return (

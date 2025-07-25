@@ -122,7 +122,7 @@ type DisplayAmount = {|
 
 @observer
 class SignTxPage extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -171,11 +171,7 @@ class SignTxPage extends Component<Props, State> {
             })
             .catch(error => {
               if (error instanceof WrongPassphraseError) {
-                this.form
-                  .$('walletPassword')
-                  .invalidate(
-                    this.context.formatMessage(messages.incorrectWalletPasswordError)
-                  );
+                this.form.$('walletPassword').invalidate(this.context.formatMessage(messages.incorrectWalletPasswordError));
               } else {
                 throw error;
               }

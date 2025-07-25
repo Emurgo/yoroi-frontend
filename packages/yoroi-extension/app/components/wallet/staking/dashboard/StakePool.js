@@ -91,14 +91,14 @@ type Props = {|
   /**
    * we don't allow to undelegate if the user is using ratio stake
    * since the UX in this case is not obvious (undelegate from one pool or all pools)
-  */
+   */
   +undelegate: void | (void => Promise<void>),
   +purpose: 'dashboard' | 'delegation',
 |};
 
 @observer
 export default class StakePool extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
@@ -150,11 +150,7 @@ export default class StakePool extends Component<Props> {
 
     const poolIdNotificationId = 'poolId-copyNotification';
     return (
-      <CardShadow title={
-        this.props.purpose === 'dashboard'
-          ? intl.formatMessage(messages.title)
-          : undefined}
-      >
+      <CardShadow title={this.props.purpose === 'dashboard' ? intl.formatMessage(messages.title) : undefined}>
         <div className={styles.head}>
           <div className={styles.avatarWrapper}>
             <img alt="User avatar" src={avatar} className={styles.avatar} />
@@ -163,24 +159,16 @@ export default class StakePool extends Component<Props> {
             <h3 className={styles.userTitle}>{poolName}</h3>
             <div className={styles.subTitle}>
               <CopyableAddress
-                id='stakePool'
+                id="stakePool"
                 hash={hash}
                 elementId={poolIdNotificationId}
                 onCopyAddress={() => this.props.onCopyAddressTooltip(hash, poolIdNotificationId)}
                 notification={this.props.notification}
                 placementTooltip="bottom-start"
               >
-                <ExplorableHashContainer
-                  selectedExplorer={this.props.selectedExplorer}
-                  hash={hash}
-                  light
-                  linkType="pool"
-                >
+                <ExplorableHashContainer selectedExplorer={this.props.selectedExplorer} hash={hash} light linkType="pool">
                   <RawHash light>
-                    <span className={styles.hash}>{
-                      truncateStakePool(hash)
-                    }
-                    </span>
+                    <span className={styles.hash}>{truncateStakePool(hash)}</span>
                   </RawHash>
                 </ExplorableHashContainer>
               </CopyableAddress>
@@ -207,10 +195,9 @@ export default class StakePool extends Component<Props> {
               );
             })}
           </ul> */}
-          {this.props.purpose === 'delegation'
-            ? <span className={styles.description}>{this.props.data.description}</span>
-            : undefined
-          }
+          {this.props.purpose === 'delegation' ? (
+            <span className={styles.description}>{this.props.data.description}</span>
+          ) : undefined}
           {this.getMoreInfoButton(this.props.moreInfo)}
         </div>
       </CardShadow>

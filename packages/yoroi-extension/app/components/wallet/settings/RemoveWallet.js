@@ -24,7 +24,7 @@ type Props = {|
 
 @observer
 export default class RemoveWallet extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { openDialog } = this.props;
@@ -39,20 +39,11 @@ export default class RemoveWallet extends Component<Props> {
           borderColor: false,
         }}
       >
-        <Typography
-          variant="body1"
-          fontWeight={500}
-          mb="16px"
-          color="grayscale.900"
-        >
+        <Typography variant="body1" fontWeight={500} mb="16px" color="grayscale.900">
           {intl.formatMessage(messages.titleLabel)}
         </Typography>
 
-        <Typography
-          variant="body1"
-          color="ds.text_gray_medium"
-          mb="16px"
-        >
+        <Typography variant="body1" color="ds.text_gray_medium" mb="16px">
           {intl.formatMessage(messages.removeExplanation)}
         </Typography>
 

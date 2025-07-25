@@ -28,9 +28,9 @@ const defaultDurations = [2, 4, 6, 8, 10, 12].map(String);
 const MAX_ALLOWED_DURATION = 60;
 
 interface Props {
-  onClose: () => void,
-  initialDuration: number,
-  onSetDuration: (duration: number) => void,
+  onClose: () => void;
+  initialDuration: number;
+  onSetDuration: (duration: number) => void;
 }
 
 export default function NotificationDurationDialog({ onClose, initialDuration, onSetDuration }: Props) {
@@ -48,12 +48,14 @@ export default function NotificationDurationDialog({ onClose, initialDuration, o
       closeOnOverlayClick
       styleContentOverride={{ paddingTop: '16px' }}
       styleOverride={{ minWidth: '612px', height: '540px', maxWidth: '612px' }}
-      dialogActions={[{
-        label: intl.formatMessage(globalMessages.apply),
-        onClick: () => onSetDuration(Number(currentDuration)),
-        primary: true,
-        disabled: !/^[1-9]\d?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
-      }]}
+      dialogActions={[
+        {
+          label: intl.formatMessage(globalMessages.apply),
+          onClick: () => onSetDuration(Number(currentDuration)),
+          primary: true,
+          disabled: !/^[1-9]\d?$/.test(currentDuration) || Number(currentDuration) > MAX_ALLOWED_DURATION,
+        },
+      ]}
       forceBottomDivider
       forceTopDivider
     >

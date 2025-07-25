@@ -28,66 +28,81 @@ export type Anchor = {|
   dataHash: string,
 |};
 
-export type Cip95Info = {|
-  type: 'StakeRegistrationCert',
-  coin: string | null,
-|} | {|
-  type: 'StakeDeregistrationCert',
-  coin: string | null,
-|} | {|
-  type: 'StakeDelegationCert',
-  poolKeyHash: string,
-|} | {|
-  type: 'VoteDelegCert',
-  drep: string,
-|} | {|
-  type: 'StakeVoteDelegCert',
-  poolKeyHash: string,
-  drep: string,
-|} | {|
-  type: 'StakeRegDelegCert',
-  poolKeyHash: string,
-  coin: string,
-|} | {|
-  type: 'VoteRegDelegCert',
-  drep: string,
-  coin: string,
-|} | {|
-  type: 'StakeVoteRegDelegCert',
-  poolKeyHash: string,
-  drep: string,
-  coin: string,
-|} | {|
-  type: 'RegDrepCert',
-  coin: string,
-  anchor: Anchor | null,
-|} | {|
-  type: 'UnregDrepCert',
-  coin: string,
-|} | {|
-  type: 'UpdateDrepCert',
-  anchor: Anchor | null,
-|} | {|
-  type: 'VotingProcedure',
-  voterType: number,
-  voterHash: string,
-  govActionTxId: string,
-  govActionIndex: number,
-  vote: number, // 0 | 1 | 2,
-  anchor: Anchor | null,
-|} | {|
-  type: 'ProposalProcedure',
-  deposit: string,
-  reward_account: string,
-  govAction: any, // todo
-  anchor: Anchor,
-|} | {|
-  type: 'TreasuryValue',
-  coin: string,
-|} | {|
-  type: 'TreasuryDonation',
-  positiveCoin: string,
-|}
+export type Cip95Info =
+  | {|
+      type: 'StakeRegistrationCert',
+      coin: string | null,
+    |}
+  | {|
+      type: 'StakeDeregistrationCert',
+      coin: string | null,
+    |}
+  | {|
+      type: 'StakeDelegationCert',
+      poolKeyHash: string,
+    |}
+  | {|
+      type: 'VoteDelegCert',
+      drep: string,
+    |}
+  | {|
+      type: 'StakeVoteDelegCert',
+      poolKeyHash: string,
+      drep: string,
+    |}
+  | {|
+      type: 'StakeRegDelegCert',
+      poolKeyHash: string,
+      coin: string,
+    |}
+  | {|
+      type: 'VoteRegDelegCert',
+      drep: string,
+      coin: string,
+    |}
+  | {|
+      type: 'StakeVoteRegDelegCert',
+      poolKeyHash: string,
+      drep: string,
+      coin: string,
+    |}
+  | {|
+      type: 'RegDrepCert',
+      coin: string,
+      anchor: Anchor | null,
+    |}
+  | {|
+      type: 'UnregDrepCert',
+      coin: string,
+    |}
+  | {|
+      type: 'UpdateDrepCert',
+      anchor: Anchor | null,
+    |}
+  | {|
+      type: 'VotingProcedure',
+      voterType: number,
+      voterHash: string,
+      govActionTxId: string,
+      govActionIndex: number,
+      vote: number, // 0 | 1 | 2,
+      anchor: Anchor | null,
+    |}
+  | {|
+      type: 'ProposalProcedure',
+      deposit: string,
+      reward_account: string,
+      govAction: any, // todo
+      anchor: Anchor,
+    |}
+  | {|
+      type: 'TreasuryValue',
+      coin: string,
+    |}
+  | {|
+      type: 'TreasuryDonation',
+      positiveCoin: string,
+    |};
 export type CardanoConnectorSignRequest = {|
   inputs: Array<TxDataInput>,
   foreignInputs: Array<TxDataInput>,

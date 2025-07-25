@@ -2,8 +2,8 @@
 import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
-import { defineMessages, IntlContext, } from 'react-intl';
-import { ReactComponent as ExternalLinkSVG }  from '../../assets/images/link-external.inline.svg';
+import { defineMessages, IntlContext } from 'react-intl';
+import { ReactComponent as ExternalLinkSVG } from '../../assets/images/link-external.inline.svg';
 import styles from './Maintenance.scss';
 import globalMessages from '../../i18n/global-messages';
 import UnavailableDialog from '../widgets/UnavailableDialog';
@@ -25,28 +25,18 @@ type Props = {|
 
 @observer
 export default class Maintenance extends Component<Props> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
     return (
-      <UnavailableDialog
-        title={intl.formatMessage(messages.title)}
-      >
+      <UnavailableDialog title={intl.formatMessage(messages.title)}>
         <div className={styles.body}>
-          <div className={styles.attention}>
-            {intl.formatMessage(globalMessages.attentionHeaderText)}
-          </div>
+          <div className={styles.attention}>{intl.formatMessage(globalMessages.attentionHeaderText)}</div>
           <br />
-          <div className={styles.explanation}>
-            {intl.formatMessage(messages.explanation)}
-          </div>
+          <div className={styles.explanation}>{intl.formatMessage(messages.explanation)}</div>
           <div className={styles.learnMore}>
-            <a
-              href="https://twitter.com/YoroiWallet"
-              onClick={event => this.props.onExternalLinkClick(event)}
-            >
+            <a href="https://twitter.com/YoroiWallet" onClick={event => this.props.onExternalLinkClick(event)}>
               {intl.formatMessage(globalMessages.learnMore) + ' '}
               <ExternalLinkSVG />
             </a>

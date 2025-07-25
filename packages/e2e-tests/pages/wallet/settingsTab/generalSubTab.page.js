@@ -27,7 +27,7 @@ class GeneralSubTab extends SettingsTab {
   };
   switchNetworkBtnLocator = {
     locator: 'settings:general-switchNetwork-button',
-    method: 'id'
+    method: 'id',
   };
   // * network text
   networkInfoTextLocator = {

@@ -78,9 +78,7 @@ class DAppSignTx extends DAppSignBase {
   async _getAssetsFromRow(addressRow) {
     const result = [];
     this.logger.info(`DAppSignTx::_getAmountFromRow is called`);
-    const amountElements = await addressRow.findElements(
-      getByLocator(this.addressRowAmountLocator)
-    );
+    const amountElements = await addressRow.findElements(getByLocator(this.addressRowAmountLocator));
     for (const amountEl of amountElements) {
       const [amount, name] = (await amountEl.getText()).split(' ');
       result.push({ tokenName: name, tokenAmount: amount });
@@ -89,9 +87,7 @@ class DAppSignTx extends DAppSignBase {
   }
   async _getAddressFromRow(addressRow, rowIndex) {
     this.logger.info(`DAppSignTx::_getAddressFromRow is called`);
-    const addressElement = await addressRow.findElement(
-      getByLocator(this.addressRowAddressInfoLocator(rowIndex))
-    );
+    const addressElement = await addressRow.findElement(getByLocator(this.addressRowAddressInfoLocator(rowIndex)));
     const linkElement = await addressElement.findElement(getByLocator(this.addressRowLinkLocator));
     const linkText = await linkElement.getAttribute('href');
     const linkTextArr = linkText.split('/');
@@ -143,19 +139,13 @@ class DAppSignTx extends DAppSignBase {
   }
   async getInputsInfo() {
     this.logger.info(`DAppSignTx::getInputsInfo is called`);
-    const result = await this._getSectionAddresses(
-      this.fromAddressYourInputsLocator,
-      this.fromAddressForeignInputsLocator
-    );
+    const result = await this._getSectionAddresses(this.fromAddressYourInputsLocator, this.fromAddressForeignInputsLocator);
     this.logger.info(`DAppSignTx::getInputsInfo Result: ${JSON.stringify(result, null, 2)}`);
     return result;
   }
   async getOutputsInfo() {
     this.logger.info(`DAppSignTx::getOutputsInfo is called`);
-    const result = await this._getSectionAddresses(
-      this.toAddressYourInputsLocator,
-      this.toAddressForeignInputsLocator
-    );
+    const result = await this._getSectionAddresses(this.toAddressYourInputsLocator, this.toAddressForeignInputsLocator);
     this.logger.info(`DAppSignTx::getOutputsInfo Result: ${JSON.stringify(result, null, 2)}`);
     return result;
   }

@@ -32,17 +32,7 @@ export class SpeculosDockerController {
           ],
         },
       },
-      Cmd: [
-        '--display',
-        'headless',
-        '--api-port',
-        '5001',
-        '--model',
-        model,
-        '--seed',
-        seedPhrase,
-        appFile,
-      ],
+      Cmd: ['--display', 'headless', '--api-port', '5001', '--model', model, '--seed', seedPhrase, appFile],
     };
   };
 

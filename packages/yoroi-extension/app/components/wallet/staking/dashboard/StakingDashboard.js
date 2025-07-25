@@ -29,8 +29,7 @@ const messages = defineMessages({
   },
   pendingTxWarning: {
     id: 'wallet.dashboard.warning.pendingTx',
-    defaultMessage:
-      '!!!Staking dashboard information will update once your pending transaction is confirmed',
+    defaultMessage: '!!!Staking dashboard information will update once your pending transaction is confirmed',
   },
   title: {
     id: 'wallet.dashboard.stakePool.title',
@@ -45,17 +44,16 @@ export const emptyDashboardMessages: Object = defineMessages({
   },
   text: {
     id: 'wallet.dashboard.empty.text',
-    defaultMessage:
-      '!!!Go to the delegation page to choose what stake pool you want to delegate in.',
+    defaultMessage: '!!!Go to the delegation page to choose what stake pool you want to delegate in.',
   },
 });
 
 export type RewardsGraphData = {|
   +items: ?{|
-  totalRewards: Array < GraphItems >,
-    perEpochRewards: Array < GraphItems >,
+    totalRewards: Array<GraphItems>,
+    perEpochRewards: Array<GraphItems>,
   |},
-+hideYAxis: boolean,
+  +hideYAxis: boolean,
   +error: ?LocalizableError,
 |};
 export type GraphData = {|
@@ -64,35 +62,35 @@ export type GraphData = {|
 
 type Props = {|
   +graphData: GraphData,
-  +stakePools: {| error: LocalizableError |} | {| pools: null | Array < Node | void> |},
-+userSummary: Node,
+  +stakePools: {| error: LocalizableError |} | {| pools: null | Array<Node | void> |},
+  +userSummary: Node,
   +hasAnyPending: boolean,
-    +pageInfo: void | {|
-      +currentPage: number,
-        +numPages: number,
-          +goToPage: number => void,
+  +pageInfo: void | {|
+    +currentPage: number,
+    +numPages: number,
+    +goToPage: number => void,
   |},
-+isUnregistered: boolean,
+  +isUnregistered: boolean,
   +epochLength: ?number,
-    +ticker: string,
+  +ticker: string,
 |};
 
 @observer
 export default class StakingDashboard extends Component<Props> {
-  static contextType:any = IntlContext;
-render(): Node {
-  const { graphData, isUnregistered } = this.props;
+  static contextType: any = IntlContext;
+  render(): Node {
+    const { graphData, isUnregistered } = this.props;
 
-  const pendingTxWarningComponent = this.props.hasAnyPending ? (
-    <div className={styles.warningBox}>
-      <WarningBox>{this.context.formatMessage(messages.pendingTxWarning)}</WarningBox>
-    </div>
-  ) : null;
+    const pendingTxWarningComponent = this.props.hasAnyPending ? (
+      <div className={styles.warningBox}>
+        <WarningBox>{this.context.formatMessage(messages.pendingTxWarning)}</WarningBox>
+      </div>
+    ) : null;
 
-  const graphs = isUnregistered ? null : (
-    <div className={styles.graphsWrapper}>
-      {this._displayGraph(graphData.rewardsGraphData)}
-      {/* <GraphWrapper
+    const graphs = isUnregistered ? null : (
+      <div className={styles.graphsWrapper}>
+        {this._displayGraph(graphData.rewardsGraphData)}
+        {/* <GraphWrapper
             themeVars={this.props.themeVars}
             tabs={[
               this.context.formatMessage(messages.positionsLabel),
@@ -102,129 +100,126 @@ render(): Node {
             graphName="positions"
             data={graphData.positionsGraphData}
           /> */}
-    </div>
-  );
-  return (
-    <div className={styles.page}>
-      <div className={styles.contentWrap}>
-        {pendingTxWarningComponent}
-        <div className={styles.statsWrapper}>
-          <div className={styles.summary}>
-            {/* <div className={styles.summaryItem}>{this.props.userSummary}</div> */}
+      </div>
+    );
+    return (
+      <div className={styles.page}>
+        <div className={styles.contentWrap}>
+          {pendingTxWarningComponent}
+          <div className={styles.statsWrapper}>
+            <div className={styles.summary}>{/* <div className={styles.summaryItem}>{this.props.userSummary}</div> */}</div>
+          </div>
+          <div className={styles.bodyWrapper}>
+            {graphs}
+            {this.displayStakePools(isUnregistered)}
           </div>
         </div>
-        <div className={styles.bodyWrapper}>
-          {graphs}
-          {this.displayStakePools(isUnregistered)}
+      </div>
+    );
+  }
+
+  _displayGraph: RewardsGraphData => Node = graphData => {
+    const intl = this.context;
+    if (graphData.error) {
+      return (
+        <div className={styles.poolError}>
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={graphData.error} />
         </div>
-      </div>
-    </div>
-  );
-}
+      );
+    }
 
-_displayGraph: RewardsGraphData => Node = graphData => {
-  const intl = this.context;
-  if (graphData.error) {
+    const items = graphData.items;
     return (
-      <div className={styles.poolError}>
-        <center>
-          <InvalidURIImg />
-        </center>
-        <ErrorBlock error={graphData.error} />
-      </div>
+      <GraphWrapper
+        tabs={[
+          {
+            tabName: intl.formatMessage(globalMessages.rewardsLabel),
+            data: items ? items.perEpochRewards : [],
+            primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            hideYAxis: graphData.hideYAxis,
+          },
+          {
+            tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
+            data: items ? items.totalRewards : [],
+            primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
+            yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
+            hideYAxis: graphData.hideYAxis,
+          },
+        ]}
+        epochLength={this.props.epochLength}
+      />
     );
-  }
+  };
 
-  const items = graphData.items;
-  return (
-    <GraphWrapper
-      tabs={[
-        {
-          tabName: intl.formatMessage(globalMessages.rewardsLabel),
-          data: items ? items.perEpochRewards : [],
-          primaryBarLabel: intl.formatMessage(globalMessages.rewardsLabel),
-          yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
-          hideYAxis: graphData.hideYAxis,
-        },
-        {
-          tabName: intl.formatMessage(globalMessages.totalRewardsLabel),
-          data: items ? items.totalRewards : [],
-          primaryBarLabel: intl.formatMessage(globalMessages.totalRewardsLabel),
-          yAxisLabel: intl.formatMessage(globalMessages.rewardsLabel),
-          hideYAxis: graphData.hideYAxis,
-        },
-      ]}
-      epochLength={this.props.epochLength}
-    />
-  );
-};
-
-displayStakePools: boolean => Node = isUnregistered => {
-  const width = classnames([
-    // if they've delegated before we need to make space for the chart
-    !isUnregistered ? styles.stakePoolMaxWidth : null,
-    styles.stakePool,
-  ]);
-  const intl = this.context;
-  if (this.props.stakePools.error) {
-    return (
-      <div className={styles.poolError}>
-        <center>
-          <InvalidURIImg />
-        </center>
-        <ErrorBlock error={this.props.stakePools.error} />
-      </div>
-    );
-  }
-  if (
-    this.props.stakePools.pools === null ||
-    this.props.pageInfo == null ||
-    (this.props.stakePools.pools.length > 0 &&
-      this.props.stakePools.pools[this.props.pageInfo.currentPage] == null)
-  ) {
-    return (
-      <div className={width}>
-        <Typography component="div" fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
-          {intl.formatMessage(messages.title)}
-        </Typography>
-        <Skeleton
-          variant="rectangular"
-          width="100%"
-          height="254px"
-          animation="wave"
-          sx={{
-            backgroundColor: 'var(--yoroi-palette-gray-50)',
-            borderRadius: '4px',
-          }}
-        />
-      </div>
-    );
-  }
-  const currPool = this.props.pageInfo.currentPage;
-  if (this.props.stakePools.pools.length === 0 || isUnregistered) {
-    return (
-      <div className={width}>
-        <InformativeError
-          title={intl.formatMessage(emptyDashboardMessages.title, { ticker: this.props.ticker })}
-          text={
-            !isUnregistered
-              ? // no need to explain to user how to delegate their ADA if they've done it before
-              null
-              : intl.formatMessage(emptyDashboardMessages.text)
-          }
-        />
-      </div>
-    );
-  }
-  if (this.props.stakePools.pools[currPool] == null) {
-    return (
-      <div className={width}>
-        <VerticallyCenteredLayout>
-          <LoadingSpinner />
-        </VerticallyCenteredLayout>
-      </div>
-    );
-  }
-  return <div className={width}>{this.props.stakePools.pools[currPool]}</div>;
-};
+  displayStakePools: boolean => Node = isUnregistered => {
+    const width = classnames([
+      // if they've delegated before we need to make space for the chart
+      !isUnregistered ? styles.stakePoolMaxWidth : null,
+      styles.stakePool,
+    ]);
+    const intl = this.context;
+    if (this.props.stakePools.error) {
+      return (
+        <div className={styles.poolError}>
+          <center>
+            <InvalidURIImg />
+          </center>
+          <ErrorBlock error={this.props.stakePools.error} />
+        </div>
+      );
+    }
+    if (
+      this.props.stakePools.pools === null ||
+      this.props.pageInfo == null ||
+      (this.props.stakePools.pools.length > 0 && this.props.stakePools.pools[this.props.pageInfo.currentPage] == null)
+    ) {
+      return (
+        <div className={width}>
+          <Typography component="div" fontWeight="500" fontSize="18px" lineHeight="22px" marginBottom="16px">
+            {intl.formatMessage(messages.title)}
+          </Typography>
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="254px"
+            animation="wave"
+            sx={{
+              backgroundColor: 'var(--yoroi-palette-gray-50)',
+              borderRadius: '4px',
+            }}
+          />
+        </div>
+      );
+    }
+    const currPool = this.props.pageInfo.currentPage;
+    if (this.props.stakePools.pools.length === 0 || isUnregistered) {
+      return (
+        <div className={width}>
+          <InformativeError
+            title={intl.formatMessage(emptyDashboardMessages.title, { ticker: this.props.ticker })}
+            text={
+              !isUnregistered
+                ? // no need to explain to user how to delegate their ADA if they've done it before
+                  null
+                : intl.formatMessage(emptyDashboardMessages.text)
+            }
+          />
+        </div>
+      );
+    }
+    if (this.props.stakePools.pools[currPool] == null) {
+      return (
+        <div className={width}>
+          <VerticallyCenteredLayout>
+            <LoadingSpinner />
+          </VerticallyCenteredLayout>
+        </div>
+      );
+    }
+    return <div className={width}>{this.props.stakePools.pools[currPool]}</div>;
+  };
 }

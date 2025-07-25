@@ -3,7 +3,7 @@ import { Component } from 'react';
 import type { Node } from 'react';
 import { observer } from 'mobx-react';
 import { action, observable } from 'mobx';
-import { IntlContext, } from 'react-intl';
+import { IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../utils/ReactToolboxMobxForm';
 import LegacyTransferLayout from '../../components/transfer/LegacyTransferLayout';
 import TransferSummaryPage from '../../components/transfer/TransferSummaryPage';
@@ -12,13 +12,11 @@ import VerticallyCenteredLayout from '../../components/layout/VerticallyCentered
 import Dialog from '../../components/widgets/Dialog';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import SpendingPasswordInput from '../../components/widgets/forms/SpendingPasswordInput';
-import { addressToDisplayString, } from '../../api/ada/lib/storage/bridge/utils';
+import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import globalMessages from '../../i18n/global-messages';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { ISignRequest } from '../../api/common/lib/transactions/ISignRequest';
-import type {
-  TransferTx,
-} from '../../types/TransferTypes';
+import type { TransferTx } from '../../types/TransferTypes';
 import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
@@ -34,7 +32,7 @@ type LocalProps = {|
     +trigger: void => void,
     +label: string,
   |},
-  +toTransferTx: ISignRequest<any> => TransferTx,
+  +toTransferTx: (ISignRequest<any>) => TransferTx,
   +transactionRequest: {|
     +error: ?LocalizableError,
     +result: ?ISignRequest<any>,
@@ -45,10 +43,9 @@ type LocalProps = {|
 
 @observer
 export default class TransferSendPage extends Component<{| ...StoresProps, ...LocalProps |}> {
-
-  static contextType:any = IntlContext;
-  static defaultProps: {|header: void|} = {
-    header: undefined
+  static contextType: any = IntlContext;
+  static defaultProps: {| header: void |} = {
+    header: undefined,
   };
 
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
@@ -73,7 +70,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
     const signRequest = this.props.transactionRequest.result;
     if (signRequest == null) return;
 
-    const send = (password) => {
+    const send = password => {
       if (!(signRequest instanceof HaskellShelleyTxSignRequest)) {
         throw new Error('unexpected signRequest type');
       }
@@ -88,28 +85,23 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
           }
         },
       });
-    }
+    };
     if (this.spendingPasswordForm == null) {
       send(null);
     } else {
       // why do we have to submit the form
       this.spendingPasswordForm.submit({
-        onSuccess: async (form) => {
+        onSuccess: async form => {
           send(form.values().walletPassword);
         },
-        onError: () => {}
+        onError: () => {},
       });
     }
   };
 
   render(): Node {
     if (this.props.transactionRequest.error != null) {
-      return (
-        <YoroiTransferErrorPage
-          error={this.props.transactionRequest.error}
-          onCancel={this.props.onClose.trigger}
-        />
-      );
+      return <YoroiTransferErrorPage error={this.props.transactionRequest.error} onCancel={this.props.onClose.trigger} />;
     }
 
     if (this.props.transactionRequest.result == null) {
@@ -121,10 +113,7 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
   getSpinner: void => Node = () => {
     const intl = this.context;
     return (
-      <Dialog
-        title={intl.formatMessage(globalMessages.processingLabel)}
-        closeOnOverlayClick={false}
-      >
+      <Dialog title={intl.formatMessage(globalMessages.processingLabel)} closeOnOverlayClick={false}>
         <LegacyTransferLayout>
           <VerticallyCenteredLayout>
             <LoadingSpinner />
@@ -132,20 +121,18 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
         </LegacyTransferLayout>
       </Dialog>
     );
-  }
+  };
 
-  getContent:  ISignRequest<any> => Node = (
-    tentativeTx
-  ) => {
+  getContent: (ISignRequest<any>) => Node = tentativeTx => {
     const selected = this.props.stores.wallets.selected;
     if (selected == null) {
       throw new Error(`${nameof(TransferSendPage)} no wallet selected`);
     }
 
-    const spendingPasswordForm = selected.type === 'mnemonic'
-      ? (
+    const spendingPasswordForm =
+      selected.type === 'mnemonic' ? (
         <SpendingPasswordInput
-          setForm={(form) => this.setSpendingPasswordForm(form)}
+          setForm={form => this.setSpendingPasswordForm(form)}
           isSubmitting={this.props.stores.transactionProcessingStore.sendMoneyRequest.isExecuting}
         />
       ) : null;
@@ -156,8 +143,11 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
       <TransferSummaryPage
         header={this.props.header}
         form={spendingPasswordForm}
-        selectedExplorer={this.props.stores.explorers.selectedExplorer
-          .get(selected.networkId) ?? (() => { throw new Error('No explorer for wallet network'); })()
+        selectedExplorer={
+          this.props.stores.explorers.selectedExplorer.get(selected.networkId) ??
+          (() => {
+            throw new Error('No explorer for wallet network');
+          })()
         }
         transferTx={this.props.toTransferTx(tentativeTx)}
         getTokenInfo={genLookupOrFail(this.props.stores.tokenInfoStore.tokenInfo)}
@@ -175,12 +165,10 @@ export default class TransferSendPage extends Component<{| ...StoresProps, ...Lo
           selected.networkId,
           intl,
           undefined, // don't want to go to route from within a dialog
-          this.props.stores.addresses.addressSubgroupMap,
+          this.props.stores.addresses.addressSubgroupMap
         )}
-        addressToDisplayString={
-          addr => addressToDisplayString(addr, getNetworkById(selected.networkId))
-        }
+        addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
       />
     );
-  }
+  };
 }

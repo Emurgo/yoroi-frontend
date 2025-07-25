@@ -36,9 +36,7 @@ export class WindowManager {
     this.logger.info(`WindowManager::init Initializing the Window manager`);
     const mainWindowHandle = await this._getCurrentWindowHandle();
     const windowTitle = await this._getWindowTitle();
-    this.logger.info(
-      `WindowManager::init The first and main window is { "${windowTitle}": "${mainWindowHandle}" }`
-    );
+    this.logger.info(`WindowManager::init The first and main window is { "${windowTitle}": "${mainWindowHandle}" }`);
     this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
   }
 
@@ -71,36 +69,28 @@ export class WindowManager {
   _getHandleByTitle(title) {
     this.logger.info(`WindowManager::_getHandleByTitle Getting a handle by the title "${title}"`);
     const handles = this.windowHandles.filter(customHandle => customHandle.title === title);
-    this.logger.info(
-      `WindowManager::_getHandleByTitle The handles for title "${title}" are ${JSON.stringify(handles)}`
-    );
+    this.logger.info(`WindowManager::_getHandleByTitle The handles for title "${title}" are ${JSON.stringify(handles)}`);
     return handles;
   }
 
   _getTitleByHandle(handle) {
     this.logger.info(`WindowManager::_getTitleByHandle Getting a title by the handle "${handle}"`);
     const handles = this.windowHandles.filter(customHandle => customHandle.handle === handle);
-    this.logger.info(
-      `WindowManager::_getTitleByHandle The titles for the handle "${handle}" are ${JSON.stringify(handles)}`
-    );
+    this.logger.info(`WindowManager::_getTitleByHandle The titles for the handle "${handle}" are ${JSON.stringify(handles)}`);
     return handles;
   }
 
   async _getCurrentWindowHandle() {
     this.logger.info(`WindowManager::_getCurrentWindowHandle Getting the current handle`);
     const currentHandle = await this.driver.getWindowHandle();
-    this.logger.info(
-      `WindowManager::_getCurrentWindowHandle The current handle is "${currentHandle}"`
-    );
+    this.logger.info(`WindowManager::_getCurrentWindowHandle The current handle is "${currentHandle}"`);
     return currentHandle;
   }
 
   async getAllWindowHandles() {
     this.logger.info(`WindowManager::getAllWindowHandles Getting all window handles`);
     const allHandles = await this.driver.getAllWindowHandles();
-    this.logger.info(
-      `WindowManager::getAllWindowHandles All handles: ${JSON.stringify(allHandles)}`
-    );
+    this.logger.info(`WindowManager::getAllWindowHandles All handles: ${JSON.stringify(allHandles)}`);
     return allHandles;
   }
 
@@ -108,17 +98,13 @@ export class WindowManager {
     this.logger.info(`WindowManager::_openNew Opening a new ${type} with a name "${windowName}"`);
     await this.driver.switchTo().newWindow(type);
     const currentWindowHandle = await this._getCurrentWindowHandle();
-    this.logger.info(
-      `WindowManager::_openNew The new ${type} with a name "${windowName}" has handle "${currentWindowHandle}"`
-    );
+    this.logger.info(`WindowManager::_openNew The new ${type} with a name "${windowName}" has handle "${currentWindowHandle}"`);
 
     return { title: windowName, handle: currentWindowHandle };
   }
 
   async getCurrentWindowName() {
-    this.logger.info(
-      `WindowManager::getCurrentWindowName Getting the window name from window manager`
-    );
+    this.logger.info(`WindowManager::getCurrentWindowName Getting the window name from window manager`);
     const currentHandle = await this._getCurrentWindowHandle();
     const handles = this._getTitleByHandle(currentHandle);
     if (handles.length === 1) {
@@ -128,9 +114,7 @@ export class WindowManager {
   }
 
   async _openNewWithCheck(type, windowName, url) {
-    this.logger.info(
-      `WindowManager::_openNewWithCheck Opening with checking a new ${type} "${url}" with a name "${windowName}"`
-    );
+    this.logger.info(`WindowManager::_openNewWithCheck Opening with checking a new ${type} "${url}" with a name "${windowName}"`);
     const checkTitle = this._getHandleByTitle(windowName);
     if (!checkTitle.length) {
       const handle = await this._openNew(type, windowName);
@@ -138,9 +122,7 @@ export class WindowManager {
       this.windowHandles.push(handle);
       return handle;
     }
-    this.logger.error(
-      `WindowManager::_openNewWithCheck The handle with the title ${windowName} already exists`
-    );
+    this.logger.error(`WindowManager::_openNewWithCheck The handle with the title ${windowName} already exists`);
     throw new WindowManagerError(`The handle with the title ${windowName} already exists`);
   }
 
@@ -163,9 +145,7 @@ export class WindowManager {
     await this.driver.switchTo().window(switchToHandle.handle);
     const indexOfHandle = this.windowHandles.indexOf(handleToClose);
     this.windowHandles.splice(indexOfHandle, 1);
-    this.logger.info(
-      `WindowManager::closeTabWindow The tab "${titleToClose}" is closed and removed from this.windowHandles`
-    );
+    this.logger.info(`WindowManager::closeTabWindow The tab "${titleToClose}" is closed and removed from this.windowHandles`);
   }
 
   async switchTo(title) {
@@ -195,12 +175,8 @@ export class WindowManager {
       this.logger.info(`WindowManager::findNewWindows Try ${i} to find a new window`);
       await new Promise(resolve => setTimeout(resolve, 100));
       newWindowHandles = await this.getAllWindowHandles();
-      this.logger.info(
-        `WindowManager::findNewWindows newWindowHandles: ${JSON.stringify(newWindowHandles)}`
-      );
-      this.logger.info(
-        `WindowManager::findNewWindows oldHandles: ${JSON.stringify(this.windowHandles)}`
-      );
+      this.logger.info(`WindowManager::findNewWindows newWindowHandles: ${JSON.stringify(newWindowHandles)}`);
+      this.logger.info(`WindowManager::findNewWindows oldHandles: ${JSON.stringify(this.windowHandles)}`);
       if (newWindowHandles.length > this.windowHandles.length) {
         const newHandle = this._filterHandles(newWindowHandles);
         this.logger.info(`WindowManager::findNewWindows The new window handle is "${newHandle}"`);
@@ -225,25 +201,17 @@ export class WindowManager {
     this.windowHandles.push(popUpCustomHandle);
 
     await this.driver.switchTo().window(popupWindowHandle);
-    this.logger.info(
-      `WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(popUpCustomHandle)}`
-    );
+    this.logger.info(`WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
     await this._waitWindowTitle();
 
     return popUpCustomHandle;
   }
 
   async isClosed(title) {
-    this.logger.info(
-      `WindowManager::isClosed Checking the window with the title "${title}" is closed`
-    );
-    const expectToBeClosedHandle = this.windowHandles.filter(
-      customHandle => customHandle.title === title
-    );
+    this.logger.info(`WindowManager::isClosed Checking the window with the title "${title}" is closed`);
+    const expectToBeClosedHandle = this.windowHandles.filter(customHandle => customHandle.title === title);
     if (!expectToBeClosedHandle.length) {
-      this.logger.warn(
-        `WindowManager::isClosed There is no handle for the title ${title}. Suppose it is closed`
-      );
+      this.logger.warn(`WindowManager::isClosed There is no handle for the title ${title}. Suppose it is closed`);
       return true;
     }
     for (let i = 0; i < 50; i++) {
@@ -257,9 +225,7 @@ export class WindowManager {
       this.logger.info(`WindowManager::isClosed The window with the title "${title}" is closed`);
       return true;
     }
-    this.logger.info(
-      `WindowManager::isClosed The window with the title "${title}" is still opened`
-    );
+    this.logger.info(`WindowManager::isClosed The window with the title "${title}" is still opened`);
     return false;
   }
 

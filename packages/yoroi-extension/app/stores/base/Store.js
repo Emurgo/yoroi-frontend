@@ -4,7 +4,6 @@ import type { Api } from '../../api/index';
 
 // Base store class used by all stores in our application
 export default class Store<TStores> {
-
   stores: TStores;
   api: Api;
 

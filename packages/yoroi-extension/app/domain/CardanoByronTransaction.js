@@ -4,7 +4,7 @@ import type { CardanoByronTxIO } from '../api/ada/lib/storage/database/transacti
 import type { DbBlock, NetworkRow } from '../api/ada/lib/storage/database/primitives/tables';
 import type { DefaultTokenEntry } from '../api/common/lib/MultiToken';
 import { action } from 'mobx';
-import WalletTransaction, { toAddr, } from './WalletTransaction';
+import WalletTransaction, { toAddr } from './WalletTransaction';
 import type { WalletTransactionCtorData } from './WalletTransaction';
 import { MultiToken } from '../api/common/lib/MultiToken';
 

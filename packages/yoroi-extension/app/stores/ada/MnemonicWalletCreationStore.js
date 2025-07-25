@@ -16,10 +16,7 @@ export default class MnemonicWalletCreationStore extends Store<StoresMap> {
     this.api.ada.generateWalletRecoveryPhrase
   );
 
-  startWalletCreation: ({|
-    name: string,
-    password: string,
-  |}) => Promise<void> = async params => {
+  startWalletCreation: ({| name: string, password: string |}) => Promise<void> = async params => {
     const recoveryPhrase = await this.generateWalletRecoveryPhraseRequest.execute({}).promise;
     if (recoveryPhrase == null) {
       throw new Error(`${nameof(this.startWalletCreation)} failed to generate recovery phrase`);
@@ -50,22 +47,19 @@ export default class MnemonicWalletCreationStore extends Store<StoresMap> {
     });
   };
 
-  createWallet: {|
-    recoveryPhrase: Array<string>,
-    walletPassword: string,
-    walletName: string,
-  |} => Promise<void> = async (request) => {
-    const { selectedNetwork } = this.stores.profile;
-    if (selectedNetwork == null) throw new Error(`${nameof(this.finishWalletBackup)} no network selected`);
-    await this.stores.wallets.createWalletRequest.execute(async () => {
-      const wallet = await createWallet({
-        walletName: request.walletName,
-        walletPassword: request.walletPassword,
-        recoveryPhrase: request.recoveryPhrase.join(' '),
-        networkId: selectedNetwork.NetworkId,
-        accountIndex: 0 + HARD_DERIVATION_START,
-      });
-      return wallet;
-    }).promise;
-  };
+  createWallet: ({| recoveryPhrase: Array<string>, walletPassword: string, walletName: string |}) => Promise<void> =
+    async request => {
+      const { selectedNetwork } = this.stores.profile;
+      if (selectedNetwork == null) throw new Error(`${nameof(this.finishWalletBackup)} no network selected`);
+      await this.stores.wallets.createWalletRequest.execute(async () => {
+        const wallet = await createWallet({
+          walletName: request.walletName,
+          walletPassword: request.walletPassword,
+          recoveryPhrase: request.recoveryPhrase.join(' '),
+          networkId: selectedNetwork.NetworkId,
+          accountIndex: 0 + HARD_DERIVATION_START,
+        });
+        return wallet;
+      }).promise;
+    };
 }

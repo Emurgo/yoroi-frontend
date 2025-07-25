@@ -26,7 +26,7 @@ export default class ServerConnectionStore extends Store<StoresMap> {
       };
     }
 
-    listenForServerStatusUpdate(async (serverStatus) => {
+    listenForServerStatusUpdate(async serverStatus => {
       runInAction(() => {
         for (const s of serverStatus) {
           const oldStatus = this.serverStatusByNetworkId[s.networkId];

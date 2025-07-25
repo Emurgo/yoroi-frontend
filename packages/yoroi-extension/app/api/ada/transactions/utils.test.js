@@ -1,73 +1,43 @@
 // @flow
 import '../lib/test-config.forTests';
 import BigNumber from 'bignumber.js';
-import {
-  convertAdaTransactionsToExportRows,
-  sumInputsOutputs,
-  getFromUserPerspective,
-} from './utils';
-import {
-  formatBigNumberToFloatString,
-} from '../../../utils/formatters';
-import type {
-  TransactionExportRow,
-} from '../../export';
-import type {
-  UtxoTransactionInputRow,
-  UtxoTransactionOutputRow,
-} from '../lib/storage/database/transactionModels/utxo/tables';
-import {
-  TxStatusCodes,
-} from '../lib/storage/database/primitives/enums';
-import {
-  transactionTypes,
-} from './types';
-import {
-  TransactionType,
-} from '../lib/storage/database/primitives/tables';
+import { convertAdaTransactionsToExportRows, sumInputsOutputs, getFromUserPerspective } from './utils';
+import { formatBigNumberToFloatString } from '../../../utils/formatters';
+import type { TransactionExportRow } from '../../export';
+import type { UtxoTransactionInputRow, UtxoTransactionOutputRow } from '../lib/storage/database/transactionModels/utxo/tables';
+import { TxStatusCodes } from '../lib/storage/database/primitives/enums';
+import { transactionTypes } from './types';
+import { TransactionType } from '../lib/storage/database/primitives/tables';
 import type { CardanoByronTxIO } from '../lib/storage/database/transactionModels/multipart/tables';
-import type {
-  DbBlock,
-  DbTokenInfo,
-  TokenListRow,
-} from '../lib/storage/database/primitives/tables';
-import type {
-  UserAnnotation,
-} from './types';
+import type { DbBlock, DbTokenInfo, TokenListRow } from '../lib/storage/database/primitives/tables';
+import type { UserAnnotation } from './types';
 import { defaultAssets, networks } from '../lib/storage/database/prepackaged/networks';
 
 const cardanoToken = {
   TokenId: 0,
   Digest: 0,
-  ...defaultAssets.filter(
-    token => token.NetworkId === networks.CardanoMainnet.NetworkId
-  )[0],
+  ...defaultAssets.filter(token => token.NetworkId === networks.CardanoMainnet.NetworkId)[0],
 };
-const tokenTypes = [{
-  TokenId: 0,
-  Identifier: cardanoToken.Identifier,
-  NetworkId: cardanoToken.NetworkId,
-}];
+const tokenTypes = [
+  {
+    TokenId: 0,
+    Identifier: cardanoToken.Identifier,
+    NetworkId: cardanoToken.NetworkId,
+  },
+];
 const defaultToken = {
   defaultNetworkId: tokenTypes[0].NetworkId,
   defaultIdentifier: tokenTypes[0].Identifier,
 };
 
-const _tokenList = (
-  amount: number,
-  listId: number,
-  tokenId: number,
-): TokenListRow => ({
+const _tokenList = (amount: number, listId: number, tokenId: number): TokenListRow => ({
   TokenListItemId: 0,
   ListId: listId,
   TokenId: tokenId,
   Amount: amount.toString(),
 });
 
-const _input = (
-  listId: number,
-  id: number,
-): UtxoTransactionInputRow => ({
+const _input = (listId: number, id: number): UtxoTransactionInputRow => ({
   UtxoTransactionInputId: 0,
   TransactionId: 0,
   AddressId: id,
@@ -76,10 +46,7 @@ const _input = (
   IndexInOwnTx: 0,
   TokenListId: listId,
 });
-const _output = (
-  listId: number,
-  id: number,
-): UtxoTransactionOutputRow => ({
+const _output = (listId: number, id: number): UtxoTransactionOutputRow => ({
   UtxoTransactionOutputId: 0,
   TransactionId: 0,
   AddressId: id,
@@ -96,7 +63,7 @@ function tokenEntry(row: TokenListRow): ReadonlyElementOf<$PropertyType<DbTokenI
   return {
     TokenList: row,
     Token: tokenTypes.filter(token => token.TokenId === row.TokenId)[0],
-  }
+  };
 }
 
 const lists = [
@@ -134,30 +101,31 @@ test('convertAdaTransactionsToExportRows - empty', () => {
 });
 
 test('convertAdaTransactionsToExportRows', () => {
-  const res: Array<TransactionExportRow> = convertAdaTransactionsToExportRows([
-    _tx(
-      [testInputs[0]],
-      [testOutputs[0], testOutputs[1]],
-      lists.map(list => tokenEntry(list)),
-      new Set([4]),
-      '2010-01-01 22:12:22',
-    ),
-    _tx(
-      [testInputs[1]],
-      [testOutputs[2], testOutputs[3]],
-      lists.map(list => tokenEntry(list)),
-      new Set([6]),
-      '2012-05-12 11:22:33'
-    ),
-    _tx(
-      [testInputs[2], testInputs[3]],
-      [testOutputs[4], testOutputs[5]],
-      lists.map(list => tokenEntry(list)),
-      new Set([2, 3, 9]),
-      '2015-12-13 10:20:30'
-    ),
-  ],
-  cardanoToken
+  const res: Array<TransactionExportRow> = convertAdaTransactionsToExportRows(
+    [
+      _tx(
+        [testInputs[0]],
+        [testOutputs[0], testOutputs[1]],
+        lists.map(list => tokenEntry(list)),
+        new Set([4]),
+        '2010-01-01 22:12:22'
+      ),
+      _tx(
+        [testInputs[1]],
+        [testOutputs[2], testOutputs[3]],
+        lists.map(list => tokenEntry(list)),
+        new Set([6]),
+        '2012-05-12 11:22:33'
+      ),
+      _tx(
+        [testInputs[2], testInputs[3]],
+        [testOutputs[4], testOutputs[5]],
+        lists.map(list => tokenEntry(list)),
+        new Set([2, 3, 9]),
+        '2015-12-13 10:20:30'
+      ),
+    ],
+    cardanoToken
   );
   _expectEqual(res, [
     _expRow('1.0', '0.0', 'in', '2010-01-01 22:12:22', 'a'),
@@ -191,26 +159,15 @@ test('multi tx', () => {
 });
 
 test('sumInputsOutputs - empty', () => {
-  _expectEqual(
-    sumInputsOutputs(
-      [],
-      [],
-      defaultToken
-    ).getDefault(),
-    new BigNumber(0)
-  );
+  _expectEqual(sumInputsOutputs([], [], defaultToken).getDefault(), new BigNumber(0));
 });
 
 test('sumInputsOutputs', () => {
   _expectEqual(
     sumInputsOutputs(
-      [
-        _input(lists[0].ListId, 0),
-        _output(lists[4].ListId, 0),
-        _input(lists[2].ListId, 0),
-      ],
+      [_input(lists[0].ListId, 0), _output(lists[4].ListId, 0), _input(lists[2].ListId, 0)],
       lists.map(list => tokenEntry(list)),
-      defaultToken,
+      defaultToken
     ).getDefault(),
     new BigNumber(4000000)
   );
@@ -218,7 +175,7 @@ test('sumInputsOutputs', () => {
 
 test('formatBigNumberToFloatString', () => {
   const f = formatBigNumberToFloatString;
-  const big = (x) => new BigNumber(x);
+  const big = x => new BigNumber(x);
   _expectEqual(f(big(0)), '0.0');
   _expectEqual(f(big(42)), '42.0');
   _expectEqual(f(big(42).dividedBy(10)), '4.2');
@@ -229,7 +186,7 @@ const _tx = (
   utxoOutputs: Array<UtxoTransactionOutputRow>,
   tokens: $PropertyType<DbTokenInfo, 'tokens'>,
   ownedAddresses: Set<number>,
-  date: string,
+  date: string
 ): {|
   ...CardanoByronTxIO,
   ...WithNullableFields<DbBlock>,
@@ -272,13 +229,13 @@ const _tx = (
   };
 };
 
-const _expRow = (
-  amount: string,
-  fee: string,
-  type: 'in' | 'out',
-  date: string,
-  id: string,
-): TransactionExportRow => ({ type, amount, fee, date: new Date(date), id });
+const _expRow = (amount: string, fee: string, type: 'in' | 'out', date: string, id: string): TransactionExportRow => ({
+  type,
+  amount,
+  fee,
+  date: new Date(date),
+  id,
+});
 
 function _expectEqual(a: any, b: any): void {
   expect(a).toEqual(b);

@@ -25,7 +25,7 @@ const messages = defineMessages({
 });
 @observer
 export default class NFTsWrapper extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
 
   static defaultProps: {| children: void |} = {
     children: undefined,
@@ -52,12 +52,7 @@ export default class NFTsWrapper extends Component<Props> {
       <TopBarLayout
         banner={<BannerContainer stores={stores} />}
         sidebar={sidebarContainer}
-        navbar={
-          <NavBarContainerRevamp
-            stores={stores}
-            title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />}
-          />
-        }
+        navbar={<NavBarContainerRevamp stores={stores} title={<NavBarTitle title={intl.formatMessage(messages.NFTGallery)} />} />}
         withPadding={false}
       >
         {this.props.children}

@@ -14,8 +14,7 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class LanguageSelectionPage extends Component<StoresProps> {
-
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   async componentDidMount() {
     const profileStore = this.props.stores.profile;
     // if user uses back button to get back to this page
@@ -29,11 +28,11 @@ export default class LanguageSelectionPage extends Component<StoresProps> {
     await this.props.stores.profile.resetLocale();
   }
 
-  onSelectLanguage: {| locale: string |} => void = (values) => {
+  onSelectLanguage: ({| locale: string |}) => void = values => {
     this.props.stores.profile.updateTentativeLocale(values);
   };
 
-  onSubmit: {| locale: string |} => Promise<void> = async (_values) => {
+  onSubmit: ({| locale: string |}) => Promise<void> = async _values => {
     // Important! The order of triggering these two events must not be exchanged!
     const { stores } = this.props;
     await stores.profile.acceptTermsOfUse();
@@ -43,21 +42,15 @@ export default class LanguageSelectionPage extends Component<StoresProps> {
   renderByron(props: StoresProps): Node {
     const { selected } = this.props.stores.wallets;
     const isWalletTestnet = Boolean(selected && selected.isTestnet);
-    const displayedBanner = props.stores
-      .serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy
-      ? <TestnetWarningBanner isTestnet={isWalletTestnet} />
-      : <ServerErrorBanner errorType={
-        props.stores.serverConnectionStore.checkAdaServerStatus
-      }
-      />;
+    const displayedBanner =
+      props.stores.serverConnectionStore.checkAdaServerStatus === ServerStatusErrors.Healthy ? (
+        <TestnetWarningBanner isTestnet={isWalletTestnet} />
+      ) : (
+        <ServerErrorBanner errorType={props.stores.serverConnectionStore.checkAdaServerStatus} />
+      );
     return (
-      <TopBarLayout
-        languageSelectionBackground
-        banner={displayedBanner}
-      >
-        <IntroBanner
-          isNightly={environment.isNightly()}
-        />
+      <TopBarLayout languageSelectionBackground banner={displayedBanner}>
+        <IntroBanner isNightly={environment.isNightly()} />
         <LanguageSelectionForm
           onSelectLanguage={this.onSelectLanguage}
           onSubmit={this.onSubmit}

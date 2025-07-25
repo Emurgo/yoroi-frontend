@@ -7,20 +7,14 @@ import { observer } from 'mobx-react';
 import { useStrings } from '../../../../UI/features/transaction-review/common/hooks/useStrings';
 
 export const DelegateButton = observer(({ stores, label, disabled, poolName, poolID }) => {
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    stakeKeyDeposit,
-    primaryTokenInfo,
-    showTxResultModal,
-    networkId,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
+    useTxReviewModal();
   const isTestnet = networkId !== 0;
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
   const onDelegate = async () => {
-    const id = isTestnet ? poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
+    const id = isTestnet ? (poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349') : poolID;
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
 
     openTxReviewModal({
@@ -82,7 +76,7 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, poo
 });
 
 const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit }) => {
-  const strings =  useStrings();
+  const strings = useStrings();
   return (
     <Stack direction="column" spacing={16}>
       <Stack direction="row" justifyContent="space-between">

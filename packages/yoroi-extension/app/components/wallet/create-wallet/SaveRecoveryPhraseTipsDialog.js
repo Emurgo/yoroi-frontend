@@ -13,8 +13,7 @@ const messages: Object = defineMessages({
   },
   firstTip: {
     id: 'wallet.create.dialog.saveRecoveryPhrase.firstTip',
-    defaultMessage:
-      '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
+    defaultMessage: '!!!DO NOT share the recovery phrase as this will allow anyone to access your assets and wallet.',
   },
   secondTip: {
     id: 'wallet.create.dialog.saveRecoveryPhrase.secondTip',
@@ -22,13 +21,11 @@ const messages: Object = defineMessages({
   },
   thirdTip: {
     id: 'wallet.create.dialog.saveRecoveryPhrase.thirdTip',
-    defaultMessage:
-      '!!!Yoroi will NEVER ask for the recovery phrase. Watch out for scammers and impersonators.',
+    defaultMessage: '!!!Yoroi will NEVER ask for the recovery phrase. Watch out for scammers and impersonators.',
   },
   forthTip: {
     id: 'wallet.create.dialog.saveRecoveryPhrase.forthTip',
-    defaultMessage:
-      '!!!If you lose your recovery phrase, it will not be possible to recover your wallet.',
+    defaultMessage: '!!!If you lose your recovery phrase, it will not be possible to recover your wallet.',
   },
   fifthTip: {
     id: 'wallet.create.dialog.saveRecoveryPhrase.fifthTip',

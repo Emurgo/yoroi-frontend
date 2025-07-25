@@ -16,8 +16,8 @@ export const mapStakingKeyStateToGovernanceAction = (state: any) => {
   return vote.action === 'abstain'
     ? { kind: 'abstain' }
     : vote.action === 'no-confidence'
-    ? { kind: 'no-confidence' }
-    : { kind: 'delegate', drepID: vote.drepID };
+      ? { kind: 'no-confidence' }
+      : { kind: 'delegate', drepID: vote.drepID };
 };
 
 const getStakePoolMeta = (stores: any) => {
@@ -52,7 +52,7 @@ export const getTotalAmount = (walletAmount, rewards) => {
 };
 
 const combinedMultiToken = (walletAmount /*: MultiToken */, rewards /*: MultiToken */) /*: MultiToken */ => {
-  return walletAmount && rewards ? walletAmount.joinAddCopy(rewards) : walletAmount ?? rewards;
+  return walletAmount && rewards ? walletAmount.joinAddCopy(rewards) : (walletAmount ?? rewards);
 };
 
 const getWalletTotalAdaBalance = (stores, selectedWallet /*: WalletState */) /*: MultiToken */ => {
@@ -81,7 +81,6 @@ const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
       }
       return item.info.IsNFT === false;
     })
-
     .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');

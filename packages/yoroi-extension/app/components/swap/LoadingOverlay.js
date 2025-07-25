@@ -4,8 +4,7 @@ import { alpha, Modal } from '@mui/material';
 import { ModalContainer } from '../widgets/Dialog';
 import LoadingSpinner from '../widgets/LoadingSpinner';
 
-type Props = {|
-|};
+type Props = {||};
 
 export default function LoadingOverlay(_: Props): Node {
   return (
@@ -24,7 +23,7 @@ export default function LoadingOverlay(_: Props): Node {
         empty
         display="flex"
         flexDirection="column"
-        className='loadingOverlay'
+        className="loadingOverlay"
         boxShadow="0px 13px 20px -1px #00000026"
       >
         <LoadingSpinner large light />

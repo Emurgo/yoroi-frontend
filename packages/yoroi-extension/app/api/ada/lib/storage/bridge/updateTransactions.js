@@ -3,18 +3,14 @@
 import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
 import ObjectHash from 'object-hash';
-import type {
-  lf$Database, lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
 
-import {
-  getAllSchemaTables,
-  raii,
-  mapToTables,
-} from '../database/utils';
+import { getAllSchemaTables, raii, mapToTables } from '../database/utils';
 import type {
-  BlockInsert, BlockRow,
-  TransactionInsert, TransactionRow,
+  BlockInsert,
+  BlockRow,
+  TransactionInsert,
+  TransactionRow,
   CardanoByronTransactionInsert,
   CardanoShelleyTransactionInsert,
   NetworkRow,
@@ -24,14 +20,8 @@ import type {
   TokenListInsert,
   CardanoAssetMintMetadata,
 } from '../database/primitives/tables';
-import {
-  TransactionType,
-} from '../database/primitives/tables';
-import type {
-  TxStatusCodesType,
-  CertificateRelationType,
-  CoreAddressT,
-} from '../database/primitives/enums';
+import { TransactionType } from '../database/primitives/tables';
+import type { TxStatusCodesType, CertificateRelationType, CoreAddressT } from '../database/primitives/enums';
 import {
   GetAddress,
   GetBlock,
@@ -45,81 +35,44 @@ import {
   GetToken,
   AssociateToken,
 } from '../database/primitives/api/read';
-import {
-  ModifyAddress,
-  ModifyTransaction,
-  FreeBlocks,
-  ModifyToken,
-  ModifyTokenList,
-} from '../database/primitives/api/write';
+import { ModifyAddress, ModifyTransaction, FreeBlocks, ModifyToken, ModifyTokenList } from '../database/primitives/api/write';
 import type { AddCertificateRequest } from '../database/primitives/api/write';
-import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from  '../database/transactionModels/multipart/api/write';
-import { digestForHash, } from '../database/primitives/api/utils';
-import {
-  MarkUtxo,
-} from '../database/transactionModels/utxo/api/write';
+import { ModifyCardanoByronTx, ModifyCardanoShelleyTx } from '../database/transactionModels/multipart/api/write';
+import { digestForHash } from '../database/primitives/api/utils';
+import { MarkUtxo } from '../database/transactionModels/utxo/api/write';
 import {
   GetUtxoTxOutputsWithTx,
   GetUtxoInputs,
   AssociateTxWithUtxoIOs,
   createTokenListIdGenFunction,
 } from '../database/transactionModels/utxo/api/read';
+import { AssociateTxWithAccountingIOs } from '../database/transactionModels/account/api/read';
 import {
-  AssociateTxWithAccountingIOs,
-} from '../database/transactionModels/account/api/read';
-import {
-  CardanoByronAssociateTxWithIOs, CardanoShelleyAssociateTxWithIOs,
+  CardanoByronAssociateTxWithIOs,
+  CardanoShelleyAssociateTxWithIOs,
 } from '../database/transactionModels/multipart/api/read';
-import type {
-  UserAnnotation,
-} from '../../../transactions/types';
-import type {
-  UtxoTransactionInputInsert, UtxoTransactionOutputInsert,
-} from '../database/transactionModels/utxo/tables';
-import type {
-  AccountingTransactionInputInsert,
-} from '../database/transactionModels/account/tables';
-import {
-  TxStatusCodes,
-  CoreAddressTypes,
-  CertificateRelation,
-  PRIMARY_ASSET_CONSTANTS,
-} from '../database/primitives/enums';
-import {
-  asScanAddresses, asGetAllUtxos,
-} from '../models/PublicDeriver/traits';
+import type { UserAnnotation } from '../../../transactions/types';
+import type { UtxoTransactionInputInsert, UtxoTransactionOutputInsert } from '../database/transactionModels/utxo/tables';
+import type { AccountingTransactionInputInsert } from '../database/transactionModels/account/tables';
+import { TxStatusCodes, CoreAddressTypes, CertificateRelation, PRIMARY_ASSET_CONSTANTS } from '../database/primitives/enums';
+import { asScanAddresses, asGetAllUtxos } from '../models/PublicDeriver/traits';
 import { ConceptualWallet } from '../models/ConceptualWallet/index';
-import type {
-  IPublicDeriver,
-} from '../models/PublicDeriver/interfaces';
-import {
-  GetLastSyncForPublicDeriver,
-  GetPublicDeriver,
-  GetKeyForPublicDeriver,
-} from '../database/walletTypes/core/api/read';
-import { ModifyDisplayCutoff, } from '../database/walletTypes/bip44/api/write';
-import { AddDerivationTree, } from '../database/walletTypes/common/api/write';
-import { GetDerivationSpecific, } from '../database/walletTypes/common/api/read';
-import { getCardanoHaskellBaseConfig, } from '../database/prepackaged/networks';
-import {
-  ModifyLastSyncInfo,
-  DeleteAllTransactions,
-} from '../database/walletTypes/core/api/write';
-import type { LastSyncInfoRow, } from '../database/walletTypes/core/tables';
+import type { IPublicDeriver } from '../models/PublicDeriver/interfaces';
+import { GetLastSyncForPublicDeriver, GetPublicDeriver, GetKeyForPublicDeriver } from '../database/walletTypes/core/api/read';
+import { ModifyDisplayCutoff } from '../database/walletTypes/bip44/api/write';
+import { AddDerivationTree } from '../database/walletTypes/common/api/write';
+import { GetDerivationSpecific } from '../database/walletTypes/common/api/read';
+import { getCardanoHaskellBaseConfig } from '../database/prepackaged/networks';
+import { ModifyLastSyncInfo, DeleteAllTransactions } from '../database/walletTypes/core/api/write';
+import type { LastSyncInfoRow } from '../database/walletTypes/core/tables';
 import type { CardanoByronTxIO, CardanoShelleyTxIO } from '../database/transactionModels/multipart/tables';
-import {
-  rawGetAddressRowsForWallet,
-} from  './traitUtils';
+import { rawGetAddressRowsForWallet } from './traitUtils';
 import TimeUtils from './timeUtils';
-import {
-  rawGenHashToIdsFunc, rawGenFindOwnAddress,
-} from '../../../../common/lib/storage/bridge/hashMapper';
-import type {
-  HashToIdsFunc, FindOwnAddressFunc,
-} from '../../../../common/lib/storage/bridge/hashMapper';
+import { rawGenHashToIdsFunc, rawGenFindOwnAddress } from '../../../../common/lib/storage/bridge/hashMapper';
+import type { HashToIdsFunc, FindOwnAddressFunc } from '../../../../common/lib/storage/bridge/hashMapper';
 import { CARDANO_STABLE_SIZE } from '../../../../../config/numbersConfig';
 import { RollbackApiError } from '../../../../common/errors';
-import { getFromUserPerspective, identifierToCardanoAsset, } from '../../../transactions/utils';
+import { getFromUserPerspective, identifierToCardanoAsset } from '../../../transactions/utils';
 
 import type {
   BestBlockFunc,
@@ -134,18 +87,14 @@ import type {
   MultiAssetMintMetadataResponse,
   MultiAssetSupplyResponse,
   TxSummary,
-  HistoryFunc, FilterFunc,
+  HistoryFunc,
+  FilterFunc,
 } from '../../state-fetch/types';
-import {
-  ShelleyCertificateTypes,
-  RemoteTransactionTypes,
-} from '../../state-fetch/types';
-import { addressToKind, } from './utils';
+import { ShelleyCertificateTypes, RemoteTransactionTypes } from '../../state-fetch/types';
+import { addressToKind } from './utils';
 import { RustModule } from '../../cardanoCrypto/rustLoader';
 import { Bech32Prefix } from '../../../../../config/stringConfig';
-import type {
-  DefaultTokenEntry,
-} from '../../../../common/lib/MultiToken';
+import type { DefaultTokenEntry } from '../../../../common/lib/MultiToken';
 import { UtxoStorageApi } from '../models/utils';
 import { bytesToHex, createFilterUniqueBy, hexToBytes, listValues } from '../../../../../coreUtils';
 import type { RelativeSlot } from './timeUtils';
@@ -154,7 +103,7 @@ import { getLocalItem, setLocalItem } from '../../../../localStorage/primitives'
 type TxData = {|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-    ...(CardanoByronTxIO | CardanoShelleyTxIO),
+    ...CardanoByronTxIO | CardanoShelleyTxIO,
     ...WithNullableFields<DbBlock>,
     ...UserAnnotation,
   |}>,
@@ -171,19 +120,16 @@ async function rawGetAllTxIds(
     AssociateTxWithAccountingIOs: Class<AssociateTxWithAccountingIOs>,
     GetCertificates: Class<GetCertificates>,
   |},
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
-  derivationTables: Map<number, string>,
+  request: {| publicDeriver: IPublicDeriver<ConceptualWallet> |},
+  derivationTables: Map<number, string>
 ): Promise<{|
   txIds: Array<number>,
   addresses: {|
     utxoAddresses: Array<$ReadOnly<AddressRow>>,
     accountingAddresses: Array<$ReadOnly<AddressRow>>,
-  |}
+  |},
 |}> {
-  const {
-    utxoAddresses,
-    accountingAddresses,
-  } = await rawGetAddressRowsForWallet(
+  const { utxoAddresses, accountingAddresses } = await rawGetAddressRowsForWallet(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -191,28 +137,23 @@ async function rawGetAllTxIds(
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     request,
-    derivationTables,
+    derivationTables
   );
 
   const utxoAddressIds = utxoAddresses.map(row => row.address.AddressId);
   const accountingAddressIds = accountingAddresses.map(row => row.address.AddressId);
 
   const certificateTransactions = await deps.GetCertificates.forAddress(db, dbTx, {
-    addressIds: [
-      ...accountingAddressIds,
-      ...utxoAddressIds,
-    ],
+    addressIds: [...accountingAddressIds, ...utxoAddressIds],
   });
 
-  const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
-    ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: utxoAddressIds },
-    )),
-    ...certificateTransactions.map(certTx => certTx.transaction.TransactionId),
-  ]));
+  const txIds = Array.from(
+    new Set([
+      ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(db, dbTx, { addressIds: accountingAddressIds })),
+      ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(db, dbTx, { addressIds: utxoAddressIds })),
+      ...certificateTransactions.map(certTx => certTx.transaction.TransactionId),
+    ])
+  );
   return {
     txIds,
     addresses: {
@@ -238,27 +179,27 @@ export async function rawGetTransactions(
   |},
   request: {
     publicDeriver: IPublicDeriver<ConceptualWallet>,
-    getTxAndBlock: (txIds: Array<number>) => Promise<$ReadOnlyArray<{|
-      Block: null | $ReadOnly<BlockRow>,
-      Transaction: $ReadOnly<TransactionRow>,
-    |}>>,
+    getTxAndBlock: (txIds: Array<number>) => Promise<
+      $ReadOnlyArray<{|
+        Block: null | $ReadOnly<BlockRow>,
+        Transaction: $ReadOnly<TransactionRow>,
+      |}>,
+    >,
     ...
   },
-  derivationTables: Map<number, string>,
+  derivationTables: Map<number, string>
 ): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
-  ...WithNullableFields<DbBlock>,
-  ...UserAnnotation,
-|}>,
+    ...CardanoByronTxIO | CardanoShelleyTxIO,
+    ...WithNullableFields<DbBlock>,
+    ...UserAnnotation,
+  |}>,
 |}> {
   const { publicDeriver } = request;
-  const {
-    addresses,
-    txIds,
-  } = await rawGetAllTxIds(
-    db, dbTx,
+  const { addresses, txIds } = await rawGetAllTxIds(
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -268,35 +209,22 @@ export async function rawGetTransactions(
       GetCertificates: deps.GetCertificates,
     },
     { publicDeriver },
-    derivationTables,
+    derivationTables
   );
   const blockMap = new Map<number, null | $ReadOnly<BlockRow>>();
   const txs = await request.getTxAndBlock(txIds);
   for (const tx of txs) {
     blockMap.set(tx.Transaction.TransactionId, tx.Block);
   }
-  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: txs
-        .map(txWithBlock => txWithBlock.Transaction)
-        .filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: txs
-        .map(txWithBlock => txWithBlock.Transaction)
-        .filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const txsWithIOs = [
-    ...byronWithIOs,
-    ...shelleyWithIOs,
-  ];
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: txs.map(txWithBlock => txWithBlock.Transaction).filter(tx => tx.Type === TransactionType.CardanoByron),
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: txs.map(txWithBlock => txWithBlock.Transaction).filter(tx => tx.Type === TransactionType.CardanoShelley),
+    networkId: publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const txsWithIOs = [...byronWithIOs, ...shelleyWithIOs];
 
   // we need to build a lookup map of AddressId => Hash
   // note: some inputs or outputs may not belong to us
@@ -306,19 +234,14 @@ export async function rawGetTransactions(
     const allAddressIds = txsWithIOs.flatMap(txWithIO => [
       ...txWithIO.utxoInputs.map(input => input.AddressId),
       ...txWithIO.utxoOutputs.map(output => output.AddressId),
-      ...(txWithIO.accountingInputs == null
-        ? []
-        : txWithIO.accountingInputs.map(output => output.AddressId)
-      ),
+      ...(txWithIO.accountingInputs == null ? [] : txWithIO.accountingInputs.map(output => output.AddressId)),
       ...(txWithIO.certificates == null
         ? []
-        : txWithIO.certificates.flatMap(
-          cert => cert.relatedAddresses.map(relation => relation.AddressId)
-        )
-      ),
+        : txWithIO.certificates.flatMap(cert => cert.relatedAddresses.map(relation => relation.AddressId))),
     ]);
     const addressRows = await GetAddress.getById(
-      db, dbTx,
+      db,
+      dbTx,
       // get rid of duplications (some tx can have multiple inputs of same address)
       Array.from(new Set(allAddressIds))
     );
@@ -338,55 +261,50 @@ export async function rawGetTransactions(
       utxoOutputs: tx.utxoOutputs,
       accountingInputs: tx.accountingInputs == null ? undefined : tx.accountingInputs,
       allOwnedAddressIds: new Set(
-        Object.keys(addresses).flatMap(key => addresses[key]).map(addrRow => addrRow.AddressId)
+        Object.keys(addresses)
+          .flatMap(key => addresses[key])
+          .map(addrRow => addrRow.AddressId)
       ),
       /**
-        * Note: we don't consider certificate refunds as belonging to you.
-        * Rationale:
-        * 1) It's very unclear who the refund "belongs to" in the case of a pool registration.
-        *    Does it belong to the owner? Operators? Some weird split?
-        *    Better to just say it's just bonus ADA to whoever gets it in the tx outputs
-        * 2) For stake deregistration, it's tempting to say it belongs to the owner of the stake key
-        *    But the protocol allows other people to pay to register your staking key
-        *    (no staking key witness required for registration)
-        *    So that wouldn't be quite accurate either.
-        *    Again, it's easier to say it's just whoever gets it
-      */
+       * Note: we don't consider certificate refunds as belonging to you.
+       * Rationale:
+       * 1) It's very unclear who the refund "belongs to" in the case of a pool registration.
+       *    Does it belong to the owner? Operators? Some weird split?
+       *    Better to just say it's just bonus ADA to whoever gets it in the tx outputs
+       * 2) For stake deregistration, it's tempting to say it belongs to the owner of the stake key
+       *    But the protocol allows other people to pay to register your staking key
+       *    (no staking key witness required for registration)
+       *    So that wouldn't be quite accurate either.
+       *    Again, it's easier to say it's just whoever gets it
+       */
       ownImplicitInput: publicDeriver.getParent().getDefaultMultiToken(),
       ownImplicitOutput: (() => {
         if (tx.txType === TransactionType.CardanoShelley) {
           const implicitOutputSum = publicDeriver.getParent().getDefaultMultiToken();
           for (const cert of tx.certificates) {
-            if (
-              cert.certificate.Kind !==
-              RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert
-            ) {
+            if (cert.certificate.Kind !== RustModule.WalletV4.CertificateKind.MoveInstantaneousRewardsCert) {
               continue;
             }
 
             RustModule.WasmScope(Module => {
               const mir = Module.WalletV4.MoveInstantaneousRewardsCert.from_hex(cert.certificate.Payload)
-                .move_instantaneous_reward().as_to_stake_creds();
+                .move_instantaneous_reward()
+                .as_to_stake_creds();
 
               for (const relatedAddr of cert.relatedAddresses) {
                 // recall: length of this list is usually just 1
                 for (const addr of addresses.accountingAddresses) {
                   if (relatedAddr.AddressId === addr.AddressId) {
                     // this address got some rewards inside the cert
-                    const rewardAddr = Module.WalletV4.RewardAddress.from_address(
-                      Module.WalletV4.Address.from_hex(addr.Hash)
-                    );
+                    const rewardAddr = Module.WalletV4.RewardAddress.from_address(Module.WalletV4.Address.from_hex(addr.Hash));
                     if (rewardAddr == null) continue; // should never happen
                     const rewardAmount = mir?.get(rewardAddr.payment_cred());
                     // happens if the MIR is to another pot
                     if (rewardAmount == null) continue;
                     const isPositive = rewardAmount.is_positive();
-                    const rewardAmountBigInt = isPositive
-                      ? rewardAmount.as_positive()
-                      : rewardAmount.as_negative();
+                    const rewardAmountBigInt = isPositive ? rewardAmount.as_positive() : rewardAmount.as_negative();
                     if (rewardAmountBigInt == null) continue;
-                    const rewardAmountStr =
-                      (isPositive ? '' : '-') + rewardAmountBigInt.to_str();
+                    const rewardAmountStr = (isPositive ? '' : '-') + rewardAmountBigInt.to_str();
                     implicitOutputSum.add({
                       identifier: defaultToken.defaultIdentifier,
                       networkId: defaultToken.defaultNetworkId,
@@ -402,7 +320,7 @@ export async function rawGetTransactions(
         return publicDeriver.getParent().getDefaultMultiToken();
       })(),
       defaultToken,
-    })
+    }),
   }));
 
   return {
@@ -411,13 +329,11 @@ export async function rawGetTransactions(
   };
 }
 
-export async function getAllTransactions(
-  request: {|
-    publicDeriver: IPublicDeriver<ConceptualWallet>,
-    skip?: number,
-    limit?: number,
-  |},
-): Promise<TxData> {
+export async function getAllTransactions(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+  skip?: number,
+  limit?: number,
+|}): Promise<TxData> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -430,20 +346,17 @@ export async function getAllTransactions(
     GetDerivationSpecific,
     GetCertificates,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
   return await raii<PromisslessReturnType<typeof getAllTransactions>>(
     request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
-    ],
+    [...depTables, ...mapToTables(request.publicDeriver.getDb(), derivationTables)],
     async dbTx => {
       return await rawGetTransactions(
-        request.publicDeriver.getDb(), dbTx,
+        request.publicDeriver.getDb(),
+        dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
@@ -457,30 +370,26 @@ export async function getAllTransactions(
         },
         {
           ...request,
-          getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.byTime(
-            request.publicDeriver.getDb(), dbTx,
-            {
+          getTxAndBlock: async txIds =>
+            await deps.GetTxAndBlock.byTime(request.publicDeriver.getDb(), dbTx, {
               txIds,
               skip: request.skip,
               limit: request.limit,
-            }
-          )
+            }),
         },
-        derivationTables,
+        derivationTables
       );
     }
   );
 }
 
-export async function getPendingTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
-): Promise<{|
+export async function getPendingTransactions(request: {| publicDeriver: IPublicDeriver<ConceptualWallet> |}): Promise<{|
   addressLookupMap: Map<number, string>,
   txs: Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
-  ...WithNullableFields<DbBlock>,
-  ...UserAnnotation,
-|}>,
+    ...CardanoByronTxIO | CardanoShelleyTxIO,
+    ...WithNullableFields<DbBlock>,
+    ...UserAnnotation,
+  |}>,
 |}> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
@@ -494,20 +403,17 @@ export async function getPendingTransactions(
     GetDerivationSpecific,
     GetCertificates,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(request.publicDeriver.getDb(), table));
 
   return await raii<PromisslessReturnType<typeof getPendingTransactions>>(
     request.publicDeriver.getDb(),
-    [
-      ...depTables,
-      ...mapToTables(request.publicDeriver.getDb(), derivationTables),
-    ],
+    [...depTables, ...mapToTables(request.publicDeriver.getDb(), derivationTables)],
     async dbTx => {
       return await rawGetTransactions(
-        request.publicDeriver.getDb(), dbTx,
+        request.publicDeriver.getDb(),
+        dbTx,
         {
           GetPathWithSpecific: deps.GetPathWithSpecific,
           GetAddress: deps.GetAddress,
@@ -521,15 +427,13 @@ export async function getPendingTransactions(
         },
         {
           ...request,
-          getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.withStatus(
-            request.publicDeriver.getDb(), dbTx,
-            {
+          getTxAndBlock: async txIds =>
+            await deps.GetTxAndBlock.withStatus(request.publicDeriver.getDb(), dbTx, {
               txIds,
               status: [TxStatusCodes.PENDING],
-            }
-          )
+            }),
         },
-        derivationTables,
+        derivationTables
       );
     }
   );
@@ -552,10 +456,11 @@ export async function rawGetTokenListIds(
   derivationTables: Map<number, string>,
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
-  |},
+  |}
 ): Promise<Array<number>> {
   const relatedIds = await rawGetAllTxIds(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -565,36 +470,22 @@ export async function rawGetTokenListIds(
       GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
-    derivationTables,
+    derivationTables
   );
 
-  const fullTxs = await deps.GetTransaction.fromIds(
-    db, dbTx,
-    { ids: relatedIds.txIds }
-  );
+  const fullTxs = await deps.GetTransaction.fromIds(db, dbTx, { ids: relatedIds.txIds });
 
-  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const txsWithIOs = [
-    ...byronWithIOs,
-    ...shelleyWithIOs,
-  ];
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
+    networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+    networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const txsWithIOs = [...byronWithIOs, ...shelleyWithIOs];
 
-  return Array.from(new Set(txsWithIOs
-    .flatMap(txs => txs.tokens)
-    .map(token => token.TokenList.ListId)));
+  return Array.from(new Set(txsWithIOs.flatMap(txs => txs.tokens).map(token => token.TokenList.ListId)));
 }
 
 export async function rawGetForeignAddresses(
@@ -614,10 +505,11 @@ export async function rawGetForeignAddresses(
   derivationTables: Map<number, string>,
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
-  |},
+  |}
 ): Promise<Array<number>> {
   const relatedIds = await rawGetAllTxIds(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -627,40 +519,25 @@ export async function rawGetForeignAddresses(
       GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
-    derivationTables,
+    derivationTables
   );
 
-  const fullTxs = await deps.GetTransaction.fromIds(
-    db, dbTx,
-    { ids: relatedIds.txIds }
-  );
+  const fullTxs = await deps.GetTransaction.fromIds(db, dbTx, { ids: relatedIds.txIds });
 
-  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-    db, dbTx,
-    {
-      txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
-      networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
-    }
-  );
-  const txsWithIOs = [
-    ...byronWithIOs,
-    ...shelleyWithIOs,
-  ];
+  const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoByron),
+    networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+    txs: fullTxs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+    networkId: request.publicDeriver.getParent().getNetworkInfo().NetworkId,
+  });
+  const txsWithIOs = [...byronWithIOs, ...shelleyWithIOs];
 
   const allAddressIds = txsWithIOs.flatMap(txWithIO => [
     ...txWithIO.utxoInputs.map(input => input.AddressId),
     ...txWithIO.utxoOutputs.map(output => output.AddressId),
-    ...(txWithIO.accountingInputs == null
-      ? []
-      : txWithIO.accountingInputs.map(input => input.AddressId)
-    ),
+    ...(txWithIO.accountingInputs == null ? [] : txWithIO.accountingInputs.map(input => input.AddressId)),
     // note: we don't show other addresses in a certificate as unknown addresses
   ]);
 
@@ -676,12 +553,12 @@ export async function rawGetForeignAddresses(
   // get rid of duplications (some tx can have multiple inputs of same address)
   return Array.from(new Set(unownedAddresses));
 }
-export async function getForeignAddresses(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
-): Promise<Array<{|
-  address: string,
-  type: CoreAddressT,
-|}>> {
+export async function getForeignAddresses(request: {| publicDeriver: IPublicDeriver<ConceptualWallet> |}): Promise<
+  Array<{|
+    address: string,
+    type: CoreAddressT,
+  |}>,
+> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -695,8 +572,7 @@ export async function getForeignAddresses(
     GetCertificates,
   });
   const db = request.publicDeriver.getDb();
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
@@ -709,16 +585,10 @@ export async function getForeignAddresses(
       ...mapToTables(db, derivationTables),
     ],
     async dbTx => {
-      const addressIds = await rawGetForeignAddresses(
-        db, dbTx,
-        deps,
-        request.publicDeriver.getParent().getDerivationTables(),
-        { publicDeriver: request.publicDeriver },
-      );
-      const addressRows = await GetAddress.getById(
-        db, dbTx,
-        addressIds
-      );
+      const addressIds = await rawGetForeignAddresses(db, dbTx, deps, request.publicDeriver.getParent().getDerivationTables(), {
+        publicDeriver: request.publicDeriver,
+      });
+      const addressRows = await GetAddress.getById(db, dbTx, addressIds);
       const result = [];
       const seenAddresses = new Set<string>();
 
@@ -759,10 +629,11 @@ export async function rawRemoveAllTransactions(
   derivationTables: Map<number, string>,
   request: {|
     publicDeriver: IPublicDeriver<ConceptualWallet>,
-  |},
+  |}
 ): ReturnType<typeof rawGetAllTxIds> {
   const unownedAddresses = await rawGetForeignAddresses(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -775,10 +646,11 @@ export async function rawRemoveAllTransactions(
       GetCertificates: deps.GetCertificates,
     },
     derivationTables,
-    request,
+    request
   );
   const relatedIds = await rawGetAllTxIds(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -788,11 +660,12 @@ export async function rawRemoveAllTransactions(
       GetCertificates: deps.GetCertificates,
     },
     { publicDeriver: request.publicDeriver },
-    derivationTables,
+    derivationTables
   );
 
   const tokenListIds = await rawGetTokenListIds(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -805,42 +678,33 @@ export async function rawRemoveAllTransactions(
       GetCertificates: deps.GetCertificates,
     },
     derivationTables,
-    request,
+    request
   );
 
   // WARNING: anything past this point can't assume txs exist in the DB
   // since we start removing stuff
 
   // 1) remove txs themselves
-  await deps.DeleteAllTransactions.delete(
-    db, dbTx,
-    {
-      publicDeriverId: request.publicDeriver.getPublicDeriverId(),
-      txIds: relatedIds.txIds,
-    }
-  );
+  await deps.DeleteAllTransactions.delete(db, dbTx, {
+    publicDeriverId: request.publicDeriver.getPublicDeriverId(),
+    txIds: relatedIds.txIds,
+  });
 
   // 2) remove addresses who only existed as metadata for txs that were removed
-  await deps.ModifyAddress.remove(
-    db, dbTx,
-    unownedAddresses
-  );
+  await deps.ModifyAddress.remove(db, dbTx, unownedAddresses);
 
   // 3) remove blocks no longer needed
   await deps.FreeBlocks.free(db, dbTx);
 
   // 4) Remove token lists
-  await deps.ModifyTokenList.remove(
-    db, dbTx,
-    tokenListIds,
-  );
+  await deps.ModifyTokenList.remove(db, dbTx, tokenListIds);
 
   return relatedIds;
 }
 
-export async function removeAllTransactions(
-  request: {| publicDeriver: IPublicDeriver<ConceptualWallet>, |},
-): ReturnType<typeof rawGetAllTxIds> {
+export async function removeAllTransactions(request: {|
+  publicDeriver: IPublicDeriver<ConceptualWallet>,
+|}): ReturnType<typeof rawGetAllTxIds> {
   const derivationTables = request.publicDeriver.getParent().getDerivationTables();
   const deps = Object.freeze({
     GetPathWithSpecific,
@@ -858,12 +722,10 @@ export async function removeAllTransactions(
     ModifyTokenList,
   });
   const db = request.publicDeriver.getDb();
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  const updateUtxoTables = Object
-    .keys(UtxoStorageApi.depsTables)
+  const updateUtxoTables = Object.keys(UtxoStorageApi.depsTables)
     .map(key => UtxoStorageApi.depsTables[key])
     .flatMap(table => getAllSchemaTables(db, table));
 
@@ -877,20 +739,11 @@ export async function removeAllTransactions(
       ...updateUtxoTables,
     ],
     async dbTx => {
-      await UtxoStorageApi.depsTables.ModifyUtxoAtSafePoint.remove(
-        db, dbTx,
-        request.publicDeriver.getPublicDeriverId(),
-      );
-      await UtxoStorageApi.depsTables.ModifyUtxoDiffToBestBlock.removeAll(
-        db, dbTx,
-        request.publicDeriver.getPublicDeriverId(),
-      );
-      return rawRemoveAllTransactions(
-        db, dbTx,
-        deps,
-        request.publicDeriver.getParent().getDerivationTables(),
-        { publicDeriver: request.publicDeriver },
-      );
+      await UtxoStorageApi.depsTables.ModifyUtxoAtSafePoint.remove(db, dbTx, request.publicDeriver.getPublicDeriverId());
+      await UtxoStorageApi.depsTables.ModifyUtxoDiffToBestBlock.removeAll(db, dbTx, request.publicDeriver.getPublicDeriverId());
+      return rawRemoveAllTransactions(db, dbTx, deps, request.publicDeriver.getParent().getDerivationTables(), {
+        publicDeriver: request.publicDeriver,
+      });
     }
   );
 }
@@ -901,7 +754,7 @@ export async function updateUtxos(
   checkAddressesInUse: FilterFunc,
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMintMetadata: MultiAssetMintMetadataFunc,
-  getMultiAssetSupply: MultiAssetSupplyFunc,
+  getMultiAssetSupply: MultiAssetSupplyFunc
 ): Promise<void> {
   const derivationTables = publicDeriver.getParent().getDerivationTables();
 
@@ -923,7 +776,8 @@ export async function updateUtxos(
   await raii(
     db,
     [
-      ...Object.keys(scanAddrTables).map(key => scanAddrTables[key])
+      ...Object.keys(scanAddrTables)
+        .map(key => scanAddrTables[key])
         .flatMap(table => getAllSchemaTables(db, table)),
       ...mapToTables(db, derivationTables),
     ],
@@ -947,7 +801,7 @@ export async function updateUtxos(
           },
           // TODO: race condition because we don't pass in best block here
           { checkAddressesInUse },
-          derivationTables,
+          derivationTables
         );
       }
     }
@@ -963,40 +817,36 @@ export async function updateUtxos(
   await raii(
     db,
     [
-      ...Object.keys(UtxoStorageApi.depsTables).map(key => UtxoStorageApi.depsTables[key])
+      ...Object.keys(UtxoStorageApi.depsTables)
+        .map(key => UtxoStorageApi.depsTables[key])
         .flatMap(table => getAllSchemaTables(db, table)),
-      ...Object.keys(getAddrTables).map(key => getAddrTables[key])
+      ...Object.keys(getAddrTables)
+        .map(key => getAddrTables[key])
         .flatMap(table => getAllSchemaTables(db, table)),
     ],
     async dbTx => {
-      await rawUpdateUtxos(
-        db, dbTx,
-        publicDeriver,
-        getAddrTables,
-        derivationTables,
-      );
+      await rawUpdateUtxos(db, dbTx, publicDeriver, getAddrTables, derivationTables);
     }
   );
 
   // new UTXOs may contain new tokens so update token info
   const withUtxos = asGetAllUtxos(publicDeriver);
   if (withUtxos == null) {
-    throw new Error('wallet doesn\'t support IGetAllUtxos');
+    throw new Error("wallet doesn't support IGetAllUtxos");
   }
   const utxos = await withUtxos.getAllUtxos();
   const tokenIds = utxos.flatMap(utxo => utxo.output.tokens.map(token => token.Token.Identifier));
-  const updateTokenTables =  Object.freeze({
+  const updateTokenTables = Object.freeze({
     ModifyToken,
     GetToken,
   });
 
   await raii(
     db,
-    Object
-      .keys(updateTokenTables)
+    Object.keys(updateTokenTables)
       .map(key => updateTokenTables[key])
       .flatMap(table => getAllSchemaTables(db, table)),
-    dbTx => (
+    dbTx =>
       genCardanoAssetMap(
         db,
         dbTx,
@@ -1005,9 +855,8 @@ export async function updateUtxos(
         getTokenInfo,
         getMultiAssetMintMetadata,
         getMultiAssetSupply,
-        publicDeriver.getParent().getNetworkInfo(),
+        publicDeriver.getParent().getNetworkInfo()
       )
-    )
   );
 }
 
@@ -1028,7 +877,7 @@ export async function updateTransactions(
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
   after?: ?ReferenceTx,
-  before?: ?ReferenceTx,
+  before?: ?ReferenceTx
 ): Promise<TxData> {
   const derivationTables = publicDeriver.getParent().getDerivationTables();
   let lastSyncInfo = undefined;
@@ -1066,45 +915,35 @@ export async function updateTransactions(
       AssociateToken,
       DeleteAllTransactions,
     });
-    const updateTables = Object
-      .keys(updateDepTables)
+    const updateTables = Object.keys(updateDepTables)
       .map(key => updateDepTables[key])
       .flatMap(table => getAllSchemaTables(db, table));
 
-    return await raii(
-      db,
-      [
-        ...updateTables,
-        ...mapToTables(db, derivationTables),
-      ],
-      async dbTx => {
-        lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(
-          db, dbTx,
-          publicDeriver.getPublicDeriverId()
-        );
-        const {
-          // need this hack to remove a single element from the list
-          GetLastSyncForPublicDeriver, // eslint-disable-line no-unused-vars, no-shadow
-          ...remainingDeps
-        } = updateDepTables;
-        return await rawUpdateTransactions(
-          db, dbTx,
-          remainingDeps,
-          publicDeriver,
-          lastSyncInfo,
-          getTransactionHistory,
-          getRecentTransactionHashes,
-          getTransactionsByHashes,
-          getBestBlock,
-          derivationTables,
-          getTokenInfo,
-          getMultiAssetMetadata,
-          getMultiAssetSupply,
-          after,
-          before,
-        );
-      }
-    );
+    return await raii(db, [...updateTables, ...mapToTables(db, derivationTables)], async dbTx => {
+      lastSyncInfo = await updateDepTables.GetLastSyncForPublicDeriver.forId(db, dbTx, publicDeriver.getPublicDeriverId());
+      const {
+        // need this hack to remove a single element from the list
+        GetLastSyncForPublicDeriver, // eslint-disable-line no-unused-vars, no-shadow
+        ...remainingDeps
+      } = updateDepTables;
+      return await rawUpdateTransactions(
+        db,
+        dbTx,
+        remainingDeps,
+        publicDeriver,
+        lastSyncInfo,
+        getTransactionHistory,
+        getRecentTransactionHashes,
+        getTransactionsByHashes,
+        getBestBlock,
+        derivationTables,
+        getTokenInfo,
+        getMultiAssetMetadata,
+        getMultiAssetSupply,
+        after,
+        before
+      );
+    });
   } catch (e) {
     if (!(e instanceof RollbackApiError)) {
       throw e;
@@ -1130,39 +969,33 @@ export async function updateTransactions(
       AssociateTxWithUtxoIOs,
       AssociateTxWithAccountingIOs,
     });
-    const rollbackTables = Object
-      .keys(rollbackDepTables)
+    const rollbackTables = Object.keys(rollbackDepTables)
       .map(key => rollbackDepTables[key])
       .flatMap(table => getAllSchemaTables(db, table));
-    await raii(
-      db,
-      [
-        ...rollbackTables,
-        ...mapToTables(db, derivationTables),
-      ],
-      async dbTx => {
-        const newLastSyncInfo = await rollbackDepTables.GetLastSyncForPublicDeriver.forId(
-          db, dbTx,
-          publicDeriver.getPublicDeriverId()
-        );
-        // it's possible there was a sync after when we unlocked tables
-        // after failing to sync transactions
-        // but before we locked them to process a rollback
-        // in that case, just abort the rollback
-        if (!isEqual(newLastSyncInfo, lastSyncInfo)) {
-          return;
-        }
-        await rollback(
-          db, dbTx,
-          rollbackDepTables,
-          {
-            publicDeriver,
-            lastSyncInfo: newLastSyncInfo,
-          },
-          derivationTables
-        );
+    await raii(db, [...rollbackTables, ...mapToTables(db, derivationTables)], async dbTx => {
+      const newLastSyncInfo = await rollbackDepTables.GetLastSyncForPublicDeriver.forId(
+        db,
+        dbTx,
+        publicDeriver.getPublicDeriverId()
+      );
+      // it's possible there was a sync after when we unlocked tables
+      // after failing to sync transactions
+      // but before we locked them to process a rollback
+      // in that case, just abort the rollback
+      if (!isEqual(newLastSyncInfo, lastSyncInfo)) {
+        return;
       }
-    );
+      await rollback(
+        db,
+        dbTx,
+        rollbackDepTables,
+        {
+          publicDeriver,
+          lastSyncInfo: newLastSyncInfo,
+        },
+        derivationTables
+      );
+    });
     return {
       addressLookupMap: new Map(),
       txs: [],
@@ -1194,9 +1027,9 @@ async function rollback(
     publicDeriver: IPublicDeriver<>,
     lastSyncInfo: $ReadOnly<LastSyncInfoRow>,
   |},
-  derivationTables: Map<number, string>,
+  derivationTables: Map<number, string>
 ): Promise<void> {
-  const { TransactionSeed, } = await deps.GetEncryptionMeta.get(db, dbTx);
+  const { TransactionSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
   // if we've never successfully synced from the server, no need to rollback
   const lastSyncSlotNum = request.lastSyncInfo.SlotNum;
@@ -1205,10 +1038,7 @@ async function rollback(
   }
 
   // 1) Get all transactions
-  const {
-    utxoAddresses,
-    accountingAddresses,
-  } = await rawGetAddressRowsForWallet(
+  const { utxoAddresses, accountingAddresses } = await rawGetAddressRowsForWallet(
     dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
@@ -1216,27 +1046,22 @@ async function rollback(
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver: request.publicDeriver },
-    derivationTables,
+    derivationTables
   );
   const utxoAddressIds = utxoAddresses.map(a => a.address.AddressId);
   const accountingAddressIds = accountingAddresses.map(a => a.address.AddressId);
-  const txIds = Array.from(new Set([
-    ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: accountingAddressIds },
-    )),
-    ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(
-      db, dbTx, { addressIds: utxoAddressIds },
-    )),
-  ]));
+  const txIds = Array.from(
+    new Set([
+      ...(await deps.AssociateTxWithAccountingIOs.getTxIdsForAddresses(db, dbTx, { addressIds: accountingAddressIds })),
+      ...(await deps.AssociateTxWithUtxoIOs.getTxIdsForAddresses(db, dbTx, { addressIds: utxoAddressIds })),
+    ])
+  );
 
   // 2) get best tx in block
-  const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(
-    db, dbTx,
-    {
-      txIds,
-      height: Number.MAX_SAFE_INTEGER,
-    }
-  );
+  const bestInStorage = await deps.GetTxAndBlock.firstSuccessTxBefore(db, dbTx, {
+    txIds,
+    height: Number.MAX_SAFE_INTEGER,
+  });
   if (bestInStorage == null) {
     // if we have no txs stored, no need to rollback
     return;
@@ -1244,10 +1069,10 @@ async function rollback(
 
   // 3) Get latest k transactions
 
-  const txsToRevert = await deps.GetTxAndBlock.gteHeight(
-    db, dbTx,
-    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
-  );
+  const txsToRevert = await deps.GetTxAndBlock.gteHeight(db, dbTx, {
+    txIds,
+    height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE,
+  });
 
   // 4) mark rollback transactions as failed
   // Note: theoretically we should mark rolled back transactions as pending
@@ -1257,13 +1082,10 @@ async function rollback(
   for (const tx of txsToRevert) {
     // we keep both the block in the tx in history
     // because we need this information to show the fail tx information to the user
-    await deps.ModifyTransaction.updateStatus(
-      db, dbTx,
-      {
-        status: TxStatusCodes.ROLLBACK_FAIL,
-        transaction: tx.Transaction,
-      }
-    );
+    await deps.ModifyTransaction.updateStatus(db, dbTx, {
+      status: TxStatusCodes.ROLLBACK_FAIL,
+      transaction: tx.Transaction,
+    });
   }
 
   // 5) set all UTXO from these transactions as unspent
@@ -1273,12 +1095,14 @@ async function rollback(
   // 1) Our outputs are already marked as "unspent" so nothing is required
   // 2) Our outputs were spent but the tx that spent it also got rolled back & marked us as unspent
   await markAllInputs(
-    db, dbTx,
+    db,
+    dbTx,
     {
       MarkUtxo: deps.MarkUtxo,
       GetUtxoInputs: deps.GetUtxoInputs,
       GetTransaction: deps.GetTransaction,
-    }, {
+    },
+    {
       inputTxIds: txsToRevert.map(tx => tx.Transaction.TransactionId),
       allTxIds: txIds,
       isUnspent: true,
@@ -1288,39 +1112,30 @@ async function rollback(
   );
 
   // 6) marked pending transactions as failed
-  const pendingTxs = await deps.GetTransaction.withStatus(
-    db, dbTx,
-    {
-      txIds,
-      status: [TxStatusCodes.PENDING]
-    }
-  );
+  const pendingTxs = await deps.GetTransaction.withStatus(db, dbTx, {
+    txIds,
+    status: [TxStatusCodes.PENDING],
+  });
   for (const pendingTx of pendingTxs) {
     // TODO: would be faster if this was batched
-    await deps.ModifyTransaction.updateStatus(
-      db, dbTx,
-      {
-        transaction: pendingTx,
-        status: TxStatusCodes.ROLLBACK_FAIL,
-      }
-    );
+    await deps.ModifyTransaction.updateStatus(db, dbTx, {
+      transaction: pendingTx,
+      status: TxStatusCodes.ROLLBACK_FAIL,
+    });
   }
 
   // 7) Rollback LastSyncTable
-  const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(
-    db, dbTx,
-    { txIds, height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE }
-  );
-  await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
-    db, dbTx,
-    {
-      LastSyncInfoId: request.lastSyncInfo.LastSyncInfoId,
-      Time: new Date(Date.now()),
-      SlotNum: bestStillIncluded === undefined ? null : bestStillIncluded.Block.SlotNum,
-      Height: bestStillIncluded === undefined ? 0 : bestStillIncluded.Block.Height,
-      BlockHash: bestStillIncluded === undefined ? null : bestStillIncluded.Block.Hash,
-    }
-  );
+  const bestStillIncluded = await deps.GetTxAndBlock.firstSuccessTxBefore(db, dbTx, {
+    txIds,
+    height: bestInStorage.Block.Height - CARDANO_STABLE_SIZE,
+  });
+  await deps.ModifyLastSyncInfo.overrideLastSyncInfo(db, dbTx, {
+    LastSyncInfoId: request.lastSyncInfo.LastSyncInfoId,
+    Time: new Date(Date.now()),
+    SlotNum: bestStillIncluded === undefined ? null : bestStillIncluded.Block.SlotNum,
+    Height: bestStillIncluded === undefined ? 0 : bestStillIncluded.Block.Height,
+    BlockHash: bestStillIncluded === undefined ? null : bestStillIncluded.Block.Hash,
+  });
 
   // note: we don't modify the display cutoff since it may confuse the user to suddenly shrink it
 }
@@ -1370,11 +1185,10 @@ async function rawUpdateTransactions(
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
   after: ?ReferenceTx,
-  before: ?ReferenceTx,
+  before: ?ReferenceTx
 ): Promise<TxData> {
   const network = publicDeriver.getParent().getNetworkInfo();
-  const toAbsoluteSlotNumber = (slot: RelativeSlot) =>
-    TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), slot);
+  const toAbsoluteSlotNumber = (slot: RelativeSlot) => TimeUtils.toAbsoluteSlotNumber(getCardanoHaskellBaseConfig(network), slot);
 
   if (before != null && after != null) {
     throw new Error('Only one of `before` or `after` should be used for a resync');
@@ -1384,36 +1198,33 @@ async function rawUpdateTransactions(
   const untilBlock = before == null ? bestBlock.hash : before.blockHash;
   const shouldUpdateLastSync = before == null;
 
-
   if (shouldUpdateLastSync) {
     // update last sync
-    const slotInRemote = (bestBlock.epoch == null || bestBlock.slot == null)
-      ? null
-      : toAbsoluteSlotNumber({
-        epoch: bestBlock.epoch,
-        slot: bestBlock.slot,
-      });
-    await deps.ModifyLastSyncInfo.overrideLastSyncInfo(
-      db, dbTx,
-      {
-        LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
-        Time: new Date(Date.now()),
-        SlotNum: slotInRemote,
-        BlockHash: bestBlock.hash,
-        Height: bestBlock.height,
-      }
-    );
+    const slotInRemote =
+      bestBlock.epoch == null || bestBlock.slot == null
+        ? null
+        : toAbsoluteSlotNumber({
+            epoch: bestBlock.epoch,
+            slot: bestBlock.slot,
+          });
+    await deps.ModifyLastSyncInfo.overrideLastSyncInfo(db, dbTx, {
+      LastSyncInfoId: lastSyncInfo.LastSyncInfoId,
+      Time: new Date(Date.now()),
+      SlotNum: slotInRemote,
+      BlockHash: bestBlock.hash,
+      Height: bestBlock.height,
+    });
   }
 
   let txHashes;
 
   if (untilBlock != null) {
-
     // address syncing has been done by scanUtxos so no need to do it here again
     // get new txs from fetcher
     // important: get addresses for our wallet AFTER scanning for new addresses
     const { txIds, addresses } = await rawGetAllTxIds(
-      db, dbTx,
+      db,
+      dbTx,
       {
         GetPathWithSpecific: deps.GetPathWithSpecific,
         GetAddress: deps.GetAddress,
@@ -1423,7 +1234,7 @@ async function rawUpdateTransactions(
         GetCertificates: deps.GetCertificates,
       },
       { publicDeriver },
-      derivationTables,
+      derivationTables
     );
 
     let txsFromNetwork;
@@ -1453,14 +1264,14 @@ async function rawUpdateTransactions(
           txHash: before?.txHash,
         },
       });
-      const summaries: Array<TxSummary> =
-        listValues(recentTxHashesResult).flat()
-          .filter(createFilterUniqueBy(x => x.txHash));
+      const summaries: Array<TxSummary> = listValues(recentTxHashesResult)
+        .flat()
+        .filter(createFilterUniqueBy(x => x.txHash));
       summaries.sort((a: TxSummary, b: TxSummary) => {
         // DESC ordering (b < a)
         return b.epoch - a.epoch || b.slot - a.slot || b.txBlockIndex - a.txBlockIndex;
       });
-      txHashes = summaries.slice(0,20).map(x => x.txHash);
+      txHashes = summaries.slice(0, 20).map(x => x.txHash);
       txsFromNetwork = await getTransactionsByHashes({ network, txHashes });
     }
 
@@ -1495,14 +1306,9 @@ async function rawUpdateTransactions(
         network: publicDeriver.getParent().getNetworkInfo(),
         txIds,
         txsFromNetwork,
-        hashToIds: rawGenHashToIdsFunc(
-          ourIds,
-          publicDeriver.getParent().getNetworkInfo()
-        ),
+        hashToIds: rawGenHashToIdsFunc(ourIds, publicDeriver.getParent().getNetworkInfo()),
         defaultToken: publicDeriver.getParent().getDefaultToken(),
-        findOwnAddress: rawGenFindOwnAddress(
-          ourIds
-        ),
+        findOwnAddress: rawGenFindOwnAddress(ourIds),
         toAbsoluteSlotNumber,
         derivationTables,
         getTokenInfo,
@@ -1515,7 +1321,8 @@ async function rawUpdateTransactions(
   }
 
   const txs = await rawGetTransactions(
-    db, dbTx,
+    db,
+    dbTx,
     {
       GetPathWithSpecific: deps.GetPathWithSpecific,
       GetAddress: deps.GetAddress,
@@ -1529,24 +1336,23 @@ async function rawUpdateTransactions(
     },
     {
       publicDeriver,
-      getTxAndBlock: async (txIds) => await deps.GetTxAndBlock.byTime(
-        db, dbTx,
-        {
+      getTxAndBlock: async txIds =>
+        await deps.GetTxAndBlock.byTime(db, dbTx, {
           txIds,
-        }
-      )
+        }),
     },
-    derivationTables,
+    derivationTables
   );
   const toRemoveTxIds = txs.txs.slice(100).map(tx => tx.transaction.TransactionId);
 
   await deps.DeleteAllTransactions.delete(
-    db, dbTx,
+    db,
+    dbTx,
     {
       publicDeriverId: publicDeriver.getPublicDeriverId(),
       txIds: toRemoveTxIds,
     },
-    false,
+    false
   );
 
   const txHashSet = new Set(txHashes);
@@ -1590,10 +1396,12 @@ async function updateTransactionBatch(
     getMultiAssetMetadata: MultiAssetMintMetadataFunc,
     getMultiAssetSupply: MultiAssetSupplyFunc,
   |}
-): Promise<Array<{|
-  ...(CardanoByronTxIO | CardanoShelleyTxIO),
-  ...DbBlock,
-|}>> {
+): Promise<
+  Array<{|
+    ...CardanoByronTxIO | CardanoShelleyTxIO,
+    ...DbBlock,
+  |}>,
+> {
   const { TransactionSeed, BlockSeed } = await deps.GetEncryptionMeta.get(db, dbTx);
 
   const matchesInDb = new Map<string, CardanoByronTxIO | CardanoShelleyTxIO>();
@@ -1604,24 +1412,15 @@ async function updateTransactionBatch(
       txIds: request.txIds,
     });
     const txs: Array<$ReadOnly<TransactionRow>> = Array.from(matchByDigest.values());
-    const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(
-      db, dbTx,
-      {
-        txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron),
-        networkId: request.network.NetworkId,
-      }
-    );
-    const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(
-      db, dbTx,
-      {
-        txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley),
-        networkId: request.network.NetworkId,
-      }
-    );
-    const txsWithIOs = [
-      ...byronWithIOs,
-      ...shelleyWithIOs,
-    ];
+    const byronWithIOs = await deps.CardanoByronAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+      txs: txs.filter(tx => tx.Type === TransactionType.CardanoByron),
+      networkId: request.network.NetworkId,
+    });
+    const shelleyWithIOs = await deps.CardanoShelleyAssociateTxWithIOs.getIOsForTx(db, dbTx, {
+      txs: txs.filter(tx => tx.Type === TransactionType.CardanoShelley),
+      networkId: request.network.NetworkId,
+    });
+    const txsWithIOs = [...byronWithIOs, ...shelleyWithIOs];
     for (const tx of txsWithIOs) {
       matchesInDb.set(tx.transaction.Hash, tx);
     }
@@ -1629,7 +1428,7 @@ async function updateTransactionBatch(
 
   const unseenNewTxs: Array<RemoteTransaction> = [];
   const txsAddedToBlock: Array<{|
-    ...(CardanoByronTxIO | CardanoShelleyTxIO),
+    ...CardanoByronTxIO | CardanoShelleyTxIO,
     ...DbBlock,
   |}> = [];
   const modifiedTxIds = new Set<number>();
@@ -1651,24 +1450,15 @@ async function updateTransactionBatch(
      * We may however see a "success" tx that is exactly the same as already stored
      * ex: two calls to this function on same backend result
      */
-    const modifiedTxForDb = networkTxHeaderToDb(
-      txFromNetwork,
-      request.toAbsoluteSlotNumber,
-      TransactionSeed,
-      BlockSeed
-    );
+    const modifiedTxForDb = networkTxHeaderToDb(txFromNetwork, request.toAbsoluteSlotNumber, TransactionSeed, BlockSeed);
     modifiedTxIds.add(matchInDb.transaction.TransactionId);
-    const result = await deps.ModifyTransaction.updateExisting(
-      db,
-      dbTx,
-      {
-        block: modifiedTxForDb.block,
-        transaction: (blockId) => ({
-          ...modifiedTxForDb.transaction(blockId),
-          TransactionId: matchInDb.transaction.TransactionId,
-        })
-      },
-    );
+    const result = await deps.ModifyTransaction.updateExisting(db, dbTx, {
+      block: modifiedTxForDb.block,
+      transaction: blockId => ({
+        ...modifiedTxForDb.transaction(blockId),
+        TransactionId: matchInDb.transaction.TransactionId,
+      }),
+    });
 
     // sanity check: although we should only see non-success => success
     // it's possible we see the same success tx twice
@@ -1677,7 +1467,7 @@ async function updateTransactionBatch(
     }
     if (result.block !== null) {
       txsAddedToBlock.push({
-        ...(matchInDb: (CardanoByronTxIO | CardanoShelleyTxIO)),
+        ...(matchInDb: CardanoByronTxIO | CardanoShelleyTxIO),
         // override with updated
         transaction: result.transaction,
         block: result.block,
@@ -1686,19 +1476,20 @@ async function updateTransactionBatch(
   }
 
   // 2) Add any new assets & lookup known ones
-  const tokenIds = Array.from(new Set(unseenNewTxs.flatMap(tx => [
-    ...tx.inputs
-      .flatMap(input => input.assets)
-      .map(asset => asset.assetId),
-    ...tx.outputs
-      .flatMap(output => output.assets)
-      .map(asset => asset.assetId),
-    // force inclusion of primary token for chain
-    request.defaultToken.defaultIdentifier
-  ])));
+  const tokenIds = Array.from(
+    new Set(
+      unseenNewTxs.flatMap(tx => [
+        ...tx.inputs.flatMap(input => input.assets).map(asset => asset.assetId),
+        ...tx.outputs.flatMap(output => output.assets).map(asset => asset.assetId),
+        // force inclusion of primary token for chain
+        request.defaultToken.defaultIdentifier,
+      ])
+    )
+  );
 
   const assetLookup = await genCardanoAssetMap(
-    db, dbTx,
+    db,
+    dbTx,
     {
       ModifyToken: deps.ModifyToken,
       GetToken: deps.GetToken,
@@ -1707,15 +1498,12 @@ async function updateTransactionBatch(
     request.getTokenInfo,
     request.getMultiAssetMetadata,
     request.getMultiAssetSupply,
-    request.network,
+    request.network
   );
 
   // 3) Add new transactions
-  const genNextTokenListId = await createTokenListIdGenFunction(
-    db, dbTx,
-    { AssociateToken: deps.AssociateToken }
-  );
-  const { byronTxs, shelleyTxs, } = await networkTxToDbTx(
+  const genNextTokenListId = await createTokenListIdGenFunction(db, dbTx, { AssociateToken: deps.AssociateToken });
+  const { byronTxs, shelleyTxs } = await networkTxToDbTx(
     db,
     dbTx,
     request.network,
@@ -1727,17 +1515,13 @@ async function updateTransactionBatch(
     TransactionSeed,
     BlockSeed,
     assetLookup,
-    genNextTokenListId,
+    genNextTokenListId
   );
   const newsTxsIdSet = new Set();
 
   // <TODO:PENDING_REMOVAL> Byron Legacy: this should be impossible now, we are not syncing history from pre-Shelley
   for (const newTx of byronTxs) {
-    const result = await deps.ModifyCardanoByronTx.addTxWithIOs(
-      db,
-      dbTx,
-      newTx,
-    );
+    const result = await deps.ModifyCardanoByronTx.addTxWithIOs(db, dbTx, newTx);
     newsTxsIdSet.add(result.transaction.TransactionId);
     if (result.block !== null) {
       txsAddedToBlock.push({
@@ -1751,11 +1535,7 @@ async function updateTransactionBatch(
     }
   }
   for (const newTx of shelleyTxs) {
-    const result = await deps.ModifyCardanoShelleyTx.addTxWithIOs(
-      db,
-      dbTx,
-      newTx,
-    );
+    const result = await deps.ModifyCardanoShelleyTx.addTxWithIOs(db, dbTx, newTx);
     newsTxsIdSet.add(result.transaction.TransactionId);
     if (result.block !== null) {
       txsAddedToBlock.push({
@@ -1773,9 +1553,10 @@ async function updateTransactionBatch(
 
   // 4) Update UTXO set
 
-  const newTxIds = txsAddedToBlock.map(tx =>  tx.transaction.TransactionId);
+  const newTxIds = txsAddedToBlock.map(tx => tx.transaction.TransactionId);
   await markAllInputs(
-    db, dbTx,
+    db,
+    dbTx,
     {
       MarkUtxo: deps.MarkUtxo,
       GetUtxoInputs: deps.GetUtxoInputs,
@@ -1783,10 +1564,7 @@ async function updateTransactionBatch(
     },
     {
       inputTxIds: newTxIds,
-      allTxIds: [
-        ...request.txIds,
-        ...newTxIds,
-      ],
+      allTxIds: [...request.txIds, ...newTxIds],
       isUnspent: false,
       TransactionSeed,
       networkId: request.network.NetworkId,
@@ -1795,32 +1573,25 @@ async function updateTransactionBatch(
 
   // Mark any pending tx that is not found by remote as failed
 
-  const pendingTxs = await deps.GetTransaction.withStatus(
-    db, dbTx,
-    {
-      // note: we purposely don't include the txids of transactions we just added
-      txIds: request.txIds,
-      status: [TxStatusCodes.PENDING]
-    }
-  );
+  const pendingTxs = await deps.GetTransaction.withStatus(db, dbTx, {
+    // note: we purposely don't include the txids of transactions we just added
+    txIds: request.txIds,
+    status: [TxStatusCodes.PENDING],
+  });
   // CAREFUL: this means you can't set a tx as pending locally (such as when you send a tx)
   // since it will may right away marked as failed by this code
   // this is because we don't keep track of the local time a pending TX was created
   for (const pendingTx of pendingTxs) {
-
     if (
       // this pending tx both didn't already exist and we did not just add it
       !modifiedTxIds.has(pendingTx.TransactionId) &&
       !newsTxsIdSet.has(pendingTx.TransactionId)
     ) {
       // TODO: would be faster if this was batched
-      await deps.ModifyTransaction.updateStatus(
-        db, dbTx,
-        {
-          transaction: pendingTx,
-          status: TxStatusCodes.NOT_IN_REMOTE
-        }
-      );
+      await deps.ModifyTransaction.updateStatus(db, dbTx, {
+        transaction: pendingTx,
+        status: TxStatusCodes.NOT_IN_REMOTE,
+      });
     }
   }
 
@@ -1832,8 +1603,8 @@ function genByronIOGen(
   getIdOrThrow: string => number,
   network: $ReadOnly<NetworkRow>,
   getAssetInfoOrThrow: string => $ReadOnly<TokenRow>,
-  genNextTokenListId: void => number,
-): (number => {|
+  genNextTokenListId: void => number
+): number => {|
   utxoInputs: Array<UtxoTransactionInputInsert>,
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
   tokenList: Array<{|
@@ -1841,11 +1612,11 @@ function genByronIOGen(
     identifier: string,
     networkId: number,
   |}>,
-|}) {
+|} {
   if (!(byronTx.type == null || byronTx.type === RemoteTransactionTypes.byron)) {
     throw new Error(`${nameof(genByronIOGen)} not a byron transaction`);
   }
-  return (txRowId) => {
+  return txRowId => {
     const utxoInputs = [];
     const utxoOutputs = [];
     const tokenList = [];
@@ -1919,10 +1690,10 @@ function genByronIOGen(
         AddressId: getIdOrThrow(output.address),
         OutputIndex: i,
         /**
-          * we assume unspent for now but it will be updated after if necessary
-          * Note: if this output doesn't belong to you, it will be true forever
-          * This is slightly misleading, but using null would require null-checks everywhere
-          */
+         * we assume unspent for now but it will be updated after if necessary
+         * Note: if this output doesn't belong to you, it will be true forever
+         * This is slightly misleading, but using null would require null-checks everywhere
+         */
         IsUnspent: true,
         ErgoBoxId: null,
         ErgoCreationHeight: null,
@@ -1944,8 +1715,8 @@ function genShelleyIOGen(
   getIdOrThrow: string => number,
   network: $ReadOnly<NetworkRow>,
   getAssetInfoOrThrow: string => $ReadOnly<TokenRow>,
-  genNextTokenListId: void => number,
-): (number => {|
+  genNextTokenListId: void => number
+): number => {|
   utxoInputs: Array<UtxoTransactionInputInsert>,
   utxoOutputs: Array<UtxoTransactionOutputInsert>,
   accountingInputs: Array<AccountingTransactionInputInsert>,
@@ -1954,11 +1725,11 @@ function genShelleyIOGen(
     identifier: string,
     networkId: number,
   |}>,
-|}) {
+|} {
   if (shelleyTx.type !== RemoteTransactionTypes.shelley) {
     throw new Error(`${nameof(genShelleyIOGen)} not a shelley transaction`);
   }
-  return (txRowId) => {
+  return txRowId => {
     const utxoInputs = [];
     const utxoOutputs = [];
     const accountingInputs = [];
@@ -2071,19 +1842,17 @@ function genShelleyIOGen(
           OutputIndex: i,
           TokenListId: listId,
           /**
-            * we assume unspent for now but it will be updated after if necessary
-            * Note: if this output doesn't belong to you, it will be true forever
-            * This is slightly misleading, but using null would require null-checks everywhere
-            */
+           * we assume unspent for now but it will be updated after if necessary
+           * Note: if this output doesn't belong to you, it will be true forever
+           * This is slightly misleading, but using null would require null-checks everywhere
+           */
           IsUnspent: true,
           ErgoBoxId: null,
           ErgoCreationHeight: null,
           ErgoRegisters: null,
           ErgoTree: null,
         });
-      } else if (
-        outputType === CoreAddressTypes.CARDANO_REWARD
-      ) {
+      } else if (outputType === CoreAddressTypes.CARDANO_REWARD) {
         throw new Error(`${nameof(networkTxToDbTx)} cannot send to a reward address`);
       } else {
         // TODO: handle multisig
@@ -2105,11 +1874,8 @@ export async function getTokenMintMetadataAndSupply(
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
   network: $ReadOnly<NetworkRow>
-) : Promise<[
-  $ReadOnly<MultiAssetMintMetadataResponse>,
-  $ReadOnly<MultiAssetSupplyResponse>,
-]> {
-  const assets = (tokenIds||[])
+): Promise<[$ReadOnly<MultiAssetMintMetadataResponse>, $ReadOnly<MultiAssetSupplyResponse>]> {
+  const assets = (tokenIds || [])
     .filter(t => t.indexOf('.') !== -1)
     .map(t => {
       const parts = t.split('.');
@@ -2121,8 +1887,7 @@ export async function getTokenMintMetadataAndSupply(
       };
     });
 
-  if (assets.length === 0)
-    return [{}, {}];
+  if (assets.length === 0) return [{}, {}];
 
   const [tokensMintMetadata, tokensSupply] = await Promise.all([
     getMultiAssetMetadata({ network, assets }),
@@ -2130,7 +1895,7 @@ export async function getTokenMintMetadataAndSupply(
   ]);
 
   return [tokensMintMetadata, tokensSupply];
-};
+}
 
 const TOKEN_INFO_CACHE_TIME = 1 * 60 * 60 * 1000;
 
@@ -2145,56 +1910,54 @@ export async function genCardanoAssetMap(
   getTokenInfo: TokenInfoFunc,
   getMultiAssetMetadata: MultiAssetMintMetadataFunc,
   getMultiAssetSupply: MultiAssetSupplyFunc,
-  network: $ReadOnly<NetworkRow>,
+  network: $ReadOnly<NetworkRow>
 ): Promise<Map<string, $ReadOnly<TokenRow>>> {
-  const existingDbRows = (await deps.GetToken.fromIdentifier(
-    db, dbTx,
-    tokenIds
-  )).filter(row => row.NetworkId === network.NetworkId);
-  const existingRowsMap = new Map<string, $ReadOnly<TokenRow>>(
-    existingDbRows.map(row => [row.Identifier, row])
+  const existingDbRows = (await deps.GetToken.fromIdentifier(db, dbTx, tokenIds)).filter(
+    row => row.NetworkId === network.NetworkId
   );
+  const existingRowsMap = new Map<string, $ReadOnly<TokenRow>>(existingDbRows.map(row => [row.Identifier, row]));
 
   const noNeedForUpdateTokens = new Set<string>(
-    existingDbRows.filter(row => {
-      // default token rows are never updated from the network
-      if (row.IsDefault) {
-        return true;
-      }
-      // tokens rows that have never been queried from the network
-      const { lastUpdatedAt } = row.Metadata;
-      if (lastUpdatedAt == null) {
+    existingDbRows
+      .filter(row => {
+        // default token rows are never updated from the network
+        if (row.IsDefault) {
+          return true;
+        }
+        // tokens rows that have never been queried from the network
+        const { lastUpdatedAt } = row.Metadata;
+        if (lastUpdatedAt == null) {
+          return false;
+        }
+        // fresh enough, no need for updating this time
+        if (Date.now() - Date.parse(lastUpdatedAt) < TOKEN_INFO_CACHE_TIME) {
+          return true;
+        }
         return false;
-      }
-      // fresh enough, no need for updating this time
-      if (Date.now() - Date.parse(lastUpdatedAt) < TOKEN_INFO_CACHE_TIME) {
-        return true;
-      }
-      return false;
-    }).map(row => row.Identifier)
+      })
+      .map(row => row.Identifier)
   );
 
   const updatingTokenIds = tokenIds.filter(token => !noNeedForUpdateTokens.has(token));
 
   const tokenInfoPromise = getTokenInfo({
     network,
-    tokenIds: updatingTokenIds.map(id => id.split('.').join(''))
+    tokenIds: updatingTokenIds.map(id => id.split('.').join('')),
   });
 
   const tokenMintMetadataAndSupplyPromise = getTokenMintMetadataAndSupply(
     tokenIds,
     getMultiAssetMetadata,
     getMultiAssetSupply,
-    network,
+    network
   );
 
   let tokenInfoResponse = {};
   let metadata = {};
   let supply = {};
   try {
-    [tokenInfoResponse, [metadata, supply]] =
-      await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
-  } catch(e) {
+    [tokenInfoResponse, [metadata, supply]] = await Promise.all([tokenInfoPromise, tokenMintMetadataAndSupplyPromise]);
+  } catch (e) {
     console.error('Failed to query token info, metadata, or supply', e);
   }
 
@@ -2264,15 +2027,13 @@ export async function genCardanoAssetMap(
           assetName,
           policyId,
           lastUpdatedAt,
-          assetMintMetadata
+          assetMintMetadata,
         },
       };
-    }).filter(Boolean);
+    })
+    .filter(Boolean);
 
-  const newDbRows = await deps.ModifyToken.upsert(
-    db, dbTx,
-    databaseInsert
-  );
+  const newDbRows = await deps.ModifyToken.upsert(db, dbTx, databaseInsert);
 
   const result = new Map<string, $ReadOnly<TokenRow>>();
   existingDbRows.forEach(row => result.set(row.Identifier, row));
@@ -2293,7 +2054,7 @@ async function networkTxToDbTx(
   TransactionSeed: number,
   BlockSeed: number,
   assetLookup: Map<string, $ReadOnly<TokenRow>>,
-  genNextTokenListId: void => number,
+  genNextTokenListId: void => number
 ): Promise<{|
   byronTxs: Array<{|
     block: null | BlockInsert,
@@ -2303,25 +2064,24 @@ async function networkTxToDbTx(
   shelleyTxs: Array<{|
     block: null | BlockInsert,
     transaction: (blockId: null | number) => TransactionInsert,
-    certificates: $ReadOnlyArray<number => (void | AddCertificateRequest)>,
+    certificates: $ReadOnlyArray<(number) => void | AddCertificateRequest>,
     ioGen: ReturnType<typeof genShelleyIOGen>,
   |}>,
 |}> {
-  const allAddresses = Array.from(new Set(
-    newTxs.flatMap(tx => [
-      ...tx.inputs.map(input => input.address),
-      ...tx.outputs.map(output => output.address),
-      ...(tx.withdrawals
-        ? tx.withdrawals.map(withdrawal => withdrawal.address)
-        : []
-      ),
-    ]),
-  ));
+  const allAddresses = Array.from(
+    new Set(
+      newTxs.flatMap(tx => [
+        ...tx.inputs.map(input => input.address),
+        ...tx.outputs.map(output => output.address),
+        ...(tx.withdrawals ? tx.withdrawals.map(withdrawal => withdrawal.address) : []),
+      ])
+    )
+  );
   const idMapping = await hashToIds({
     db,
     tx: dbTx,
     lockedTables: Array.from(derivationTables.values()),
-    hashes: allAddresses
+    hashes: allAddresses,
   });
 
   const getIdOrThrow = (hash: string): number => {
@@ -2350,54 +2110,32 @@ async function networkTxToDbTx(
   const shelleyTxs = [];
 
   for (const networkTx of newTxs) {
-    const { block, transaction } = networkTxHeaderToDb(
-      networkTx,
-      toAbsoluteSlotNumber,
-      TransactionSeed,
-      BlockSeed,
-    );
+    const { block, transaction } = networkTxHeaderToDb(networkTx, toAbsoluteSlotNumber, TransactionSeed, BlockSeed);
 
     // <TODO:PENDING_REMOVAL> Byron
     if (networkTx.type == null || networkTx.type === RemoteTransactionTypes.byron) {
       byronTxs.push({
         block,
         transaction,
-        ioGen: genByronIOGen(
-          networkTx,
-          getIdOrThrow,
-          network,
-          getAssetInfoOrThrow,
-          genNextTokenListId
-        ),
+        ioGen: genByronIOGen(networkTx, getIdOrThrow, network, getAssetInfoOrThrow, genNextTokenListId),
       });
     } else if (networkTx.type === RemoteTransactionTypes.shelley) {
-      const baseConfig = getCardanoHaskellBaseConfig(network)
-        .reduce((acc, next) => Object.assign(acc, next), {});
-      const certificates: $ReadOnlyArray<
-        number => (void | AddCertificateRequest)
-      > = networkTx.certificates == null
-        ? [(_txId) => undefined]
-        : await certificateToDb(
-          db, dbTx,
-          {
-            certificates: networkTx.certificates,
-            hashToIds,
-            findOwnAddress,
-            derivationTables,
-            network: Number.parseInt(baseConfig.ChainNetworkId, 10)
-          }
-        );
+      const baseConfig = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
+      const certificates: $ReadOnlyArray<(number) => void | AddCertificateRequest> =
+        networkTx.certificates == null
+          ? [_txId => undefined]
+          : await certificateToDb(db, dbTx, {
+              certificates: networkTx.certificates,
+              hashToIds,
+              findOwnAddress,
+              derivationTables,
+              network: Number.parseInt(baseConfig.ChainNetworkId, 10),
+            });
       shelleyTxs.push({
         block,
         transaction,
         certificates,
-        ioGen: genShelleyIOGen(
-          networkTx,
-          getIdOrThrow,
-          network,
-          getAssetInfoOrThrow,
-          genNextTokenListId
-        ),
+        ioGen: genShelleyIOGen(networkTx, getIdOrThrow, network, getAssetInfoOrThrow, genNextTokenListId),
       });
     } else {
       throw new Error(`${nameof(networkTxToDbTx)} Unhandled tx type ${networkTx.type ?? ''}`);
@@ -2425,20 +2163,14 @@ async function markAllInputs(
     TransactionSeed: number,
     networkId: number,
     ...
-  },
+  }
 ): Promise<void> {
-  const inputs = await deps.GetUtxoInputs.fromTxIds(
-    db, dbTx,
-    { ids: request.inputTxIds },
-  );
+  const inputs = await deps.GetUtxoInputs.fromTxIds(db, dbTx, { ids: request.inputTxIds });
   const digests = inputs.map(input => digestForHash(input.ParentTxHash, request.TransactionSeed));
-  const txMap = await deps.GetTransaction.byDigest(
-    db, dbTx,
-    {
-      digests,
-      txIds: request.allTxIds,
-    },
-  );
+  const txMap = await deps.GetTransaction.byDigest(db, dbTx, {
+    digests,
+    txIds: request.allTxIds,
+  });
   for (const input of inputs) {
     // get parent
     const parentTx = txMap.get(input.ParentTxHash);
@@ -2447,21 +2179,16 @@ async function markAllInputs(
       continue;
     }
     // note: this does nothing if the transaction output is not a UTXO output
-    await deps.MarkUtxo.markAs(
-      db, dbTx,
-      {
-        txId: parentTx.TransactionId,
-        outputIndex: input.IndexInParentTx,
-        isUnspent: request.isUnspent,
-        networkId: request.networkId,
-      }
-    );
+    await deps.MarkUtxo.markAs(db, dbTx, {
+      txId: parentTx.TransactionId,
+      outputIndex: input.IndexInParentTx,
+      isUnspent: request.isUnspent,
+      networkId: request.networkId,
+    });
   }
 }
 
-export function statusStringToCode(
-  state: RemoteTxState,
-): TxStatusCodesType {
+export function statusStringToCode(state: RemoteTxState): TxStatusCodesType {
   if (state === 'Successful') {
     return TxStatusCodes.IN_BLOCK;
   }
@@ -2478,25 +2205,21 @@ export function networkTxHeaderToDb(
   tx: RemoteTransaction,
   toAbsoluteSlotNumber: RelativeSlot => number,
   TransactionSeed: number,
-  BlockSeed: number,
+  BlockSeed: number
 ): {
   block: null | BlockInsert,
   transaction: (blockId: null | number) => TransactionInsert,
   ...
 } {
   const block =
-    tx.epoch != null &&
-    tx.slot != null &&
-    tx.block_hash != null &&
-    tx.time != null &&
-    tx.height != null
+    tx.epoch != null && tx.slot != null && tx.block_hash != null && tx.time != null && tx.height != null
       ? {
-        Hash: tx.block_hash,
-        BlockTime: new Date(tx.time),
-        Height: tx.height,
-        SlotNum: toAbsoluteSlotNumber({ epoch: tx.epoch, slot: tx.slot }),
-        Digest: digestForHash(tx.hash, BlockSeed),
-      }
+          Hash: tx.block_hash,
+          BlockTime: new Date(tx.time),
+          Height: tx.height,
+          SlotNum: toAbsoluteSlotNumber({ epoch: tx.epoch, slot: tx.slot }),
+          Digest: digestForHash(tx.hash, BlockSeed),
+        }
       : null;
   const digest = digestForHash(tx.hash, TransactionSeed);
 
@@ -2504,9 +2227,10 @@ export function networkTxHeaderToDb(
     Hash: tx.hash,
     Digest: digest,
     Ordinal: tx.tx_ordinal,
-    LastUpdateTime: block == null || tx.time == null
-      ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
-      : new Date(tx.time).getTime(),
+    LastUpdateTime:
+      block == null || tx.time == null
+        ? new Date(tx.last_update).getTime() // this is out best guess for txs not in a block
+        : new Date(tx.time).getTime(),
     Status: statusStringToCode(tx.tx_state),
     ErrorMessage: null, // TODO: add error message from backend if present
   };
@@ -2514,28 +2238,30 @@ export function networkTxHeaderToDb(
   if (tx.type == null || tx.type === RemoteTransactionTypes.byron) {
     return {
       block,
-      transaction: (blockId) => ({
-        Type: TransactionType.CardanoByron,
-        Extra: null,
-        BlockId: blockId,
-        ...baseTx,
-      }: CardanoByronTransactionInsert),
+      transaction: blockId =>
+        ({
+          Type: TransactionType.CardanoByron,
+          Extra: null,
+          BlockId: blockId,
+          ...baseTx,
+        }: CardanoByronTransactionInsert),
     };
   }
   if (tx.type === RemoteTransactionTypes.shelley) {
     return {
       block,
-      transaction: (blockId) => ({
-        Type: TransactionType.CardanoShelley,
-        Extra: {
-          Fee: tx.fee,
-          Metadata: tx.metadata,
-          // for backward compatiblity, if the field is not present, we take the tx as valid
-          IsValid: tx.valid_transaction ?? true,
-        },
-        BlockId: blockId,
-        ...baseTx,
-      }: CardanoShelleyTransactionInsert),
+      transaction: blockId =>
+        ({
+          Type: TransactionType.CardanoShelley,
+          Extra: {
+            Fee: tx.fee,
+            Metadata: tx.metadata,
+            // for backward compatiblity, if the field is not present, we take the tx as valid
+            IsValid: tx.valid_transaction ?? true,
+          },
+          BlockId: blockId,
+          ...baseTx,
+        }: CardanoShelleyTransactionInsert),
     };
   }
   throw new Error(`${nameof(networkTxHeaderToDb)} Unhandled tx type ${tx.type ?? ''}`);
@@ -2550,20 +2276,21 @@ async function certificateToDb(
     hashToIds: HashToIdsFunc,
     findOwnAddress: FindOwnAddressFunc,
     derivationTables: Map<number, string>,
-  |},
-): Promise<$ReadOnlyArray<number => AddCertificateRequest>> {
-  const findOwnAddress = async (addr: string) => await request.findOwnAddress({
-    db,
-    tx: dbTx,
-    lockedTables: Array.from(request.derivationTables.values()),
-    hash: addr
-  });
+  |}
+): Promise<$ReadOnlyArray<(number) => AddCertificateRequest>> {
+  const findOwnAddress = async (addr: string) =>
+    await request.findOwnAddress({
+      db,
+      tx: dbTx,
+      lockedTables: Array.from(request.derivationTables.values()),
+      hash: addr,
+    });
   const addressToId = async (bytes: string): Promise<number> => {
     const idMap = await request.hashToIds({
       db,
       tx: dbTx,
       lockedTables: Array.from(request.derivationTables.values()),
-      hashes: [bytes]
+      hashes: [bytes],
     });
     const id = idMap.get(bytes);
     if (id === undefined) {
@@ -2571,9 +2298,7 @@ async function certificateToDb(
     }
     return id;
   };
-  const tryGetKey = async (
-    stakeCredentialHex: string
-  ): Promise<void | number> => {
+  const tryGetKey = async (stakeCredentialHex: string): Promise<void | number> => {
     // an operator/owner key might belong to the wallet
     // however, these keys are plain ED25519 hashes
     // there there is no way of knowing what address it corresponds to
@@ -2583,14 +2308,8 @@ async function certificateToDb(
     // and in most cases, people generate these addresses through the CLI anyway
     {
       const rewardAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.Credential
-          .from_bytes(hexToBytes(stakeCredentialHex));
-        return bytesToHex(
-          Module.WalletV4.RewardAddress
-            .new(request.network, stakeCredential)
-            .to_address()
-            .to_bytes()
-        );
+        const stakeCredential = Module.WalletV4.Credential.from_bytes(hexToBytes(stakeCredentialHex));
+        return bytesToHex(Module.WalletV4.RewardAddress.new(request.network, stakeCredential).to_address().to_bytes());
       });
       const ownAddress = await findOwnAddress(rewardAddressHex);
       if (ownAddress != null) {
@@ -2599,12 +2318,8 @@ async function certificateToDb(
     }
     {
       const enterpriseAddressHex = RustModule.WasmScope(Module => {
-        const stakeCredential = Module.WalletV4.Credential
-          .from_bytes(hexToBytes(stakeCredentialHex));
-        return Module.WalletV4.EnterpriseAddress
-          .new(request.network, stakeCredential)
-          .to_address()
-          .to_hex();
+        const stakeCredential = Module.WalletV4.Credential.from_bytes(hexToBytes(stakeCredentialHex));
+        return Module.WalletV4.EnterpriseAddress.new(request.network, stakeCredential).to_address().to_hex();
       });
       const ownAddress = await findOwnAddress(enterpriseAddressHex);
       if (ownAddress != null) return ownAddress;
@@ -2624,10 +2339,8 @@ async function certificateToDb(
             )?.payment_cred();
             if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
             return [
-              bytesToHex(Module.WalletV4.RewardAddress
-                .new(request.network, stakeCredentials).to_address().to_bytes()),
-              bytesToHex(Module.WalletV4.StakeRegistration
-                .new(stakeCredentials).to_bytes()),
+              bytesToHex(Module.WalletV4.RewardAddress.new(request.network, stakeCredentials).to_address().to_bytes()),
+              bytesToHex(Module.WalletV4.StakeRegistration.new(stakeCredentials).to_bytes()),
             ];
           });
           const addressId = await addressToId(addressHex);
@@ -2638,11 +2351,13 @@ async function certificateToDb(
               Payload: certificateHex,
               TransactionId: txId,
             },
-            relatedAddresses: (certId: number) => [{
-              CertificateId: certId,
-              AddressId: addressId,
-              Relation: CertificateRelation.SIGNER,
-            }]
+            relatedAddresses: (certId: number) => [
+              {
+                CertificateId: certId,
+                AddressId: addressId,
+                Relation: CertificateRelation.SIGNER,
+              },
+            ],
           }));
         } catch (e) {
           console.warn('Failed to process certificate:', cert, e);
@@ -2656,10 +2371,8 @@ async function certificateToDb(
           )?.payment_cred();
           if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
           return [
-            bytesToHex(Module.WalletV4.RewardAddress
-              .new(request.network, stakeCredentials).to_address().to_bytes()),
-            bytesToHex(Module.WalletV4.StakeRegistration
-              .new(stakeCredentials).to_bytes()),
+            bytesToHex(Module.WalletV4.RewardAddress.new(request.network, stakeCredentials).to_address().to_bytes()),
+            bytesToHex(Module.WalletV4.StakeRegistration.new(stakeCredentials).to_bytes()),
           ];
         });
         const addressId = await addressToId(addressHex);
@@ -2670,11 +2383,13 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (certId: number) => [{
-            CertificateId: certId,
-            AddressId: addressId,
-            Relation: CertificateRelation.SIGNER,
-          }]
+          relatedAddresses: (certId: number) => [
+            {
+              CertificateId: certId,
+              AddressId: addressId,
+              Relation: CertificateRelation.SIGNER,
+            },
+          ],
         }));
         break;
       }
@@ -2689,31 +2404,30 @@ async function certificateToDb(
           );
           if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
           const stakeCredentials = rewardAddress.payment_cred();
-          const poolKeyHash = Module.WalletV4.Ed25519KeyHash
-            .from_bytes(hexToBytes(cert.poolKeyHash));
+          const poolKeyHash = Module.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(cert.poolKeyHash));
           return [
             bytesToHex(rewardAddress.to_address().to_bytes()),
-            bytesToHex(Module.WalletV4.StakeDelegation
-              .new(stakeCredentials, poolKeyHash).to_bytes()),
-            bytesToHex(Module.WalletV4.Credential
-              .from_keyhash(poolKeyHash).to_bytes()),
-          ]
+            bytesToHex(Module.WalletV4.StakeDelegation.new(stakeCredentials, poolKeyHash).to_bytes()),
+            bytesToHex(Module.WalletV4.Credential.from_keyhash(poolKeyHash).to_bytes()),
+          ];
         });
-        { // pool key
+        {
+          // pool key
           const poolKeyId = await tryGetKey(stakeCredentialHex);
           if (poolKeyId != null) {
             relatedAddressesInfo.push({
               AddressId: poolKeyId,
-              Relation: CertificateRelation.POOL_KEY
+              Relation: CertificateRelation.POOL_KEY,
             });
           }
         }
 
-        { // delegator
+        {
+          // delegator
           const addressId = await addressToId(addressHex);
           relatedAddressesInfo.push({
             AddressId: addressId,
-            Relation: CertificateRelation.SIGNER
+            Relation: CertificateRelation.SIGNER,
           });
         }
 
@@ -2724,10 +2438,11 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
+          relatedAddresses: (certId: number) =>
+            relatedAddressesInfo.map(info => ({
+              ...info,
+              CertificateId: certId,
+            })),
         }));
         break;
       }
@@ -2743,8 +2458,7 @@ async function certificateToDb(
           );
           if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} registration address not a reward address`);
 
-          const operatorKey = Module.WalletV4.Ed25519KeyHash
-            .from_bytes(hexToBytes(cert.poolParams.operator));
+          const operatorKey = Module.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(cert.poolParams.operator));
 
           // pool owners
           const owners = Module.WalletV4.Ed25519KeyHashes.new();
@@ -2752,8 +2466,7 @@ async function certificateToDb(
             const owner = cert.poolParams.poolOwners[j];
             const ownerKey = Module.WalletV4.Ed25519KeyHash.from_hex(owner);
             owners.add(ownerKey);
-            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.Credential
-              .from_keyhash(ownerKey).to_bytes());
+            const ownerStakeCredentialHex = bytesToHex(Module.WalletV4.Credential.from_keyhash(ownerKey).to_bytes());
             ownerStakeCredentialHexes.push(ownerStakeCredentialHex);
           }
 
@@ -2775,7 +2488,7 @@ async function certificateToDb(
               Module.WalletV4.UnitInterval.new(
                 // TODO: dummy data since db-sync doesn't support this yet
                 Module.WalletV4.BigNum.from_str('1'),
-                Module.WalletV4.BigNum.from_str('1'),
+                Module.WalletV4.BigNum.from_str('1')
                 // Module.WalletV4.BigNum.from_str(cert.poolParams.margin.numerator),
                 // Module.WalletV4.BigNum.from_str(cert.poolParams.margin.denominator),
               ),
@@ -2787,37 +2500,39 @@ async function certificateToDb(
           );
 
           return [
-            bytesToHex(Module.WalletV4.Credential
-              .from_keyhash(operatorKey).to_bytes()),
+            bytesToHex(Module.WalletV4.Credential.from_keyhash(operatorKey).to_bytes()),
             bytesToHex(certificate.to_bytes()),
           ];
         });
 
-        { // owners
+        {
+          // owners
           for (const ownerStakeCredentialHex of ownerStakeCredentialHexes) {
             const ownerId = await tryGetKey(ownerStakeCredentialHex);
             if (ownerId != null) {
               relatedAddressesInfo.push({
                 AddressId: ownerId,
-                Relation: CertificateRelation.OWNER
+                Relation: CertificateRelation.OWNER,
               });
             }
           }
         }
-        { // operator
+        {
+          // operator
           const operatorId = await tryGetKey(operatorStakeCredentialHex);
           if (operatorId != null) {
             relatedAddressesInfo.push({
               AddressId: operatorId,
-              Relation: CertificateRelation.OPERATOR
+              Relation: CertificateRelation.OPERATOR,
             });
           }
         }
-        { // reward
+        {
+          // reward
           const addressId = await addressToId(cert.poolParams.rewardAccount);
           relatedAddressesInfo.push({
             AddressId: addressId,
-            Relation: CertificateRelation.REWARD_ADDRESS
+            Relation: CertificateRelation.REWARD_ADDRESS,
           });
         }
 
@@ -2828,10 +2543,11 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
+          relatedAddresses: (certId: number) =>
+            relatedAddressesInfo.map(info => ({
+              ...info,
+              CertificateId: certId,
+            })),
         }));
         break;
       }
@@ -2841,13 +2557,10 @@ async function certificateToDb(
           Relation: CertificateRelationType,
         |}> = [];
         const [stakeCredentialHex, certificateHex] = RustModule.WasmScope(Module => {
-          const poolKeyHash = Module.WalletV4.Ed25519KeyHash
-            .from_bytes(hexToBytes(cert.poolKeyHash));
+          const poolKeyHash = Module.WalletV4.Ed25519KeyHash.from_bytes(hexToBytes(cert.poolKeyHash));
           return [
-            bytesToHex(Module.WalletV4.Credential
-              .from_keyhash(poolKeyHash).to_bytes()),
-            bytesToHex(Module.WalletV4.PoolRetirement
-              .new(poolKeyHash, cert.epoch).to_bytes()),
+            bytesToHex(Module.WalletV4.Credential.from_keyhash(poolKeyHash).to_bytes()),
+            bytesToHex(Module.WalletV4.PoolRetirement.new(poolKeyHash, cert.epoch).to_bytes()),
           ];
         });
 
@@ -2856,7 +2569,7 @@ async function certificateToDb(
           if (poolKeyId != null) {
             relatedAddressesInfo.push({
               AddressId: poolKeyId,
-              Relation: CertificateRelation.POOL_KEY
+              Relation: CertificateRelation.POOL_KEY,
             });
           }
         }
@@ -2868,24 +2581,24 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
+          relatedAddresses: (certId: number) =>
+            relatedAddressesInfo.map(info => ({
+              ...info,
+              CertificateId: certId,
+            })),
         }));
         break;
       }
       case ShelleyCertificateTypes.GenesisKeyDelegation: {
-        const certificateHex = RustModule.WasmScope(Module => bytesToHex(
-          Module.WalletV4.GenesisKeyDelegation.new(
-            Module.WalletV4.GenesisHash
-              .from_bytes(hexToBytes(cert.genesishash)),
-            Module.WalletV4.GenesisDelegateHash
-              .from_bytes(hexToBytes(cert.genesisDelegateHash)),
-            Module.WalletV4.VRFKeyHash
-              .from_bytes(hexToBytes(cert.vrfKeyHash)),
-          ).to_bytes()
-        ));
+        const certificateHex = RustModule.WasmScope(Module =>
+          bytesToHex(
+            Module.WalletV4.GenesisKeyDelegation.new(
+              Module.WalletV4.GenesisHash.from_bytes(hexToBytes(cert.genesishash)),
+              Module.WalletV4.GenesisDelegateHash.from_bytes(hexToBytes(cert.genesisDelegateHash)),
+              Module.WalletV4.VRFKeyHash.from_bytes(hexToBytes(cert.vrfKeyHash))
+            ).to_bytes()
+          )
+        );
 
         result.push((txId: number) => ({
           certificate: {
@@ -2894,7 +2607,7 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (_certId: number) => []
+          relatedAddresses: (_certId: number) => [],
         }));
         break;
       }
@@ -2912,18 +2625,10 @@ async function certificateToDb(
             if (rewardAddress == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
             const stakeCredentials = rewardAddress.payment_cred();
             if (stakeCredentials == null) throw new Error(`${nameof(certificateToDb)} not a valid reward account`);
-            certPot.insert(
-              stakeCredentials,
-              Module.WalletV4.Int.new(
-                Module.WalletV4.BigNum.from_str(cert.rewards[addressHex])
-              ),
-            );
+            certPot.insert(stakeCredentials, Module.WalletV4.Int.new(Module.WalletV4.BigNum.from_str(cert.rewards[addressHex])));
           }
           const certificate = Module.WalletV4.MoveInstantaneousRewardsCert.new(
-            Module.WalletV4.MoveInstantaneousReward.new_to_stake_creds(
-              cert.pot,
-              certPot,
-            )
+            Module.WalletV4.MoveInstantaneousReward.new_to_stake_creds(cert.pot, certPot)
           );
           return bytesToHex(certificate.to_bytes());
         });
@@ -2934,7 +2639,7 @@ async function certificateToDb(
             if (rewardAddrKey != null) {
               relatedAddressesInfo.push({
                 AddressId: rewardAddrKey,
-                Relation: CertificateRelation.REWARD_ADDRESS
+                Relation: CertificateRelation.REWARD_ADDRESS,
               });
             }
           }
@@ -2947,10 +2652,11 @@ async function certificateToDb(
             Payload: certificateHex,
             TransactionId: txId,
           },
-          relatedAddresses: (certId: number) => relatedAddressesInfo.map(info => ({
-            ...info,
-            CertificateId: certId,
-          }))
+          relatedAddresses: (certId: number) =>
+            relatedAddressesInfo.map(info => ({
+              ...info,
+              CertificateId: certId,
+            })),
         }));
         break;
       }
@@ -3074,7 +2780,8 @@ async function certificateToDb(
         }));
         break;
       }
-      default: throw new Error(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
+      default:
+        throw new Error(`${nameof(certificateToDb)} unknown cert kind ` + cert.kind);
     }
   }
   return result;
@@ -3103,7 +2810,7 @@ async function rawUpdateUtxos(
     GetAddress: Class<GetAddress>,
     GetDerivationSpecific: Class<GetDerivationSpecific>,
   |},
-  derivationTables: Map<number, string>,
+  derivationTables: Map<number, string>
 ): Promise<void> {
   const addresses = await rawGetAddressRowsForWallet(
     dbTx,
@@ -3113,7 +2820,7 @@ async function rawUpdateUtxos(
       GetDerivationSpecific: deps.GetDerivationSpecific,
     },
     { publicDeriver },
-    derivationTables,
+    derivationTables
   );
 
   const utxoStorageApi = publicDeriver.getUtxoStorageApi();
@@ -3132,34 +2839,27 @@ async function rawUpdateUtxos(
   await utxoService.syncUtxoState(requestAddresses);
 }
 
-export function toRequestAddresses(
-  addresses: {|
-    utxoAddresses: Array<$ReadOnly<AddressRow>>,
-    accountingAddresses: Array<$ReadOnly<AddressRow>>,
-  |}
-): Array<string> {
+export function toRequestAddresses(addresses: {|
+  utxoAddresses: Array<$ReadOnly<AddressRow>>,
+  accountingAddresses: Array<$ReadOnly<AddressRow>>,
+|}): Array<string> {
   return [
     // needs to send legacy addresses directly since they don't use the payment key method
-    ...addresses.utxoAddresses
-      .filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY)
-      .map(address => address.Hash),
+    ...addresses.utxoAddresses.filter(address => address.Type === CoreAddressTypes.CARDANO_LEGACY).map(address => address.Hash),
     // payment keys will fetch all addresses with the same payment key
     ...addresses.utxoAddresses
       .filter(address => address.Type === CoreAddressTypes.CARDANO_ENTERPRISE)
-      .reduce(
-        (list, next) => {
-          return RustModule.WasmScope(Module => {
-            const wasmAddr = Module.WalletV4.Address.from_hex(next.Hash);
-            const enterpriseWasm = Module.WalletV4.EnterpriseAddress.from_address(wasmAddr);
-            if (enterpriseWasm == null) return list;
-            const keyHash = enterpriseWasm.payment_cred().to_keyhash();
-            if (keyHash == null) return list;
-            list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
-            return list;
-          });
-        },
-        []
-      ),
+      .reduce((list, next) => {
+        return RustModule.WasmScope(Module => {
+          const wasmAddr = Module.WalletV4.Address.from_hex(next.Hash);
+          const enterpriseWasm = Module.WalletV4.EnterpriseAddress.from_address(wasmAddr);
+          if (enterpriseWasm == null) return list;
+          const keyHash = enterpriseWasm.payment_cred().to_keyhash();
+          if (keyHash == null) return list;
+          list.push(keyHash.to_bech32(Bech32Prefix.PAYMENT_KEY_HASH));
+          return list;
+        });
+      }, []),
     // note: sending account addresses is required
     // since for example, the staking key registration certificate doesn't need a witness
     // so a tx where no input/output belongs to you could register your staking key
