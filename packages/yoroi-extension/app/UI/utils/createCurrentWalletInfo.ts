@@ -81,7 +81,6 @@ const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
       }
       return item.info.IsNFT === false;
     })
-
     .map((token: any) => {
       const numberOfDecimals = token.info?.Metadata.numberOfDecimals ?? 0;
       const tokenName = truncateToken(getTokenStrictName(token.info).name ?? '-');
