@@ -190,6 +190,7 @@ export default class SwapStore extends Store<StoresMap> {
       });
     }
     const protocolParameters = await getProtocolParameters(wallet);
+
     return this.api.ada.createSimpleTx({
       publicDeriver: wallet,
       entries,
@@ -228,6 +229,75 @@ export default class SwapStore extends Store<StoresMap> {
       (res, [tx, slot]) => ({ ...res, [tx.toLowerCase()]: slotToTimestamp(slot) }),
       ({}: { [string]: Date })
     );
+  };
+
+  createRevampUnsignedSwapTx: ({|
+    wallet: WalletState,
+    swapState: any,
+    parsedCbor: any,
+    tokenInfos: Map<string, any>,
+  |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, tokenInfos }) => {
+    const sellTokenId = swapState.tokenInInput.tokenId;
+    const buyTokenId = swapState.tokenOutInput.tokenId;
+    const sell = {
+      tokenId: sellTokenId,
+      quantity: String(Number(swapState.tokenInInput.value * 1000000)), // assumes ADA for now
+    };
+
+    const buy = {
+      tokenId: buyTokenId,
+      quantity: String(swapState.createTx.totalOutputWithoutSlippage * 10 ** (tokenInfos.get(buyTokenId)?.decimals ?? 0)),
+    };
+
+    const ptFees = {
+      deposit: String(swapState.createTx.deposits * 10 ** 6), // assume ADA for now
+      batcher: String(swapState.createTx.batcherFee * 10 ** 6), // assume ADA for now
+    };
+
+    const feFees = {
+      tokenId: sell.tokenId,
+      quantity: String(swapState.createTx.frontendFee * 1000000), // assumes ADA
+    };
+
+    const metadata = createMetadata([
+      {
+        label: '674',
+        data: {
+          msg: splitStringInto64CharArray(
+            JSON.stringify({
+              provider: swapState.createTx.splits[0].protocol,
+              sellTokenId: sell.tokenId,
+              sellQuantity: sell.quantity,
+              buyTokenId: buy.tokenId,
+              buyQuantity: buy.quantity,
+            })
+          ),
+        },
+      },
+    ]);
+    const entries: Array<TxOutput> = [];
+
+    entries.push({
+      address: parsedCbor.outputs[0].address,
+      amount: createSwapOrderAmount({ wallet, sell, ptFees }),
+      dataHash: parsedCbor.auxiliary_data_hash,
+    });
+
+    if (swapState.createTx.frontendFee > 0) {
+      entries.push({
+        address: FRONTEND_FEE_ADDRESS_MAINNET,
+        amount: createSwapFeFeeAmount({ wallet, feFees }),
+      });
+    }
+
+    const protocolParameters = await getProtocolParameters(wallet);
+
+    return await this.api.ada.createSimpleTx({
+      publicDeriver: wallet,
+      entries,
+      metadata,
+      protocolParameters,
+    });
   };
 }
 

@@ -289,7 +289,11 @@ export default class DelegationStore extends Store<StoresMap> {
 
   createDelegationTransaction: string => Promise<any> = async poolId => {
     this.stores.delegation.poolInfoQuery.reset();
-    await this.stores.delegation.poolInfoQuery.execute([poolId]);
+    try {
+      await this.stores.delegation.poolInfoQuery.execute([poolId]);
+    } catch (error) {
+      Logger.error(`${nameof(DelegationStore)}::${nameof(this.createDelegationTransaction)} error: ` + stringifyError(error));
+    }
     return await this.stores.substores.ada.delegationTransaction.createTransaction({
       poolRequest: poolId,
       wallet: this.stores.wallets.selectedOrFail,

@@ -5,7 +5,7 @@ import { Chain } from '@yoroi/types';
 const supportedSizes = [64, 128, 256, 512, 720] as const;
 const getClosestSize = (size: number | string) => {
   const n = Number(size);
-  return supportedSizes.find(s => n <= s) ?? supportedSizes.at(-1);
+  return supportedSizes.find(s => n <= s) ?? supportedSizes[supportedSizes.length - 1];
 };
 
 type UsePortfolioImageProps = {
@@ -33,7 +33,7 @@ export const usePortfolioImage = ({
   const h = getClosestSize(height);
   const mimeType = mediaType.toLowerCase() === 'image/gif' ? 'image/gif' : 'image/webp';
 
-  const cacheKey = [`token-img`, `${policy}.${name}`, `${w}x${h}`, kind, contentFit];
+  const cacheKey = [`token-icon-img`, `${policy}.${name}`, `${w}x${h}`, kind, contentFit];
 
   const {
     data: uri,
