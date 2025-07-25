@@ -290,7 +290,7 @@ export default class SwapStore extends Store<StoresMap> {
 
     if (swapState.createTx.frontendFee > 0) {
       entries.push({
-        address: wallet.isTestnet ? FRONTEND_FEE_ADDRESS_PREPROD : FRONTEND_FEE_ADDRESS_MAINNET,
+        address: FRONTEND_FEE_ADDRESS_MAINNET,
         amount: createSwapFeFeeAmount({ wallet, feFees }),
       });
     }

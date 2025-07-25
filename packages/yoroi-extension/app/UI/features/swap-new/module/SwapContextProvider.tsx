@@ -194,9 +194,10 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     setIsCreateOrderLoading(true);
 
     const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
-
-    const quantityIn = Number(state.tokenInInput.value) * 10 ** (tokenInInfo?.decimals ?? 0);
-    const amountsIn = { [state.tokenInInput.tokenId]: `${quantityIn}` };
+    const quantityIn =
+      Number(state.tokenInInput.value) *
+      10 ** (state.tokenInInput.tokenId === '.' ? primaryTokenInfo.decimals : tokenInInfo?.decimals);
+    const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
     const inputs = await getInputs(amountsIn);
 
     swapManager.api

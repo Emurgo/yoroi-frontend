@@ -65,19 +65,6 @@ export const AssetSwap = () => {
           handleSubmitTransaction(passswordInput);
         },
         cborTx: swapForm.createTx.cbor,
-        // extraOverviewDetails: {
-        //   title: 'Cancel swap order details',
-        //   onClick: () => changeModalView({ modalView: 'extraDetails' }),
-        //   component: (
-        //     <SwapTxCancelInfo
-        //       formattedFeeValue={formattedFeeValue}
-        //       defaultTokenInfo={defaultTokenInfo}
-        //       order={order}
-        //       returnValues={totalCancelOutput}
-        //       swapPoolLabel={<SwapPoolLabel provider={order.provider} />}
-        //     />
-        //   ),
-        // },
       });
     }
   }, [swapForm.createTx]);
