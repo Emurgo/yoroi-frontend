@@ -65,7 +65,7 @@ export const AssetInfoInRow = React.memo(
   return (
     <RowWrapper direction="row" width="100%" justifyContent="space-between" alignItems="center" onClick={onAssetClick}>
       <Stack direction="row" alignItems="center" {...atoms.gap_lg}>
-        <TokenInfoIcon info={{ id: formatId(token.id), policy: token?.fingerprint, name: token?.name }} size="md" />
+        <TokenInfoIcon info={{ id: formatId(token?.id), policy: token?.fingerprint, name: token?.name }} size="md" />
         <Stack direction="column" justifyContent="space-between">
           <Typography variant="body1" color="ds.text_gray_medium">
             {token.name}
