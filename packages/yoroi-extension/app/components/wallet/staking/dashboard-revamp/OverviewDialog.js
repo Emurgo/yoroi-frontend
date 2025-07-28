@@ -31,13 +31,12 @@ const messages = defineMessages({
   },
   availableTotalRewardsHelper: {
     id: 'wallet.staking.availableTotalRewardsHelper',
-    defaultMessage:
-      '!!!If the Reward amount is different than expected, see possible reasons of that on our {faqLink}.',
+    defaultMessage: '!!!If the Reward amount is different than expected, see possible reasons of that on our {faqLink}.',
   },
   FAQPage: {
     id: 'wallet.staking.FAQPage',
-    defaultMessage: '!!!FAQ page'
-  }
+    defaultMessage: '!!!FAQ page',
+  },
 });
 
 type Props = {|
@@ -51,7 +50,7 @@ type Props = {|
 
 @observer
 export default class OverviewModal extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { withdrawRewards, onClose, totalRewards } = this.props;
@@ -73,7 +72,7 @@ export default class OverviewModal extends Component<Props> {
     const faqLink = (
       <Link
         href="https://emurgohelpdesk.zendesk.com"
-        target='_blank'
+        target="_blank"
         rel="noreferrer noopener"
         sx={{
           color: 'inherit',
@@ -82,7 +81,7 @@ export default class OverviewModal extends Component<Props> {
       >
         {intl.formatMessage(messages.FAQPage)}
       </Link>
-    )
+    );
     return (
       <Dialog
         title={this.context.formatMessage(globalMessages.overview)}
@@ -96,15 +95,10 @@ export default class OverviewModal extends Component<Props> {
         </Typography>
         <Box display="flex" alignItems="center" py="50px">
           <Box display="flex" alignItems="center" flex="1">
-            <Typography component="div" mr="6px">{intl.formatMessage(messages.availableTotalRewards)}</Typography>
-            <HelperTooltip
-              message={
-                <FormattedMessage
-                  {...messages.availableTotalRewardsHelper}
-                  values={{ faqLink }}
-                />
-              }
-            />
+            <Typography component="div" mr="6px">
+              {intl.formatMessage(messages.availableTotalRewards)}
+            </Typography>
+            <HelperTooltip message={<FormattedMessage {...messages.availableTotalRewardsHelper} values={{ faqLink }} />} />
           </Box>
 
           <Box flex="1">

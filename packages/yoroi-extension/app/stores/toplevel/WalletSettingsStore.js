@@ -1,7 +1,7 @@
 // @flow
 import { action, observable } from 'mobx';
 import type { Node } from 'react';
-import { find, } from 'lodash';
+import { find } from 'lodash';
 import Store from '../base/Store';
 import type { RemoveAllTransactionsFunc } from '../../api/common';
 import Request from '../lib/LocalizedRequest';
@@ -17,39 +17,36 @@ import { ROUTES } from '../../routes-config';
 
 export type WarningList = {|
   publicDeriverId: number,
-  dialogs: Array<void => Node>,
+  dialogs: Array<(void) => Node>,
 |};
 
 export default class WalletSettingsStore extends Store<StoresMap> {
+  @observable renameModelRequest: Request<(() => Promise<void>) => Promise<void>> = new Request(async func => {
+    await func();
+  });
 
-  @observable renameModelRequest: Request<(() => Promise<void>) => Promise<void>>
-    = new Request(async (func) => { await func(); });
+  @observable changeSigningKeyRequest: Request<(() => Promise<void>) => Promise<void>> = new Request(async func => {
+    await func();
+  });
 
-  @observable changeSigningKeyRequest: Request<(() => Promise<void>) => Promise<void>>
-    = new Request(async (func) => { await func(); });
+  @observable clearHistory: Request<RemoveAllTransactionsFunc> = new Request(removeAllTransactions);
 
-  @observable clearHistory: Request<RemoveAllTransactionsFunc>
-    = new Request(removeAllTransactions);
-
-  @observable removeWalletRequest: Request<typeof removeWalletFromDb>
-    = new Request<typeof removeWalletFromDb>(removeWalletFromDb);
+  @observable removeWalletRequest: Request<typeof removeWalletFromDb> = new Request<typeof removeWalletFromDb>(
+    removeWalletFromDb
+  );
 
   @observable walletFieldBeingEdited: string | null = null;
   @observable lastUpdatedWalletField: string | null = null;
 
   @observable walletWarnings: Array<WarningList> = [];
-  getWalletWarnings: number => WarningList = (
-    publicDeriverId
-  ) => {
+  getWalletWarnings: number => WarningList = publicDeriverId => {
     const foundRequest = find(this.walletWarnings, { publicDeriverId });
     if (foundRequest) return foundRequest;
 
     throw new Error(`${nameof(WalletSettingsStore)}::${nameof(this.getWalletWarnings)} no warning list found`);
-  }
+  };
 
-  @action startEditingWalletField: {| field: string |} => void = (
-    { field }
-  ) => {
+  @action startEditingWalletField: ({| field: string |}) => void = ({ field }) => {
     this.walletFieldBeingEdited = field;
   };
 
@@ -65,22 +62,16 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     this.walletFieldBeingEdited = null;
   };
 
-  @action updateSigningPassword: {|
-    publicDeriverId: number,
-    oldPassword: string,
-    newPassword: string
-  |} => Promise<void> = async (request) => {
-    await this.changeSigningKeyRequest.execute(async () => {
-      await changeSigningKeyPassword(request);
-    });
-    this.stores.uiDialogs.closeActiveDialog();
-    this.changeSigningKeyRequest.reset();
-  };
+  @action updateSigningPassword: ({| publicDeriverId: number, oldPassword: string, newPassword: string |}) => Promise<void> =
+    async request => {
+      await this.changeSigningKeyRequest.execute(async () => {
+        await changeSigningKeyPassword(request);
+      });
+      this.stores.uiDialogs.closeActiveDialog();
+      this.changeSigningKeyRequest.reset();
+    };
 
-   renameConceptualWallet: {|
-    conceptualWalletId: number,
-    newName: string
-  |} => Promise<void> = async (request) => {
+  renameConceptualWallet: ({| conceptualWalletId: number, newName: string |}) => Promise<void> = async request => {
     this.stores.wallets.onRenameSelectedWallet(request.newName);
 
     await this.renameModelRequest.execute(async () => {
@@ -88,9 +79,7 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     });
   };
 
-  @action resyncHistory: {|
-    publicDeriverId: number,
-  |} => Promise<void> = async (request) => {
+  @action resyncHistory: ({| publicDeriverId: number |}) => Promise<void> = async request => {
     this.clearHistory.reset();
 
     await this.clearHistory.execute({
@@ -100,13 +89,11 @@ export default class WalletSettingsStore extends Store<StoresMap> {
         await resyncWallet({
           publicDeriverId: request.publicDeriverId,
         });
-      }
+      },
     }).promise;
   };
 
-  @action removeWallet: {|
-    publicDeriverId: number,
-  |} => Promise<void> = async (request) => {
+  @action removeWallet: ({| publicDeriverId: number |}) => Promise<void> = async request => {
     this.removeWalletRequest.reset();
     const { stores } = this;
     stores.wallets.unsetActiveWallet(); // deselect before deleting
@@ -114,9 +101,7 @@ export default class WalletSettingsStore extends Store<StoresMap> {
     // ==================== Disconnect related dApps ====================
     await this.stores.connector.getConnectorWhitelist();
     const connectorWhitelist = stores.connector.currentConnectorWhitelist;
-    const connectedDapps = connectorWhitelist.filter(
-      dapp => dapp.publicDeriverId === request.publicDeriverId
-    );
+    const connectedDapps = connectorWhitelist.filter(dapp => dapp.publicDeriverId === request.publicDeriverId);
 
     for (const dapp of connectedDapps) {
       await this.stores.connector.removeWalletFromWhitelist1({

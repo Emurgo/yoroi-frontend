@@ -148,10 +148,7 @@ describe('dApp, CIP-95, signData', function () {
 
     it('Send and check cip95 sign data request, other wallet DRepID', async function () {
       const testMessage = 'test message sign data';
-      await mockedDApp.requestSigningDataCIP95(
-        'bb72e2c1796ba57bc7bdb19b7bb59d6c711f17fdda768aff91882078',
-        testMessage
-      );
+      await mockedDApp.requestSigningDataCIP95('bb72e2c1796ba57bc7bdb19b7bb59d6c711f17fdda768aff91882078', testMessage);
       const signDataResponse = await mockedDApp.getSigningDataCIP95Result();
       expect(signDataResponse.success).to.be.false;
       expect(signDataResponse.errMsg.code).to.equal(DataSignErrorCode.AddressNotPK);

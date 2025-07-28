@@ -25,9 +25,7 @@ export const compareExportedTxsAndDisplayedTxs = (exportedTxs, displayedTxs) => 
   for (const exportedTx of exportedTxs) {
     const foundTx = displayedTxs.filter(dTx => dTx.txHashId === exportedTx.txHashId);
     if (foundTx.length === 0) {
-      errorMessages.push(
-        `\n- The tx with txHasId "${exportedTx.txHashId}" wasn't found in the displayed txs`
-      );
+      errorMessages.push(`\n- The tx with txHasId "${exportedTx.txHashId}" wasn't found in the displayed txs`);
       continue;
     }
     const displayedTx = foundTx[0];

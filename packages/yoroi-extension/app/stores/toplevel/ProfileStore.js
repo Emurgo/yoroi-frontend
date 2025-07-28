@@ -148,11 +148,11 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
   );
 
   @observable getWalletsNavigationRequest: Request<(void) => Promise<?WalletsNavigation>> = new Request<
-    (void) => Promise<?WalletsNavigation>
+    (void) => Promise<?WalletsNavigation>,
   >(this.api.localStorage.getWalletsNavigation);
 
   @observable setWalletsNavigationRequest: Request<(WalletsNavigation) => Promise<void>> = new Request<
-    (WalletsNavigation) => Promise<void>
+    (WalletsNavigation) => Promise<void>,
   >(walletsNavigation => this.api.localStorage.setWalletsNavigation(walletsNavigation));
 
   setup(): void {

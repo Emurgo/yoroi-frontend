@@ -1,18 +1,8 @@
 // @flow
 
-import {
-  Mixin,
-} from 'mixwith';
-import type {
-  IKey,
-  IKeyDerivation,
-  KeyKindType,
-  IPrivate,
-  IPublic,
-} from './types';
-import {
-  KeyKind,
-} from './types';
+import { Mixin } from 'mixwith';
+import type { IKey, IKeyDerivation, KeyKindType, IPrivate, IPublic } from './types';
+import { KeyKind } from './types';
 import { RustModule } from '../rustLoader';
 import type { BIP32Interface } from 'bip32';
 import { fromBase58, fromPublicKey } from 'bip32';
@@ -41,10 +31,7 @@ export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
 
   verify(data: Buffer, signature: Buffer): boolean {
     return RustModule.WasmScope(Scope => {
-      return this.key.to_raw_key().verify(
-        data,
-        Scope.WalletV4.Ed25519Signature.from_bytes(signature)
-      );
+      return this.key.to_raw_key().verify(data, Scope.WalletV4.Ed25519Signature.from_bytes(signature));
     });
   }
 
@@ -58,9 +45,7 @@ export class BIP32ED25519PublicKey implements IKey, IKeyDerivation, IPublic {
     return new newKey(key);
   }
 }
-function annotateBIP32ED25519PublicKey(
-  clazz: Class<BIP32ED25519PublicKey>
-): Class<BIP32ED25519PublicKey> {
+function annotateBIP32ED25519PublicKey(clazz: Class<BIP32ED25519PublicKey>): Class<BIP32ED25519PublicKey> {
   return PublicKey(KeyDerivation(clazz));
 }
 
@@ -100,9 +85,7 @@ export class BIP32ED25519PrivateKey implements IKey, IKeyDerivation, IPrivate {
   }
 }
 
-function annotateBIP32ED25519PrivateKey(
-  clazz: Class<BIP32ED25519PrivateKey>
-): Class<BIP32ED25519PrivateKey> {
+function annotateBIP32ED25519PrivateKey(clazz: Class<BIP32ED25519PrivateKey>): Class<BIP32ED25519PrivateKey> {
   return PrivateKey(KeyDerivation(clazz));
 }
 
@@ -127,10 +110,7 @@ export class BIP32PublicKey implements IKey, IKeyDerivation, IPublic {
   }
 
   verify(data: Buffer, signature: Buffer): boolean {
-    return this.key.verify(
-      data,
-      signature
-    );
+    return this.key.verify(data, signature);
   }
 
   static fromBuffer(buff: Buffer): BIP32PublicKey {
@@ -143,9 +123,7 @@ export class BIP32PublicKey implements IKey, IKeyDerivation, IPublic {
     return new newKey(key);
   }
 }
-function annotateBIP32PublicKey(
-  clazz: Class<BIP32PublicKey>
-): Class<BIP32PublicKey> {
+function annotateBIP32PublicKey(clazz: Class<BIP32PublicKey>): Class<BIP32PublicKey> {
   return PublicKey(KeyDerivation(clazz));
 }
 
@@ -185,12 +163,9 @@ export class BIP32PrivateKey implements IKey, IKeyDerivation, IPrivate {
   }
 }
 
-function annotateBIP32PrivateKey(
-  clazz: Class<BIP32PrivateKey>
-): Class<BIP32PrivateKey> {
+function annotateBIP32PrivateKey(clazz: Class<BIP32PrivateKey>): Class<BIP32PrivateKey> {
   return PrivateKey(KeyDerivation(clazz));
 }
-
 
 interface Empty {}
 
@@ -199,19 +174,9 @@ interface Empty {}
 // =================
 
 type KeyDerivationDependencies = IKeyDerivation;
-const KeyDerivationMixin = (
-  superclass: Class<KeyDerivationDependencies>,
-) => (class KeyDerivation extends superclass {
-});
-const KeyDerivation: * = Mixin<
-  KeyDerivationDependencies,
-  Empty,
->(KeyDerivationMixin);
-export function asKeyDerivationInstance<
-  T: Empty
->(
-  obj: T
-): void | (IKeyDerivation & KeyDerivationDependencies & T) {
+const KeyDerivationMixin = (superclass: Class<KeyDerivationDependencies>) => class KeyDerivation extends superclass {};
+const KeyDerivation: * = Mixin<KeyDerivationDependencies, Empty>(KeyDerivationMixin);
+export function asKeyDerivationInstance<T: Empty>(obj: T): void | (IKeyDerivation & KeyDerivationDependencies & T) {
   if (obj instanceof KeyDerivation) {
     return obj;
   }
@@ -223,19 +188,9 @@ export function asKeyDerivationInstance<
 // ==============
 
 type PrivateKeyDependencies = IPrivate;
-const PrivateKeyMixin = (
-  superclass: Class<PrivateKeyDependencies>,
-) => (class PrivateKey extends superclass {
-});
-const PrivateKey: * = Mixin<
-  PrivateKeyDependencies,
-  Empty,
->(PrivateKeyMixin);
-export function asPrivateKeyInstance<
-  T: Empty
->(
-  obj: T
-): void | (IPrivate & PrivateKeyDependencies & T) {
+const PrivateKeyMixin = (superclass: Class<PrivateKeyDependencies>) => class PrivateKey extends superclass {};
+const PrivateKey: * = Mixin<PrivateKeyDependencies, Empty>(PrivateKeyMixin);
+export function asPrivateKeyInstance<T: Empty>(obj: T): void | (IPrivate & PrivateKeyDependencies & T) {
   if (obj instanceof PrivateKey) {
     return obj;
   }
@@ -247,19 +202,9 @@ export function asPrivateKeyInstance<
 // =============
 
 type PublicKeyDependencies = IPublic;
-const PublicKeyMixin = (
-  superclass: Class<PublicKeyDependencies>,
-) => (class PublicKey extends superclass {
-});
-const PublicKey: * = Mixin<
-  PublicKeyDependencies,
-  Empty,
->(PublicKeyMixin);
-export function asPublicKeyInstance<
-  T: Empty
->(
-  obj: T
-): void | (IPublic & PublicKeyDependencies & T) {
+const PublicKeyMixin = (superclass: Class<PublicKeyDependencies>) => class PublicKey extends superclass {};
+const PublicKey: * = Mixin<PublicKeyDependencies, Empty>(PublicKeyMixin);
+export function asPublicKeyInstance<T: Empty>(obj: T): void | (IPublic & PublicKeyDependencies & T) {
   if (obj instanceof PublicKey) {
     return obj;
   }

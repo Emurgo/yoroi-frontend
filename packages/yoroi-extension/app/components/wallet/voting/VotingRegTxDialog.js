@@ -29,7 +29,7 @@ import { truncateToken } from '../../../utils/formatters';
 import { MultiToken } from '../../../api/common/lib/MultiToken';
 import type { WalletType, StepsList } from './types';
 import Stepper from '../../common/stepper/Stepper';
-import { Typography } from '@mui/material';
+import { Box, Typography, styled } from '@mui/material';
 
 const messages = defineMessages({
   line1: {
@@ -45,6 +45,15 @@ const messages = defineMessages({
     defaultMessage: '!!!After connecting your Ledger device to your computer’s USB port, press the Register button.',
   },
 });
+
+const GradientInfoBox = styled(Box)(({ theme }) => ({
+  padding: '16px',
+  paddingLeft: '24px',
+  marginTop: '16px',
+  marginBottom: '16px',
+  background: theme.palette.ds.bg_gradient_1,
+  borderRadius: '8px',
+}));
 
 type Props = {|
   +stepsList: StepsList,
@@ -64,7 +73,7 @@ type Props = {|
 export default class VotingRegTxDialog extends Component<Props> {
   @observable spendingPasswordForm: void | ReactToolboxMobxForm;
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   @action
   setSpendingPasswordForm(form: ReactToolboxMobxForm) {
     this.spendingPasswordForm = form;
@@ -109,18 +118,18 @@ export default class VotingRegTxDialog extends Component<Props> {
     }
 
     return (
-      <div className={styles.infoBlock}>
-        <ul>
-          <li key="1">
-            <span>{intl.formatMessage(infoLine1)}</span>
-            <br />
-          </li>
-          <li key="2">
-            <span>{intl.formatMessage(infoLine2)}</span>
-            <br />
-          </li>
-        </ul>
-      </div>
+      <GradientInfoBox>
+        <Typography component="div" textAlign="center" variant="body1" color="ds.text_gray_medium">
+          <ul style={{ listStyle: 'disc', padding: 0, margin: 0, textAlign: 'left' }}>
+            <li style={{ marginLeft: '18px', marginBottom: '8px' }}>
+              <span>{intl.formatMessage(infoLine1)}</span>
+            </li>
+            <li style={{ marginLeft: '18px', marginBottom: '8px' }}>
+              <span>{intl.formatMessage(infoLine2)}</span>
+            </li>
+          </ul>
+        </Typography>
+      </GradientInfoBox>
     );
   }
 
@@ -129,10 +138,7 @@ export default class VotingRegTxDialog extends Component<Props> {
 
     const spendingPasswordForm =
       this.props.walletType === 'mnemonic' ? (
-        <SpendingPasswordInput
-          setForm={form => this.setSpendingPasswordForm(form)}
-          isSubmitting={this.props.isSubmitting}
-        />
+        <SpendingPasswordInput setForm={form => this.setSpendingPasswordForm(form)} isSubmitting={this.props.isSubmitting} />
       ) : undefined; // hardware wallet
 
     const staleTxWarning = (
@@ -173,7 +179,7 @@ export default class VotingRegTxDialog extends Component<Props> {
         closeButton={<DialogCloseButton />}
         backButton={<DialogBackButton onBack={this.props.goBack} />}
       >
-        {(
+        {
           <Stepper
             currentStep={String(this.props.progressInfo.currentStep)}
             steps={this.props.stepsList.map(step => ({
@@ -182,7 +188,7 @@ export default class VotingRegTxDialog extends Component<Props> {
             }))}
             setCurrentStep={() => {}}
           />
-        )}
+        }
         {this.props.staleTx && staleTxWarning}
 
         {this.renderInfoBlock()}

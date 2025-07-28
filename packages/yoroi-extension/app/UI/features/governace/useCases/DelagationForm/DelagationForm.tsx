@@ -14,7 +14,7 @@ import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
-import { maybe } from '../../../../../coreUtils'
+import { maybe } from '../../../../../coreUtils';
 import { truncateToken } from '../../../../../utils/formatters';
 import { getDefaultAssetByWallet } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 
@@ -153,7 +153,7 @@ export const DelagationForm = () => {
               <TransactionDetails>
                 {governanceVote.kind === 'delegate' && (
                   <OperationInfo
-                    label={(
+                    label={
                       <>
                         <Typography variant="body1" color="ds.text_gray_medium">
                           Delegate voting to DRep (CIP 129): {normalizedDrep}
@@ -163,30 +163,22 @@ export const DelagationForm = () => {
                             Specified as: {specifiedDrep}
                           </Typography>
                         ) : null}
-                        {isHardwareWallet && (preCip129Drep !== specifiedDrep) ? (
+                        {isHardwareWallet && preCip129Drep !== specifiedDrep ? (
                           <Typography variant="body1" color="ds.text_gray_medium">
                             On a Hardware device this DRep ID might be displayed in old format: {preCip129Drep}
                           </Typography>
                         ) : null}
                       </>
-                    )}
+                    }
                     fee={txFee}
                     defaultTokenName={defaultTokenName}
                   />
                 )}
                 {governanceVote.kind === DREP_ALWAYS_ABSTAIN && (
-                  <OperationInfo
-                    label={strings.selectAbstein}
-                    fee={txFee}
-                    defaultTokenName={defaultTokenName}
-                  />
+                  <OperationInfo label={strings.selectAbstein} fee={txFee} defaultTokenName={defaultTokenName} />
                 )}
                 {governanceVote.kind === DREP_ALWAYS_NO_CONFIDENCE && (
-                  <OperationInfo
-                    label={strings.selectNoConfidence}
-                    fee={txFee}
-                    defaultTokenName={defaultTokenName}
-                  />
+                  <OperationInfo label={strings.selectNoConfidence} fee={txFee} defaultTokenName={defaultTokenName} />
                 )}
               </TransactionDetails>
             }
@@ -238,7 +230,9 @@ const OperationInfo = ({ label, fee, defaultTokenName }: OperationInfoProps) => 
         <Typography variant="body1" color="ds.text_gray_medium">
           {label}
         </Typography>
-      ) : label}
+      ) : (
+        label
+      )}
       <Stack direction="row" justifyContent="space-between">
         <Typography variant="body1" fontWeight="500" color="ds.text_gray_normal">
           Transaction fee

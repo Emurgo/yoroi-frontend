@@ -8,11 +8,8 @@ import type { IFetcher as IFetcherCommon } from '../../../app/api/common/lib/sta
 import { RemoteFetcher as RemoteFetcherCommon } from '../../../app/api/common/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as BatchedFetcherCommon } from '../../../app/api/common/lib/state-fetch/batchedFetcher';
 
-async function createFetcher(
-  fetcherType: Function,
-  localStorageApi: LocalStorageApi,
-): * {
-  const locale = await localStorageApi.getUserLocale() ?? 'en-US';
+async function createFetcher(fetcherType: Function, localStorageApi: LocalStorageApi): * {
+  const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
   return new fetcherType(
     () => environment.getVersion(),
     () => locale,
@@ -24,29 +21,29 @@ async function createFetcher(
         return 'chrome';
       }
       return '-';
-    },
-  )
+    }
+  );
 }
 
-export async function getCardanoStateFetcher(
-  localStorageApi: LocalStorageApi = new LocalStorageApi(),
-): Promise<IFetcher> {
+export async function getCardanoStateFetcher(localStorageApi: LocalStorageApi = new LocalStorageApi()): Promise<IFetcher> {
   return new BatchedFetcher(await createFetcher(RemoteFetcher, localStorageApi));
 }
 
 export async function getCommonStateFetcher(): Promise<IFetcherCommon> {
-  const locale = await (new LocalStorageApi()).getUserLocale() ?? 'en-US';
-  return new BatchedFetcherCommon(new RemoteFetcherCommon(
-    () => environment.getVersion(),
-    () => locale,
-    () => {
-      if (environment.isFirefox()) {
-        return 'firefox';
+  const locale = (await new LocalStorageApi().getUserLocale()) ?? 'en-US';
+  return new BatchedFetcherCommon(
+    new RemoteFetcherCommon(
+      () => environment.getVersion(),
+      () => locale,
+      () => {
+        if (environment.isFirefox()) {
+          return 'firefox';
+        }
+        if (environment.isChrome()) {
+          return 'chrome';
+        }
+        return '-';
       }
-      if (environment.isChrome()) {
-        return 'chrome';
-      }
-      return '-';
-    },
-  ))
+    )
+  );
 }

@@ -115,26 +115,10 @@ export default class NftDetails extends WalletCommonBase {
    */
   async isDisplayed() {
     this.logger.info(`NftDetails::isDisplayed is called`);
-    const backBtnPromise = this.customWaitIsPresented(
-      this.backNFTsGalleryBtnLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const nextBtnPromise = this.customWaitIsPresented(
-      this.nextNftBtnLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const nftNamePromise = this.customWaitIsPresented(
-      this.nftNameLocator,
-      fiveSeconds,
-      quarterSecond
-    );
-    const [backBtnState, nextBtnState, nftNameState] = await Promise.all([
-      backBtnPromise,
-      nextBtnPromise,
-      nftNamePromise,
-    ]);
+    const backBtnPromise = this.customWaitIsPresented(this.backNFTsGalleryBtnLocator, fiveSeconds, quarterSecond);
+    const nextBtnPromise = this.customWaitIsPresented(this.nextNftBtnLocator, fiveSeconds, quarterSecond);
+    const nftNamePromise = this.customWaitIsPresented(this.nftNameLocator, fiveSeconds, quarterSecond);
+    const [backBtnState, nextBtnState, nftNameState] = await Promise.all([backBtnPromise, nextBtnPromise, nftNamePromise]);
 
     return backBtnState && nextBtnState && nftNameState;
   }

@@ -19,7 +19,7 @@ export default class YoroiTransferErrorPage extends Component<Props> {
     error: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { error, onCancel } = this.props;

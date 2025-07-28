@@ -1,18 +1,18 @@
 .wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .title {
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 22px;
-    margin-bottom: 16px;
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 16px;
 }
 
 .inner {
-    flex: 1;
-    border-radius: 6px;
-    box-shadow: 0 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
+  flex: 1;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px 2px var(--yoroi-dashboard-card-shadow-color);
 }

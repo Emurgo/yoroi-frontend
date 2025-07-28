@@ -74,14 +74,14 @@ const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
 
 @observer
 export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isBannerVisible: false,
     isSurveyVisible: false,
   };
 
   UNSAFE_componentWillMount: void => Promise<void> = async () => {
-    if (!await surveyDismissedFlag.get()) {
+    if (!(await surveyDismissedFlag.get())) {
       this.setState({ isSurveyVisible: true });
       return;
     }
@@ -95,12 +95,9 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
   surveyClose: () => void = () => {
     surveyDismissedFlag.set(true);
     this.setState({ isSurveyVisible: false });
-  }
+  };
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: MultiToken,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| shouldHideBalance: boolean, amount: MultiToken |}) => Node = request => {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
@@ -126,10 +123,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     );
   };
 
-  getWalletBalance: ({|
-    shouldHideBalance: boolean,
-    amount: MultiToken,
-  |}) => Node = request => {
+  getWalletBalance: ({| shouldHideBalance: boolean, amount: MultiToken |}) => Node = request => {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
@@ -218,7 +212,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     const onClose = () => {
       this.setState({ isBannerVisible: false });
       localStorage.setBringBannerClosed('true');
-    }
+    };
 
     // <TODO:UNFLAG_LATER>
     if (!environment.isDev()) return null;
@@ -245,12 +239,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     if (true) return null;
 
     // noinspection UnreachableCodeJS
-    return (
-      <UsdaBanner
-        onClose={() => {}}
-        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
-      />
-    );
+    return <UsdaBanner onClose={() => {}} onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })} />;
   }
 
   render(): Node {
@@ -316,11 +305,11 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        {!this.state.isSurveyVisible && (<DrepPromotionBanner stores={stores} intl={intl} />)}
+        {!this.state.isSurveyVisible && <DrepPromotionBanner stores={stores} intl={intl} />}
         <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
           {this.renderBringBanner()}
           {this.renderUsdaBanner()}
-          {this.state.isSurveyVisible && (<SurveyBanner onClose={this.surveyClose} />)}
+          {this.state.isSurveyVisible && <SurveyBanner onClose={this.surveyClose} />}
         </Box>
         {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
         {!shouldShowEmptyBanner && !isLoadingTransactions && (

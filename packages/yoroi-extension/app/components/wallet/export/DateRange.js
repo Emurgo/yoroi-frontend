@@ -54,7 +54,7 @@ const OpenPickerIcon = () => (
 
 @observer
 export default class ExportTransactionDialog extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { date, setStartDate, setEndDate, initialId } = this.props;

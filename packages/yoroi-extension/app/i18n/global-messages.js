@@ -206,7 +206,8 @@ const globalMessages: * = defineMessages({
   },
   governanceBannerText: {
     id: 'governance.banner.text',
-    defaultMessage: '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.',
+    defaultMessage:
+      '!!!Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.',
   },
   publicKeyExplanation: {
     id: 'global.publicKey.explanation',
@@ -1041,8 +1042,7 @@ const globalMessages: * = defineMessages({
   },
   tosAgreement: {
     id: 'profile.languageSelect.tosAgreement',
-    defaultMessage:
-      '!!!I agree with <tosLink>Terms of Service Agreement</tosLink> and <privacyLink>Privacy Notice</privacyLink>',
+    defaultMessage: '!!!I agree with <tosLink>Terms of Service Agreement</tosLink> and <privacyLink>Privacy Notice</privacyLink>',
   },
   poolNotGenerating: {
     id: 'wallet.transitionDialog.poolNotGenerating',
@@ -1071,10 +1071,6 @@ const globalMessages: * = defineMessages({
   preprod: {
     id: 'networkName.preprod',
     defaultMessage: '!!!Preprod',
-  },
-  preview: {
-    id: 'networkName.preview',
-    defaultMessage: '!!!Preview',
   },
   goToFaucetButton: {
     id: 'wallet.emptyWalletMessage.goToFaucet',

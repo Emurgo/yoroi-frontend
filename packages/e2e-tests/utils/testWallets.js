@@ -6,8 +6,7 @@ export const testWallet1 = Object.freeze({
   plate: 'JPAX-4675',
   mnemonic: process.env.FIRST_SMOKE_TEST_WALLET,
   balance: 8.828823,
-  receiveAddress:
-    'addr_test1qp8tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsc4l6ve',
+  receiveAddress: 'addr_test1qp8tt4wxnt32h3fn63xkzh4q7ah57v330v40mc2e9ale5jp4ytssp23mthvgruacyluaa0f868fffgnch75082k8awhsc4l6ve',
 });
 export const testWallet1Mainnet = Object.freeze({
   name: 'TestWallet1',
@@ -40,7 +39,8 @@ export const testWalletTrezor = Object.freeze({
 export const testWalletLedger = Object.freeze({
   name: 'LedgerEmul',
   plate: 'XDPH-3069',
-  mnemonic: 'canal program butter sell isolate say doll document miss burger join owner fabric behave stomach theory sing math school force inhale vast sunset trouble',
+  mnemonic:
+    'canal program butter sell isolate say doll document miss burger join owner fabric behave stomach theory sing math school force inhale vast sunset trouble',
   balance: 0,
 });
 export const testWalletNFTs = Object.freeze({
@@ -48,7 +48,7 @@ export const testWalletNFTs = Object.freeze({
   plate: 'DCDT-7109',
   mnemonic: 'eternal logic shrimp direct weasel heart relief tonight else expose lift lava barrel frame multiply',
   balance: 3.24112,
-})
+});
 
 export const getSpendableWallet = () => {
   const browserName = getTargetBrowser();

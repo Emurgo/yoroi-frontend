@@ -147,7 +147,7 @@ function SummaryCard({
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIconWrapper>
-             <StakingIcon />
+            <StakingIcon />
           </StakingIconWrapper>
           <InfoDetails>
             <Typography component="div" variant="caption1" color="grayscale.600" sx={{ textTransform: 'uppercase' }}>

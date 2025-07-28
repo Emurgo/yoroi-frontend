@@ -24,8 +24,8 @@ export const priceChange = (open: number | string | undefined, close: number | s
   const variantPnl: PriceChangeResult['variantPnl'] = change.isZero()
     ? 'neutral'
     : change.isGreaterThan(0)
-    ? 'success'
-    : 'danger';
+      ? 'success'
+      : 'danger';
 
   return {
     changeValue: change.toNumber(),

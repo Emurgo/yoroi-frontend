@@ -45,7 +45,7 @@ export const BaseBanner = ({
           icon={Icons.CloseCircleIcon}
           color="ds.el_gray_max"
           borderColor="ds.el_gray_max"
-          iconProps={{fill: theme.palette.ds.el_gray_max}}
+          iconProps={{ fill: theme.palette.ds.el_gray_max }}
           asButton
         />
       </Stack>

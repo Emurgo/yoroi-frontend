@@ -50,6 +50,7 @@ export function genCSP(request: {|
   connectSrc.push('https://api-us.dexhunterv3.app/');
   connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
   connectSrc.push('https://*.yoroiwallet.com');
+  connectSrc.push('https://api-us.dexhunterv3.app/swap/');
 
   // Bringweb3
   frameSrc.push('https://*.bringweb3.io/');

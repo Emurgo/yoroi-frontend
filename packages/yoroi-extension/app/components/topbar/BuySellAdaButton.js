@@ -19,13 +19,11 @@ const messages = defineMessages({
   },
 });
 
-const buttonText = (environment.isDev() || environment.isNightly()) ?
-  globalMessages.buySellAda :
-  globalMessages.buyAda;
+const buttonText = environment.isDev() || environment.isNightly() ? globalMessages.buySellAda : globalMessages.buyAda;
 
 @observer
 export default class BuySellAdaButton extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     return (
@@ -33,7 +31,7 @@ export default class BuySellAdaButton extends Component<Props> {
         sx={{
           '&.MuiButton-sizeMedium': {
             padding: '13px 24px',
-            height: 'unset'
+            height: 'unset',
           },
           lineHeight: '18px',
         }}

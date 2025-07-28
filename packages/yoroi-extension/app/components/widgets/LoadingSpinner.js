@@ -15,7 +15,7 @@ type Props = {|
 
 @observer
 export default class LoadingSpinner extends Component<Props> {
-  static defaultProps: {|light: boolean, large: boolean, small: boolean, color: number, id: string|} = {
+  static defaultProps: {| light: boolean, large: boolean, small: boolean, color: number, id: string |} = {
     small: false,
     large: false,
     light: false,
@@ -43,20 +43,18 @@ export default class LoadingSpinner extends Component<Props> {
         break;
     }
 
-    const sizeIndex = 1
-      - (this.props.small ? 1 : 0)
-      + (this.props.large ? 1 : 0);
-    const sizeClass =
-      ([styles.smallSize, styles.standardSize, styles.largeSize])
-        [sizeIndex];
-    const kindClass = colorIsUsed ? colorStyles : this.props.light === true
-      ? styles.light
-      : styles.dark;
-    const componentClasses = classnames([
-      styles.component,
-      kindClass,
-      sizeClass,
-    ]);
-    return <div className={componentClasses} id={this.props.id && this.props.id + '-loadingSpinner-component'} ref={(div) => { this.root = div; }} />;
+    const sizeIndex = 1 - (this.props.small ? 1 : 0) + (this.props.large ? 1 : 0);
+    const sizeClass = [styles.smallSize, styles.standardSize, styles.largeSize][sizeIndex];
+    const kindClass = colorIsUsed ? colorStyles : this.props.light === true ? styles.light : styles.dark;
+    const componentClasses = classnames([styles.component, kindClass, sizeClass]);
+    return (
+      <div
+        className={componentClasses}
+        id={this.props.id && this.props.id + '-loadingSpinner-component'}
+        ref={div => {
+          this.root = div;
+        }}
+      />
+    );
   }
 }

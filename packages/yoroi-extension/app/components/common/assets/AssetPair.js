@@ -17,7 +17,7 @@ type Props = {|
 function tokenImgSrc(token, defaultTokenInfo): string {
   return token.ticker === defaultTokenInfo.ticker
     ? adaTokenImage
-    : urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage;
+    : (urlResolveForIpfsAndCorsproxy(token.image) ?? defaultTokenImage);
 }
 
 export const tokenImg = (token: any, defaultTokenInfo: any, width?: any, height?: any): React$Node => {
