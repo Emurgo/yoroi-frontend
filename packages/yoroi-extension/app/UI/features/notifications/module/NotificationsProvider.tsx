@@ -70,6 +70,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   const strings = useStrings();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isNotificationCenterOpen, setNotificationCenterOpen] = React.useState<boolean>(false);
 
   const getSelectedWalletId =
     () => walletsStore.selected?.publicDeriverId;
@@ -239,11 +240,12 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     () => ({
       showRandomToast,
       createNotification,
+      setNotificationCenterOpen,
     }),
     []
   );
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  return <Context.Provider value={{ isNotificationCenterOpen, ...value}}>{children}</Context.Provider>;
 }
 
 export const useNotifications = () => {

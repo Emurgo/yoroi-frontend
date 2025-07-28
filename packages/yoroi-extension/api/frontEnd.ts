@@ -1,8 +1,9 @@
+import { useState, useEffect } from 'react';
 import type Notifications from './notifications';
 import { getValue, listen, makeClientAccessor, cache } from './objectModel';
 
 
-const { modelAccessor: notificationModel, onServerEvent } = makeClientAccessor<Notifications>((clientRequest) => {
+const { modelAccessor: notificationModel, onServerEvent } = makeClientAccessor<typeof Notifications>((clientRequest) => {
   const msg = {
     type: 'yoroi-ng-client-request',
     clientRequest,
@@ -24,25 +25,23 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-const cachedNotifications = cache(notificationModel);
+export const cachedNotifications = cache(notificationModel);
 
-function use<T>(value: T): { loaded: false } | { loaded: true, value: T} {
-  const [retVal, setRetVal] = useState({ loaded: false });
+type RetT<T> = { loaded: false } | { loaded: true, value: T}
+export function use<T>(value: T extends (...args: any) => any ? never : T): RetT<T> {
+  const [retVal, setRetVal] = useState<RetT<T>>({ loaded: false });
 
   useEffect(() => {
     getValue(value).then((v) => {
       setRetVal({ value: v, loaded: true });
     });
     return listen(value, (event) => {
-      getValue(value).then((v) => {
-        setRetVal({ value: v, loaded: true });
-      });
+      if (event.type === 'change') {
+        getValue(value).then((v) => {
+          setRetVal({ value: v, loaded: true });
+        });
+      }
     });
   }, []);
   return retVal;
 }
-
-export {
-  use,
-  notifications: cachedNotifications,
-};
