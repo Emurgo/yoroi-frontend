@@ -7,7 +7,6 @@ import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box, Typography, Checkbox, FormControlLabel, } from '@mui/material';
-import TextField from '../../components/common/TextField';
 import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
 import BigNumber from 'bignumber.js';
 import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
@@ -15,9 +14,11 @@ import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { LoadingButton } from '@mui/lab';
-import Dialog from '../../components/widgets/Dialog';
-import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { forceNonNull } from '../../coreUtils.js';
+import Zero from '../features/airdrop/useCases/Zero';
+import Terms from '../features/airdrop/useCases/Terms';
+import ClaimDialog from '../features/airdrop/useCases/ClaimDialog';
+import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
 
 const messages = defineMessages({
   size: {
@@ -27,10 +28,6 @@ const messages = defineMessages({
   destinationAddress: {
     id: 'airdrop.destinationAddress',
     defaultMessage: '!!!Your destination address',
-  },
-  terms: {
-    id: 'airdrop.terms',
-    defaultMessage: '!!!Terms & Conditions',
   },
   agree: {
     id: 'airdrop.agree',
@@ -59,26 +56,6 @@ const messages = defineMessages({
   claimDialogTitle: {
     id: 'airdrop.claimDialogTitle',
     defaultMessage: '!!!sign message',
-  },
-  ledgerClaimDialogTitle: {
-    id: 'airdrop.ledgerClaimDialogTitle',
-    defaultMessage: '!!!sign message { index } of { total }',
-  },
-  wrongPassword: {
-    id: 'airdrop.wrongPassword',
-    defaultMessage: '!!!Wrong password',
-  },
-  mnemonicClaimDialogText: {
-    id: 'airdrop.mnemonicClaimDialogText',
-    defaultMessage: '!!!Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.',
-  },
-  ledgerClaimDialogText: {
-    id: 'airdrop.ledgerClaimDialogText',
-    defaultMessage: '!!!Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address',
-  },
-  messageLabel: {
-    id: 'airdrop.messageLabel',
-    defaultMessage: '!!!Message',
   },
 });
 
@@ -182,36 +159,7 @@ export default function AirdropPage({ stores }: Props) {
   if (!alloc) {
     content = (<LoadingSpinner />);
   } else if (alloc.isZero()) {
-    content = (
-      <Box
-        sx={{
-          marginLeft: 'auto',
-          marginRight: 'auto',
-          width: '612px',
-          borderRadius: '8px',
-          bgcolor: 'ds.bg_color_contrast_min',
-          padding: '24px',
-        }}
-      >
-        {/*  @ts-ignore */}
-        <Typography variant="h1xl">
-          {intl.formatMessage(messages.noAllocTitle)}
-        </Typography>
-        <Box>
-          {/*  @ts-ignore */}
-          <Typography variant="body1" as="span">
-            {intl.formatMessage(messages.noAllocTitle)}
-          </Typography>
-          &nbsp;
-          {/*  @ts-ignore */}
-          <Typography variant="body1" as="span">
-            <a href="">
-              {intl.formatMessage(globalMessages.learnMore)}
-            </a>
-          </Typography>
-        </Box>
-      </Box>
-    );
+    content = (<Zero />);
   } else {
     content = (<>
       <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1}}>
@@ -349,165 +297,4 @@ export default function AirdropPage({ stores }: Props) {
       </Box>
     </TopBarLayout>
   );
-}
-
-function LedgerClaimDialog(props: {
-  onClose: () => void,
-  message: string,
-  onClaim: (_password: string) => Promise<void>
-}) {
-  const intl = useIntl();
-
-  const [error, setError] = useState<string | null>(null);
-  const [isClaiming, setClaiming] = useState(false);
-
-  const onClaim = async () => {
-    setClaiming(true);
-    setError(null);
-    try {
-      await props.onClaim('');
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(String(error));
-      }
-    } finally {
-      setClaiming(false);
-    }
-  };
-
-  return (
-    <Dialog
-      withCloseButton
-      onClose={props.onClose}
-      title={intl.formatMessage(messages.claimDialogTitle)}
-      dialogActions={[
-        {
-          label: intl.formatMessage(messages.claimDialogTitle),
-          primary: true,
-          disabled: isClaiming,
-          onClick: onClaim,
-        },
-      ]}
-    >
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {intl.formatMessage(messages.ledgerClaimDialogText)}
-      </Typography>
-      {isClaiming ? (
-        <Box sx={{ marginTop: '16px', marginBottom: '16px' }}>
-          <LoadingSpinner />
-        </Box>
-      ) : (
-        <Box sx={{ height: '39px' }}></Box>
-      )}
-      <Typography variant="body1" color="ds.text_gray_low">
-        {intl.formatMessage(messages.messageLabel)}
-      </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {props.message}
-      </Typography>
-      <Typography component="div" variant="body2" color="ds.text_error">
-        {error}
-      </Typography>
-    </Dialog>
-  );
-}
-
-function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) => Promise<void>, message: string }) {
-  const intl = useIntl();
-  const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [isClaiming, setClaiming] = useState(false);
-
-  const onClaim = async () => {
-    setClaiming(true);
-    setError(null);
-    try {
-      await props.onClaim(password);
-    } catch (error) {
-      if (error instanceof WrongPassphraseError) {
-        setPasswordError(wrongPasswordErrorMessage);
-      } else if (error instanceof Error) {
-        setError(error.message);
-      } else {
-        setError(String(error));
-      }
-    } finally {
-      setClaiming(false);
-    }
-  };
-
-  return (
-    <Dialog
-      withCloseButton
-      onClose={props.onClose}
-      title={intl.formatMessage(messages.claimDialogTitle)}
-      dialogActions={[
-        {
-          label: intl.formatMessage(messages.claimDialogTitle),
-          primary: true,
-          disabled: (password.length === 0) || isClaiming,
-          onClick: onClaim,
-        },
-      ]}
-    >
-      <Typography variant="body1" color="ds.text_gray_medium">
-        {intl.formatMessage(messages.mnemonicClaimDialogText)}
-      </Typography>
-      <Typography variant="body1" color="ds.text_gray_low" sx={{ marginTop: '16px' }}>
-        {intl.formatMessage(messages.messageLabel)}
-      </Typography>
-      <Typography variant="body1" color="ds.text_gray_medium" sx={{ marginBottom: '16px' }}>
-        {props.message}
-      </Typography>
-      <TextField
-        error={passwordError}
-        type="password"
-        className="walletPassword"
-        value={password}
-        label={intl.formatMessage(globalMessages.passwordLabel)}
-        isLoading={isClaiming}
-        onChange={e => {
-          if (error === wrongPasswordErrorMessage) {
-            setPasswordError(null);
-          }
-          setPassword(e.target.value);
-        }}
-        autoFocus
-      />
-      <Typography component="div" variant="body2" color="ds.text_error">
-        {error}
-      </Typography>
-    </Dialog>
-  );
-}
-
-function Terms() {
-  const intl = useIntl();
-  return (<>
-    <Typography variant="body1" color="ds.text_gray_min" sx={{ marginTop: '32px', marginBottom: '16px' }}>
-      {intl.formatMessage(messages.terms)}
-    </Typography>
-    <Typography variant="body1">
-      <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
-
-      <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
-
-       <p>&nbsp;</p>
-       <Typography fontWeight={500}>2. Eligibility</Typography>
-
-       <p>2.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
-
-       <p>2.2 Jurisdiction: The Airdrop is not available to residents or citizens of countries where participation in cryptocurrency activities is restricted or illegal. It is your responsibility that you comply with your local laws.</p>
-       <p>2.3 Verification: Participants may be required to undergo identity</p>
-
-       <p>&nbsp;</p>
-       <Typography fontWeight={500}>3. Heading</Typography>
-
-       <p>3.1 Age Requirement: Participants must be at least 18 years old or the age of majority in their jurisdiction, whichever is higher.</p>
-    </Typography>
-  </>);
 }
