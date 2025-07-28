@@ -9,7 +9,7 @@ import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledger
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
-const TC_HASH = '6bf2adf825baa496729e2eac1e895ebc77973744bce67f44276bf6006f5c21de863ed121e11828d8fc0241773191e26dc1134803a681a9a98ba0ae812553db24';
+const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 // remember to change chrome/constants.js
 const CHECK_ENDPOINT = 'https://proof-staging.provtree-midnight.com';
 const CLAIM_ENDPOINT = 'https://preprod.gd.midnighttge.io/claims/cardano';
