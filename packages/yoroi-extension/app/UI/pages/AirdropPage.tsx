@@ -4,60 +4,20 @@ import BannerContainer from '../../containers/banners/BannerContainer';
 import SidebarContainer from '../../containers/SidebarContainer';
 import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
-import { useIntl, defineMessages } from 'react-intl';
+import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box, Typography, Checkbox, FormControlLabel, } from '@mui/material';
-import { ReactComponent as ErrorTriangleIcon } from '../../assets/images/revamp/error.triangle.svg';
+import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import { LoadingButton } from '@mui/lab';
 import { forceNonNull } from '../../coreUtils.js';
 import Zero from '../features/airdrop/useCases/Zero';
-import Terms from '../features/airdrop/useCases/Terms';
 import ClaimDialog from '../features/airdrop/useCases/ClaimDialog';
 import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
+import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 
-const messages = defineMessages({
-  size: {
-    id: 'airdrop.size',
-    defaultMessage: '!!!Your allocation size',
-  },
-  destinationAddress: {
-    id: 'airdrop.destinationAddress',
-    defaultMessage: '!!!Your destination address',
-  },
-  agree: {
-    id: 'airdrop.agree',
-    defaultMessage: '!!!By checking this box I confirm that I have read and understood the Glacier Drop terms and conditions for this claim.',
-  },
-  claim: {
-    id: 'airdrop.claim',
-    defaultMessage: '!!!claim allocation',
-  },
-  noAllocTitle: {
-    id: 'aidrop.noAllocTitle',
-    defaultMessage: '!!!No eligible addresses found in your wallet',
-  },
-  noAllocText: {
-    id: 'aidrop.noAllocText',
-    defaultMessage: '!!!None of the addresses provided are eligible for an allocation',
-  },
-  trezorTitle: {
-    id: 'airdrop.trezorTitle',
-    defaultMessage: '!!!Trezor not supported',
-  },
-  trezorText: {
-    id: 'airdrop.trezorText',
-    defaultMessage: '!!!Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.',
-  },
-  claimDialogTitle: {
-    id: 'airdrop.claimDialogTitle',
-    defaultMessage: '!!!sign message',
-  },
-});
 
 type AddressClaimData = {
   addrHex: string,
@@ -89,8 +49,6 @@ interface Props {
   }
 }
 
-const NUMBER_OF_NIGHT_DECIMALS = 6;
-
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
   const wallet = stores.wallets.selected;
@@ -101,7 +59,6 @@ export default function AirdropPage({ stores }: Props) {
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
-  const [isTermsAgreed, setTermsAgreed] = useState<boolean>(false);
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
@@ -161,109 +118,16 @@ export default function AirdropPage({ stores }: Props) {
   } else if (alloc.isZero()) {
     content = (<Zero />);
   } else {
-    content = (<>
-      <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1}}>
-        <Box
-          sx={{
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            width: '612px',
-          }}
-        >
-          <Box
-            sx={{
-              borderRadius: '8px',
-              bgcolor: 'ds.bg_color_contrast_min',
-              padding: '24px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '24px',
-            }}
-          >
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
-              <Typography variant="body2" color="ds.text_gray_low">
-                {intl.formatMessage(messages.size)}
-              </Typography>
-              {/*  @ts-ignore */}
-              <Typography variant="h1xl">
-                {alloc.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat()} NIGHT
-              </Typography>
-            </Box>
-            {!isTrezor && (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
-                <Typography variant="body2" color="ds.text_gray_low">
-                  {intl.formatMessage(messages.destinationAddress)}
-                </Typography>
-                <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-                  {destAddrBech32}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-          {!isTrezor ? (
-            !isClaimDone && (<>
-              <Terms />
-              <FormControlLabel
-                label={intl.formatMessage(messages.agree)}
-                control={
-                  <Checkbox
-                    checked={isTermsAgreed}
-                    onChange={()=>{ setTermsAgreed(!isTermsAgreed); }}
-                    sx={{ marginRight: '8px' }}
-                  />
-                }
-                sx={{
-                  marginTop: '24px',
-                  color: 'ds.text_gray_medium',
-                }}
-              />
-            </>)
-          ) : ( // if trezor
-            <Box
-              sx={{
-                borderRadius: '8px',
-                bgcolor: 'ds.sys_magenta_100',
-                padding: '24px',
-                marginTop: '24px',
-              }}
-            >
-              <Box>
-                {/*  @ts-ignore */}
-                <Box as="span" sx={{ verticalAlign: 'middle' }}>
-                  <ErrorTriangleIcon/>
-                </Box>
-                {/*  @ts-ignore */}
-                <Typography
-                  sx={{ verticalAlign: 'middle' }}
-                  as="span" variant="body1"
-                  fontWeight={500}
-                  color="ds.sys_magenta_500"
-                >
-                  {intl.formatMessage(messages.trezorTitle)}
-                </Typography>
-              </Box>
-              <Typography variant="body1" color="ds.text_gray_medium">
-                {intl.formatMessage(messages.trezorText)}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-      </Box>
-      {!isTrezor && !isClaimDone && (
-        <Box sx={{ height: '96px', display: 'flex' }}>
-          <LoadingButton
-            //  @ts-ignore
-            variant="primary"
-            sx={{ margin: 'auto' }}
-            disabled={!isTermsAgreed || unclaimedAddrs.length === 0}
-            loading={isClaimDialog}
-            onClick={showClaimDialog}
-          >
-            {intl.formatMessage(messages.claim)}
-          </LoadingButton>
-        </Box>
-      )}
-    </>);
+    content = (
+      <ClaimContent
+        alloc={alloc}
+        isTrezor={isTrezor}
+        destAddrBech32={destAddrBech32}
+        isClaimDone={isClaimDone}
+        isClaimDialog={isClaimDialog}
+        showClaimDialog={showClaimDialog}
+      />
+    );
   }
   return (
     <TopBarLayout
