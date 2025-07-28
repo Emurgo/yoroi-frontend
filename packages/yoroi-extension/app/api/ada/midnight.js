@@ -163,7 +163,9 @@ export async function claimForAddress(
     try {
       const respBody = await resp.json();
       errorMessage = respBody[0].error.message;
-    } catch {}
+    } catch {
+      errorMessage = 'response is not JSON';
+    }
     throw new Error(`Error ${resp.status} response: ${errorMessage}`);
   }
 }
