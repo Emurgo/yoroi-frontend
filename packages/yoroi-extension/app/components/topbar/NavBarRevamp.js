@@ -1,9 +1,10 @@
 // @flow
 import { Box, Typography, IconButton, styled } from '@mui/material';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
-import { Component } from 'react';
+import type { Node, ComponentType } from 'react';
+// $FlowIgnore
 import { Icon } from '../../UI/components';
+// $FlowIgnore
 import { useNotifications } from '../../UI/features/notifications/module/NotificationsProvider';
 
 type Props = {|
@@ -77,4 +78,4 @@ function NavBarRevamp(props: Props) {
     </Box>
   );
 }
-export default observer(NavBarRevamp);
+export default (observer(NavBarRevamp): ComponentType<Props>);

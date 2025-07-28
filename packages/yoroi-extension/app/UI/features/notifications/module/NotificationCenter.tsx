@@ -1,8 +1,8 @@
-import * as React from 'react';
-import { IconButton, Drawer, styled, Stack, Typography } from '@mui/material';
+import { Box, IconButton, Drawer, styled, Stack, Typography, Button } from '@mui/material';
 import { Icon } from '../../../components';
 import { useStrings } from '../common/hooks/useStrings';
 import { useNotifications } from './NotificationsProvider';
+import { appState, useModelValue } from '../../../../../api/frontEnd';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
@@ -26,19 +26,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 export const NotificationCenter = () => {
   const strings = useStrings();
   const { isNotificationCenterOpen, setNotificationCenterOpen } = useNotifications();
-
-  const toggleDrawer = (anchor: string, open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
-    return
-    if (
-      event.type === 'keydown' &&
-      ((event as React.KeyboardEvent).key === 'Tab' || (event as React.KeyboardEvent).key === 'Shift')
-    ) {
-      return;
-    }
-
-    setState({ ...state, [anchor]: open });
-    closeTxReviewModal();
-  };
+  const notifications = useModelValue(appState.notifications.all).value;
 
   if (!isNotificationCenterOpen) {
     return null;
@@ -46,7 +34,7 @@ export const NotificationCenter = () => {
 
   return (
     <>
-      <StyledDrawer open={true} onClose={toggleDrawer('right', false)} anchor={'right'} >
+      <StyledDrawer open anchor="right" >
         <Stack direction="row" justifyContent="center">
           <Typography variant="button" my="24px" textAlign="center" id='notificationCenter-title-text'>
             {strings.notificationCenterTitle}
@@ -55,6 +43,32 @@ export const NotificationCenter = () => {
             <Icon.CloseIcon />
           </StyledButton>
         </Stack>
+        <Stack spacing="16px" sx={{ padding: '16px' }}>
+          {notifications?.map((notification) => (
+            <Stack direction="row" spacing="16px">
+              <Box>
+                <Icon.Notification />
+              </Box>
+              <Box>
+                <Typography variant="body1" color="ds.text_gray_medium">
+                  {notification.body}
+                </Typography>
+                <Typography variant="caption1" color="ds.text_gray_low">
+                  {(new Date(notification.time)).toLocaleString()}
+                </Typography>
+              </Box>
+            </Stack>
+          ))}
+        </Stack>
+        <Box sx={{ borderTop: '1px', marginTop: 'auto', padding: '16px', display: 'flex' }}>
+          <Button
+            variant="secondary"
+            onClick={() => {}}
+            sx={{ margin: 'auto' }}
+          >
+            {strings.readAll}
+          </Button>
+        </Box>
       </StyledDrawer>
     </>
   );  

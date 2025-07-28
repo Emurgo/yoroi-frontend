@@ -6,6 +6,7 @@ interface NotificationData {
   read: boolean,
   title: string;
   body: string;
+  time: string;
 };
 interface Notification extends NotificationData {
   id: number;
@@ -45,4 +46,4 @@ const notifications = {
   }),
 };
 
-export default makeAccessor(notifications);
+export default makeAccessor({ notifications });

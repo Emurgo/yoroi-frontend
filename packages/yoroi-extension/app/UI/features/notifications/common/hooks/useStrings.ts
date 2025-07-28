@@ -35,7 +35,7 @@ export const messages = Object.freeze(
     },
     readAll: {
       id: 'notifications.center.markAllAsRead',
-      defaultMssage: '!!!mark all as read',
+      defaultMessage: '!!!mark all as read',
     },
     noNotification: {
       id: 'notifications.center.noNotification',

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import type Notifications from './notifications';
+import type AppStateType from './appState';
 import { getValue, listen, makeClientAccessor, cache } from './objectModel';
 
-
-const { modelAccessor: notificationModel, onServerEvent } = makeClientAccessor<typeof Notifications>((clientRequest) => {
+const { modelAccessor, onServerEvent } = makeClientAccessor<typeof AppStateType>((clientRequest) => {
   const msg = {
     type: 'yoroi-ng-client-request',
     clientRequest,
@@ -11,7 +10,7 @@ const { modelAccessor: notificationModel, onServerEvent } = makeClientAccessor<t
   return new Promise((resolve, reject) => {
     window.chrome.runtime.sendMessage(msg, response => {
       if (window.chrome.runtime.lastError) {
-        reject(`Error ${window.chrome.runtime.lastError} when calling the background`);
+        reject(`Error ${window.chrome.runtime.lastError.message} when calling the background`);
         return;
       }
       resolve(response);
@@ -25,11 +24,11 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-export const cachedNotifications = cache(notificationModel);
+export const appState = cache(modelAccessor);
 
-type RetT<T> = { loaded: false } | { loaded: true, value: T}
-export function use<T>(value: T extends (...args: any) => any ? never : T): RetT<T> {
-  const [retVal, setRetVal] = useState<RetT<T>>({ loaded: false });
+type RetT<T> = { loaded: false, value: undefined } | { loaded: true, value: T}
+export function useModelValue<T>(value: T extends (...args: any) => any ? never : T): RetT<T> {
+  const [retVal, setRetVal] = useState<RetT<T>>({ loaded: false, value: undefined });
 
   useEffect(() => {
     getValue(value).then((v) => {

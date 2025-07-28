@@ -33,6 +33,8 @@ const initialValue = {
     console.log(type, id);
     return;
   },
+  isNotificationCenterOpen: false,
+  setNotificationCenterOpen: (_open: boolean) => {},
 };
 
 function getRandomNotification() {
