@@ -17,7 +17,7 @@ export default function Terms() {
     <Typography variant="body1">
       <Typography fontWeight={500}>1. Acceptance of Terms</Typography>
 
-      <p>By participating in the [Project Name] Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
+      <p>By participating in the Midnight Glacier Airdrop ("Airdrop"), you ("Participant") agree to be bound by these Terms of Use ("Terms"). If you do not agree with these Terms, do not participate in the Airdrop.</p>
 
        <p>&nbsp;</p>
        <Typography fontWeight={500}>2. Eligibility</Typography>
