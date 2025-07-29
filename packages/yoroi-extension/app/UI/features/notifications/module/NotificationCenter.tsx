@@ -56,6 +56,7 @@ export const NotificationCenter = () => {
                     <Typography variant="body1" color="ds.text_gray_medium">
                       {notification.body}
                     </Typography>
+                    {/* @ts-ignore */}
                     <Typography variant="caption1" color="ds.text_gray_low">
                       {(new Date(notification.time)).toLocaleString()}
                     </Typography>
@@ -66,6 +67,7 @@ export const NotificationCenter = () => {
             <Box sx={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
               <Divider />
               <Button
+                // @ts-ignore
                 variant="secondary"
                 onClick={() => { call(appState.notifications.markAllRead) }}
                 sx={{ margin: 'auto', marginTop: '16px', marginBottom: '16px' }}
@@ -78,6 +80,7 @@ export const NotificationCenter = () => {
           // empty
           <Stack spacing="16px" sx={{ margin: 'auto' }}>
             <NoNotificationIllustration />
+            {/* @ts-ignore */}
             <Typography variant="heading-3-regular" color="ds.text_gray_medium" sx={{ textAlign: 'center' }}>
               {strings.noNotification}
             </Typography>
