@@ -27,7 +27,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 export const NotificationCenter = () => {
   const strings = useStrings();
   const { isNotificationCenterOpen, setNotificationCenterOpen } = useNotifications();
-  const notifications = useModelValue(appState.notifications.all).value?.filter(notification => !notification.read);
+  const notifications = useModelValue(appState.notifications.all).value;
 
   if (!isNotificationCenterOpen) {
     return null;
@@ -48,7 +48,7 @@ export const NotificationCenter = () => {
           <>
             <Stack spacing="16px" sx={{ padding: '16px' }}>
               {notifications?.map((notification) => (
-                <Stack direction="row" spacing="16px">
+                <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                   <Box>
                     <Icon.Notification />
                   </Box>
@@ -61,20 +61,33 @@ export const NotificationCenter = () => {
                       {(new Date(notification.time)).toLocaleString()}
                     </Typography>
                   </Box>
-                </Stack>
+                  {!notification.read && (
+                    <Box sx={{
+                      height: '6px',
+                      width: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
+                      marginLeft: 'auto',
+                      marginTop: 'auto',
+                      marginBottom: 'auto'
+                    }} />
+                  )}
+                </Box>
               ))}
             </Stack>
-            <Box sx={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
-              <Divider />
-              <Button
-                // @ts-ignore
-                variant="secondary"
-                onClick={() => { call(appState.notifications.markAllRead) }}
-                sx={{ margin: 'auto', marginTop: '16px', marginBottom: '16px' }}
-              >
-                {strings.readAll}
-              </Button>
-            </Box>
+            {notifications?.find(n => !n.read) && (
+              <Box sx={{ marginTop: 'auto', display: 'flex', flexDirection: 'column' }}>
+                <Divider />
+                <Button
+                  // @ts-ignore
+                  variant="secondary"
+                  onClick={() => { call(appState.notifications.markAllRead) }}
+                  sx={{ margin: 'auto', marginTop: '16px', marginBottom: '16px' }}
+                >
+                  {strings.readAll}
+                </Button>
+              </Box>
+            )}
           </>
         ) : notifications ? (
           // empty
