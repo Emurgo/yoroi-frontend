@@ -59,11 +59,8 @@ export const LimitInput = () => {
           value={swapForm.wantedPrice}
           onChange={event => {
             const val = (event.target as HTMLInputElement).value;
-            console.log('val', val);
             swapForm.action({ type: 'WantedPriceInputChanged', value: val });
           }}
-          //   onFocus={() => !isMarketOrder && limitPriceFocusState.update(true)}
-          //   onBlur={() => !isMarketOrder && limitPriceFocusState.update(false)}
         />
         <Box sx={{ justifySelf: 'end' }}>
           <Box height="100%" width="max-content" display="flex" alignItems="center">

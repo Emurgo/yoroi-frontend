@@ -8,7 +8,7 @@ import { SelectAssetFrom } from '../../common/components/Modals/SelectAssetFrom'
 import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
-import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
+import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../common/constants';
 import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
@@ -16,11 +16,13 @@ import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBod
 import { ErrorMessage } from '../../common/components/ErrorMessage';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
+import { useStrings } from '../../common/hooks/useStrings';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { createOrder, swapForm, tokenInfos, isCreateOrderLoading, stores } = useSwapRevamp();
   const { openModal } = useModal();
+  const strings = useStrings();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
   const wallet = stores.wallets.selectedOrFail;
 
@@ -95,7 +97,7 @@ export const AssetSwap = () => {
         }}
         loading={isCreateOrderLoading}
       >
-        {swapForm.orderType === 'market' ? 'Swap' : 'Place Order'}
+        {swapForm.orderType === MARKET_ORDER ? strings.swapLabel : strings.placeOrder}
       </LoadingButton>
     </Content>
   );

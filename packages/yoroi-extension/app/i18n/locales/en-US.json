@@ -482,6 +482,7 @@
   "swap.max": "MAX",
   "swap.currentBalance": "Current balance:",
   "swap.swapLabel": "Swap",
+  "swap.placeOrder": "Place Order",
   "swap.auto": "Auto",
   "swap.slippage": "Slippage",
   "swap.slippageInputInfo": "Enter a value from 0% to 75%. You can also enter up to 1 decimal",
