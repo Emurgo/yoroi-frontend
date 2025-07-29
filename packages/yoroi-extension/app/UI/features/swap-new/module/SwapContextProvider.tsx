@@ -23,7 +23,7 @@ import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN } from '../common/constants';
-import { AssetDirectionType } from '../common/types';
+import { AssetDirectionType, MarketOrderType } from '../common/types';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -135,6 +135,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     state.selectedProtocol.isTouched,
     state.selectedProtocol.value,
   ]);
+
   useEffect(() => {
     const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
 
@@ -248,6 +249,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       createOrder: create,
       isCreateOrderLoading,
       isEstimateOrderLoading,
+      limitOptions,
       stores,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
@@ -508,7 +510,7 @@ const defaultState: SwapState = Object.freeze({
 
 type SwapState = {
   needsNewEstimate: boolean;
-  orderType: 'market' | 'limit';
+  orderType: MarketOrderType;
   lastInputTouched: AssetDirectionType;
   tokenInInput: {
     isTouched: boolean;

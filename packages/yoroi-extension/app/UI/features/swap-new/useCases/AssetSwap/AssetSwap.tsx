@@ -15,6 +15,7 @@ import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxPro
 import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
 import { TransactionResult } from '../../../transaction-review/common/types';
+import { LimitInput } from '../../common/components/LimitInput';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -93,6 +94,7 @@ export const AssetSwap = () => {
         <AssetInput direction={ASSET_DIRECTION_OUT} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_OUT)} />
         <Stack {...atoms.pt_lg} />
         <ErrorMessage />
+        <LimitInput />
         <EstimateSummary />
       </Stack>
       <LoadingButton
@@ -103,7 +105,7 @@ export const AssetSwap = () => {
         }}
         loading={isCreateOrderLoading}
       >
-        Swap
+        {swapForm.orderType === 'market' ? 'Swap' : 'Place Order'}
       </LoadingButton>
     </Content>
   );
