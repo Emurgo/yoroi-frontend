@@ -1,6 +1,7 @@
 import { Box, Typography, Link } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
+import { MIDNIGHT_DISTRIBUTION_URL } from '../../../common/constants';
 
 const messages = defineMessages({
   noAllocTitle: {
@@ -40,7 +41,7 @@ export default function Zero() {
 
       {/*  @ts-ignore */}
       <Typography variant="body1">
-        <Link href=""  target="_blank" rel="noopener noreferrer">
+        <Link href={MIDNIGHT_DISTRIBUTION_URL}  target="_blank" rel="noopener noreferrer">
           {intl.formatMessage(globalMessages.learnMore)}
         </Link>
       </Typography>
