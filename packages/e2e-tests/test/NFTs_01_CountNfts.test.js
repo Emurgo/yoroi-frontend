@@ -42,9 +42,7 @@ describe('Counting shown NFTs', function () {
   it('Check number of displayed NFTs', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      expectedNFTsAmount
-    );
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(expectedNFTsAmount);
   });
 
   afterEach(async function () {

@@ -8,20 +8,21 @@ import DialogCloseButton from '../widgets/DialogCloseButton';
 
 type Props = {|
   onDialogConfirm: () => void,
-    onDialogRefuse: () => void,
+  onDialogRefuse: () => void,
 |};
 
 export default function SwapDisclaimerDialog({ onDialogConfirm, onDialogRefuse }: Props): Node {
   const [isCheckboxMarked, setCheckboxMarked] = useState(false);
   const strings = useStrings();
 
-  const actions = [{
-    onClick: onDialogConfirm,
-    disabled: !isCheckboxMarked,
-    primary: true,
-    label: strings.disclaimerProceed
-  }]
-
+  const actions = [
+    {
+      onClick: onDialogConfirm,
+      disabled: !isCheckboxMarked,
+      primary: true,
+      label: strings.disclaimerProceed,
+    },
+  ];
 
   return (
     <Dialog
@@ -46,16 +47,18 @@ export default function SwapDisclaimerDialog({ onDialogConfirm, onDialogRefuse }
             sx={{
               display: 'flex',
               alignItems: 'center',
-              flexFlow: 'column'
+              flexFlow: 'column',
             }}
           >
             {[strings.note1, strings.note2, strings.note3, strings.note4].map((message, i) => (
-              <Box sx={{
-                display: 'flex',
-                flexFlow: 'row nowrap',
-                alignItems: 'flex-start',
-                justifyContent: 'flex-start'
-              }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexFlow: 'row nowrap',
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                }}
+              >
                 <Typography component="div" variant="body1" color="grayscale.900">
                   {i + 1}.&nbsp;
                 </Typography>
@@ -82,7 +85,6 @@ export default function SwapDisclaimerDialog({ onDialogConfirm, onDialogRefuse }
           }
           sx={{ margin: '0px' }}
         />
-
       </Box>
     </Dialog>
   );

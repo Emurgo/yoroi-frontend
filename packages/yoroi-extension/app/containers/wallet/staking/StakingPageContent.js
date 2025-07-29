@@ -34,7 +34,7 @@ type State = {|
 
 @observer
 export default class StakingPageContent extends Component<StoresProps, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     govStatusFetched: false,
   };
@@ -257,22 +257,22 @@ export default class StakingPageContent extends Component<StoresProps, State> {
             withdrawRewards={
               isParticipatingToGovernance === false
                 ? () => {
-                  this.props.stores.uiDialogs.open({
-                    dialog: GovernanceParticipateDialog,
-                  });
-                }
-                : isStakeRegistered
-                  ? () => {
                     this.props.stores.uiDialogs.open({
                       dialog: GovernanceParticipateDialog,
                     });
                   }
+                : isStakeRegistered
+                  ? () => {
+                      this.props.stores.uiDialogs.open({
+                        dialog: GovernanceParticipateDialog,
+                      });
+                    }
                   : undefined
             }
           />
         ) : null}
         {uiDialogs.isOpen(GovernanceParticipateDialog) ? (
-          <GovernanceParticipateDialog stores={stores} onClose={this.onClose}/>
+          <GovernanceParticipateDialog stores={stores} onClose={this.onClose} />
         ) : null}
         {uiDialogs.isOpen(UnmangleTxDialogContainer) ? (
           <UnmangleTxDialogContainer stores={stores} onClose={this.onClose} />

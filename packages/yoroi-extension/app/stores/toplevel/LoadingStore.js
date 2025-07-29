@@ -10,9 +10,7 @@ import { isWithinSupply } from '../../utils/validations';
 import { networks, defaultAssets } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { getDefaultEntryToken } from './TokenInfoStore';
 import type { StoresMap } from '../index';
-import {
-  TabIdKeys,
-} from '../../utils/tabManager';
+import { TabIdKeys } from '../../utils/tabManager';
 
 type SellAdaParamsType = {|
   addr: string,
@@ -34,18 +32,14 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     location: string,
   |} = { route: '', location: '' };
 
-
   setup(): void {
     const params = new URLSearchParams(document.location.search);
     if (params.get('action') === 'sell-ada') {
       const addr = params.get('addr');
       const redirect = params.get('redirect');
       const amount = params.get('amount');
-      if (
-        typeof addr === 'string' && typeof redirect === 'string' &&
-          typeof amount === 'string'
-      ) {
-        this.sellAdaParams = { addr, redirect, amount, };
+      if (typeof addr === 'string' && typeof redirect === 'string' && typeof amount === 'string') {
+        this.sellAdaParams = { addr, redirect, amount };
       }
     }
   }
@@ -88,9 +82,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
 
     if (this.fromUriScheme) {
       const networkId = networks.CardanoMainnet.NetworkId;
-      const cardanoMeta = defaultAssets.filter(
-        asset => asset.NetworkId === networkId
-      )[0];
+      const cardanoMeta = defaultAssets.filter(asset => asset.NetworkId === networkId)[0];
       const uriParams = await getURIParameters(
         decodeURIComponent(this._originRoute.location),
         currency => {
@@ -115,7 +107,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
   resetUriParams: void => void = (): void => {
     this._uriParams = null;
     this._originRoute = { route: '', location: '' };
-  }
+  };
 
   getTabIdKey(): string {
     return TabIdKeys.Primary;

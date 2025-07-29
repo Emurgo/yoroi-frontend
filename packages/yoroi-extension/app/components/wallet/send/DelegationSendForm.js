@@ -33,6 +33,7 @@ type Props = {|
   +poolName: string,
   +selectedPoolId: ?string,
   +stores: StoresMap,
+  +isTestnet: boolean,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -60,7 +61,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -112,7 +113,7 @@ export default class DelegationSendForm extends Component<Props> {
     );
 
     const poolQueryError =
-      this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
+      this.props.poolQueryError !== null && !this.props.isTestnet ? intl.formatMessage(this.props.poolQueryError) : null;
 
     return (
       <Box className={styles.component}>

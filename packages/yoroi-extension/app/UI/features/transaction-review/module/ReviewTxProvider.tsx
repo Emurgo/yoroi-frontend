@@ -174,11 +174,7 @@ export const ReviewTxProvider = ({
     [state, actions, stakeKeyDeposit]
   );
 
-  return (
-    <ModalContext.Provider value={context}>
-      {children}
-    </ModalContext.Provider>
-  );
+  return <ModalContext.Provider value={context}>{children}</ModalContext.Provider>;
 };
 
 type ModalAction = any;

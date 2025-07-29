@@ -36,22 +36,23 @@
   }
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
- .component {
-   .walletPassword {
-     .walletPasswordFields {
-       &.show {
-         max-height: 600px;
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
+  .component {
+    .walletPassword {
+      .walletPasswordFields {
+        &.show {
+          max-height: 600px;
         }
-        
+
         & > div {
           width: 100%;
         }
       }
     }
-    
+
     :global(.Dialog_actions) {
       margin-top: 10px;
     }
   }
-} 
+}

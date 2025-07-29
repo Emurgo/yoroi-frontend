@@ -19,7 +19,6 @@ function pushError(s: string): void {
 }
 
 export const Logger = {
-
   debug: (...args: any[]) => {
     logger.debug(...args);
   },
@@ -28,7 +27,7 @@ export const Logger = {
     logger.info(...args);
   },
 
-  error: (data : string) => {
+  error: (data: string) => {
     // fix format so it shows up properly in Chrome console
     const fixedString = data.replace(/\\n/g, '\n');
     logger.error(fixedString);
@@ -37,7 +36,7 @@ export const Logger = {
 
   warn: (...args: any[]) => {
     logger.warn(...args);
-  }
+  },
 };
 
 export const silenceLogsForTesting = () => {
@@ -57,38 +56,35 @@ export const downloadLogs = (publicKey?: string) => {
   errorLogs.unshift(header);
   const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
 
-  import('file-saver').then(FileSaver => {
-    FileSaver.default.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
-    return null;
-  }).catch((error) => {
-    Logger.error(`error when downloading error log ${error}`);
-  });
+  import('file-saver')
+    .then(FileSaver => {
+      FileSaver.default.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
+      return null;
+    })
+    .catch(error => {
+      Logger.error(`error when downloading error log ${error}`);
+    });
 };
 
 // ========== STRINGIFY =========
 
 export const generateLogHeader = (publicKey?: string): string => {
   let header =
-  `[INFO] Yoroi v.${environment.getVersion()}\r\n`
-  + `[INFO] Commit: ${environment.commit}\r\n`
-  + `[INFO] Network: ${environment.getNetworkName()}\r\n`
-  + `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`;
+    `[INFO] Yoroi v.${environment.getVersion()}\r\n` +
+    `[INFO] Commit: ${environment.commit}\r\n` +
+    `[INFO] Network: ${environment.getNetworkName()}\r\n` +
+    `[INFO] User Agent: ${stringifyData(environment.userAgentInfo.ua)}\r\n`;
 
   if (publicKey != null) {
     header += `[INFO] Wallet public key: ${publicKey}\r\n`;
   }
-  return header
-    + `----\r\n`; // this like should be always the last line of the header block
+  return header + `----\r\n`; // this like should be always the last line of the header block
 };
 
-export const stringifyData = (data : any): string => inspect(data);
+export const stringifyData = (data: any): string => inspect(data);
 
-export const stringifyError = (error : any): string => (
-  JSON.stringify(error, Object.getOwnPropertyNames(error), 2)
-);
+export const stringifyError = (error: any): string => JSON.stringify(error, Object.getOwnPropertyNames(error), 2);
 
 // It should convert the whole error object into json
 // Unlike `stringifyError` which use a `replacer` to select some fields
-export const fullErrStr = (err: any): string  => (
-  JSON.stringify(err, null, 2)
-)
+export const fullErrStr = (err: any): string => JSON.stringify(err, null, 2);

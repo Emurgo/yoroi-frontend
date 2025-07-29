@@ -32,7 +32,7 @@ type State = {|
 |};
 
 export default class WalletRowRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     showDeleteIcon: false,
   };
@@ -45,10 +45,7 @@ export default class WalletRowRevamp extends Component<Props, State> {
     this.setState({ showDeleteIcon: false });
   };
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| shouldHideBalance: boolean, amount: ?MultiToken |}) => Node = request => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }

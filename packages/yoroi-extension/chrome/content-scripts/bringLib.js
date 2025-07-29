@@ -7,7 +7,7 @@ declare var chrome;
 const callbacks: Map<number, (Object) => void> = new Map();
 let uid_counter = 0;
 
-window.addEventListener('message', (event) => {
+window.addEventListener('message', event => {
   if (event.data.type === 'bring_rpc_response') {
     const callback = callbacks.get(event.data.uid);
     if (callback) {
@@ -20,7 +20,7 @@ window.addEventListener('message', (event) => {
 function callBackground(functionName: string, params: any): Promise<any> {
   const uid = uid_counter++;
   return new Promise((resolve, reject) => {
-    callbacks.set(uid, (msg) => {
+    callbacks.set(uid, msg => {
       if (msg.return.err) {
         reject(new Error(msg.return.err));
       } else {
@@ -72,7 +72,7 @@ export function listenForCashbackWalletChange(callback: () => void): void {
   });
 }
 
-export async function getWallets(): Promise<Array<{| id: number, name: string, address: string, |}>> {
+export async function getWallets(): Promise<Array<{| id: number, name: string, address: string |}>> {
   return callBackground('get-wallets');
 }
 

@@ -15,15 +15,8 @@ type Props = {|
 export default function AddWalletPageRevamp(props: Props): Node {
   return (
     <Box>
-      <AddWalletPageHeader
-        goToCurrentWallet={props.goToCurrentWallet}
-        hasAnyWallets={props.hasAnyWallets}
-      />
-      <AddWalletPageContent
-        onCreate={props.onCreate}
-        onRestore={props.onRestore}
-        onHardwareConnect={props.onHardwareConnect}
-      />
+      <AddWalletPageHeader goToCurrentWallet={props.goToCurrentWallet} hasAnyWallets={props.hasAnyWallets} />
+      <AddWalletPageContent onCreate={props.onCreate} onRestore={props.onRestore} onHardwareConnect={props.onHardwareConnect} />
     </Box>
   );
 }

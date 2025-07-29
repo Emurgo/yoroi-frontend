@@ -3,10 +3,7 @@
 import { Type, ConstraintAction } from 'lovefield';
 import type { lf$schema$Builder } from 'lovefield';
 
-import {
-  TransactionSchema,
-  AddressSchema,
-} from '../../primitives/tables';
+import { TransactionSchema, AddressSchema } from '../../primitives/tables';
 
 export type UtxoTransactionInputInsert = {|
   /**
@@ -37,7 +34,7 @@ export const UtxoTransactionInputSchema: {|
     IndexInParentTx: 'IndexInParentTx',
     IndexInOwnTx: 'IndexInOwnTx',
     TokenListId: 'TokenListId',
-  }
+  },
 };
 
 export type ErgoFields = {|
@@ -80,19 +77,20 @@ export const UtxoTransactionOutputSchema: {|
     ErgoCreationHeight: 'ErgoCreationHeight',
     ErgoTree: 'ErgoTree',
     ErgoRegisters: 'ErgoRegisters',
-  }
+  },
 };
 
 export type DbUtxoInputs = {|
-  +utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>;
+  +utxoInputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionInputRow>>,
 |};
 export type DbUtxoOutputs = {|
-  +utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>;
+  +utxoOutputs: $ReadOnlyArray<$ReadOnly<UtxoTransactionOutputRow>>,
 |};
 
 export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => {
   // UtxoTransactionInput Table
-  schemaBuilder.createTable(UtxoTransactionInputSchema.name)
+  schemaBuilder
+    .createTable(UtxoTransactionInputSchema.name)
     .addColumn(UtxoTransactionInputSchema.properties.UtxoTransactionInputId, Type.INTEGER)
     .addColumn(UtxoTransactionInputSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(UtxoTransactionInputSchema.properties.AddressId, Type.INTEGER)
@@ -100,10 +98,7 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addColumn(UtxoTransactionInputSchema.properties.IndexInParentTx, Type.INTEGER)
     .addColumn(UtxoTransactionInputSchema.properties.IndexInOwnTx, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.TokenListId, Type.INTEGER)
-    .addPrimaryKey(
-      ([UtxoTransactionInputSchema.properties.UtxoTransactionInputId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([UtxoTransactionInputSchema.properties.UtxoTransactionInputId]: Array<string>), true)
     .addForeignKey('UtxoTransactionInput_Transaction', {
       local: UtxoTransactionInputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,
@@ -115,7 +110,8 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     });
 
   // UtxoTransactionOutput Table
-  schemaBuilder.createTable(UtxoTransactionOutputSchema.name)
+  schemaBuilder
+    .createTable(UtxoTransactionOutputSchema.name)
     .addColumn(UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.TransactionId, Type.INTEGER)
     .addColumn(UtxoTransactionOutputSchema.properties.AddressId, Type.INTEGER)
@@ -126,10 +122,7 @@ export const populateUtxoTransactionsDb = (schemaBuilder: lf$schema$Builder) => 
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoCreationHeight, Type.NUMBER)
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoTree, Type.STRING)
     .addColumn(UtxoTransactionOutputSchema.properties.ErgoRegisters, Type.STRING)
-    .addPrimaryKey(
-      ([UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId]: Array<string>),
-      true
-    )
+    .addPrimaryKey(([UtxoTransactionOutputSchema.properties.UtxoTransactionOutputId]: Array<string>), true)
     .addForeignKey('UtxoTransactionOutput_Transaction', {
       local: UtxoTransactionOutputSchema.properties.TransactionId,
       ref: `${TransactionSchema.name}.${TransactionSchema.properties.TransactionId}`,

@@ -1,12 +1,5 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import {
-  defaultWaitTimeout,
-  fiveSeconds,
-  halfSecond,
-  oneMinute,
-  oneSecond,
-  quarterSecond,
-} from '../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, halfSecond, oneMinute, oneSecond, quarterSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 export default class WalletCommonBase extends BasePage {
@@ -160,19 +153,13 @@ export default class WalletCommonBase extends BasePage {
       fiatBalance,
       fiatCurrency,
     };
-    this.logger.info(
-      `WalletCommonBase::getSelectedWalletInfo::walletInfo is ${JSON.stringify(walletInfo)}`
-    );
+    this.logger.info(`WalletCommonBase::getSelectedWalletInfo::walletInfo is ${JSON.stringify(walletInfo)}`);
     return walletInfo;
   }
   async closeUpdatesModalWindow() {
     this.logger.info(`WalletCommonBase::closeUpdatesModalWindow is called`);
     await this.customWaitIsPresented(this.dialogUpdatesTitleLocator, fiveSeconds, quarterSecond);
-    await this.customWaitIsPresented(
-      this.dialogUpdatesGoToWalletButtonLocator,
-      fiveSeconds,
-      quarterSecond
-    );
+    await this.customWaitIsPresented(this.dialogUpdatesGoToWalletButtonLocator, fiveSeconds, quarterSecond);
     await this.click(this.dialogUpdatesGoToWalletButtonLocator);
     await this.sleep(500);
   }
@@ -201,11 +188,7 @@ export default class WalletCommonBase extends BasePage {
   }
   async waitInitialWalletLoaderIsClosed() {
     this.logger.info(`WalletCommonBase::waitInitialWalletLoaderisClosed is called`);
-    const state = await this.customWaitIsNotPresented(
-      this.walletIsLoadingLogo,
-      oneMinute,
-      halfSecond
-    );
+    const state = await this.customWaitIsNotPresented(this.walletIsLoadingLogo, oneMinute, halfSecond);
     if (!state) {
       this.logger.error(
         `WalletCommonBase::waitInitialWalletLoaderisClosed The wallet loading banner is still displayed after ${
@@ -267,15 +250,11 @@ export default class WalletCommonBase extends BasePage {
       if (foundWalletName === walletName) {
         const walletButtonLocator = this.getWalletButtonLocator(index);
         await this.click(walletButtonLocator);
-        this.logger.info(
-          `WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is found and selected`
-        );
+        this.logger.info(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is found and selected`);
         return;
       }
     }
-    this.logger.warn(
-      `WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is NOT found`
-    );
+    this.logger.warn(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is NOT found`);
   }
   async switchToFirstWallet() {
     this.logger.info(`WalletCommonBase::switchToFirstWallet is called`);
@@ -291,13 +270,9 @@ export default class WalletCommonBase extends BasePage {
     await this.click(this.changeWalletDialogApplyWalletButtonLocator);
   }
   async getWalletInfoFromChangeWalletDialog(walletIndex) {
-    this.logger.info(
-      `WalletCommonBase::getWalletInfoFromChangeWalletDialog is called. Wallet index: ${walletIndex}`
-    );
+    this.logger.info(`WalletCommonBase::getWalletInfoFromChangeWalletDialog is called. Wallet index: ${walletIndex}`);
     const name = await this.getText(this.getWalletNameLocator(walletIndex));
-    const balanceString = (await this.getText(this.getWalletBalanceLocator(walletIndex))).split(
-      ' '
-    )[0];
+    const balanceString = (await this.getText(this.getWalletBalanceLocator(walletIndex))).split(' ')[0];
     const tokensString = await this.getText(this.getWalletTokensAmountLocator(walletIndex));
     const nftsString = await this.getText(this.getWalletNFTsAmountLocator(walletIndex));
     const balance = parseFloat(balanceString);
@@ -319,23 +294,17 @@ export default class WalletCommonBase extends BasePage {
   async balanceIsHiddenOnTopPanel() {
     this.logger.info(`WalletCommonBase::showHideBalance is called`);
 
-    const adaBalanceIsHidden = await this.waitPresentedAndAct(
-      this.walletBalanceTextLocator,
-      async () => {
-        const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
-        const balanceStr = rawBalanceText.split(' ')[0].trim();
-        return balanceStr === balanceReplacer;
-      }
-    );
+    const adaBalanceIsHidden = await this.waitPresentedAndAct(this.walletBalanceTextLocator, async () => {
+      const rawBalanceText = await this.getText(this.walletBalanceTextLocator);
+      const balanceStr = rawBalanceText.split(' ')[0].trim();
+      return balanceStr === balanceReplacer;
+    });
 
-    const fiatBalanceIsHidden = await this.waitPresentedAndAct(
-      this.walletFiatBalanceTextLocator,
-      async () => {
-        const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
-        const fiatBalanceStr = rawFiatBalanceText.split(' ')[0].trim();
-        return fiatBalanceStr === balanceReplacer;
-      }
-    );
+    const fiatBalanceIsHidden = await this.waitPresentedAndAct(this.walletFiatBalanceTextLocator, async () => {
+      const rawFiatBalanceText = await this.getText(this.walletFiatBalanceTextLocator);
+      const fiatBalanceStr = rawFiatBalanceText.split(' ')[0].trim();
+      return fiatBalanceStr === balanceReplacer;
+    });
 
     return adaBalanceIsHidden && fiatBalanceIsHidden;
   }

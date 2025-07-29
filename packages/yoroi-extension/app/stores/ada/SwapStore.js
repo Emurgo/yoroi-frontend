@@ -31,8 +31,6 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { Portfolio } from '@yoroi/types';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -201,10 +199,10 @@ export default class SwapStore extends Store<StoresMap> {
     });
   };
 
-  executeTransactionHexes: ({|
-    wallet: WalletState,
-    signedTransactionHexes: Array<string>,
-  |}) => Promise<void> = async ({ wallet, signedTransactionHexes }) => {
+  executeTransactionHexes: ({| wallet: WalletState, signedTransactionHexes: Array<string> |}) => Promise<void> = async ({
+    wallet,
+    signedTransactionHexes,
+  }) => {
     await broadcastTransaction({
       publicDeriverId: wallet.publicDeriverId,
       signedTxHexArray: signedTransactionHexes,
@@ -214,17 +212,16 @@ export default class SwapStore extends Store<StoresMap> {
     noop(this.stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId));
   };
 
-  fetchTransactionTimestamps: ({|
-    wallet: WalletState,
-    txHashes: Array<string>,
-  |}) => Promise<{ [string]: Date }> = async ({ wallet, txHashes }) => {
+  fetchTransactionTimestamps: ({| wallet: WalletState, txHashes: Array<string> |}) => Promise<{ [string]: Date }> = async ({
+    wallet,
+    txHashes,
+  }) => {
     if (txHashes.length === 0) {
       return {};
     }
     const network = getNetworkById(wallet.networkId);
-    const globalSlotMap: {
-      [string]: string,
-    } = await this.stores.substores.ada.stateFetchStore.fetcher.getTransactionSlotsByHashes({ network, txHashes });
+    const globalSlotMap: { [string]: string } =
+      await this.stores.substores.ada.stateFetchStore.fetcher.getTransactionSlotsByHashes({ network, txHashes });
     const timeCalcRequests = this.stores.substores.ada.time.getTimeCalcRequests(wallet);
     const { toRealTime } = timeCalcRequests.requests;
     const slotToTimestamp: string => Date = s => toRealTime({ absoluteSlotNum: Number(s) });
@@ -238,15 +235,12 @@ export default class SwapStore extends Store<StoresMap> {
     wallet: WalletState,
     swapState: any,
     parsedCbor: any,
-    datum: string,
-    datumHash: string,
     tokenInfos: Map<string, any>,
-  |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, datum, datumHash, tokenInfos }) => {
+  |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, tokenInfos }) => {
     const sellTokenId = swapState.tokenInInput.tokenId;
     const buyTokenId = swapState.tokenOutInput.tokenId;
-
     const sell = {
-      tokenId: '',
+      tokenId: sellTokenId,
       quantity: String(Number(swapState.tokenInInput.value * 1000000)), // assumes ADA for now
     };
 
@@ -291,7 +285,7 @@ export default class SwapStore extends Store<StoresMap> {
 
     if (swapState.createTx.frontendFee > 0) {
       entries.push({
-        address: wallet.isTestnet ? FRONTEND_FEE_ADDRESS_PREPROD : FRONTEND_FEE_ADDRESS_MAINNET,
+        address: FRONTEND_FEE_ADDRESS_MAINNET,
         amount: createSwapFeFeeAmount({ wallet, feFees }),
       });
     }

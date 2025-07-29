@@ -31,13 +31,13 @@ const dialogMessages = defineMessages({
 
 @observer
 export default class IncludePublicKeyDialog extends Component<{| ...Props, ...StoresProps |}> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   @observable isChecked: boolean = false;
 
   @action
   toggleCheck: void => void = () => {
     this.isChecked = !this.isChecked;
-  }
+  };
 
   render(): Node {
     const intl = this.context;
@@ -56,19 +56,23 @@ export default class IncludePublicKeyDialog extends Component<{| ...Props, ...St
           onClick: () => {
             this.props.downloadIncludingKey();
             this.props.stores.uiDialogs.closeActiveDialog();
-          }
+          },
         }}
         secondaryButton={{
           label: intl.formatMessage(dialogMessages.withoutKey),
           onClick: () => {
             this.props.downloadExcludingKey();
             this.props.stores.uiDialogs.closeActiveDialog();
-          }
+          },
         }}
         id="includePublicKeyDialog"
       >
-        <div><FormattedMessage {...dialogMessages.includeKeyExplanationLine1} values={{ strong }}/></div>
-        <div><FormattedMessage {...globalMessages.publicKeyExplanation} values={{ strong }}/></div>
+        <div>
+          <FormattedMessage {...dialogMessages.includeKeyExplanationLine1} values={{ strong }} />
+        </div>
+        <div>
+          <FormattedMessage {...globalMessages.publicKeyExplanation} values={{ strong }} />
+        </div>
       </DangerousActionDialog>
     );
   }

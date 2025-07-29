@@ -37,9 +37,7 @@ describe('Search NFTs no matches', function () {
   it('Check number of displayed NFTs', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(testWalletNFTsAllNfts.length);
   });
 
   it('Search for NFT by random value', async function () {
@@ -57,9 +55,7 @@ describe('Search NFTs no matches', function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.clearSearch();
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(testWalletNFTsAllNfts.length);
   });
 
   afterEach(async function () {

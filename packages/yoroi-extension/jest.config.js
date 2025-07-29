@@ -8,15 +8,10 @@ module.exports = {
     '@emurgo/cardano-message-signing-browser': '@emurgo/cardano-message-signing-nodejs',
     '@emurgo/cross-csl-browser': '@emurgo/cross-csl-nodejs',
     '\\.png$': 'lodash/noop.js',
-    "^axios$": "axios/dist/node/axios.cjs",
+    '^axios$': 'axios/dist/node/axios.cjs',
   },
-  transformIgnorePatterns: [
-    '<rootDir>/node_modules/(?!@emurgo/ledger-connect-handler)'
-  ],
-  setupFiles: [
-    'jest-canvas-mock',
-    './jestSetup',
-  ],
+  transformIgnorePatterns: ['<rootDir>/node_modules/(?!@emurgo/ledger-connect-handler)'],
+  setupFiles: ['jest-canvas-mock', './jestSetup'],
   // ignore manifest.test.js file, because it isn't a test
   testPathIgnorePatterns: ['manifest.test.js', 'manifest-mv2.test.js'],
 };

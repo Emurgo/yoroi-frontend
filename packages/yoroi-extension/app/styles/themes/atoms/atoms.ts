@@ -202,7 +202,7 @@ export const atoms = {
   ...border,
   ...size,
   ...flex,
-  space:tokens.space,
+  space: tokens.space,
 
   overflow_hidden: {
     overflow: 'hidden',

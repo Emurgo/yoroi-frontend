@@ -22,16 +22,8 @@ class TxSuccessModal extends BasePage {
   // methods
   async isDisplayed() {
     this.logger.info(`TxSuccessModal::isDisplayed is called`);
-    const modalWindowPromise = this.customWaitIsPresented(
-      this.modalWindowLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
-    const titlePromise = this.customWaitIsPresented(
-      this.modalTitleLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
+    const modalWindowPromise = this.customWaitIsPresented(this.modalWindowLocator, defaultWaitTimeout, quarterSecond);
+    const titlePromise = this.customWaitIsPresented(this.modalTitleLocator, defaultWaitTimeout, quarterSecond);
     const [modalWindowState, titleState] = await Promise.all([modalWindowPromise, titlePromise]);
 
     return modalWindowState && titleState;

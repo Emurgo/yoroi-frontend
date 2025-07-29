@@ -180,19 +180,19 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
     if (swapFormState.buyQuantity.error != null) actions.buyAmountErrorChanged(null);
   }, [actions, swapFormState.buyQuantity.error, swapFormState.sellQuantity.error]);
 
-  const baseSwapFieldChangeHandler = (tokenInfo: any, handler: ({| input: string, quantity: string |}) => void) => (
-    text: string = ''
-  ) => {
-    if (tokenInfo.tokenId === '') {
-      // empty input
-      return;
-    }
-    const decimals = tokenInfo.decimals ?? 0;
-    const precision = tokenInfo.precision ?? decimals;
-    const [input, quantity] = Quantities.parseFromText(text, decimals, numberLocale, precision);
-    clearErrors();
-    handler({ quantity, input: text === '' ? '' : input });
-  };
+  const baseSwapFieldChangeHandler =
+    (tokenInfo: any, handler: ({| input: string, quantity: string |}) => void) =>
+    (text: string = '') => {
+      if (tokenInfo.tokenId === '') {
+        // empty input
+        return;
+      }
+      const decimals = tokenInfo.decimals ?? 0;
+      const precision = tokenInfo.precision ?? decimals;
+      const [input, quantity] = Quantities.parseFromText(text, decimals, numberLocale, precision);
+      clearErrors();
+      handler({ quantity, input: text === '' ? '' : input });
+    };
 
   const sellUpdateHandler = ({ input, quantity }) => {
     if (quantity !== sellQuantity) {

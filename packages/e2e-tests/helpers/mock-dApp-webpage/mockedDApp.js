@@ -40,9 +40,7 @@ export class MockDAppWebpage {
         callback({ success: false, retValue: response, errMsg: null });
       }
     });
-    this.logger.info(
-      `MockDApp::getYoroiObject The response is ${JSON.stringify(yoroiObjResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getYoroiObject The response is ${JSON.stringify(yoroiObjResponse, null, 2)}`);
     return yoroiObjResponse;
   }
 
@@ -62,9 +60,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: error });
         });
     });
-    this.logger.info(
-      `MockDApp::getChangeAddress The response is ${JSON.stringify(changeAddressResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getChangeAddress The response is ${JSON.stringify(changeAddressResponse, null, 2)}`);
     return changeAddressResponse;
   }
 
@@ -84,9 +80,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: error });
         });
     });
-    this.logger.info(
-      `MockDApp::getRewardAddresses The response is ${JSON.stringify(rewardAddressesResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getRewardAddresses The response is ${JSON.stringify(rewardAddressesResponse, null, 2)}`);
     return rewardAddressesResponse;
   }
 
@@ -113,9 +107,7 @@ export class MockDAppWebpage {
       const utxos = mapCborUtxos(getUTXOsResponse.retValue);
       getUTXOsResponse.retValue = utxos;
     }
-    this.logger.info(
-      `MockDApp::getUTXOs The walletUTXOsResponse: ${JSON.stringify(getUTXOsResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getUTXOs The walletUTXOsResponse: ${JSON.stringify(getUTXOsResponse, null, 2)}`);
     return getUTXOsResponse;
   }
 
@@ -178,9 +170,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: error });
         });
     });
-    this.logger.info(
-      `MockDApp::checkAccessRequest The access response: ${JSON.stringify(accessResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::checkAccessRequest The access response: ${JSON.stringify(accessResponse, null, 2)}`);
 
     await this.driver.executeScript(accResp => {
       if (accResp.success) {
@@ -232,9 +222,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: error });
         });
     });
-    this.logger.info(
-      `MockDApp::isEnabled The wallet isEnabled response: ${JSON.stringify(isEnabledResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::isEnabled The wallet isEnabled response: ${JSON.stringify(isEnabledResponse, null, 2)}`);
     return isEnabledResponse;
   }
 
@@ -251,9 +239,7 @@ export class MockDAppWebpage {
       states.push(walletConnectedState);
     }
     const resultConnectionState = states.every(walletState => walletState === true);
-    this.logger.info(
-      `MockDApp::getConnectionState The connection state is ${JSON.stringify(resultConnectionState)}`
-    );
+    this.logger.info(`MockDApp::getConnectionState The connection state is ${JSON.stringify(resultConnectionState)}`);
     return resultConnectionState;
   }
 
@@ -271,9 +257,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getBalance The response is ${JSON.stringify(balanceResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getBalance The response is ${JSON.stringify(balanceResponse, null, 2)}`);
     if (balanceResponse.success) {
       const value = getCslValue(balanceResponse.retValue);
       const valueStr = value.coin().to_str();
@@ -284,9 +268,7 @@ export class MockDAppWebpage {
   }
 
   async requestSigningTxHex(unsignedTxHex) {
-    this.logger.info(
-      `MockDApp::requestSigningTxHex Requesting signing the unsigned transaction "${unsignedTxHex}"`
-    );
+    this.logger.info(`MockDApp::requestSigningTxHex Requesting signing the unsigned transaction "${unsignedTxHex}"`);
     this.driver.executeScript(uTxHex => {
       window.signTxPromise = window.api.signTx({ tx: uTxHex });
     }, unsignedTxHex);
@@ -299,30 +281,19 @@ export class MockDAppWebpage {
 
     const utxoAmount = Number(amount) + 1000000;
     const UTXOsreposne = await this.getUTXOs(String(utxoAmount), false);
-    this.logger.info(
-      `MockDApp::requestSigningTx The UTXOsreposne: ${JSON.stringify(UTXOsreposne, null, 2)}`
-    );
+    this.logger.info(`MockDApp::requestSigningTx The UTXOsreposne: ${JSON.stringify(UTXOsreposne, null, 2)}`);
     if (!UTXOsreposne.success || UTXOsreposne.retValue.length === 0) {
-      this.logger.error(
-        `MockDApp::requestSigningTx The error is received in UTXOsreposne: ${UTXOsreposne.errMsg}`
-      );
+      this.logger.error(`MockDApp::requestSigningTx The error is received in UTXOsreposne: ${UTXOsreposne.errMsg}`);
       throw new MockDAppWebpageError(UTXOsreposne.errMsg);
     }
 
     const changeAddressResponse = await this.getChangeAddress();
     if (!changeAddressResponse.success) {
-      this.logger.error(
-        `MockDApp::requestSigningTx The error is received: ${changeAddressResponse.errMsg}`
-      );
+      this.logger.error(`MockDApp::requestSigningTx The error is received: ${changeAddressResponse.errMsg}`);
       throw new MockDAppWebpageError(changeAddressResponse.errMsg);
     }
     const changeAddressHex = changeAddressResponse.retValue;
-    const { uTxHex, txFee } = buildSimpleTx(
-      toAddress,
-      amount,
-      changeAddressHex,
-      UTXOsreposne.retValue
-    );
+    const { uTxHex, txFee } = buildSimpleTx(toAddress, amount, changeAddressHex, UTXOsreposne.retValue);
 
     await this.requestSigningTxHex(uTxHex);
 
@@ -347,9 +318,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getSigningTxResult Signing result: ${JSON.stringify(signingResult, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getSigningTxResult Signing result: ${JSON.stringify(signingResult, null, 2)}`);
     return signingResult;
   }
 
@@ -363,9 +332,7 @@ export class MockDAppWebpage {
       address = addressesResponse.retValue[0];
       this.logger.info(`MockDApp::requestSigningData Using the address ${address}`);
     } else {
-      this.logger.error(
-        `MockDApp::requestSigningData The error is received: No used or unused addresses`
-      );
+      this.logger.error(`MockDApp::requestSigningData The error is received: No used or unused addresses`);
       throw new MockDAppWebpageError('There are no addresses to proceed');
     }
 
@@ -405,9 +372,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getSigningDataResult Signing data result: ${JSON.stringify(signingResult, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getSigningDataResult Signing data result: ${JSON.stringify(signingResult, null, 2)}`);
     return signingResult;
   }
 
@@ -431,21 +396,13 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     }, convertedAmount);
-    if (
-      collateralResponse.success &&
-      collateralResponse.retValue != null &&
-      collateralResponse.retValue.length !== 0
-    ) {
+    if (collateralResponse.success && collateralResponse.retValue != null && collateralResponse.retValue.length !== 0) {
       const utxos = mapCborUtxos(collateralResponse.retValue);
       collateralResponse.retValue = utxos;
-      this.logger.info(
-        `MockDApp::getCollateral response: ${JSON.stringify(collateralResponse, null, 2)}`
-      );
+      this.logger.info(`MockDApp::getCollateral response: ${JSON.stringify(collateralResponse, null, 2)}`);
       return collateralResponse;
     }
-    this.logger.error(
-      `MockDApp::getCollateral Something went wrong: ${JSON.stringify(collateralResponse.errMsg, null, 2)}`
-    );
+    this.logger.error(`MockDApp::getCollateral Something went wrong: ${JSON.stringify(collateralResponse.errMsg, null, 2)}`);
     return collateralResponse;
   }
 
@@ -467,17 +424,11 @@ export class MockDAppWebpage {
           return callback({ success: false, retValue: null, errMsg: error });
         });
     });
-    if (
-      collateralResult.success &&
-      collateralResult.retValue != null &&
-      collateralResult.retValue.length !== 0
-    ) {
+    if (collateralResult.success && collateralResult.retValue != null && collateralResult.retValue.length !== 0) {
       const utxos = mapCborUtxos(collateralResult.retValue);
       return { success: true, retValue: utxos, errMsg: null };
     }
-    this.logger.error(
-      `MockDApp::getCollateralResult Something went wrong: ${JSON.stringify(collateralResult)}`
-    );
+    this.logger.error(`MockDApp::getCollateralResult Something went wrong: ${JSON.stringify(collateralResult)}`);
     return collateralResult;
   }
 
@@ -495,9 +446,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     }, signedTxHex);
-    this.logger.info(
-      `MockDApp::submitTx The response is ${JSON.stringify(submitResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::submitTx The response is ${JSON.stringify(submitResponse, null, 2)}`);
     return submitResponse;
   }
 
@@ -514,9 +463,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getNetworkId The response is ${JSON.stringify(networkIdResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getNetworkId The response is ${JSON.stringify(networkIdResponse, null, 2)}`);
     return networkIdResponse;
   }
 
@@ -533,9 +480,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getExtensions The response is ${JSON.stringify(extensionsResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getExtensions The response is ${JSON.stringify(extensionsResponse, null, 2)}`);
     return extensionsResponse;
   }
 
@@ -555,9 +500,7 @@ export class MockDAppWebpage {
     if (pubDRepKeyResponse.success && convert) {
       pubDRepKeyResponse.retValue = getDRepIDHexAndBechFromHex(pubDRepKeyResponse.retValue);
     }
-    this.logger.info(
-      `MockDApp::getPubDRepKey The response is ${JSON.stringify(pubDRepKeyResponse, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getPubDRepKey The response is ${JSON.stringify(pubDRepKeyResponse, null, 2)}`);
     return pubDRepKeyResponse;
   }
 
@@ -578,16 +521,12 @@ export class MockDAppWebpage {
       const regPubStakeKey = response.retValue[0];
       response.retValue = [getCSLPubKeyHash(regPubStakeKey).to_hex()];
     }
-    this.logger.info(
-      `MockDApp::getRegisteredPubStakeKeys The response is ${JSON.stringify(response, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getRegisteredPubStakeKeys The response is ${JSON.stringify(response, null, 2)}`);
     return response;
   }
 
   async getUnregisteredPubStakeKeys(convert = false) {
-    this.logger.info(
-      `MockDApp::getUnregisteredPubStakeKeys Getting unregistered public stake keys`
-    );
+    this.logger.info(`MockDApp::getUnregisteredPubStakeKeys Getting unregistered public stake keys`);
     const response = await this.driver.executeAsyncScript((...args) => {
       const callback = args[args.length - 1];
       window.api.cip95
@@ -603,9 +542,7 @@ export class MockDAppWebpage {
       const unregPubStakeKey = response.retValue[0];
       response.retValue = [getCSLPubKeyHash(unregPubStakeKey).to_hex()];
     }
-    this.logger.info(
-      `MockDApp::getUnregisteredPubStakeKeys The response is ${JSON.stringify(response, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getUnregisteredPubStakeKeys The response is ${JSON.stringify(response, null, 2)}`);
     return response;
   }
 
@@ -645,9 +582,7 @@ export class MockDAppWebpage {
           callback({ success: false, retValue: null, errMsg: err });
         });
     });
-    this.logger.info(
-      `MockDApp::getSigningDataCIP95Result Signing data result: ${JSON.stringify(signingResult, null, 2)}`
-    );
+    this.logger.info(`MockDApp::getSigningDataCIP95Result Signing data result: ${JSON.stringify(signingResult, null, 2)}`);
     return signingResult;
   }
 }

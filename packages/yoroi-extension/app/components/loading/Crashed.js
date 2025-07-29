@@ -21,16 +21,14 @@ type Props = {|
 
 @observer
 export default class Crashed extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
     return (
       <UnavailableDialog title={intl.formatMessage(messages.title)}>
         <div className={styles.body}>
-          <div className={styles.attention}>
-            {intl.formatMessage(globalMessages.attentionHeaderText)}
-          </div>
+          <div className={styles.attention}>{intl.formatMessage(globalMessages.attentionHeaderText)}</div>
           <br />
           <div className={styles.explanation}>{this._getErrorMessageComponent()}</div>
         </div>

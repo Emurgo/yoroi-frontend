@@ -2,11 +2,7 @@ import { expect } from 'chai';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
-import {
-  WindowManager,
-  extensionTabName,
-  ledgerConnectTabName,
-} from '../../helpers/windowManager.js';
+import { WindowManager, extensionTabName, ledgerConnectTabName } from '../../helpers/windowManager.js';
 import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
@@ -96,12 +92,8 @@ for (const model in LedgerModels) {
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
       const walletInfo = await transactionsPage.getSelectedWalletInfo();
-      expect(walletInfo.balance, 'The wallet balance is different').to.equal(
-        testWalletLedger.balance
-      );
-      expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal(
-        testWalletLedger.name
-      );
+      expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWalletLedger.balance);
+      expect(walletInfo.name, `The wallet name should be Speculos.`).to.equal(testWalletLedger.name);
       expect(walletInfo.plate, `The wallet plate is different`).to.equal(testWalletLedger.plate);
     });
 

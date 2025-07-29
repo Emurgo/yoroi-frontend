@@ -35,13 +35,7 @@ describe('Changing wallet password. Negative. Incorrect old one.', function () {
 
   it('Changing password, incorrect old one, correct new one', async function () {
     const walletSubTabPage = new WalletSubTab(webdriver, logger);
-    await walletSubTabPage.changeWalletPassword(
-      incorrectOldPassword,
-      newPassword,
-      newPassword,
-      true,
-      true
-    );
+    await walletSubTabPage.changeWalletPassword(incorrectOldPassword, newPassword, newPassword, true, true);
   });
 
   it('Checking the error message', async function () {
@@ -49,7 +43,7 @@ describe('Changing wallet password. Negative. Incorrect old one.', function () {
     const errIsShown = await walletSubTabPage.passwordErrDisplayedAndNotEmpty();
     expect(errIsShown, 'The error is not displayed').to.be.true;
     const realErrMsg = await walletSubTabPage.getPasswordErrorMsg();
-    expect(realErrMsg, 'The error message isn\'t correct').to.equal(WRONG_PASSWORD);
+    expect(realErrMsg, "The error message isn't correct").to.equal(WRONG_PASSWORD);
   });
 
   after(function (done) {

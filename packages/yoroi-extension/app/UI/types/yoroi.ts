@@ -50,7 +50,6 @@ export type YoroiMetadata = {
 
 export type YoroiNftModerationStatus = 'consent' | 'blocked' | 'approved' | 'pending' | 'manual_review';
 
-
 export type YoroiRemoteConfig = {
   pushLinkKeys?: {
     internal?: Record<string, any>;

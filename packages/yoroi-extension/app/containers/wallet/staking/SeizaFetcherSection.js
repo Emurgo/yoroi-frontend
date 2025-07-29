@@ -69,7 +69,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
 
 const OperationsDetails = ({ avatarGenerated, poolName }) => {
   const { isStakeRegistered, stakeKeyDeposit, primaryTokenInfo } = useTxReviewModal();
-  const strings =  useStrings();
+  const strings = useStrings();
   return (
     <Stack direction="column" spacing={16}>
       {!isStakeRegistered && (
