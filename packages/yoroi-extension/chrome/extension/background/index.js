@@ -94,7 +94,7 @@ const { request } = makeAccessorServer(appState, async (serverEvent) => {
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === 'yoroi-ng-client-request') {
-    request(message.clientRequest).then(sendResponse);
+    request(message.clientRequest).then(sendResponse).catch(console.error);
   }
   return true;
 });
