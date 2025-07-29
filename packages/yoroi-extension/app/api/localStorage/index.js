@@ -43,7 +43,7 @@ const storageKeys = {
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
-  NFTS_GRID_VIEW_STATE: 'NFTS_GRID_STATE',
+  NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
