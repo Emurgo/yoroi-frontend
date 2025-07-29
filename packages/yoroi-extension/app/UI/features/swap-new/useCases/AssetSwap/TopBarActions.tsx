@@ -1,5 +1,4 @@
 import { Stack, useTheme } from '@mui/material';
-import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
