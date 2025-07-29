@@ -17,7 +17,7 @@ import Zero from '../features/airdrop/useCases/Zero';
 import ClaimDialog from '../features/airdrop/useCases/ClaimDialog';
 import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
 import ClaimContent from '../features/airdrop/useCases/ClaimContent';
-
+import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 
 type AddressClaimData = {
   addrHex: string,
@@ -117,13 +117,19 @@ export default function AirdropPage({ stores }: Props) {
     content = (<LoadingSpinner />);
   } else if (alloc.isZero()) {
     content = (<Zero />);
+  } else if (isClaimDone) {
+    content = (
+      <ClaimDone
+        alloc={alloc}
+        destAddrBech32={destAddrBech32}
+      />
+    );
   } else {
     content = (
       <ClaimContent
         alloc={alloc}
         isTrezor={isTrezor}
         destAddrBech32={destAddrBech32}
-        isClaimDone={isClaimDone}
         isClaimDialog={isClaimDialog}
         showClaimDialog={showClaimDialog}
       />

@@ -1,4 +1,4 @@
-import { Box, Typography, Checkbox, FormControlLabel, } from '@mui/material';
+import { Box, Typography, Checkbox, FormControlLabel } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useIntl, defineMessages } from 'react-intl';
 import type BigNumber from 'bignumber.js';
@@ -39,13 +39,12 @@ interface Props {
   alloc: BigNumber,
   isTrezor: boolean,
   destAddrBech32: string,
-  isClaimDone: boolean,
   isClaimDialog: boolean,
   showClaimDialog: () => void,
 }
 
 export default function ClaimContent(props: Props) {
-  const { alloc, isTrezor, destAddrBech32, isClaimDone, isClaimDialog, showClaimDialog } = props;
+  const { alloc, isTrezor, destAddrBech32, isClaimDialog, showClaimDialog } = props;
   const [isTermsAgreed, setTermsAgreed] = useState<boolean>(false);
 
   const intl = useIntl();
@@ -90,7 +89,7 @@ export default function ClaimContent(props: Props) {
             )}
           </Box>
           {!isTrezor ? (
-            !isClaimDone && (<>
+            <>
               <Terms />
               <FormControlLabel
                 label={intl.formatMessage(messages.agree)}
@@ -106,7 +105,7 @@ export default function ClaimContent(props: Props) {
                   color: 'ds.text_gray_medium',
                 }}
               />
-            </>)
+            </>
           ) : ( // if trezor
             <Box
               sx={{
@@ -138,7 +137,7 @@ export default function ClaimContent(props: Props) {
           )}
         </Box>
       </Box>
-      {!isTrezor && !isClaimDone && (
+      {!isTrezor && (
         <Box sx={{ height: '96px', display: 'flex' }}>
           <LoadingButton
             //  @ts-ignore
