@@ -1,10 +1,12 @@
 import { IconButton, styled } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 export const SwitchAssets = () => {
+  const { swapForm } = useSwapRevamp();
   return (
     <Wrapper>
-      <IconWrapper icon={Icons.Swap} color="ds.el_primary_medium" />
+      <IconWrapper icon={Icons.Swap} color="ds.el_primary_medium" onClick={() => swapForm.action({ type: 'SwitchTouched' })} />
     </Wrapper>
   );
 };
@@ -19,7 +21,7 @@ const Wrapper = styled(IconButton)(({ theme }: any) => ({
   alignItems: 'center',
   backgroundColor: theme.palette.ds.bg_color_contrast_min,
   position: 'absolute',
-  top: '32%',
+  top: '50%',
   left: '45%',
   cursor: 'pointer',
   '&:hover': {

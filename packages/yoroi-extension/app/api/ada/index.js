@@ -1477,7 +1477,6 @@ export default class AdaApi {
         request.metadata,
         request.publicDeriver.networkId
       );
-
       return new HaskellShelleyTxSignRequest({
         senderUtxos: unsignedTx.senderUtxos,
         unsignedTx: unsignedTx.txBuilder,

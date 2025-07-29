@@ -10,6 +10,7 @@ import { atomicBreakdown } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../constants';
 import { AssetDirectionType } from '../types';
+import { normalizeTokenId } from '../helpers';
 
 type AssetInputProps = {
   direction: AssetDirectionType;
@@ -21,13 +22,11 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
-
   const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
   const value = tokenInput.value;
 
   const inputRef = direction === ASSET_DIRECTION_IN ? swapForm.tokenInInputRef : swapForm.tokenOutInputRef;
   const error = direction === ASSET_DIRECTION_IN ? tokenInput.error : null;
-
   const label = direction === ASSET_DIRECTION_IN ? 'From' : 'To';
   const tokenInputInfo = tokenInfos.get(tokenInput.tokenId);
   const touched = tokenInput.isTouched;
@@ -42,18 +41,19 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   } = useCurrencyPairing();
 
   let totalPrice: string | undefined;
-  let selectedToken: any;
+  let selectedTokenIn: any;
+  let selectedTokenOut: any;
   const tokenPrice = data24h?.[1]?.price?.close ?? 1;
 
   if (direction === ASSET_DIRECTION_IN && primaryTokenActivity != null) {
-    const normalizeId = (id?: string | null) => (id === '' ? '.' : id);
-    selectedToken = ftAssetList.filter(token => {
-      return normalizeId(token.info.id) === swapForm.tokenInInput?.tokenId;
+    const formatId = (id?: string | null) => (id === '.' ? '' : id);
+    selectedTokenIn = ftAssetList.filter(token => {
+      return token.info.id === formatId(swapForm.tokenInInput?.tokenId);
     })[0];
-    const selectedTokenDecimals = selectedToken?.info?.numberOfDecimals ?? 0;
 
+    const selectedTokenDecimals = selectedTokenIn?.info?.numberOfDecimals ?? 0;
     try {
-      const quantityBigInt = bigNumberToBigInt(selectedToken.quantity);
+      const quantityBigInt = bigNumberToBigInt(selectedTokenIn.quantity);
       const activityBN = new BigNumber(primaryTokenActivity.toString());
 
       totalPrice = atomicBreakdown(quantityBigInt, selectedTokenDecimals)
@@ -63,6 +63,13 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     } catch (err) {
       console.error('Failed to calculate totalPrice:', err);
     }
+  }
+
+  if (direction === ASSET_DIRECTION_OUT) {
+    const formatId = (id?: string | null) => (id === '.' ? '' : id);
+    selectedTokenOut = ftAssetList.filter(token => {
+      return token.info.id === formatId(swapForm.tokenOutInput?.tokenId);
+    })[0];
   }
 
   const assetInputName = React.useMemo(() => {
@@ -78,6 +85,16 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     return undefined;
   }, [direction, tokenInputInfo]);
 
+  const AssetIdForIcon = React.useMemo(() => {
+    if (direction === ASSET_DIRECTION_IN) {
+      return tokenInput.tokenId ?? tokenInputInfo?.id;
+    }
+    if (direction === ASSET_DIRECTION_OUT) {
+      return tokenInputInfo?.id;
+    }
+    return undefined;
+  }, [direction, tokenInputInfo, tokenInput]);
+
   const focusInput = () => {
     if (inputRef?.current) {
       inputRef.current.focus();
@@ -90,7 +107,15 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   };
 
   return (
-    <Wrapper selected={focusState} hasError={!!error} atoms={atoms} direction={direction}>
+    <Wrapper
+      selected={focusState}
+      hasError={!!error}
+      atoms={atoms}
+      direction={direction}
+      onClick={() => {
+        direction === ASSET_DIRECTION_OUT && swapForm.tokenOutInput.value.length === 0 && onAssetSelect();
+      }}
+    >
       <Stack spacing={1} {...atoms.gap_sm}>
         <Label variant="body2">{label}</Label>
 
@@ -105,7 +130,10 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
             sx={{ cursor: 'pointer' }}
           >
             <TokenInfoIcon
-              info={{ id: tokenInputInfo?.id, policy: tokenInputInfo?.fingerprint, name: tokenInputInfo?.name }}
+              info={{
+                id: normalizeTokenId(AssetIdForIcon),
+                direction,
+              }}
               size="md"
             />
             <Typography variant="h5" fontWeight={500} {...atoms.pl_sm} inline>
@@ -140,23 +168,29 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
         </Stack>
 
         {direction === ASSET_DIRECTION_IN ? (
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
-              <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
-              <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
-                {selectedToken?.formatedAmount} {selectedToken?.info.name}
+          swapForm.tokenInInput.error === null ? (
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
+                <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
+                <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
+                  {selectedTokenIn?.formatedAmount} {selectedTokenIn?.info.name}
+                </Typography>
+              </Stack>
+              <Typography variant="body2" color="ds.text_gray_low">
+                {totalPrice} {currency}
               </Typography>
             </Stack>
-            <Typography variant="body2" color="ds.text_gray_low">
-              {totalPrice} {currency}
+          ) : (
+            <Typography variant="caption" color="ds.sys_magenta_500">
+              {swapForm.tokenInInput.error}
             </Typography>
-          </Stack>
+          )
         ) : (
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Stack direction="row" justifyContent="flex-start" alignItems="center" gap={4}>
               <IconWrapper icon={Icons.Wallet} color="ds.el_gray_low" />
               <Typography variant="body2" color="ds.text_gray_low" textAlign="center">
-                0
+                {selectedTokenOut ? selectedTokenOut.formatedAmount : '0'} {selectedTokenOut?.info.name}
               </Typography>
             </Stack>
           </Stack>
