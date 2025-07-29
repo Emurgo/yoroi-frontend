@@ -1,7 +1,5 @@
-export const normalizeTokenId = (id?: string | null) => (id === '' ? '.' : id);
-
-// import {CSL} from '@emurgo/cardano-serialization-lib-browser'
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+export const normalizeTokenId = (id?: string | null) => (id === '' ? '.' : id);
 
 export const useGetInputs = (walletUtxos: any[]) => {
   const getInputs = async (amounts: { [tokenId: string]: string }) => {
@@ -10,7 +8,7 @@ export const useGetInputs = (walletUtxos: any[]) => {
       if (tokenId === undefined) {
         throw new Error('No tokenId provided in amounts');
       }
-      const requiredAmount = BigInt(Number(amounts[tokenId]!) * 1000000);
+      const requiredAmount = BigInt(Number(amounts[tokenId]));
 
       const matching = walletUtxos
         .map(utxo => {
@@ -80,8 +78,9 @@ export const useGetInputs = (walletUtxos: any[]) => {
       );
 
       return inputs;
-    } finally {
-      //   release()
+    } catch {
+      console.warn('Failed to get inputs');
+      return [];
     }
   };
 
