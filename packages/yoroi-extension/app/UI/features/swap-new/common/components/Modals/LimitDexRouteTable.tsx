@@ -2,12 +2,8 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
 
-
-
-
-
 export const LimitDexRouteTable = () => {
-  const { primaryTokenInfo, swapForm,limitOptions } = useSwapRevamp();
+  const { primaryTokenInfo, swapForm, limitOptions } = useSwapRevamp();
   const { closeModal } = useModal();
   const headers = ['Route', 'TVL', 'DEX fee'];
 
@@ -42,7 +38,7 @@ export const LimitDexRouteTable = () => {
         </TableHead>
 
         <TableBody>
-          {limitOptions?.options.map((row,index) => {
+          {limitOptions?.options.map((row, index) => {
             const isSelected = row.protocol === swapForm.selectedProtocol.value;
             return (
               <TableRow
@@ -76,7 +72,6 @@ export const LimitDexRouteTable = () => {
                     {row.batcherFee} {primaryTokenInfo.name}
                   </Typography>
                 </TableCell>
-      
               </TableRow>
             );
           })}

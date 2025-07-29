@@ -75,7 +75,7 @@ export const AssetSwap = () => {
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
-      <Stack position="relative">
+      <Stack>
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
         <AssetInput direction={ASSET_DIRECTION_IN} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_IN)} />
