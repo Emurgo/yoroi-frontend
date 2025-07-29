@@ -212,7 +212,7 @@ export default class LocalStorageApi {
     return Number(id);
   };
 
-  // ========== Selected Wallet ========== // EXAMPLE
+  // ========== Selected Wallet ========== //
   getSelectedWalletPublicKey: void => Promise<?string> = async () => {
     return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
   };
