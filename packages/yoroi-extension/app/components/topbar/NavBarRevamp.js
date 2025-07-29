@@ -28,7 +28,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 
 function NavBarRevamp(props: Props) {
   const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = props;
-  const { setNotificationCenterOpen } = useNotifications();
+  const { setNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
   
   return (
     <Box
@@ -65,6 +65,17 @@ function NavBarRevamp(props: Props) {
               {children}
               <StyledButton onClick={() => { setNotificationCenterOpen(true); }}>
                 <Icon.Bell />
+                {hasUnreadNotifications && (
+                   <Box sx={{
+                     height: '6px',
+                     width: '6px',
+                     borderRadius: '50%',
+                     backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
+                     position: 'relative',
+                     right: '10px',
+                     top: '-8px'
+                   }} />
+              )}
               </StyledButton>
               {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
               {walletDetails != null && (

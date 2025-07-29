@@ -1,5 +1,5 @@
 import appState from '../../../api/appState';
-import { call, makeAccessorServer } from '../../../api/objectModel';
+import { call } from '../../../api/objectModel';
 
 const broadcast = new BroadcastChannel('');
 
@@ -27,21 +27,6 @@ broadcast.onmessage = (event: Event) => {
       time: (new Date()).toISOString(),
     });
   } else if (event.data.type === 'push-notification-close') {
-    call(notifications.setRead, event.data.data.fcmMessageId);
+    call(appState.notifications.setRead, event.data.data.fcmMessageId);
   }
 }
-
-const { request } = makeAccessorServer(appState, (serverEvent) => {
-  {
-    type: 'yoroi-ng-server-event',
-    serverEvent
-  }
-
-})
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === 'yoroi-ng-client-request') {
-    request(message.clientRequest).then(sendResponse);
-  }
-  return true;
-});

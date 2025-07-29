@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type AppStateType from './appState';
-import { getValue, listen, makeClientAccessor, cache } from './objectModel';
+import { getValue, listen, makeClientAccessor, cache, call } from './objectModel';
 
 const { modelAccessor, onServerEvent } = makeClientAccessor<typeof AppStateType>((clientRequest) => {
   const msg = {
@@ -44,3 +44,5 @@ export function useModelValue<T>(value: T extends (...args: any) => any ? never 
   }, []);
   return retVal;
 }
+
+export { call }

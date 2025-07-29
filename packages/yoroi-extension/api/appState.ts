@@ -36,13 +36,18 @@ const notifications = {
     emitChange([...path, 'all']);
     emitChange([...path, 'hasUnread']);
   }),
+  markAllRead: mutateFunc((path, emitChange) => async () => {
+    await db.notifications.toCollection().modify({ read: true });
+    emitChange([...path, 'all']);
+    emitChange([...path, 'hasUnread'], false);
+  }),
   add: mutateFunc((path, emitChange) => async (notification: NotificationData) => {
     await db.notifications.put(notification);
     emitChange([...path, 'all']);
     emitChange([...path, 'hasUnread']);
   }),
   hasUnread: lazy(async () =>  {
-    return !!(await db.notifications.get({ read: false }));
+    return !!(await db.notifications.toArray()).find(notification => !notification.read);
   }),
 };
 

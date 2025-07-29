@@ -10,6 +10,7 @@ import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import LocalStorageApi from '../../../../api/localStorage';
 import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
+import { appState, useModelValue } from '../../../../../api/frontEnd';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
@@ -35,6 +36,7 @@ const initialValue = {
   },
   isNotificationCenterOpen: false,
   setNotificationCenterOpen: (_open: boolean) => {},
+  hasUnreadNotifications: false,
 };
 
 function getRandomNotification() {
@@ -247,7 +249,18 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     []
   );
 
-  return <Context.Provider value={{ isNotificationCenterOpen, ...value}}>{children}</Context.Provider>;
+  const hasUnreadNotifications = (() => {
+    const { loaded, value } = useModelValue(appState.notifications.hasUnread);
+    return loaded && value;
+  })();
+
+  return (
+    <Context.Provider
+      value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value}}
+    >
+      {children}
+    </Context.Provider>
+  );
 }
 
 export const useNotifications = () => {

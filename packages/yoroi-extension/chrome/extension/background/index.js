@@ -12,6 +12,10 @@ import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
 // $FlowIgnore
 import './pushNotificationHandler';
+// $FlowIgnore
+import { makeAccessorServer } from '../../../api/objectModel';
+// $FlowIgnore
+import appState from '../../../api/appState';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -72,3 +76,25 @@ if (environment.isFirefox()) {
     }
   });
 }
+
+const { request } = makeAccessorServer(appState, async (serverEvent) => {
+  const tabs = await chrome.tabs.query({});
+  for (let tab of tabs) {
+    if (tab.url.startsWith(location.origin)) {
+      chrome.tabs.sendMessage(
+        tab.id,
+        {
+          type: 'yoroi-ng-server-event',
+          serverEvent
+        }
+      );
+    }
+  }
+})
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'yoroi-ng-client-request') {
+    request(message.clientRequest).then(sendResponse);
+  }
+  return true;
+});
