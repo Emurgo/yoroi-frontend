@@ -22,7 +22,7 @@ db.version(1).stores({
 
 const notifications = {
   all: lazy(async () => {
-    return (await db.notifications.toArray()).map(notification => ({
+    return (await db.notifications.reverse().toArray()).map(notification => ({
       ...notification,
       setRead: mutateFunc((path, emitChange) => async () => {
         await db.notifications.update(notification.id, { read: true });
