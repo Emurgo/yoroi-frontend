@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Link } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
 
@@ -25,25 +25,26 @@ export default function Zero() {
         borderRadius: '8px',
         bgcolor: 'ds.bg_color_contrast_min',
         padding: '24px',
+        textAlign: 'center'
       }}
     >
       {/*  @ts-ignore */}
       <Typography variant="h1xl">
         {intl.formatMessage(messages.noAllocTitle)}
       </Typography>
-      <Box>
-        {/*  @ts-ignore */}
-        <Typography variant="body1" as="span">
-          {intl.formatMessage(messages.noAllocTitle)}
-        </Typography>
-        &nbsp;
-        {/*  @ts-ignore */}
-        <Typography variant="body1" as="span">
-          <a href="">
-            {intl.formatMessage(globalMessages.learnMore)}
-          </a>
-        </Typography>
-      </Box>
+
+      {/*  @ts-ignore */}
+      <Typography variant="body1">
+        {intl.formatMessage(messages.noAllocText)}
+      </Typography>
+
+      {/*  @ts-ignore */}
+      <Typography variant="body1">
+        <Link href=""  target="_blank" rel="noopener noreferrer">
+          {intl.formatMessage(globalMessages.learnMore)}
+        </Link>
+      </Typography>
+
     </Box>
   );
 }
