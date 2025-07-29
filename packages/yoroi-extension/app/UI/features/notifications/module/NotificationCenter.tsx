@@ -35,7 +35,7 @@ export const NotificationCenter = () => {
 
   return (
     <>
-      <StyledDrawer open anchor="right" >
+      <StyledDrawer open anchor="right" onClose={() => { setNotificationCenterOpen(false) }}>
         <Stack direction="row" justifyContent="center">
           <Typography variant="button" my="24px" textAlign="center" id='notificationCenter-title-text'>
             {strings.notificationCenterTitle}
