@@ -249,7 +249,7 @@
   "global.labels.unexpectedError": "Une erreur inattendue s'est produite",
   "global.labels.upgrade": "Mettre à jour",
   "global.labels.wrongPassword": "Mot de passe incorrect",
-  "global.labels.incorectFormat": "Incorrect format",
+  "global.labels.incorectFormat": "Format incorrect",
   "global.language.chinese.simplified": "简体中文",
   "global.language.chinese.traditional": "繁體中文",
   "global.language.czech": "Czech",
