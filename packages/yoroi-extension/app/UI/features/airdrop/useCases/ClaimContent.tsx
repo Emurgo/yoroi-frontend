@@ -40,7 +40,7 @@ export default function ClaimContent(props: Props) {
   const intl = useIntl();
   return (
     <>
-      <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1}}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', flexGrow: 1, overflow: 'scroll' }}>
         <Box
           sx={{
             marginLeft: 'auto',
