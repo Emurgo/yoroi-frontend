@@ -3,8 +3,8 @@ import { LoadingButton } from '@mui/lab';
 import { useIntl, defineMessages } from 'react-intl';
 import { useState, useRef, useEffect } from 'react';
 import Terms from './Terms';
-import { ReactComponent as ErrorTriangleIcon } from '../../../../assets/images/revamp/error.triangle.svg';
 import { ClaimInfo1 } from './ClaimInfo';
+import { Icons, IconWrapper } from '../../../components';
 
 const messages = defineMessages({
   agree: {
@@ -102,10 +102,10 @@ export default function ClaimContent(props: Props) {
                 marginTop: '24px',
               }}
             >
-              <Box>
+              <Stack direction="row" gap="8px">
                 {/*  @ts-ignore */}
                 <Box as="span" sx={{ verticalAlign: 'middle' }}>
-                  <ErrorTriangleIcon />
+                  <IconWrapper color="ds.sys_magenta_500" icon={Icons.ErrorTriangle} />
                 </Box>
                 {/*  @ts-ignore */}
                 <Typography
@@ -114,11 +114,10 @@ export default function ClaimContent(props: Props) {
                   variant="body1"
                   fontWeight={500}
                   color="ds.sys_magenta_500"
-                  ml="8px"
                 >
                   {intl.formatMessage(messages.trezorTitle)}
                 </Typography>
-              </Box>
+              </Stack>
               <Typography variant="body1" color="ds.text_gray_medium">
                 {intl.formatMessage(messages.trezorText)}
               </Typography>
