@@ -77,9 +77,10 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
           disabled: !disclaimerAgreed,
           primary: true,
         },
+        id="disclaimer"
       ]}
     >
-      <DisclaimerText>{intl.formatMessage(messages.disclaimer)}</DisclaimerText>
+      <DisclaimerText id="disclaimer-text">{intl.formatMessage(messages.disclaimer)}</DisclaimerText>
       <DisclaimerText>&nbsp;</DisclaimerText>
       <DisclaimerBold>{intl.formatMessage(messages.disclaimerNote)}</DisclaimerBold>
       <DisclaimerText>{intl.formatMessage(messages.disclaimerNote1)}</DisclaimerText>
@@ -88,6 +89,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
       <DisclaimerText>{intl.formatMessage(messages.disclaimerNote4)}</DisclaimerText>
       <DisclaimerText>&nbsp;</DisclaimerText>
       <FormControlLabel
+        id="disclaimer-checkbox"
         sx={{ marginLeft: '0px', color: 'ds.text_gray_medium' }}
         control={<Checkbox checked={disclaimerAgreed} onChange={event => setDisclaimerAgreed(event.target.checked)} />}
         label={intl.formatMessage(messages.disclaimerAgree)}

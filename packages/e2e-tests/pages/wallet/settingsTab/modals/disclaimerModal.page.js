@@ -9,7 +9,7 @@ class CashbackTermsModal extends BasePage {
   // locators - Updated for actual cashback terms modal
   
   disclaimerDialogLocator = {
-    locator: '.ModalContent.MuiBox-root.css-136wgu4',
+    locator: '#disclaimer',
     method: 'css',
   };
   disclaimerTitleLocator = {
@@ -17,19 +17,19 @@ class CashbackTermsModal extends BasePage {
     method: 'css',
   };
   disclaimerCloseBtnLocator = {
-    locator: 'button.MuiButtonBase-root.MuiIconButton-root.MuiIconButton-sizeMedium.css-ed9i7i',
+    locator: 'button[aria-label="close"]',
     method: 'css',
   };
   disclaimerContentLocator = {
-    locator: '.MuiBox-root.css-czp7nw',
+    locator: '#disclaimer',
     method: 'css',
   };
   disclaimerProceedBtnLocator = {
-    locator: '#dialog-proceed-button',
+    locator: '#disclaimer-proceed',
     method: 'css',
   };
   disclaimerCheckboxLocator = {
-    locator: 'label.MuiFormControlLabel-root.MuiFormControlLabel-labelPlacementEnd.css-y4s9hd',
+    locator: '#disclaimer-checkbox',
     method: 'css',
   };
 
