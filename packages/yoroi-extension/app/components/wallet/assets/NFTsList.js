@@ -19,6 +19,7 @@ import { ROUTES } from '../../../routes-config';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 // $FlowIgnore
 import { imageExists } from '../../../UI/tsUiCoreUtils';
+import LocalStorageApi from '../../../api/localStorage';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -54,8 +55,25 @@ const listColumnViews = [
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
+  const localStorageApi = new LocalStorageApi();
   const [columns, setColumns] = useState(listColumnViews[0]);
-  const setColumnsAndTrack = function (column) {
+
+  useEffect(() => {
+    const loadGridViewState = async () => {
+      const viewInStorage = await localStorageApi.getNftGridViewState();
+      if (viewInStorage) {
+        const savedCount = parseInt(viewInStorage, 10);
+        const savedColumn = listColumnViews.find(view => view.count === savedCount);
+        if (savedColumn) {
+          setColumns(savedColumn);
+        }
+      }
+    };
+    loadGridViewState();
+  }, []);
+
+  const setColumnsAndTrack = async column => {
+    await localStorageApi.setNftGridViewState(column.count.toString());
     setColumns(column);
     ampli.nftGalleryGridViewSelected({
       nft_grid_view: column.count === 4 ? '4_rows' : '6_rows',
