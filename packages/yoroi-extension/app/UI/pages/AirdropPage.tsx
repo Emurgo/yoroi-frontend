@@ -49,6 +49,8 @@ interface Props {
   }
 }
 
+const NUMBER_OF_NIGHT_DECIMALS = 6;
+
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
   const wallet = stores.wallets.selected;
@@ -62,6 +64,8 @@ export default function AirdropPage({ stores }: Props) {
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setClaimDialog] = useState(false);
   const [isClaimDone, setClaimDone] = useState(false);
+
+  const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
@@ -120,14 +124,14 @@ export default function AirdropPage({ stores }: Props) {
   } else if (isClaimDone) {
     content = (
       <ClaimDone
-        alloc={alloc}
+        alloc={formattedAlloc}
         destAddrBech32={destAddrBech32}
       />
     );
   } else {
     content = (
       <ClaimContent
-        alloc={alloc}
+        alloc={formattedAlloc}
         isTrezor={isTrezor}
         destAddrBech32={destAddrBech32}
         isClaimDialog={isClaimDialog}
