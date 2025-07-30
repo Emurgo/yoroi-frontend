@@ -13,7 +13,7 @@
   "airdrop.size": "Your allocation size",
   "airdrop.terms": "Terms & Conditions",
   "airdrop.trezorText": "Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.",
-  "airdrop.trezorTitle": "Trezor not supported",
+  "airdrop.trezorTitle": "Trezor tidak didukung",
   "airdrop.wrongPassword": "Wrong password",
   "api.errors.ApiMethodNotYetImplementedError": "Fungsi API ini belum diterapkan.",
   "api.errors.CannotSendBelowMinimumValueError": "A minimum of 1 ADA is required",
