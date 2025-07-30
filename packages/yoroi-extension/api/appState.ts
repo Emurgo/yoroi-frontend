@@ -47,7 +47,15 @@ const notifications = {
     emitChange([...path, 'hasUnread']);
   }),
   hasUnread: lazy(async () =>  {
-    return !!(await db.notifications.toArray()).find(notification => !notification.read);
+    let hasUnread = false;
+    await db.notifications.toCollection().reverse().each((notification, cursor) => {
+      if (!notification.read) {
+        hasUnread = true;
+        // @ts-ignore: undocumented
+        cursor.stop();
+      }
+    });
+    return hasUnread;
   }),
 };
 
