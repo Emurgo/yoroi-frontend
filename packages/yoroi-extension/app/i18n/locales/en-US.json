@@ -12,6 +12,8 @@
   "airdrop.mnemonicClaimDialogText": "Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.",
   "airdrop.size": "Your allocation size",
   "airdrop.terms": "Terms & Conditions",
+  "airdrop.tooltip.allocation": "This is the NIGHT token allocation entitlement for this claim based on the current wallet.",
+  "airdrop.tooltop.destinationAddress": "A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.",
   "airdrop.trezorText": "Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.",
   "airdrop.trezorTitle": "Trezor not supported",
   "airdrop.wrongPassword": "Wrong password",
