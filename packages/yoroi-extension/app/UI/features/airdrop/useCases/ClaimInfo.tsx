@@ -1,7 +1,7 @@
 import { Box, Typography, styled, Stack } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
-import CopyableAddress from '../../../../components/widgets/CopyableAddress';
+import CopyableText from '../../../components/CopyableText';
 import globalMessages from '../../../../i18n/global-messages';
 
 const messages = defineMessages({
@@ -70,11 +70,11 @@ export function ClaimInfo1(props: Props & { isTrezor: boolean }) {
             {intl.formatMessage(messages.destinationAddress)}
             <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
           </Typography>
-          <CopyableAddress hash={destAddrBech32}>
+          <CopyableText value={destAddrBech32} copyButtonFollowText>
             <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
               {destAddrBech32}
             </Typography>
-          </CopyableAddress>
+          </CopyableText>
         </Box>
       )}
     </BoxWithInfo>
@@ -113,11 +113,11 @@ export function ClaimInfo2(props: Props) {
           <Typography variant="body1" sx={{ fontWeight: 500 }}>
             {intl.formatMessage(globalMessages.addressLabel)}
           </Typography>
-          <CopyableAddress hash={destAddrBech32}>
+          <CopyableText value={destAddrBech32} copyButtonFollowText>
             <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
               {destAddrBech32}
             </Typography>
-          </CopyableAddress>
+          </CopyableText>
         </Stack>
       </Box>
     </Stack>
