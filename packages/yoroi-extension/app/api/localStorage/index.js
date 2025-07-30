@@ -43,6 +43,7 @@ const storageKeys = {
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
+  NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -317,6 +318,15 @@ export default class LocalStorageApi {
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
     setLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST, JSON.stringify(value ?? []));
+
+  // ========== NFTs Grid View State  ========== //
+  getNftGridViewState: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.NFTS_GRID_VIEW_STATE);
+  };
+
+  setNftGridViewState: string => Promise<void> = async gridViewState => {
+    await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
+  };
 
   // =========== Common =============== //
 
