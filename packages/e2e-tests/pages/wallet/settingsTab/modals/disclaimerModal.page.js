@@ -9,28 +9,24 @@ class CashbackTermsModal extends BasePage {
   // locators - Updated for actual cashback terms modal
   
   disclaimerDialogLocator = {
-    locator: 'dialog-dialogWindow-modalWindow',
+    locator: 'disclaimer-dialogWindow-modalWindow',
     method: 'id',
   };
   disclaimerTitleLocator = {
-    locator: '#dialog-dialogTitle-text',
-    method: 'css',
+    locator: 'disclaimer-dialogTitle-text',
+    method: 'id',
   };
   disclaimerCloseBtnLocator = {
-    locator: 'button[aria-label="close"]',
-    method: 'css',
-  };
-  disclaimerContentLocator = {
-    locator: '#disclaimer',
-    method: 'css',
+    locator: 'disclaimer-closeModal-button',
+    method: 'id',
   };
   disclaimerProceedBtnLocator = {
-    locator: '#disclaimer-proceed',
-    method: 'css',
+    locator: 'disclaimer-proceed-button',
+    method: 'id',
   };
   disclaimerCheckboxLocator = {
-    locator: '#disclaimer-checkbox',
-    method: 'css',
+    locator: 'CheckBoxOutlineBlankIcon',
+    method: 'id',
   };
 
   // methods
@@ -62,12 +58,6 @@ class CashbackTermsModal extends BasePage {
   async proceedWithDisclaimer() {
     return await this.withLogging('proceedWithDisclaimer', async () => {
       await this.click(this.disclaimerProceedBtnLocator);
-    });
-  }
-
-  async getDisclaimerContent() {
-    return await this.withLogging('getDisclaimerContent', async () => {
-      return await this.getText(this.disclaimerContentLocator);
     });
   }
 
