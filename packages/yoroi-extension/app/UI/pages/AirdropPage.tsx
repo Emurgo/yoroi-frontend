@@ -104,15 +104,10 @@ export default function AirdropPage({ stores }: Props) {
   }
 
   const claim = async (password) => {
-    if (wallet.type === 'mnemonic') {
-      for (const addr of unclaimedAddrs) {
-        await claimForAddress(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
-      }
-      setClaimDialog(false);
-      setClaimDone(true);
-    } else { // ledger
-      await claimForAddress(wallet, unclaimedAddrs[0], destAddrBech32, password, stores.profile.currentLocale);
-    }
+    const addr = unclaimedAddrs[0];
+    await claimForAddress(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+    setClaimDialog(false);
+    setClaimDone(true);
   }
 
   let content;
