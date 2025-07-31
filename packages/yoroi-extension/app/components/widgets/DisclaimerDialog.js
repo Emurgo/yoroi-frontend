@@ -79,7 +79,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
         },
       ]}
     >
-      <DisclaimerText id="disclaimer-text">{intl.formatMessage(messages.disclaimer)}</DisclaimerText>
+      <DisclaimerText>{intl.formatMessage(messages.disclaimer)}</DisclaimerText>
       <DisclaimerText>&nbsp;</DisclaimerText>
       <DisclaimerBold>{intl.formatMessage(messages.disclaimerNote)}</DisclaimerBold>
       <DisclaimerText>{intl.formatMessage(messages.disclaimerNote1)}</DisclaimerText>
