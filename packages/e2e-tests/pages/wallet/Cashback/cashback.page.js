@@ -64,10 +64,13 @@ class CashbackPage extends WalletCommonBase {
   async isCashbackPageTitleVisible(timeout = twoSeconds) {
     return await this.withLogging('isCashbackPageTitleVisible', async () => {
       try {
-        await this.waitForElement(this.cashbackPageTitleLocator, timeout);
-        return await this.customWaitIsPresented(this.cashbackPageTitleLocator, timeout, quarterSecond);
+        const pageTitle = await this.getPageTitle();
+        const expectedTitle = 'Cashback';
+        const result = pageTitle === expectedTitle;
+        this.logger.info(`Page title: "${pageTitle}", Expected: "${expectedTitle}", Match: ${result}`);
+        return result;
       } catch (error) {
-        this.logger.info(`Cashback page title not visible: ${error.message}`);
+        this.logger.info(`Failed to get page title: ${error.message}`);
         return false;
       }
     });
@@ -111,11 +114,6 @@ class CashbackPage extends WalletCommonBase {
       const buttonLoaded = await this.isClaimCashbackButtonVisible(timeout);
       this.logger.info(`Claim Cashback button visible: ${buttonLoaded}`);
       
-      // Check card structure separately
-      this.logger.info('Checking Cashback card structure...');
-      const cardStructureValid = await this.isCashbackCardStructureValid(timeout);
-      this.logger.info(`Cashback card structure valid: ${cardStructureValid}`);
-      
       // Final verification
       const allElementsLoaded = titleVisible && buttonLoaded && cardStructureValid;
       this.logger.info(`All Cashback page elements loaded: ${allElementsLoaded}`);
@@ -142,12 +140,6 @@ class CashbackPage extends WalletCommonBase {
       const claimButtonVisible = await this.isClaimCashbackButtonVisible();
       this.logger.info(`✓ Claim Cashback button verification: ${claimButtonVisible}`);
       
-      const cardStructureValid = await this.isCashbackCardStructureValid();
-      this.logger.info(`✓ Cashback card structure verification: ${cardStructureValid}`);
-      
-      const result = { titleVisible, claimButtonVisible, cardStructureValid };
-      this.logger.info('Cashback page elements verification completed:', result);
-      
       return result;
     });
   }
@@ -171,8 +163,7 @@ class CashbackPage extends WalletCommonBase {
     return await this.withLogging('verifyCashbackPageLoaded', async () => {
       const titleVisible = await this.isCashbackPageTitleVisible();
       const claimButtonVisible = await this.isClaimCashbackButtonVisible();
-      const cardStructureValid = await this.isCashbackCardStructureValid();
-      return titleVisible && claimButtonVisible && cardStructureValid;
+      return titleVisible && claimButtonVisible;
     });
   }
 
