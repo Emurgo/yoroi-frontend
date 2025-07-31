@@ -305,8 +305,7 @@ const WrapperCards = styled(Box)({
 
 const RightCardsWrapper = styled(Box)({
   display: 'flex',
-  flex: '1 1 48.5%',
-  maxWidth: '48.5%',
+  width: '100%',
   flexDirection: 'column',
   gap: '24px',
 });

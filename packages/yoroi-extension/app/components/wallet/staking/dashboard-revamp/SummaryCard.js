@@ -205,8 +205,7 @@ export default (injectIntl(observer(SummaryCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
   borderRadius: '8px',
-  flex: '1 1 48.5%',
-  maxWidth: '48.5%',
+  width: '100%'
 });
 const InfoRow = styled(Box)({
   width: '100%',
