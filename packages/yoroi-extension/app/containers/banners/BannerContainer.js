@@ -15,7 +15,6 @@ import type { StoresProps } from '../../stores';
 
 @observer
 export default class BannerContainer extends Component<StoresProps> {
-
   render(): Node {
     const serverStatus = this.props.stores.serverConnectionStore.checkAdaServerStatus;
 
@@ -27,13 +26,9 @@ export default class BannerContainer extends Component<StoresProps> {
       <>
         {/* if running in offline mode, don't render an error */}
         {this.props.stores.serverConnectionStore.serverTime != null && (
-          <IncorrectTimeBanner
-            serverTime={this.props.stores.serverConnectionStore.serverTime}
-          />
+          <IncorrectTimeBanner serverTime={this.props.stores.serverConnectionStore.serverTime} />
         )}
-        {serverStatus !== ServerStatusErrors.Healthy && (
-          <ServerErrorBanner errorType={serverStatus} />
-        )}
+        {serverStatus !== ServerStatusErrors.Healthy && <ServerErrorBanner errorType={serverStatus} />}
         <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
@@ -61,11 +56,6 @@ export default class BannerContainer extends Component<StoresProps> {
       networkId: defaultToken.defaultNetworkId,
     });
 
-    return (
-      <ByronDeprecationBanner
-        onUpgrade={undefined}
-        ticker={truncateToken(getTokenName(defaultTokenInfo))}
-      />
-    );
-  }
+    return <ByronDeprecationBanner onUpgrade={undefined} ticker={truncateToken(getTokenName(defaultTokenInfo))} />;
+  };
 }

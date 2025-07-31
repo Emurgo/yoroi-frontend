@@ -1,11 +1,8 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
 import * as Tables from '../tables';
-import type { ExplorerRow, PreferredExplorerRow, } from '../tables';
+import type { ExplorerRow, PreferredExplorerRow } from '../tables';
 import { getAll } from '../../utils';
 
 export class GetExplorers {
@@ -18,38 +15,21 @@ export class GetExplorers {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async getAll(
-    db: lf$Database,
-    tx: lf$Transaction,
-  ): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
-    const rows = await getAll<ExplorerRow>(
-      db, tx,
-      GetExplorers.ownTables[Tables.ExplorerSchema.name].name,
-    );
+  static async getAll(db: lf$Database, tx: lf$Transaction): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
+    const rows = await getAll<ExplorerRow>(db, tx, GetExplorers.ownTables[Tables.ExplorerSchema.name].name);
     return rows;
   }
 
-  static async getBackups(
-    db: lf$Database,
-    tx: lf$Transaction,
-  ): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
+  static async getBackups(db: lf$Database, tx: lf$Transaction): Promise<$ReadOnlyArray<$ReadOnly<ExplorerRow>>> {
     const explorerSchema = GetExplorers.ownTables[Tables.ExplorerSchema.name];
     const explorerTable = db.getSchema().table(explorerSchema.name);
 
-    const query = db
-      .select()
-      .from(explorerTable)
-      .where(
-        explorerTable[explorerSchema.properties.IsBackup].eq(true)
-      );
+    const query = db.select().from(explorerTable).where(explorerTable[explorerSchema.properties.IsBackup].eq(true));
     const result: $ReadOnlyArray<$ReadOnly<ExplorerRow>> = await tx.attach(query);
     return result;
   }
 
-  static async getPreferredExplorer(
-    db: lf$Database,
-    tx: lf$Transaction,
-  ): Promise<Map<number, $ReadOnly<ExplorerRow>>> {
+  static async getPreferredExplorer(db: lf$Database, tx: lf$Transaction): Promise<Map<number, $ReadOnly<ExplorerRow>>> {
     const explorerMap = new Map<number, $ReadOnly<ExplorerRow>>();
 
     // 1) get the backups as the default values
@@ -77,7 +57,7 @@ export class GetExplorers {
       );
     const preferredExplorers: $ReadOnlyArray<{|
       Explorer: $ReadOnly<ExplorerRow>,
-      PreferredExplorer: $ReadOnly<PreferredExplorerRow>
+      PreferredExplorer: $ReadOnly<PreferredExplorerRow>,
     |}> = await tx.attach(query);
 
     // 3) override backup entries with user preference

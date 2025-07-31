@@ -30,7 +30,7 @@ export default class WalletDetails extends Component<Props> {
     infoText: undefined,
   };
 
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const {
@@ -59,9 +59,7 @@ export default class WalletDetails extends Component<Props> {
               shouldHideBalance,
               amount: walletAmount,
             })}
-            <span className={styles.amountLabel}>
-              {intl.formatMessage(globalMessages.walletLabel)}
-            </span>
+            <span className={styles.amountLabel}>{intl.formatMessage(globalMessages.walletLabel)}</span>
           </div>
           {/* <div className={styles.amount}>
             {this.renderAmountDisplay({ shouldHideBalance, amount: rewards })}
@@ -77,10 +75,7 @@ export default class WalletDetails extends Component<Props> {
     );
   }
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: ?MultiToken,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| shouldHideBalance: boolean, amount: ?MultiToken |}) => Node = request => {
     if (request.amount == null) {
       return <div className={styles.isLoading} />;
     }
@@ -93,10 +88,7 @@ export default class WalletDetails extends Component<Props> {
     if (request.shouldHideBalance) {
       balanceDisplay = <span>{hiddenAmount}</span>;
     } else {
-      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(
-        shiftedAmount,
-        tokenInfo.Metadata.numberOfDecimals
-      );
+      const [beforeDecimalRewards, afterDecimalRewards] = splitAmount(shiftedAmount, tokenInfo.Metadata.numberOfDecimals);
 
       balanceDisplay = (
         <>

@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode;
 };
 
-const DappCenterLayout = ({ stores, children }: Props): JSX.Element => {
+const DappCenterLayout = ({ stores, children }: Props): ReactNode => {
   const intl = useIntl();
   return (
     <GeneralPageLayout

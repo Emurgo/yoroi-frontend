@@ -7,15 +7,12 @@ import { ENV } from '../const';
 import Layout from '../components/Layout';
 import ConnectBlock from '../components/connect/ConnectBlock';
 
-type Props = InjectedContainerProps
+type Props = InjectedContainerProps;
 
 @observer
 export default class ConnectPage extends React.Component<Props> {
   render(): Node {
-    const {
-      connectStore,
-      profileStore
-    } = this.props.rootStore;
+    const { connectStore, profileStore } = this.props.rootStore;
 
     const {
       isTransportWebAuthn,
@@ -34,11 +31,7 @@ export default class ConnectPage extends React.Component<Props> {
       deviceVersion,
     } = connectStore;
 
-    const {
-      appVersion,
-      setLocale,
-      currentLocale,
-    } = profileStore;
+    const { appVersion, setLocale, currentLocale } = profileStore;
 
     return (
       <Layout

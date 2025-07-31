@@ -214,7 +214,7 @@ export const AssetAndAmountRow = ({
     }
   }, [id]);
 
-  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : remoteTokenLogo ?? defaultImage;
+  const imgSrc = ticker === defaultTokenInfo.ticker ? adaTokenImage : (remoteTokenLogo ?? defaultImage);
 
   const amount = displayAmount ?? assetAmount;
 

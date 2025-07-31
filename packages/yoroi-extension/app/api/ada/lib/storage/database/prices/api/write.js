@@ -1,12 +1,9 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
 import * as Tables from '../tables';
 import type { PriceDataRow, PriceDataInsert } from '../tables';
-import { addOrReplaceRows, } from '../../utils';
+import { addOrReplaceRows } from '../../utils';
 
 export class ModifyPriceData {
   static ownTables: {|
@@ -19,12 +16,13 @@ export class ModifyPriceData {
   static async upsertPrices(
     db: lf$Database,
     dbTx: lf$Transaction,
-    prices: $ReadOnlyArray<PriceDataInsert | PriceDataRow>,
+    prices: $ReadOnlyArray<PriceDataInsert | PriceDataRow>
   ): Promise<$ReadOnlyArray<PriceDataRow>> {
     return await addOrReplaceRows<{ ...PriceDataInsert, ... }, PriceDataRow>(
-      db, dbTx,
+      db,
+      dbTx,
       prices,
-      ModifyPriceData.ownTables[Tables.PriceDataSchema.name].name,
+      ModifyPriceData.ownTables[Tables.PriceDataSchema.name].name
     );
   }
 }

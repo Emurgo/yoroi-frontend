@@ -30,7 +30,7 @@ type Props = {|
 
 @observer
 export default class InternalHeader extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 

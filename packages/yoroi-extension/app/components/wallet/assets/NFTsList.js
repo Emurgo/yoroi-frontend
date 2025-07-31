@@ -19,6 +19,7 @@ import { ROUTES } from '../../../routes-config';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 // $FlowIgnore
 import { imageExists } from '../../../UI/tsUiCoreUtils';
+import LocalStorageApi from '../../../api/localStorage';
 
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
@@ -54,8 +55,25 @@ const listColumnViews = [
 ];
 
 function NfTsList({ list, intl }: Props & Intl): Node {
+  const localStorageApi = new LocalStorageApi();
   const [columns, setColumns] = useState(listColumnViews[0]);
-  const setColumnsAndTrack = function (column) {
+
+  useEffect(() => {
+    const loadGridViewState = async () => {
+      const viewInStorage = await localStorageApi.getNftGridViewState();
+      if (viewInStorage) {
+        const savedCount = parseInt(viewInStorage, 10);
+        const savedColumn = listColumnViews.find(view => view.count === savedCount);
+        if (savedColumn) {
+          setColumns(savedColumn);
+        }
+      }
+    };
+    loadGridViewState();
+  }, []);
+
+  const setColumnsAndTrack = async column => {
+    await localStorageApi.setNftGridViewState(column.count.toString());
     setColumns(column);
     ampli.nftGalleryGridViewSelected({
       nft_grid_view: column.count === 4 ? '4_rows' : '6_rows',
@@ -281,7 +299,7 @@ function NftCardImage({ ipfsUrl, name, nftPathId }: {| ipfsUrl: string | null, n
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} id={`${nftPathId}-component-button`}>
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId}/>
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId} />
       </Box>
       <Box>
         <Typography
@@ -310,7 +328,7 @@ const SearchInput = styled(OutlinedInput)(({ theme }) => ({
   '& input::placeholder': {
     color: theme.palette.ds.el_gray_low,
     opacity: 1,
-  }
+  },
 }));
 
 const SLink = styled(Link)({

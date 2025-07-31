@@ -24,7 +24,7 @@ const messages = defineMessages({
   dayToggleLabel: {
     id: 'wallet.dashboard.graph.dayToggleLabel',
     defaultMessage: '!!!Day (UTC)',
-  }
+  },
 });
 
 export type GraphItems = {|
@@ -33,32 +33,25 @@ export type GraphItems = {|
   +poolName: string,
 |};
 
-const GraphTabs: {|
-  tabs: Array<string>,
-  selected: number,
-  setSelected: number => void,
-|} => Node = ({ tabs, selected, setSelected, }) => {
+const GraphTabs: ({| tabs: Array<string>, selected: number, setSelected: number => void |}) => Node = ({
+  tabs,
+  selected,
+  setSelected,
+}) => {
   return (
     <ul className={styles.tabsWrapper}>
-      {
-        tabs.map(
-          (tab, i) => (
-            <li key={tab}>
-              <button
-                type="button"
-                onClick={() => setSelected(i)}
-                onKeyPress={() => setSelected(i)}
-                className={i === selected
-                  ? classnames(styles.tab, styles.tabActive)
-                  : styles.tab
-                }
-              >
-                {tab}
-              </button>
-            </li>
-          )
-        )
-      }
+      {tabs.map((tab, i) => (
+        <li key={tab}>
+          <button
+            type="button"
+            onClick={() => setSelected(i)}
+            onKeyPress={() => setSelected(i)}
+            className={i === selected ? classnames(styles.tab, styles.tabActive) : styles.tab}
+          >
+            {tab}
+          </button>
+        </li>
+      ))}
     </ul>
   );
 };
@@ -95,7 +88,7 @@ const GraphTabs: {|
 //   );
 // };
 
-export const Graph: {|
+export const Graph: ({|
   data: Array<GraphItems>,
   epochTitle: string,
   stakepoolNameTitle: string,
@@ -103,16 +96,7 @@ export const Graph: {|
   yAxisLabel: string,
   primaryBarLabel: string,
   hideYAxis: boolean,
-|} => Node = ({
-  data,
-  epochTitle,
-  stakepoolNameTitle,
-  xAxisLabel,
-  yAxisLabel,
-  primaryBarLabel,
-  hideYAxis,
-}) => {
-
+|}) => Node = ({ data, epochTitle, stakepoolNameTitle, xAxisLabel, yAxisLabel, primaryBarLabel, hideYAxis }) => {
   const graphVars = {
     axisTickColor: readCssVar('--yoroi-dashboard-graph-axis-tick-color'),
     axisTextColor: readCssVar('--yoroi-dashboard-graph-axis-text-color'),
@@ -123,13 +107,9 @@ export const Graph: {|
     lineHeight: 14,
   };
 
-  const formatYAxis = (value) => (
-    !hideYAxis ? value : '∗∗∗ '
-  );
+  const formatYAxis = value => (!hideYAxis ? value : '∗∗∗ ');
 
-  const GraphTooltip = (
-    { active, payload, label }: {| active: boolean, payload: ?[any], label: string |}
-  ) => {
+  const GraphTooltip = ({ active, payload, label }: {| active: boolean, payload: ?[any], label: string |}) => {
     if (active && payload != null) {
       return (
         <div className={styles.tooltip}>
@@ -152,23 +132,16 @@ export const Graph: {|
   };
 
   // $FlowExpectedError[prop-missing] props are passed implicitly which causes a flow error
-  const graphTooltip = (<GraphTooltip />);
+  const graphTooltip = <GraphTooltip />;
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <BarChart
-        data={data}
-        margin={{ top: 20,
-          right: 0,
-          left: 40,
-          bottom: 0
-        }}
-      >
+      <BarChart data={data} margin={{ top: 20, right: 0, left: 40, bottom: 0 }}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           tick={{
             fill: graphVars.axisTickColor,
             fontSize: graphVars.fontSize,
-            lineHeight: graphVars.lineHeight
+            lineHeight: graphVars.lineHeight,
           }}
           dataKey="name"
           height={50}
@@ -176,7 +149,7 @@ export const Graph: {|
             value: xAxisLabel,
             position: 'insideBottom',
             fontSize: graphVars.fontSize,
-            fill: graphVars.axisTextColor
+            fill: graphVars.axisTextColor,
           }}
         />
         <YAxis
@@ -184,7 +157,7 @@ export const Graph: {|
           tick={{
             fill: graphVars.axisTickColor,
             fontSize: graphVars.fontSize,
-            lineHeight: graphVars.lineHeight
+            lineHeight: graphVars.lineHeight,
           }}
         >
           <Label
@@ -195,10 +168,7 @@ export const Graph: {|
             style={{ textAnchor: 'middle', fontSize: graphVars.fontSize, fill: graphVars.axisTextColor }}
           />
         </YAxis>
-        <Tooltip
-          content={graphTooltip}
-          cursor={{ fill: graphVars.barHoverBgColor }}
-        />
+        <Tooltip content={graphTooltip} cursor={{ fill: graphVars.barHoverBgColor }} />
 
         <Bar
           name={primaryBarLabel}
@@ -229,10 +199,10 @@ type State = {|
 
 @observer
 export default class GraphWrapper extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     selectedTab: 0,
-  }
+  };
 
   _getEpochLengthLabel: void => string = () => {
     const intl = this.context;
@@ -244,7 +214,7 @@ export default class GraphWrapper extends Component<Props, State> {
     return epochLength === 1
       ? intl.formatMessage(messages.singleEpochAxisLabel)
       : intl.formatMessage(messages.epochAxisLabel, { epochLength });
-  }
+  };
 
   render(): Node {
     const intl = this.context;
@@ -257,39 +227,37 @@ export default class GraphWrapper extends Component<Props, State> {
           selected={this.state.selectedTab}
           setSelected={tab => this.setState({ selectedTab: tab })}
         />
-        {
-          tabs[this.state.selectedTab].data.length === 0 ? (
-            <Skeleton
-              variant='rectangular'
-              width='100%'
-              height='256px'
-              animation='wave'
-              sx={{
-                backgroundColor: 'var(--yoroi-palette-gray-50)',
-                borderRadius: '4px',
-              }}
-            />
-          ) : (
-            <CardShadow>
-              <div className={styles.graphContainer}>
-                {/* <GraphToggles
+        {tabs[this.state.selectedTab].data.length === 0 ? (
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height="256px"
+            animation="wave"
+            sx={{
+              backgroundColor: 'var(--yoroi-palette-gray-50)',
+              borderRadius: '4px',
+            }}
+          />
+        ) : (
+          <CardShadow>
+            <div className={styles.graphContainer}>
+              {/* <GraphToggles
                     graphName={this.props.graphName}
                     dayLabel={intl.formatMessage(messages.dayToggleLabel)}
                     epochLabel={intl.formatMessage(globalMessages.epochLabel)}
                   /> */}
-                <Graph
-                  epochTitle={intl.formatMessage(globalMessages.epochLabel)}
-                  stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
-                  xAxisLabel={this._getEpochLengthLabel()}
-                  yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
-                  primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
-                  data={tabs[this.state.selectedTab].data}
-                  hideYAxis={tabs[this.state.selectedTab].hideYAxis}
-                />
-              </div>
-            </CardShadow>
-          )
-        }
+              <Graph
+                epochTitle={intl.formatMessage(globalMessages.epochLabel)}
+                stakepoolNameTitle={intl.formatMessage(globalMessages.stakepoolNameLabel)}
+                xAxisLabel={this._getEpochLengthLabel()}
+                yAxisLabel={tabs[this.state.selectedTab].yAxisLabel}
+                primaryBarLabel={tabs[this.state.selectedTab].primaryBarLabel}
+                data={tabs[this.state.selectedTab].data}
+                hideYAxis={tabs[this.state.selectedTab].hideYAxis}
+              />
+            </div>
+          </CardShadow>
+        )}
       </div>
     );
   }

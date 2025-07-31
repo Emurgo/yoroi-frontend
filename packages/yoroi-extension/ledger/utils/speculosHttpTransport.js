@@ -1,7 +1,7 @@
 // adapted from https://github.com/LedgerHQ/ledger-live/blob/develop/libs/ledgerjs/packages/hw-transport-http/src/HttpTransport.ts
 
-import Transport from "@ledgerhq/hw-transport";
-import { TransportError } from "@ledgerhq/errors";
+import Transport from '@ledgerhq/hw-transport';
+import { TransportError } from '@ledgerhq/errors';
 
 const SPECULOS_ENDPOINT = 'http://localhost:5001/apdu';
 /**
@@ -9,7 +9,7 @@ const SPECULOS_ENDPOINT = 'http://localhost:5001/apdu';
  */
 
 export default class HttpTransport extends Transport {
-  static isSupported = (): Promise<boolean> => Promise.resolve(typeof fetch === "function");
+  static isSupported = (): Promise<boolean> => Promise.resolve(typeof fetch === 'function');
   // this transport is not discoverable
   static list = (): any => Promise.resolve([]);
   static listen = (_observer: any) => ({
@@ -22,8 +22,8 @@ export default class HttpTransport extends Transport {
 
     if (response.status !== 200) {
       throw new TransportError(
-        "failed to access HttpTransport(" + url + "): status " + response.status,
-        "HttpTransportNotAccessible",
+        'failed to access HttpTransport(' + url + '): status ' + response.status,
+        'HttpTransportNotAccessible'
       );
     }
   };
@@ -32,7 +32,6 @@ export default class HttpTransport extends Transport {
     await HttpTransport.check(url, timeout);
     return new HttpTransport(url);
   }
-
 
   static async create(): Promise<Transport> {
     return new HttpTransport(SPECULOS_ENDPOINT);
@@ -46,12 +45,12 @@ export default class HttpTransport extends Transport {
   }
 
   async exchange(apdu: Buffer): Promise<Buffer> {
-    const apduHex = apdu.toString("hex");
+    const apduHex = apdu.toString('hex');
     const response = await fetch(this.url, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         data: apduHex,
@@ -60,13 +59,13 @@ export default class HttpTransport extends Transport {
 
     if (response.status !== 200) {
       throw new TransportError(
-        "failed to communicate to server. code=" + response.status,
-        "HttpTransportStatus" + response.status,
+        'failed to communicate to server. code=' + response.status,
+        'HttpTransportStatus' + response.status
       );
     }
 
     const dataJson = await response.json();
-    return Buffer.from(dataJson.data, "hex");
+    return Buffer.from(dataJson.data, 'hex');
   }
 
   setScrambleKey() {}

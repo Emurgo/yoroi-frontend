@@ -1,20 +1,12 @@
 // @flow
 
-import type {
-  lf$Database,
-  lf$Transaction,
-} from 'lovefield';
+import type { lf$Database, lf$Transaction } from 'lovefield';
 
 import * as Tables from '../tables';
-import type {
-  PublicDeriverRow,
-  ConceptualWalletRow, LastSyncInfoRow, HwWalletMetaRow,
-} from '../tables';
-import type { KeyDerivationRow, KeyRow, } from '../../../primitives/tables';
+import type { PublicDeriverRow, ConceptualWalletRow, LastSyncInfoRow, HwWalletMetaRow } from '../tables';
+import type { KeyDerivationRow, KeyRow } from '../../../primitives/tables';
 import { GetKeyForDerivation } from '../../../primitives/api/read';
-import {
-  getRowFromKey, getRowIn, StaleStateError,
-} from '../../../utils';
+import { getRowFromKey, getRowIn, StaleStateError } from '../../../utils';
 
 export class GetConceptualWallet {
   static ownTables: {|
@@ -24,18 +16,9 @@ export class GetConceptualWallet {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async get(
-    db: lf$Database,
-    tx: lf$Transaction,
-    key: number,
-  ): Promise<$ReadOnly<ConceptualWalletRow> | void> {
+  static async get(db: lf$Database, tx: lf$Transaction, key: number): Promise<$ReadOnly<ConceptualWalletRow> | void> {
     const walletSchema = GetConceptualWallet.ownTables[Tables.ConceptualWalletSchema.name];
-    return await getRowFromKey<ConceptualWalletRow>(
-      db, tx,
-      key,
-      walletSchema.name,
-      walletSchema.properties.ConceptualWalletId,
-    );
+    return await getRowFromKey<ConceptualWalletRow>(db, tx, key, walletSchema.name, walletSchema.properties.ConceptualWalletId);
   }
 }
 
@@ -50,13 +33,14 @@ export class ReadLastSyncInfo {
   static async getLastSyncInfo(
     db: lf$Database,
     tx: lf$Transaction,
-    lastSyncInfoId: number,
+    lastSyncInfoId: number
   ): Promise<void | $ReadOnly<LastSyncInfoRow>> {
     return await getRowFromKey<LastSyncInfoRow>(
-      db, tx,
+      db,
+      tx,
       lastSyncInfoId,
       ReadLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].name,
-      ReadLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].properties.LastSyncInfoId,
+      ReadLastSyncInfo.ownTables[Tables.LastSyncInfoSchema.name].properties.LastSyncInfoId
     );
   }
 }
@@ -72,17 +56,17 @@ export class GetHwWalletMeta {
   static async getMeta(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    conceptualWalletId: number
   ): Promise<void | $ReadOnly<HwWalletMetaRow>> {
     return await getRowFromKey<HwWalletMetaRow>(
-      db, tx,
+      db,
+      tx,
       conceptualWalletId,
       GetHwWalletMeta.ownTables[Tables.HwWalletMetaSchema.name].name,
-      GetHwWalletMeta.ownTables[Tables.HwWalletMetaSchema.name].properties.ConceptualWalletId,
+      GetHwWalletMeta.ownTables[Tables.HwWalletMetaSchema.name].properties.ConceptualWalletId
     );
   }
 }
-
 
 export class GetPublicDeriver {
   static ownTables: {|
@@ -92,29 +76,27 @@ export class GetPublicDeriver {
   });
   static depTables: {||} = Object.freeze({});
 
-  static async get(
-    db: lf$Database,
-    tx: lf$Transaction,
-    key: number,
-  ): Promise<$ReadOnly<PublicDeriverRow> | void> {
+  static async get(db: lf$Database, tx: lf$Transaction, key: number): Promise<$ReadOnly<PublicDeriverRow> | void> {
     return await getRowFromKey<PublicDeriverRow>(
-      db, tx,
+      db,
+      tx,
       key,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
-      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId,
+      GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.PublicDeriverId
     );
   }
 
   static async forWallet(
     db: lf$Database,
     tx: lf$Transaction,
-    conceptualWalletId: number,
+    conceptualWalletId: number
   ): Promise<$ReadOnlyArray<$ReadOnly<PublicDeriverRow>>> {
     return await getRowIn<PublicDeriverRow>(
-      db, tx,
+      db,
+      tx,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].name,
       GetPublicDeriver.ownTables[Tables.PublicDeriverSchema.name].properties.ConceptualWalletId,
-      ([conceptualWalletId]: Array<number>),
+      ([conceptualWalletId]: Array<number>)
     );
   }
 }
@@ -134,26 +116,24 @@ export class GetKeyForPublicDeriver {
     tx: lf$Transaction,
     key: number,
     getPublic: boolean,
-    getPrivate: boolean,
+    getPrivate: boolean
   ): Promise<{|
     PublicDeriver: $ReadOnly<PublicDeriverRow>,
     KeyDerivation: $ReadOnly<KeyDerivationRow>,
     publicKey: $ReadOnly<KeyRow> | null | void,
     privateKey: $ReadOnly<KeyRow> | null | void,
   |}> {
-    const result = await GetKeyForPublicDeriver.depTables.GetPublicDeriver.get(
-      db, tx,
-      key,
-    );
+    const result = await GetKeyForPublicDeriver.depTables.GetPublicDeriver.get(db, tx, key);
     if (result === undefined) {
       throw new StaleStateError('GetKeyForPublicDeriver::get GetPublicDeriver');
     }
 
     const derivationAndKey = await GetKeyForPublicDeriver.depTables.GetKeyForDerivation.get(
-      db, tx,
+      db,
+      tx,
       result.KeyDerivationId,
       getPublic,
-      getPrivate,
+      getPrivate
     );
 
     return {
@@ -173,21 +153,17 @@ export class GetLastSyncForPublicDeriver {
     ReadLastSyncInfo,
   });
 
-  static async forId(
-    db: lf$Database,
-    tx: lf$Transaction,
-    publicDeriverId: number,
-  ): Promise<$ReadOnly<LastSyncInfoRow>> {
-    const pubDeriverRow = await GetLastSyncForPublicDeriver.depTables.GetPublicDeriver.get(
-      db, tx,
-      publicDeriverId
-    );
+  static async forId(db: lf$Database, tx: lf$Transaction, publicDeriverId: number): Promise<$ReadOnly<LastSyncInfoRow>> {
+    const pubDeriverRow = await GetLastSyncForPublicDeriver.depTables.GetPublicDeriver.get(db, tx, publicDeriverId);
     if (pubDeriverRow === undefined) {
-      throw new StaleStateError(`${nameof(GetLastSyncForPublicDeriver)}::${nameof(GetLastSyncForPublicDeriver.forId)} pubDeriverRow`);
+      throw new StaleStateError(
+        `${nameof(GetLastSyncForPublicDeriver)}::${nameof(GetLastSyncForPublicDeriver.forId)} pubDeriverRow`
+      );
     }
 
     const syncInfo = await GetLastSyncForPublicDeriver.depTables.ReadLastSyncInfo.getLastSyncInfo(
-      db, tx,
+      db,
+      tx,
       pubDeriverRow.LastSyncInfoId
     );
     if (syncInfo === undefined) {

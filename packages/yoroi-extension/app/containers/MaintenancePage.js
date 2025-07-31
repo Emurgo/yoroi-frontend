@@ -8,12 +8,7 @@ import type { StoresProps } from '../stores';
 
 @observer
 export default class MaintenancePage extends Component<StoresProps> {
-
   render(): Node {
-    return (
-      <Maintenance
-        onExternalLinkClick={handleExternalLinkClick}
-      />
-    );
+    return <Maintenance onExternalLinkClick={handleExternalLinkClick} />;
   }
 }

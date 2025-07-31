@@ -25,10 +25,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
     setStakingKey(skey);
   }, []);
 
-  const swapStorage = useMemo(
-    () => swapStorageMaker({ storage: asyncLocalStorageWrapper() }),
-    []
-  );
+  const swapStorage = useMemo(() => swapStorageMaker({ storage: asyncLocalStorageWrapper() }), []);
 
   const swapApi = useMemo(
     () =>
@@ -42,10 +39,7 @@ function SwapProvider({ children, publicDeriver }: Props): Node {
     [stakingKey]
   );
 
-  const swapManager = useMemo(() => swapManagerMaker({ swapApi, swapStorage }), [
-    swapStorage,
-    swapApi,
-  ]);
+  const swapManager = useMemo(() => swapManagerMaker({ swapApi, swapStorage }), [swapStorage, swapApi]);
 
   return <Provider swapManager={swapManager}>{children}</Provider>;
 }

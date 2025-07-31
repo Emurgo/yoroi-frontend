@@ -314,9 +314,7 @@ class ReceiveSubTab extends WalletTab {
    * @returns {Promise<{address: string, amount: string, genLink: string}>}
    */
   async geneneratePaymentURI(rowIndex, adaAmount) {
-    this.logger.info(
-      `ReceiveSubTab::geneneratePaymentURI is called. Row index: ${rowIndex}, amount: ${adaAmount}`
-    );
+    this.logger.info(`ReceiveSubTab::geneneratePaymentURI is called. Row index: ${rowIndex}, amount: ${adaAmount}`);
     const genLinkModal = await this.clickGenerateURI(rowIndex);
     const selectedAddress = await genLinkModal.getReceiverAddress();
     await genLinkModal.enterReceiveAmount(adaAmount);

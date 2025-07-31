@@ -31,7 +31,7 @@ export const useTxBody = ({
   return query.data;
 };
 
-const getCborTxBody = async (cbor: string) => {
+export const getCborTxBody = async (cbor: string) => {
   try {
     const txBody = RustModule.WalletV4.FixedTransaction.from_hex(cbor).body().to_json();
     return JSON.parse(txBody);

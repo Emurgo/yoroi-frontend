@@ -8,11 +8,7 @@ import {
   runAndPrepareTrezor,
   TrezorModels,
 } from '../../helpers/trezorHelper.js';
-import {
-  WindowManager,
-  extensionTabName,
-  trezorConnectTabName,
-} from '../../helpers/windowManager.js';
+import { WindowManager, extensionTabName, trezorConnectTabName } from '../../helpers/windowManager.js';
 import { testWalletTrezor } from '../../utils/testWallets.js';
 import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
@@ -115,15 +111,9 @@ for (const model in TrezorModels) {
 
       const trezorContentCleaned = convertExportResponse(trezorScreensContent);
       const convertedStakeKeyAddress = getStakeBeck32KeyFromKeyHash(verifyModalInfo.stakingKeyHash);
-      expect(trezorContentCleaned.addressFull, 'Receive address is different').to.equal(
-        verifyModalInfo.addressFull
-      );
-      expect(trezorContentCleaned.derivationPath, 'Derivation path is different').to.equal(
-        verifyModalInfo.derivationPath
-      );
-      expect(trezorContentCleaned.stakingKeyHash, 'Stakey key is different').to.equal(
-        convertedStakeKeyAddress
-      );
+      expect(trezorContentCleaned.addressFull, 'Receive address is different').to.equal(verifyModalInfo.addressFull);
+      expect(trezorContentCleaned.derivationPath, 'Derivation path is different').to.equal(verifyModalInfo.derivationPath);
+      expect(trezorContentCleaned.stakingKeyHash, 'Stakey key is different').to.equal(convertedStakeKeyAddress);
     });
 
     afterEach(function (done) {

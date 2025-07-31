@@ -12,7 +12,7 @@ interface NftImageProps {
   maxWidth?: string;
   maxHeight?: string;
   contentHeight?: string;
-  nftPathId: string
+  nftPathId: string;
   imageSx?: SxProps;
 }
 

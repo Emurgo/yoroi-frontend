@@ -98,9 +98,7 @@ class WalletSubTab extends SettingsTab {
   };
   // functions
   async changeWalletName(newName, oldName, confirm = true) {
-    this.logger.info(
-      `WalletSubTab::changeWalletName is called. Name: ${newName}, confirm new name: ${confirm}`
-    );
+    this.logger.info(`WalletSubTab::changeWalletName is called. Name: ${newName}, confirm new name: ${confirm}`);
     await this.click(this.walletNameInputLocator);
     await this.clearInputUpdatingForm(this.walletNameInputLocator, oldName.length);
     if (confirm) {
@@ -110,13 +108,7 @@ class WalletSubTab extends SettingsTab {
       await this.click(this.walletNameCancelChangesButtonLocator);
     }
   }
-  async changeWalletPassword(
-    oldPassword,
-    newPassword,
-    repeatNewPassword,
-    confirm = true,
-    expectError = false
-  ) {
+  async changeWalletPassword(oldPassword, newPassword, repeatNewPassword, confirm = true, expectError = false) {
     this.logger.info(
       `WalletSubTab::getWalletExportInfo is called.` +
         `The old password: ${oldPassword}, the new password: ${newPassword}, the repeat new password: ${repeatNewPassword}`
@@ -147,7 +139,7 @@ class WalletSubTab extends SettingsTab {
         quarterSecond
       );
       if (!modalState) {
-        throw new Error('Change password modal is still displayed.')
+        throw new Error('Change password modal is still displayed.');
       }
     }
   }
@@ -163,7 +155,7 @@ class WalletSubTab extends SettingsTab {
         return false;
       },
       fiveSeconds,
-      halfSecond,
+      halfSecond
     );
   }
   async getPasswordErrorMsg() {
@@ -183,7 +175,7 @@ class WalletSubTab extends SettingsTab {
         return false;
       },
       fiveSeconds,
-      halfSecond,
+      halfSecond
     );
   }
   async getNewPasswordErrorMsg() {
@@ -203,7 +195,7 @@ class WalletSubTab extends SettingsTab {
         return false;
       },
       fiveSeconds,
-      halfSecond,
+      halfSecond
     );
   }
   async getRepeatNewPasswordErrorMsg() {

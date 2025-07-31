@@ -36,9 +36,7 @@ describe('Search NFTs by fingerprint', function () {
   it('Check number of displayed NFTs', async function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(testWalletNFTsAllNfts.length);
   });
 
   it('Search for NFT by fingerprint', async function () {
@@ -58,9 +56,7 @@ describe('Search NFTs by fingerprint', function () {
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.clearSearch();
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
-    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(
-      testWalletNFTsAllNfts.length
-    );
+    expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(testWalletNFTsAllNfts.length);
   });
 
   afterEach(async function () {

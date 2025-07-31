@@ -8,11 +8,7 @@ import {
 } from '../../../helpers/timeConstants.js';
 import WalletTab from './walletTab.page.js';
 import ExportTransactionsModal from './transactionsModals/exportTransactionModal.page.js';
-import {
-  convertPrettyDateToNormal,
-  convertPrettyTimeToNormal,
-  groupDateIsInPeriod,
-} from '../../../utils/utils.js';
+import { convertPrettyDateToNormal, convertPrettyTimeToNormal, groupDateIsInPeriod } from '../../../utils/utils.js';
 import MemoWarningModal from './transactionsModals/memoWarningModal.page.js';
 import { balanceReplacer } from '../../../helpers/constants.js';
 
@@ -186,23 +182,14 @@ export class TransactionsSubTab extends WalletTab {
       defaultWaitTimeout,
       quarterSecond
     );
-    const summaryStatePromise = this.customWaitIsPresented(
-      this.walletSummaryBoxLocator,
-      defaultWaitTimeout,
-      quarterSecond
-    );
-    const [submenuState, summaryState] = await Promise.all([
-      submenuStatePromise,
-      summaryStatePromise,
-    ]);
+    const summaryStatePromise = this.customWaitIsPresented(this.walletSummaryBoxLocator, defaultWaitTimeout, quarterSecond);
+    const [submenuState, summaryState] = await Promise.all([submenuStatePromise, summaryStatePromise]);
 
     return submenuState && summaryState;
   }
   async walletIsEmpty() {
     this.logger.info(`TransactionsSubTab::walletIsEmpty is called`);
-    const emptyBannerIsDisplayed = await (
-      await this.findElement(this.walletEmptyBannerLocator)
-    ).isDisplayed();
+    const emptyBannerIsDisplayed = await (await this.findElement(this.walletEmptyBannerLocator)).isDisplayed();
     const displayedTxsGroups = await this.__getTxsGroups();
     return emptyBannerIsDisplayed && displayedTxsGroups == 0;
   }
@@ -215,9 +202,7 @@ export class TransactionsSubTab extends WalletTab {
     await this.setImplicitTimeout(twoSeconds, this.__getTxsGroups.name);
     const allGroups = await this.findElements(locatorForAllGroups);
     for (let groupIndex = 0; groupIndex < allGroups.length; groupIndex++) {
-      const groupDatePrettified = await this.getText(
-        this.walletTransactionsGroupDateTextLocator(groupIndex)
-      );
+      const groupDatePrettified = await this.getText(this.walletTransactionsGroupDateTextLocator(groupIndex));
       const groupDate = convertPrettyDateToNormal(groupDatePrettified);
 
       if (usePeriod) {
@@ -238,9 +223,7 @@ export class TransactionsSubTab extends WalletTab {
     return result;
   }
   async getTxHashID(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::getTxHashID is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const txHashId = await this.getText(this.txHashIdTextLocator(groupIndex, txIndex));
     this.logger.info(`TransactionsSubTab::getTxHashID::txHashId ${txHashId}`);
     return txHashId;
@@ -361,16 +344,8 @@ export class TransactionsSubTab extends WalletTab {
   async showMoreOrLoaderDisplayed() {
     this.logger.info(`TransactionsSubTab::showMoreOrLoaderDisplayed is called`);
     const commonTimeout = fiveSeconds;
-    const showMoreStatePromise = this.customWaitIsPresented(
-      this.showMoreTxsButtonLocator,
-      commonTimeout,
-      quarterSecond
-    );
-    const loaderStatePromise = this.customWaitIsPresented(
-      this.txsLoaderSpinnerLocator,
-      commonTimeout,
-      quarterSecond
-    );
+    const showMoreStatePromise = this.customWaitIsPresented(this.showMoreTxsButtonLocator, commonTimeout, quarterSecond);
+    const loaderStatePromise = this.customWaitIsPresented(this.txsLoaderSpinnerLocator, commonTimeout, quarterSecond);
     const state = await Promise.any([showMoreStatePromise, loaderStatePromise]);
     if (state) {
       this.logger.info(`TransactionsSubTab::showMoreOrLoaderDisplayed Show more or loader is displayed`);
@@ -382,11 +357,7 @@ export class TransactionsSubTab extends WalletTab {
   }
   async showMoreBtnIsDisplayed() {
     this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is called`);
-    const state = await this.customWaitIsPresented(
-      this.showMoreTxsButtonLocator,
-      twoSeconds,
-      quarterSecond
-    );
+    const state = await this.customWaitIsPresented(this.showMoreTxsButtonLocator, twoSeconds, quarterSecond);
     if (state) {
       this.logger.info(`TransactionsSubTab::showMoreBtnIsDisplayed is displayed`);
       return true;
@@ -397,11 +368,7 @@ export class TransactionsSubTab extends WalletTab {
   }
   async loaderIsDisplayed() {
     this.logger.info(`TransactionsSubTab::loaderIsDisplayed is called`);
-    const state = await this.customWaitIsPresented(
-      this.txsLoaderSpinnerLocator,
-      twoSeconds,
-      quarterSecond
-    );
+    const state = await this.customWaitIsPresented(this.txsLoaderSpinnerLocator, twoSeconds, quarterSecond);
     if (state) {
       this.logger.info(`TransactionsSubTab::loaderIsDisplayed is displayed`);
       return true;
@@ -420,9 +387,7 @@ export class TransactionsSubTab extends WalletTab {
       timeout,
       repearPeriod
     );
-    this.logger.info(
-      `TransactionsSubTab::waitTxLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`
-    );
+    this.logger.info(`TransactionsSubTab::waitTxLoaderIsNotDisplayed::loaderIsNotDisplayed ${loaderIsNotDisplayed}`);
 
     return loaderIsNotDisplayed;
   }
@@ -434,7 +399,7 @@ export class TransactionsSubTab extends WalletTab {
   }
   async _loadMore() {
     const somethingIsDisplayed = await this.showMoreOrLoaderDisplayed();
-    if(somethingIsDisplayed) {
+    if (somethingIsDisplayed) {
       const showMoreIsDisplayed = await this.showMoreBtnIsDisplayed();
       if (showMoreIsDisplayed) {
         return await this._pressShowMoreTransactions();
@@ -453,9 +418,7 @@ export class TransactionsSubTab extends WalletTab {
         }
       }
     }
-    this.logger.warn(
-      `TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`
-    );
+    this.logger.warn(`TransactionsSubTab::_loadMore There are no Show More Transactions button and no loader`);
     return false;
   }
   async loadMoreTxs(amountOfLoads = 1) {
@@ -495,9 +458,7 @@ export class TransactionsSubTab extends WalletTab {
     return links;
   }
   async clickOnTxRow(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::clickOnTxRow is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::clickOnTxRow is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const txRowLocator = this.txRowLocator(groupIndex, txIndex);
     await this.click(txRowLocator);
   }
@@ -508,26 +469,14 @@ export class TransactionsSubTab extends WalletTab {
    * @returns {Promise<{fromAddrsLinks: string[], toAddrsLinks: string[], txLink: string[]}>}
    */
   async getTxURLs(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::getTxURLs is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::getTxURLs is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     await this.clickOnTxRow(groupIndex, txIndex);
     // from addresses
     const amountFromAddrs = await this.__getAmountOfFromAddresses(groupIndex, txIndex);
-    const fromAddrsLinks = await this.__getAddrsLinks(
-      groupIndex,
-      txIndex,
-      amountFromAddrs,
-      this.txFromAddressTextLocator
-    );
+    const fromAddrsLinks = await this.__getAddrsLinks(groupIndex, txIndex, amountFromAddrs, this.txFromAddressTextLocator);
     // to addresses
     const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
-    const toAddrsLinks = await this.__getAddrsLinks(
-      groupIndex,
-      txIndex,
-      amountToAddrs,
-      this.txToAddressTextLocator
-    );
+    const toAddrsLinks = await this.__getAddrsLinks(groupIndex, txIndex, amountToAddrs, this.txToAddressTextLocator);
     // txHash link
     const txHashIdTextLocator = this.txHashIdTextLocator(groupIndex, txIndex);
     const txLinkElement = await this.getWebElementAbove(txHashIdTextLocator, 2);
@@ -540,34 +489,26 @@ export class TransactionsSubTab extends WalletTab {
     };
   }
   async clickAddMemo(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::clickAddMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::clickAddMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const addMemoBtnLocator = this.txAddMemoButtonLocator(groupIndex, txIndex);
     await this.click(addMemoBtnLocator);
     return new MemoWarningModal(this.driver, this.logger);
   }
   async clickEditMemo(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::clickEditMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::clickEditMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const editMemoBtnLocator = this.txEditMemoButtonLocator(groupIndex, txIndex);
     await this.click(editMemoBtnLocator);
     return new MemoWarningModal(this.driver, this.logger);
   }
   async getMemoMessage(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::getMemoMessage is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::getMemoMessage is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const addMemoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
     const result = await this.getText(addMemoMsgLocator);
     this.logger.info(`TransactionsSubTab::getMemoMessage::result ${result}`);
     return result;
   }
   async thereIsNoMemo(groupIndex, txIndex) {
-    this.logger.info(
-      `TransactionsSubTab::thereIsNoMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`
-    );
+    this.logger.info(`TransactionsSubTab::thereIsNoMemo is called. Group index: ${groupIndex}, tx index: ${txIndex}`);
     const memoMsgLocator = this.txMemoContentTextLocator(groupIndex, txIndex);
     const noMemoState = await this.customWaiter(
       async () => {
@@ -611,18 +552,14 @@ export class TransactionsSubTab extends WalletTab {
       // check all from addresses
       const amountFromAddrs = await this.__getAmountOfFromAddresses(groupIndex, txIndex);
       for (let addrFromIndex = 0; addrFromIndex < amountFromAddrs; addrFromIndex++) {
-        const addrFromAmountRawStr = await this.getText(
-          this.txFromAddressAmountTextLocator(groupIndex, txIndex, addrFromIndex)
-        );
+        const addrFromAmountRawStr = await this.getText(this.txFromAddressAmountTextLocator(groupIndex, txIndex, addrFromIndex));
         const addrFromAmountStr = addrFromAmountRawStr.split(' ')[0];
         result.push(addrFromAmountStr === balanceReplacer);
       }
       // check all to addresses
       const amountToAddrs = await this.__getAmountOfToAddresses(groupIndex, txIndex);
       for (let addrToIndex = 0; addrToIndex < amountToAddrs; addrToIndex++) {
-        const addrToAmountRawStr = await this.getText(
-          this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex)
-        );
+        const addrToAmountRawStr = await this.getText(this.txToAddressAmountTextLocator(groupIndex, txIndex, addrToIndex));
         const addrToAmountStr = addrToAmountRawStr.split(' ')[0];
         result.push(addrToAmountStr === balanceReplacer);
       }

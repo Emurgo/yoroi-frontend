@@ -16,7 +16,7 @@ import {
   TabPanel,
   Tabs,
   TextField,
-  Tooltip
+  Tooltip,
 } from '../overrides';
 import { commonTheme } from './common-theme';
 import { darkThemeBase } from './dark-theme-base';
@@ -41,6 +41,4 @@ const darkThemeComponents = {
   },
 };
 
-export const baseDarkTheme: Object = createTheme(
-  deepmerge(commonTheme, deepmerge(darkThemeBase, darkThemeComponents))
-);
+export const baseDarkTheme: Object = createTheme(deepmerge(commonTheme, deepmerge(darkThemeBase, darkThemeComponents)));

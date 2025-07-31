@@ -16,20 +16,14 @@ export const messages: * = defineMessages({
   },
 });
 
-type Props = {|
-|};
+type Props = {||};
 
 @observer
 export default class NoWalletMessage extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
 
-    return (
-      <FullscreenMessage
-        title={intl.formatMessage(messages.title)}
-        subtitle={intl.formatMessage(messages.subtitle)}
-      />
-    );
+    return <FullscreenMessage title={intl.formatMessage(messages.title)} subtitle={intl.formatMessage(messages.subtitle)} />;
   }
 }

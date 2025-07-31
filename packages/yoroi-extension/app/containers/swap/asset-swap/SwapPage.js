@@ -273,19 +273,19 @@ function SwapPage(props: StoresProps & Intl): Node {
       return true;
     }
   }
-  const handleSubmitTransaction = async (password) => {
+  const handleSubmitTransaction = async password => {
     if (signRequest == null) return;
     validateSignRequestAndUserPassword(password);
 
     setOpenedDialog('loadingOverlay');
 
     try {
-      await stores.transactionProcessingStore.adaSendAndRefresh({
-        wallet,
-        signRequest,
-        password,
-        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      });
+      // await stores.transactionProcessingStore.adaSendAndRefresh({
+      //   wallet,
+      //   signRequest,
+      //   password,
+      //   callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      // });
 
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);

@@ -18,13 +18,13 @@ import { Typography } from '@mui/material';
 import { IntlContext } from 'react-intl';
 import globalMessages from '../../../i18n/global-messages';
 // $FlowIgnore: suppressing this error
-import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings'
+import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings';
 // $FlowIgnore: suppressing this error
 import NotificationDurationDialog from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationDurationDialog';
 
 @observer
-export default class WalletSettingsPage extends Component <StoresProps> {
-  static contextType:any = IntlContext;
+export default class WalletSettingsPage extends Component<StoresProps> {
+  static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
     const { stores } = this.props;
@@ -100,9 +100,11 @@ export default class WalletSettingsPage extends Component <StoresProps> {
           }
         />
         <ExportWallet
-          openDialog={() => stores.uiDialogs.open({
-            dialog: ExportWalletDialogContainer,
-          })}
+          openDialog={() =>
+            stores.uiDialogs.open({
+              dialog: ExportWalletDialogContainer,
+            })
+          }
         />
         <RemoveWallet
           walletName={selectedWalletName}
@@ -120,46 +122,27 @@ export default class WalletSettingsPage extends Component <StoresProps> {
     const { stores } = this.props;
     const { isOpen } = this.props.stores.uiDialogs;
     if (publicDeriverId != null && isOpen(ChangeWalletPasswordDialogContainer)) {
-      return (
-        <ChangeWalletPasswordDialogContainer
-          stores={stores}
-          publicDeriverId={publicDeriverId}
-        />
-      );
+      return <ChangeWalletPasswordDialogContainer stores={stores} publicDeriverId={publicDeriverId} />;
     }
     if (publicDeriverId != null && isOpen(ExportWalletDialogContainer)) {
-      return (
-        <ExportWalletDialogContainer
-          stores={stores}
-        />
-      );
+      return <ExportWalletDialogContainer stores={stores} />;
     }
     // selected wallet becomes null as we delete it
     if (isOpen(RemoveWalletDialogContainer)) {
       if (publicDeriverId == null) {
         return null;
       }
-      return (
-        <RemoveWalletDialogContainer
-          stores={stores}
-          publicDeriverId={publicDeriverId}
-        />
-      );
+      return <RemoveWalletDialogContainer stores={stores} publicDeriverId={publicDeriverId} />;
     }
     if (publicDeriverId != null && isOpen(ResyncWalletDialogContainer)) {
-      return (
-        <ResyncWalletDialogContainer
-          stores={stores}
-          publicDeriverId={publicDeriverId}
-        />
-      );
+      return <ResyncWalletDialogContainer stores={stores} publicDeriverId={publicDeriverId} />;
     }
     if (isOpen(NotificationDurationDialog)) {
       return (
         <NotificationDurationDialog
           onClose={stores.uiDialogs.closeActiveDialog}
           initialDuration={stores.pushNotificationStore.duration}
-          onSetDuration={(duration) => {
+          onSetDuration={duration => {
             stores.pushNotificationStore.duration = duration;
             stores.uiDialogs.closeActiveDialog();
           }}
