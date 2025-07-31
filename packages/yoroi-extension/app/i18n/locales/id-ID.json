@@ -316,7 +316,7 @@
   "profile.analytics.line3": "We <strong>can not</strong> access private keys",
   "profile.analytics.line4": "We <strong>are not</strong> recording IP addresses",
   "profile.analytics.line5": "We <strong>do not</strong> sell data",
-  "profile.analytics.rejectionImpact": "Opting out won’t impact your experience",
+  "profile.analytics.rejectionImpact": "",
   "profile.analytics.seePrivacyNotice": "See Privacy Notice",
   "profile.analytics.share": "Share user insights to help us fine tune Yoroi to better serve user preferences and needs.",
   "profile.analytics.title": "Join the journey to improve Yoroi",
