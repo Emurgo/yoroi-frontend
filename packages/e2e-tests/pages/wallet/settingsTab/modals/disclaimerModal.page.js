@@ -25,7 +25,7 @@ class CashbackTermsModal extends BasePage {
     method: 'id',
   };
   disclaimerCheckboxLocator = {
-    locator: 'CheckBoxOutlineBlankIcon',
+    locator: 'disclaimer-accept-checkbox',
     method: 'id',
   };
 

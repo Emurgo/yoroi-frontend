@@ -12,11 +12,7 @@ class CashbackPage extends WalletCommonBase {
   /**
    * Locators for Cashback page elements.
    */
-  cashbackPageTitleLocator = {
-    locator: '#topBar-pageTitle-text',
-    method: 'css',
-  };
-
+  
   claimCashbackButtonLocator = {
     locator: 'button._btn_xnrj2_111._claim_btn_xnrj2_126',
     method: 'css',
@@ -59,13 +55,7 @@ class CashbackPage extends WalletCommonBase {
     locator: 'div._logo_container_1ix60_28',
     method: 'css',
   };
-
-  // Sidebar Cashback navigation locator
-  cashbackSidebarLocator = {
-    locator: '//div[contains(@class, "MuiTypography-caption2") and contains(text(), "Cashback")]',
-    method: 'xpath',
-  };
-
+  
   /**
    * Checks if the Cashback page title is visible.
    * @param {number} timeout
@@ -99,24 +89,6 @@ class CashbackPage extends WalletCommonBase {
         this.logger.info(`CSS selector failed: ${error.message}, trying XPath selector`);
         await this.waitForElement(this.claimCashbackButtonByTextLocator, timeout);
         return await this.customWaitIsPresented(this.claimCashbackButtonByTextLocator, timeout, quarterSecond);
-      }
-    });
-  }
-
-  /**
-   * Checks if the cashback card structure is valid (cards are present).
-   * @param {number} timeout
-   * @returns {Promise<boolean>}
-   */
-  async isCashbackCardStructureValid(timeout = twoSeconds) {
-    return await this.withLogging('isCashbackCardStructureValid', async () => {
-      try {
-        // Check if at least one cashback card is present
-        await this.waitForElement(this.cashbackCardContainerLocator, timeout);
-        return await this.customWaitIsPresented(this.cashbackCardContainerLocator, timeout, quarterSecond);
-      } catch (error) {
-        this.logger.info(`Card structure validation failed: ${error.message}`);
-        return false;
       }
     });
   }
@@ -181,24 +153,6 @@ class CashbackPage extends WalletCommonBase {
   }
 
   /**
-   * Clicks the CLAIM CASHBACK button.
-   */
-  async clickClaimCashback() {
-    return await this.withLogging('clickClaimCashback', async () => {
-      try {
-        // Try CSS selector first (faster)
-        await this.waitForElement(this.claimCashbackButtonLocator);
-        await this.click(this.claimCashbackButtonLocator);
-      } catch (error) {
-        // Fallback to text-based selector
-        this.logger.info(`CSS selector failed: ${error.message}, trying XPath selector`);
-        await this.waitForElement(this.claimCashbackButtonByTextLocator);
-        await this.click(this.claimCashbackButtonByTextLocator);
-      }
-    });
-  }
-
-  /**
    * Gets all cashback cards information.
    * @returns {Promise<Array>}
    */
@@ -234,40 +188,6 @@ class CashbackPage extends WalletCommonBase {
   }
 
   /**
-   * Gets the retailer name from a specific cashback card.
-   * @param {number} cardIndex - Index of the card (0-based)
-   * @returns {Promise<string>}
-   */
-  async getRetailerNameFromCard(cardIndex = 0) {
-    return await this.withLogging('getRetailerNameFromCard', async () => {
-      const cardElements = await this.findElements(this.cashbackCardContainerLocator);
-      if (cardIndex >= cardElements.length) {
-        throw new Error(`Card index ${cardIndex} is out of range. Only ${cardElements.length} cards found.`);
-      }
-      const card = cardElements[cardIndex];
-      const retailerNameElement = await card.findElement(this.driver.By.css('div._retailer_name_1ix60_53'));
-      return await retailerNameElement.getText();
-    });
-  }
-
-  /**
-   * Gets the cashback rate from a specific cashback card.
-   * @param {number} cardIndex - Index of the card (0-based)
-   * @returns {Promise<string>}
-   */
-  async getCashbackRateFromCard(cardIndex = 0) {
-    return await this.withLogging('getCashbackRateFromCard', async () => {
-      const cardElements = await this.findElements(this.cashbackCardContainerLocator);
-      if (cardIndex >= cardElements.length) {
-        throw new Error(`Card index ${cardIndex} is out of range. Only ${cardElements.length} cards found.`);
-      }
-      const card = cardElements[cardIndex];
-      const rateElement = await card.findElement(this.driver.By.css('div._cashback_rate_1ix60_61'));
-      return await rateElement.getText();
-    });
-  }
-
-  /**
    * Clicks on a specific cashback card.
    * @param {number} cardIndex - Index of the card (0-based)
    */
@@ -293,35 +213,7 @@ class CashbackPage extends WalletCommonBase {
     });
   }
 
-  /**
-   * Clicks on the Cashback sidebar option to navigate to the Cashback page.
-   * @returns {Promise<void>}
-   */
-  async clickCashbackSidebar() {
-    return await this.withLogging('clickCashbackSidebar', async () => {
-      try {
-        await this.waitForElement(this.cashbackSidebarLocator, defaultWaitTimeout);
-        await this.click(this.cashbackSidebarLocator);
-        this.logger.info('Successfully clicked Cashback sidebar');
-      } catch (error) {
-        this.logger.error(`Failed to click Cashback sidebar: ${error.message}`);
-        
-        // Try scrolling to find the Cashback option
-        try {
-          this.logger.info('Attempting to scroll down to find Cashback option...');
-          await this.driver.executeScript('window.scrollBy(0, 300);');
-          await this.sleep(twoSeconds);
-          
-          await this.waitForElement(this.cashbackSidebarLocator, defaultWaitTimeout);
-          await this.click(this.cashbackSidebarLocator);
-          this.logger.info('Successfully clicked Cashback sidebar after scrolling');
-        } catch (scrollError) {
-          this.logger.error(`Failed to find Cashback option even after scrolling: ${scrollError.message}`);
-          throw new Error('Cashback sidebar option not found');
-        }
-      }
-    });
-  }
+
 }
 
 export default CashbackPage;

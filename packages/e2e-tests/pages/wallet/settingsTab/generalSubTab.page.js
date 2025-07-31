@@ -44,20 +44,11 @@ class GeneralSubTab extends SettingsTab {
     locator: 'settings:general-commitInfo-text',
     method: 'id',
   };
-  // * wallet selection dropdown
-  walletSelectionDropdownLocator = {
-    locator: 'cashbackWalletId--',
-    method: 'id',
-  };
-  getCashbackWalletMenuItem = walletId => {
+  getCashbackWalletMenuItem = walletName => {
     return {
-      locator: `selectCashbackWallet-${walletId}-menuItem`,
+      locator: `selectCashbackWallet-${walletName}-menuItem`,
       method: 'id',
     };
-  };
-  firstCashbackWalletOptionLocator = {
-    locator: 'selectCashbackWallet-menuItem',
-    method: 'id',
   };
   // * links
   twitterLinkLocator = {
@@ -191,51 +182,12 @@ class GeneralSubTab extends SettingsTab {
   }
 
   // Wallet selection methods
-  async isWalletSelectionDropdownVisible(timeout = twoSeconds) {
-    return await this.withLogging('isWalletSelectionDropdownVisible', async () => {
-      await this.waitForElement(this.walletSelectionDropdownLocator, timeout);
-      return await this.customWaitIsPresented(this.walletSelectionDropdownLocator, timeout, 250);
-    });
-  }
-
-  async clickWalletSelectionDropdown() {
-    return await this.withLogging('clickWalletSelectionDropdown', async () => {
-      await this.waitForElement(this.walletSelectionDropdownLocator);
-      await this.click(this.walletSelectionDropdownLocator);
+  async selectCashBackWalletFromDropdown(walletName) {
+    return await this.withLogging('selectCashBackWalletFromDropdown', async () => {
+      const walletMenuItemLocator = this.getCashbackWalletMenuItem(walletName);
+      await this.waitForElement(walletMenuItemLocator, twoSeconds);
+      await this.click(walletMenuItemLocator);
       await this.sleep(halfSecond);
-    });
-  }
-
-  async selectFirstWalletFromDropdown() {
-    return await this.withLogging('selectFirstWalletFromDropdown', async () => {
-      await this.clickWalletSelectionDropdown();
-      await this.waitForElement(this.firstCashbackWalletOptionLocator, twoSeconds);
-      await this.click(this.firstCashbackWalletOptionLocator);
-      await this.sleep(halfSecond);
-    });
-  }
-
-  async getSelectedWalletText() {
-    return await this.withLogging('getSelectedWalletText', async () => {
-      await this.waitForElement(this.walletSelectionDropdownLocator, twoSeconds);
-      return await this.getText(this.walletSelectionDropdownLocator);
-    });
-  }
-
-  async performWalletSelection() {
-    return await this.withLogging('performWalletSelection', async () => {
-      const dropdownAvailable = await this.isWalletSelectionDropdownVisible();
-      if (!dropdownAvailable) {
-        throw new Error('Wallet selection dropdown is not available');
-      }
-      const initialWallet = await this.getSelectedWalletText();
-      await this.selectFirstWalletFromDropdown();
-      const selectedWallet = await this.getSelectedWalletText();
-      return {
-        initialWallet,
-        selectedWallet,
-        selectionCompleted: true,
-      };
     });
   }
 }
