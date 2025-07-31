@@ -13,6 +13,7 @@ import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore
 import { UndelegateButton } from './UndelegateButton';
 import { truncateAddress } from '../../../../utils/formatters';
 import { poolIdHexToBech32 } from '../../../../api/ada/lib/cardanoCrypto/utils';
+import { getDefaultAssetByWallet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -29,6 +30,8 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
   const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const theme = useTheme();
   const avatarGenerated = getAvatarFromPoolId(id);
+  const selectedWallet = stores.wallets.selected;
+  const defaultAsset = getDefaultAssetByWallet(selectedWallet);
 
   return (
     <Card
@@ -72,7 +75,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
         </AvatarWrapper>
         <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
           <Typography component="div" color={theme.palette.ds.text_primary_medium} variant="body1" fontWeight="medium" mb="3px">
-            {ticker != null ? `[${ticker}]` : ''} {name ?? truncateAddress(poolIdHexToBech32(id))}
+            {ticker != null ? `[${ticker}]` : ''} {name && name !== '' ? name : truncateAddress(poolIdHexToBech32(id))}
           </Typography>
           <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
           <br />
@@ -105,7 +108,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
               {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
             <Typography as="span" fontWeight={500} color={theme.palette.ds.text_gray_medium} variant="h2">
-              {poolSize}
+              {poolSize} {defaultAsset.Metadata.ticker}
             </Typography>
           </Box>
         )}
