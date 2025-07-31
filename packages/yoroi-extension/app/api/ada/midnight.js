@@ -109,7 +109,7 @@ export async function claimForAddress(
     const ledgerConnect = new LedgerConnect({ locale });
     const network = getNetworkById(wallet.networkId);
     const config = network.BaseConfig[0];
-    const hashPayload = true;
+    const hashPayload = false;
     const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
       serial: null,
       params: {
