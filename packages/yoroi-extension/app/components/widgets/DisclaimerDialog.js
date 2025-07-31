@@ -68,6 +68,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
   const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
   return (
     <Dialog
+      id="disclaimer"
       title={intl.formatMessage(globalMessages.disclaimer)}
       closeButton={props.closeButton}
       dialogActions={[

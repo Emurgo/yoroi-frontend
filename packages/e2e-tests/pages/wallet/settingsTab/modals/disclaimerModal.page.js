@@ -9,8 +9,8 @@ class CashbackTermsModal extends BasePage {
   // locators - Updated for actual cashback terms modal
   
   disclaimerDialogLocator = {
-    locator: '#disclaimer',
-    method: 'css',
+    locator: 'dialog-dialogWindow-modalWindow',
+    method: 'id',
   };
   disclaimerTitleLocator = {
     locator: '#dialog-dialogTitle-text',
