@@ -1,5 +1,5 @@
-import BasePage from '../../basepage.js';
-import { twoSeconds } from '../../../helpers/timeConstants.js';
+import BasePage from '../../../basepage.js';
+import { twoSeconds } from '../../../../helpers/timeConstants.js';
 
 /**
  * Page Object for the Cashback Terms Modal that appears when clicking on a cashback card.
