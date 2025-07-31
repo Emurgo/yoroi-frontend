@@ -129,7 +129,7 @@ class CashbackPage extends WalletCommonBase {
 
   /**
    * Verifies all key Cashback page elements are present.
-   * @returns {Promise<{titleVisible: boolean, claimButtonVisible: boolean, cardStructureValid: boolean}>}
+   * @returns {Promise<{titleVisible: boolean, claimButtonVisible: boolean}>}
    */
   async verifyAllCashbackPageElements() {
     return await this.withLogging('verifyAllCashbackPageElements', async () => {
@@ -140,6 +140,9 @@ class CashbackPage extends WalletCommonBase {
       
       const claimButtonVisible = await this.isClaimCashbackButtonVisible();
       this.logger.info(`✓ Claim Cashback button verification: ${claimButtonVisible}`);
+      
+      const result = { titleVisible, claimButtonVisible };
+      this.logger.info('Cashback page elements verification completed:', result);
       
       return result;
     });
