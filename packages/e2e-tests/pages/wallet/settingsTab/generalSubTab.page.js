@@ -1,4 +1,4 @@
-import { halfSecond } from '../../../helpers/timeConstants.js';
+import { halfSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 import SettingsTab from './settingsTab.page.js';
 
 class GeneralSubTab extends SettingsTab {
@@ -43,6 +43,12 @@ class GeneralSubTab extends SettingsTab {
   commitInfoTextLocator = {
     locator: 'settings:general-commitInfo-text',
     method: 'id',
+  };
+  getCashbackWalletMenuItem = walletName => {
+    return {
+      locator: `selectCashbackWallet-${walletName}-menuItem`,
+      method: 'id',
+    };
   };
   // * links
   twitterLinkLocator = {
@@ -173,6 +179,16 @@ class GeneralSubTab extends SettingsTab {
     const result = await this.getLinkFromComponent(this.githubLinkLocator);
     this.logger.info(`GeneralSubTab::getGithubLink::result ${result}`);
     return result;
+  }
+
+  // Wallet selection methods
+  async selectCashBackWalletFromDropdown(walletName) {
+    return await this.withLogging('selectCashBackWalletFromDropdown', async () => {
+      const walletMenuItemLocator = this.getCashbackWalletMenuItem(walletName);
+      await this.waitForElement(walletMenuItemLocator, twoSeconds);
+      await this.click(walletMenuItemLocator);
+      await this.sleep(halfSecond);
+    });
   }
 }
 

@@ -188,6 +188,34 @@ class BasePage {
     this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
     return result;
   }
+
+  /**
+   * Utility method for logging and error handling.
+   */
+  async withLogging(action, fn) {
+    this.logger.info(`${this.constructor.name}::${action} called`);
+    try {
+      const result = await fn();
+      this.logger.info(`${this.constructor.name}::${action} succeeded`);
+      return result;
+    } catch (error) {
+      this.logger.error(`${this.constructor.name}::${action} failed: ${error.message}`);
+      throw error;
+    }
+  }
+
+  /**
+   * Generic tab navigation by visible name.
+   */
+  async navigateToTab(tabName, locatorTemplate = '//div[contains(text(), "${tabName}")]', timeout = 10000) {
+    const tabLocator = {
+      locator: locatorTemplate.replace('${tabName}', tabName),
+      method: 'xpath',
+    };
+    await this.waitForElement(tabLocator, timeout);
+    await this.click(tabLocator);
+    this.logger.info(`Navigated to tab: ${tabName}`);
+  }
   async getAttribute(locator, property) {
     this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
     return await this.driver.findElement(getByLocator(locator)).getAttribute(property);
