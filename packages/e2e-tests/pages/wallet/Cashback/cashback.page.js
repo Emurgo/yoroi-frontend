@@ -4,6 +4,7 @@ import {
   quarterSecond,
   twoSeconds,
 } from '../../../helpers/timeConstants.js';
+import { pageTitle } from '../../../helpers/pageTitles.js';
 
 /**
  * Page Object for the Cashback page, providing methods to interact with and verify Cashback UI elements.
@@ -64,10 +65,10 @@ class CashbackPage extends WalletCommonBase {
   async isCashbackPageTitleVisible(timeout = twoSeconds) {
     return await this.withLogging('isCashbackPageTitleVisible', async () => {
       try {
-        const pageTitle = await this.getPageTitle();
-        const expectedTitle = 'Cashback';
-        const result = pageTitle === expectedTitle;
-        this.logger.info(`Page title: "${pageTitle}", Expected: "${expectedTitle}", Match: ${result}`);
+        const currentPageTitle = await this.getPageTitle();
+        const expectedTitle = pageTitle.cashback;
+        const result = currentPageTitle === expectedTitle;
+        this.logger.info(`Page title: "${currentPageTitle}", Expected: "${expectedTitle}", Match: ${result}`);
         return result;
       } catch (error) {
         this.logger.info(`Failed to get page title: ${error.message}`);

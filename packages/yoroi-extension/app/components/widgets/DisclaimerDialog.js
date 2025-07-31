@@ -92,7 +92,7 @@ const DisclaimerDialog: React$ComponentType<Props> = injectIntl((props: Props & 
         sx={{ marginLeft: '0px', color: 'ds.text_gray_medium' }}
         control={<Checkbox checked={disclaimerAgreed} onChange={event => setDisclaimerAgreed(event.target.checked)} />}
         label={intl.formatMessage(messages.disclaimerAgree)}
-        id='disclaimer-checkbox'
+        id='disclaimer-accept-checkbox'
       />
     </Dialog>
   );
