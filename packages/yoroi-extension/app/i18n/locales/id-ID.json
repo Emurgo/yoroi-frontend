@@ -388,7 +388,7 @@
   "settings.general.translation.contributors": "_",
   "settings.general.theme.dark": "Dark Theme",
   "settings.general.theme.light": "Light Theme",
-  "settings.general.testnetModal.title": "What are the test networks?",
+  "settings.general.testnetModal.title": "Apa saja test network?",
   "settings.general.testnetModal.subtitle": "The test networks serve as a platform for the community and developers to test products and experiments without risking real funds on the mainnet.",
   "settings.general.testnetModal.keyFeatures": "Key features of testnet coins:",
   "settings.general.testnetModal.noValue": "Have no real value.",
