@@ -191,7 +191,7 @@ export const Icon = {
   Wallets,
   Swap,
   Bell,
-  Notification
+  Notification,
 };
 
 export enum Icons {

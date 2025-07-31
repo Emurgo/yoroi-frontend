@@ -29,7 +29,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 function NavBarRevamp(props: Props) {
   const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = props;
   const { setNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
-  
+
   return (
     <Box
       sx={{
@@ -59,23 +59,31 @@ function NavBarRevamp(props: Props) {
             }}
           >
             <Box flex="0 0 auto">
-              <Typography component="div" color="ds.el_gray_medium">{title}</Typography>
+              <Typography component="div" color="ds.el_gray_medium">
+                {title}
+              </Typography>
             </Box>
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               {children}
-              <StyledButton onClick={() => { setNotificationCenterOpen(true); }}>
+              <StyledButton
+                onClick={() => {
+                  setNotificationCenterOpen(true);
+                }}
+              >
                 <Icon.Bell />
                 {hasUnreadNotifications && (
-                   <Box sx={{
-                     height: '6px',
-                     width: '6px',
-                     borderRadius: '50%',
-                     backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
-                     position: 'relative',
-                     right: '10px',
-                     top: '-8px'
-                   }} />
-              )}
+                  <Box
+                    sx={{
+                      height: '6px',
+                      width: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
+                      position: 'relative',
+                      right: '10px',
+                      top: '-8px',
+                    }}
+                  />
+                )}
               </StyledButton>
               {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
               {walletDetails != null && (

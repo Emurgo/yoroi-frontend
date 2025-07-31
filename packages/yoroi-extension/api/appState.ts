@@ -3,17 +3,17 @@ import Dexie, { type EntityTable } from 'dexie';
 
 interface NotificationData {
   fcmMessageId: string;
-  read: boolean,
+  read: boolean;
   title: string;
   body: string;
   time: string;
-};
+}
 interface Notification extends NotificationData {
   id: number;
-};
+}
 
 const db = new Dexie('yoroi-ng') as Dexie & {
-  notifications: EntityTable<Notification, 'id'>,
+  notifications: EntityTable<Notification, 'id'>;
 };
 
 db.version(1).stores({
@@ -46,15 +46,18 @@ const notifications = {
     emitChange([...path, 'all']);
     emitChange([...path, 'hasUnread']);
   }),
-  hasUnread: lazy(async () =>  {
+  hasUnread: lazy(async () => {
     let hasUnread = false;
-    await db.notifications.toCollection().reverse().each((notification, cursor) => {
-      if (!notification.read) {
-        hasUnread = true;
-        // @ts-ignore: undocumented
-        cursor.stop();
-      }
-    });
+    await db.notifications
+      .toCollection()
+      .reverse()
+      .each((notification, cursor) => {
+        if (!notification.read) {
+          hasUnread = true;
+          // @ts-ignore: undocumented
+          cursor.stop();
+        }
+      });
     return hasUnread;
   }),
 };

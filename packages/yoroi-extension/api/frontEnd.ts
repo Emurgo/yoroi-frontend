@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type AppStateType from './appState';
 import { getValue, listen, makeClientAccessor, cache, call } from './objectModel';
 
-const { modelAccessor, onServerEvent } = makeClientAccessor<typeof AppStateType>((clientRequest) => {
+const { modelAccessor, onServerEvent } = makeClientAccessor<typeof AppStateType>(clientRequest => {
   const msg = {
     type: 'yoroi-ng-client-request',
     clientRequest,
@@ -18,7 +18,7 @@ const { modelAccessor, onServerEvent } = makeClientAccessor<typeof AppStateType>
   });
 });
 
-chrome.runtime.onMessage.addListener((msg) => {
+chrome.runtime.onMessage.addListener(msg => {
   if (msg.type === 'yoroi-ng-server-event') {
     onServerEvent(msg.serverEvent);
   }
@@ -26,17 +26,17 @@ chrome.runtime.onMessage.addListener((msg) => {
 
 export const appState = cache(modelAccessor);
 
-type RetT<T> = { loaded: false, value: undefined } | { loaded: true, value: T}
+type RetT<T> = { loaded: false; value: undefined } | { loaded: true; value: T };
 export function useModelValue<T>(value: T extends (...args: any) => any ? never : T): RetT<T> {
   const [retVal, setRetVal] = useState<RetT<T>>({ loaded: false, value: undefined });
 
   useEffect(() => {
-    getValue(value).then((v) => {
+    getValue(value).then(v => {
       setRetVal({ value: v, loaded: true });
     });
-    return listen(value, (event) => {
+    return listen(value, event => {
       if (event.type === 'change') {
-        getValue(value).then((v) => {
+        getValue(value).then(v => {
           setRetVal({ value: v, loaded: true });
         });
       }
@@ -45,4 +45,4 @@ export function useModelValue<T>(value: T extends (...args: any) => any ? never 
   return retVal;
 }
 
-export { call }
+export { call };

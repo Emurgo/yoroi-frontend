@@ -1,7 +1,7 @@
 const broadcast = new BroadcastChannel('');
 let currentNotificationId;
 
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   if (event && event.data) {
     const data = event.data.json();
     /*
@@ -32,40 +32,37 @@ self.addEventListener('push', (event) => {
         body: data.notification.body,
         fcmMessageId: data.fcmMessageId,
       }),
-      self.registration.showNotification(
-        data.notification.title,
-        {
-          body: data.notification.body,
-          actions: [
-            {
-              action: 'close',
-              title: 'OK',
-              type: 'button',
-            },
-          ],
-          data: {
-            fcmMessageId: data.fcmMessageId,
+      self.registration.showNotification(data.notification.title, {
+        body: data.notification.body,
+        actions: [
+          {
+            action: 'close',
+            title: 'OK',
+            type: 'button',
           },
-        }
-      )
+        ],
+        data: {
+          fcmMessageId: data.fcmMessageId,
+        },
+      })
     );
     currentNotificationId = data.fcmMessageId;
   }
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
   // the `notificationclose` event will be fired
 });
 
-self.addEventListener('notificationclose', (event) => {
+self.addEventListener('notificationclose', event => {
   if (event.notification.data.fcmMessageId !== currentNotificationId) {
     // this is the previous notification timed out and a new notification has come
     return;
   }
   broadcast.postMessage({
     data: {
-      fcmMessageId: event.notification.data.fcmMessageId
+      fcmMessageId: event.notification.data.fcmMessageId,
     },
     type: 'push-notification-close',
   });

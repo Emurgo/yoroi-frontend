@@ -35,19 +35,31 @@ export const NotificationCenter = () => {
 
   return (
     <>
-      <StyledDrawer open anchor="right" onClose={() => { setNotificationCenterOpen(false) }}>
+      <StyledDrawer
+        open
+        anchor="right"
+        onClose={() => {
+          setNotificationCenterOpen(false);
+        }}
+      >
         <Stack direction="row" justifyContent="center">
-          <Typography variant="button" my="24px" textAlign="center" id='notificationCenter-title-text'>
+          <Typography variant="button" my="24px" textAlign="center" id="notificationCenter-title-text">
             {strings.notificationCenterTitle}
           </Typography>
-          <StyledButton onClick={() => { setNotificationCenterOpen(false) }} sx={{ right: '24px' }} id='notificationCenter-close-button'>
+          <StyledButton
+            onClick={() => {
+              setNotificationCenterOpen(false);
+            }}
+            sx={{ right: '24px' }}
+            id="notificationCenter-close-button"
+          >
             <Icon.CloseIcon />
           </StyledButton>
         </Stack>
         {notifications && notifications.length ? (
           <>
             <Stack spacing="16px" sx={{ padding: '16px' }}>
-              {notifications?.map((notification) => (
+              {notifications?.map(notification => (
                 <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
                   <Box>
                     <Icon.Notification />
@@ -58,19 +70,21 @@ export const NotificationCenter = () => {
                     </Typography>
                     {/* @ts-ignore */}
                     <Typography variant="caption1" color="ds.text_gray_low">
-                      {(new Date(notification.time)).toLocaleString()}
+                      {new Date(notification.time).toLocaleString()}
                     </Typography>
                   </Box>
                   {!notification.read && (
-                    <Box sx={{
-                      height: '6px',
-                      width: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
-                      marginLeft: 'auto',
-                      marginTop: 'auto',
-                      marginBottom: 'auto'
-                    }} />
+                    <Box
+                      sx={{
+                        height: '6px',
+                        width: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
+                        marginLeft: 'auto',
+                        marginTop: 'auto',
+                        marginBottom: 'auto',
+                      }}
+                    />
                   )}
                 </Box>
               ))}
@@ -81,7 +95,9 @@ export const NotificationCenter = () => {
                 <Button
                   // @ts-ignore
                   variant="secondary"
-                  onClick={() => { call(appState.notifications.markAllRead) }}
+                  onClick={() => {
+                    call(appState.notifications.markAllRead);
+                  }}
                   sx={{ margin: 'auto', marginTop: '16px', marginBottom: '16px' }}
                 >
                   {strings.readAll}
@@ -98,11 +114,9 @@ export const NotificationCenter = () => {
               {strings.noNotification}
             </Typography>
           </Stack>
-        ) : (
-          // loading
-          null
-        )}
+        ) : // loading
+        null}
       </StyledDrawer>
     </>
-  );  
-}
+  );
+};
