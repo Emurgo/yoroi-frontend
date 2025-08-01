@@ -1,56 +1,76 @@
 import { Typography, Button, Grid, Stack, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
 import { useModal } from '../modals/ModalContext';
-import { useEffect, useRef, useState } from 'react';
-import { MidnightIlustration } from './MidnightIlustration';
+import { useEffect } from 'react';
+import CardanoCardImage from './CardanoCardImage.png';
 import LocalStorageApi from '../../../api/localStorage/index';
-import { messages } from '../../common/hooks/useStrings';
-import { MIDNIGHT_DISTRIBUTION_URL } from '../../common/constants';
+import { useStrings } from '../../common/hooks/useStrings';
+import { CARDANO_CARD_URL } from '../../common/constants';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
-import { CardIlustration } from './CardIlustration';
 
 export const CardanoCardDialog = () => {
-  const intl = useIntl();
+  const strings = useStrings();
   const { openModal, closeModal } = useModal();
   const { data } = useYoroiRemoteConfig();
 
   useEffect(() => {
     const checkModalState = async () => {
       const localStorage = new LocalStorageApi();
-      //   const wasClosed = await localStorage.getMidnightModalClosed();
+      const wasClosed = await localStorage.getCardanoCardModalClosed();
 
-      openModal({
-        title: 'Cardano Card',
-        height: '597px',
-        width: '650px',
-        content: (
-          <CardanoCardDialogContent
-            onClose={() => {
-              localStorage.setMidnightModalClosed(true);
-              closeModal();
-            }}
-          />
-        ),
-        modalId: 'midnight',
-        onClose: () => {
-          localStorage.setMidnightModalClosed(true);
-        },
-      });
+      if (data?.popups?.cardanoCardAnnouncement?.display === false && (wasClosed === undefined || wasClosed === false)) {
+        openModal({
+          title: strings.cardanoCardTitle,
+          height: '550px',
+          width: '612px',
+          content: (
+            <CardanoCardContent
+              onClose={() => {
+                localStorage.setCardanoCardModalClosed(true);
+                closeModal();
+              }}
+            />
+          ),
+          modalId: 'cardanoCard',
+          onClose: () => {
+            localStorage.setCardanoCardModalClosed(true);
+          },
+        });
+      }
     };
 
     checkModalState();
   }, [data]);
 };
 
-const HUBSPOT_FORM_ID = 'hubspotForm';
-
-export const CardanoCardDialogContent = () => {
-  const formRef = useRef(null);
-
+const CardanoCardContent = ({ onClose }) => {
+  const strings = useStrings();
   return (
     <Stack>
-      <HubSpotForm />
+      <Stack direction="column" alignItems="center" justifyContent="center" pb="24px">
+        <Stack my={58}>
+          <img src={CardanoCardImage} alt="Midnight Illustration" />
+        </Stack>
+
+        <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mb="8px">
+          {strings.cardanoCardJoin}
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_medium" textAlign="center" mx="24px">
+          {strings.cardanoCard}
+        </Typography>
+      </Stack>
+
+      <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
+        <Link href={CARDANO_CARD_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
+          <CustomButton variant="contained" color="primary">
+            {strings.learnMore}
+          </CustomButton>
+        </Link>
+
+        <CustomButton variant="text" onClick={onClose} sx={{ marginTop: '8px' }}>
+          {strings.skip}
+        </CustomButton>
+      </Grid>
     </Stack>
   );
 };
@@ -59,26 +79,3 @@ const CustomButton = styled(Button)(() => ({
   width: '100%',
   fontSize: '14px',
 }));
-
-export const HubSpotForm = () => {
-  const formRef = useRef(null);
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://js.hsforms.net/forms/embed/v2.js';
-    script.async = true;
-    script.onload = () => {
-      if (window.hbspt) {
-        window.hbspt.forms.create({
-          region: 'na1',
-          portalId: '4311174',
-          formId: 'fa842eaa-fed6-47f3-b1b4-b1a52d6a0c6b',
-          target: formRef.current,
-        });
-      }
-    };
-    document.body.appendChild(script);
-  }, []);
-
-  return <div ref={formRef}></div>;
-};
