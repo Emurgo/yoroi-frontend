@@ -5,7 +5,7 @@ interface Props {
   destAddrBech32: string,
 }
 
-export default function ClaimDone(props: Props) {
+export default function ClaimDone(props: Readonly<Props>) {
   return (
     <ClaimInfo2 {...props} />
   );

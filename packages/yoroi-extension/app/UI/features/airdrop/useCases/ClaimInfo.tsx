@@ -39,7 +39,7 @@ interface Props {
   destAddrBech32: string,
 }
 
-export function ClaimInfo1(props: Props & { isTrezor: boolean }) {
+export function ClaimInfo1(props: Readonly<Props & { isTrezor: boolean }>) {
   const intl = useIntl();
   const { alloc, destAddrBech32, isTrezor } = props;
 
@@ -81,7 +81,7 @@ export function ClaimInfo1(props: Props & { isTrezor: boolean }) {
   );
 }
 
-export function ClaimInfo2(props: Props) {
+export function ClaimInfo2(props: Readonly<Props>) {
   const intl = useIntl();
   const { alloc, destAddrBech32 } = props;
 

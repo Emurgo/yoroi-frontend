@@ -34,9 +34,9 @@ interface Props {
   showClaimDialog: () => void;
 }
 
-export default function ClaimContent(props: Props) {
+export default function ClaimContent(props: Readonly<Props>) {
   const { alloc, isTrezor, destAddrBech32, isClaimDialog, showClaimDialog } = props;
-  const [isTermsAgreed, setTermsAgreed] = useState<boolean>(false);
+  const [isTermsAgreed, setIsTermsAgreed] = useState<boolean>(false);
   const [hasOverflow, setHasOverflow] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -81,7 +81,7 @@ export default function ClaimContent(props: Props) {
                   <Checkbox
                     checked={isTermsAgreed}
                     onChange={() => {
-                      setTermsAgreed(!isTermsAgreed);
+                      setIsTermsAgreed(!isTermsAgreed);
                     }}
                     sx={{ marginRight: '8px' }}
                   />

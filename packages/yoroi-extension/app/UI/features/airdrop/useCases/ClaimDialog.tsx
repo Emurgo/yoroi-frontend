@@ -26,16 +26,16 @@ const messages = defineMessages({
 });
 
 
-export default function ClaimDialog(props: { onClose: () => void, onClaim: (password: string) => Promise<void>, message: string }) {
+export default function ClaimDialog(props: Readonly<{ onClose: () => void, onClaim: (password: string) => Promise<void>, message: string }>) {
   const intl = useIntl();
   const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [isClaiming, setClaiming] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   const onClaim = async () => {
-    setClaiming(true);
+    setIsClaiming(true);
     setError(null);
     try {
       await props.onClaim(password);
@@ -48,7 +48,7 @@ export default function ClaimDialog(props: { onClose: () => void, onClaim: (pass
         setError(String(error));
       }
     } finally {
-      setClaiming(false);
+      setIsClaiming(false);
     }
   };
 

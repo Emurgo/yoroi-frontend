@@ -70,10 +70,10 @@ export async function checkClaimForAddress(claimEndpoint: string, addrBech32: st
       }
     ]
   */
-  if (Array.isArray(data) && data.length === 1 && (data[0].status === 'queued' || data[0].status === 'confirmed')) {
-    return true;
-  }
-  return false;
+  return Array.isArray(data)
+    && data.length === 1
+    && (data[0].status === 'queued'
+      || data[0].status === 'confirmed');
 }
 
 export function getClaimMessage(value: number, destAddrBech32: string): string {

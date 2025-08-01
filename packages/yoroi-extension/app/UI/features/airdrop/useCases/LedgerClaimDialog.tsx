@@ -23,18 +23,18 @@ const messages = defineMessages({
   },
 });
 
-export default function LedgerClaimDialog(props: {
+export default function LedgerClaimDialog(props: Readonly<{
   onClose: () => void,
   message: string,
   onClaim: (_password: string) => Promise<void>
-}) {
+}>) {
   const intl = useIntl();
 
   const [error, setError] = useState<string | null>(null);
-  const [isClaiming, setClaiming] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
 
   const onClaim = async () => {
-    setClaiming(true);
+    setIsClaiming(true);
     setError(null);
     try {
       await props.onClaim('');
@@ -45,7 +45,7 @@ export default function LedgerClaimDialog(props: {
         setError(String(error));
       }
     } finally {
-      setClaiming(false);
+      setIsClaiming(false);
     }
   };
 
