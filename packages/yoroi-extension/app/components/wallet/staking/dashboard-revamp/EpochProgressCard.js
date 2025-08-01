@@ -1,7 +1,6 @@
 // @flow
 import type { Node } from 'react';
-import { Box } from '@mui/system';
-import { CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 
 type Props = {|
   +percentage: number,
@@ -14,7 +13,7 @@ type Props = {|
 export function EpochProgressCard({ percentage, days, currentEpoch, startEpochDate, endEpochDate }: Props): Node {
   return (
     <Box>
-      <Stack direction="row" spacing={2} justifyContent="flex-start">
+      <Stack direction="row" spacing={24} justifyContent="flex-start">
         <Graph value={percentage} days={days} />
         <Stack direction="column" flexGrow="1">
           <Title label="Current Epoch" value={currentEpoch} />
