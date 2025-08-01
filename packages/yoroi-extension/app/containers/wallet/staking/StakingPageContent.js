@@ -300,7 +300,7 @@ const WrapperCards = styled(Box)({
   display: 'flex',
   gap: '24px',
   justifyContent: 'space-between',
-  marginBottom: '40px',
+  marginBottom: '24px',
 });
 
 const RightCardsWrapper = styled(Box)({
