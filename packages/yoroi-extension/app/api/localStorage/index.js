@@ -44,6 +44,7 @@ const storageKeys = {
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
+  CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -326,6 +327,15 @@ export default class LocalStorageApi {
 
   setNftGridViewState: string => Promise<void> = async gridViewState => {
     await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
+  };
+
+  // ========== Catalyst Disclaimer State ========== //
+
+  getCatalystDisclaimerState: void => Promise<boolean> = () =>
+    getLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE).then(s => s === 'false');
+
+  setCatalystDisclaimerState: boolean => Promise<void> = async state => {
+    await setLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE, state.toString());
   };
 
   // =========== Common =============== //
