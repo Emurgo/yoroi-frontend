@@ -57,22 +57,8 @@ const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
 const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io/claims/cardano';
 
 export default function AirdropPage({ stores }: Props) {
-  const intl = useIntl();
-  const wallet = stores.wallets.selected;
-  if (!wallet) {
-    return null;
-  }
-  let checkEndpoint;
-  let claimEndpoint;
-  if (wallet.networkId === 0) {
-    checkEndpoint = CHECK_ENDPOINT_MAINNET;
-    claimEndpoint = CLAIM_ENDPOINT_MAINNET;
-  } else {
-    checkEndpoint = CHECK_ENDPOINT_PREPROD;
-    claimEndpoint = CLAIM_ENDPOINT_PREPROD;
-  }
 
-  const isTrezor = wallet.type === 'trezor';
+  const intl = useIntl();
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
@@ -81,6 +67,18 @@ export default function AirdropPage({ stores }: Props) {
   const [isClaimDone, setClaimDone] = useState(false);
 
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
+
+  const wallet = stores.wallets.selected;
+  if (!wallet) {
+    return null;
+  }
+
+  const isMainnet = wallet.networkId === 0;
+
+  const checkEndpoint = isMainnet ? CHECK_ENDPOINT_MAINNET : CHECK_ENDPOINT_PREPROD;
+  const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
+
+  const isTrezor = wallet.type === 'trezor';
 
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
