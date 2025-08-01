@@ -72,12 +72,6 @@ export function genCSP(request: {|
   imgSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
   imgSrc.push('https://cardano-native-asset-images-mainnet-prod.s3.eu-central-1.amazonaws.com/');
 
-  connectSrc.push('hhttps://js.hsforms.net/forms/embed/v2/');
-  frameSrc.push('https://js.hsforms.net/forms/embed/v2');
-  scriptSrc.push('https://js.hsforms.net/forms/embed/v2.js');
-  frameSrc.push('https://js.hsforms.net');
-  connectSrc.push('https://js.hsforms.net');
-
   // Bringweb3
   frameSrc.push('http://localhost:5173/');
   frameSrc.push('https://*.bringweb3.io/');

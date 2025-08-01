@@ -51,12 +51,6 @@ export function genCSP(request: {|
   connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
   connectSrc.push('https://*.yoroiwallet.com');
 
-  connectSrc.push('hhttps://js.hsforms.net/forms/embed/v2/');
-  frameSrc.push('https://js.hsforms.net/forms/embed/v2');
-  // scriptSrc.push('https://js.hsforms.net/forms/embed/v2.js');
-  frameSrc.push('https://js.hsforms.net');
-  connectSrc.push('https://js.hsforms.net');
-
   // Bringweb3
   frameSrc.push('https://*.bringweb3.io/');
   connectSrc.push('https://*.bringweb3.io');
