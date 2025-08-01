@@ -3,7 +3,7 @@ import { BaseBanner } from './BaseBanner';
 
 interface UsdaBannerProps {
   onClose: () => void;
-  onClick: () => void;
+  onClick?: () => void;
   displayIllustration?: boolean;
 }
 
@@ -15,7 +15,7 @@ export const UsdaBanner = ({ onClose, onClick, displayIllustration = false }: Us
   };
 
   const handleClick = () => {
-    onClick();
+    onClick && onClick();
   };
 
   return (

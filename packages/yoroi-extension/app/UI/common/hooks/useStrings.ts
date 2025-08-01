@@ -100,6 +100,18 @@ export const messages = Object.freeze(
       id: 'global.labels.skip',
       defaultMessage: '!!!Skip',
     },
+    checkEligibility: {
+      id: 'global.labels.checkEligibility',
+      defaultMessage: '!!!Check Eligibility',
+    },
+    claimAnnouncement: {
+      id: 'banners.midnight.claimAnnouncement',
+      defaultMessage: '!!!Claim your NIGHT airdrop directly in Yoroi',
+    },
+    yoroiSupport: {
+      id: 'banners.midnight.yoroiSupport',
+      defaultMessage: '!!!Yoroi now supports the Midnight airdrop. Securely claim your NIGHT tokens today.',
+    },
     surveyTitle: {
       id: 'survey.title',
       defaultMessage: '!!!We’d love your feedback!',
@@ -143,6 +155,9 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
+    claimAnnouncement: intl.formatMessage(messages.claimAnnouncement),
+    yoroiSupport: intl.formatMessage(messages.yoroiSupport),
+    checkEligibility: intl.formatMessage(messages.checkEligibility),
     surveyTitle: intl.formatMessage(messages.surveyTitle),
     surveyDescription: intl.formatMessage(messages.surveyDescription),
     surveyButton: intl.formatMessage(messages.surveyButton),

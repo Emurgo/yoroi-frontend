@@ -21,8 +21,6 @@ import { genAddressLookup } from '../../stores/stateless/addressStores';
 import { addressToDisplayString } from '../../api/ada/lib/storage/bridge/utils';
 import { genLookupOrFail, genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 import WalletSummaryRevamp from '../../components/wallet/summary/WalletSummaryRevamp';
-import BuySellDialog from '../../components/buySell/BuySellDialog';
-import WalletEmptyBanner from './WalletEmptyBanner';
 import { Box } from '@mui/material';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { noop } from '../../coreUtils';
@@ -172,12 +170,6 @@ export default class WalletSummaryPage extends Component<StoresProps> {
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
           getHistoricalPrice={stores.coinPriceStore.getHistoricalPrice}
           shouldShowEmptyBanner={!isLoading && !hasAny}
-          emptyBannerComponent={
-            <WalletEmptyBanner
-              onBuySellClick={() => this.props.stores.uiDialogs.open({ dialog: BuySellDialog })}
-              isTestnet={selected.isTestnet}
-            />
-          }
           selectedWallet={selected}
           goToRoute={stores.routing.goToRoute}
         />

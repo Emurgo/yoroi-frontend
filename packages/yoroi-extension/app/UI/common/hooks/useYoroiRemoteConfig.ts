@@ -1,12 +1,15 @@
 import { useQuery } from 'react-query';
 import { YoroiRemoteConfig } from '../../types/yoroi';
-import { YOROI_REMOTE_CONFIG_URL } from '../constants';
+import { YOROI_DEV_REMOTE_CONFIG_URL, YOROI_PROD_REMOTE_CONFIG_URL } from '../constants';
+import { environment } from '../../../environment';
 
 export const useYoroiRemoteConfig = () => {
+  const isDev = environment.isDev();
+
   return useQuery<YoroiRemoteConfig>({
-    queryKey: ['yoroiRemoteConfig'],
+    queryKey: ['yoroiRemoteConfig', isDev],
     queryFn: async () => {
-      const res = await fetch(YOROI_REMOTE_CONFIG_URL);
+      const res = await fetch(isDev ? YOROI_DEV_REMOTE_CONFIG_URL : YOROI_PROD_REMOTE_CONFIG_URL);
       if (!res.ok) {
         throw new Error('Failed to fetch Yoroi remote config');
       }
