@@ -31,6 +31,8 @@ import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { MidnightDialog } from '../../UI/components/Dialogs/MidnightDialog';
 // $FlowIgnore: suppressing this error
+import { CardanoCardDialog } from '../../UI/components/Dialogs/CardanoCardDialog';
+// $FlowIgnore: suppressing this error
 import { useYoroiRemoteConfig } from '../../UI/common/hooks/useYoroiRemoteConfig';
 // $FlowIgnore: suppressing this error
 import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteConfig';
@@ -134,6 +136,7 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
                   <ReviewTxModal />
                   {this.props.children}
                   {this.getDialogs(intl, currentPool)}
+                  <CardanoCardDialog />
                   <MidnightDialog />
                 </ReviewTxProvider>
               </ModalProvider>
