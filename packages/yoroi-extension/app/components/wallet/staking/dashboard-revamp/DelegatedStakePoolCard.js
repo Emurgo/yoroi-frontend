@@ -1,7 +1,6 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { borderColor, Box, styled } from '@mui/system';
-import { Divider, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Divider, Stack, styled, Typography, useTheme } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
