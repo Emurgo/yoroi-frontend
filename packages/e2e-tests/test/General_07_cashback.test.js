@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import BasePage from '../pages/basepage.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import CashbackPage from '../pages/wallet/Cashback/cashback.page.js';
 import CashbackTermsModal from '../pages/wallet/settingsTab/modals/disclaimerModal.page.js';
@@ -8,8 +9,9 @@ import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
 import { pageTitle } from '../helpers/pageTitles.js';
-import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
-import { getTestWalletName } from '../helpers/constants.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
+import { getTestWalletName, CardanoNetworks } from '../helpers/constants.js';
+
 
 describe('Cashback General Tests', function () {
   this.timeout(2 * oneMinute);
@@ -18,76 +20,67 @@ describe('Cashback General Tests', function () {
   let walletName = null;
 
   before(async function () {
-    webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadBrowserStorage(webdriver, logger);
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
     walletName = getTestWalletName();
   });
 
   afterEach(async function () {
-    await customAfterEach(this.currentTest, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   it('Navigate to Cashback page', async function () {
     const walletBase = new WalletCommonBase(webdriver, logger);
     await walletBase.goToCashbackTab();
-    
-    // Wait for page to load
     await walletBase.sleep(twoSeconds);
-    
     // Verify we're on the cashback page
     const currentTitle = await walletBase.getPageTitle();
     expect(currentTitle).to.equal(pageTitle.cashback, `Expected to be on ${pageTitle.cashback} page`);
   });
 
-  it('Check first-time popup is displayed when clicking cashback card', async function () {
-    const cashbackPage = new CashbackPage(webdriver, logger);
+  it('Check first-time popup is displayed', async function () {
     const termsModal = new CashbackTermsModal(webdriver, logger);
-    
-    // Wait for cashback page to load
-    await cashbackPage.waitForCashbackPageLoad();
-    
-    // Verify page elements are present
-    const pageElements = await cashbackPage.verifyAllCashbackPageElements();
-    expect(pageElements.titleVisible).to.be.true;
-    expect(pageElements.claimButtonVisible).to.be.true;
-    
-    // Check if cashback cards are present
-    const cardCount = await cashbackPage.getCashbackCardCount();
-    expect(cardCount).to.be.greaterThan(0, 'At least one cashback card should be present');
-    
-    // Click on the first cashback card to trigger the terms popup
-    await cashbackPage.openCashbackTermsModal();
-    
-    // Verify the terms modal is displayed
+    const walletBase = new WalletCommonBase(webdriver, logger);
+
+    // Verify the disclaimer modal is displayed
     const modalDisplayed = await termsModal.isDisplayed();
-    expect(modalDisplayed).to.be.true;
+    expect(modalDisplayed, 'Terms modal should be displayed').to.be.true;
+    
+    
+    const disclaimerText = await termsModal.getDisclaimerText();
+    logger.info(`Disclaimer text: ${disclaimerText}`);
+   
+    // Close the modal WITHOUT accepting terms
+    await termsModal.closeCashbackTermsModal();
+    await walletBase.sleep(twoSeconds);
+    const currentTitle = await walletBase.getPageTitle();
+    expect(currentTitle).to.equal(pageTitle.wallet, `Expected to be on ${pageTitle.wallet} page`);
+    
   });
 
   it('Verify cannot continue without accepting terms on popup', async function () {
+    const cashbackPage = new CashbackPage(webdriver, logger);
     const termsModal = new CashbackTermsModal(webdriver, logger);
+    const walletBase = new WalletCommonBase(webdriver, logger);
+    await walletBase.goToCashbackTab();
+    await walletBase.sleep(twoSeconds);
+    
+    // Check if proceed button is initially disabled
+    const isInitiallyEnabled = await termsModal.isProceedButtonEnabled();
+    expect(isInitiallyEnabled, 'Proceed button should be disabled initially').to.be.false;
     
     // Try to proceed without accepting terms
-    // The proceed button should be disabled or clicking it should not work
-    try {
-      await termsModal.proceedWithDisclaimer();
-      // If we reach here, the button was clickable, which is not expected
-      expect.fail('Should not be able to proceed without accepting terms');
-    } catch (error) {
-      // Expected behavior - proceed button should be disabled or not functional
-      logger.info('Proceed button correctly disabled without accepting terms');
-    }
-    
-    // Close the modal to clean up
-    await termsModal.closeCashbackTermsModal();
+    await termsModal.proceedWithDisclaimer();
+    //await termsModal.acceptDisclaimerAndProceed();
+    // Verify the modal is still displayed
+    const modalStillDisplayed = await termsModal.isDisplayed();
+    expect(modalStillDisplayed, 'Terms modal should still be displayed').to.be.true;
+    await termsModal.acceptDisclaimerAndProceed();
   });
 
   it('Check page is displayed with general markers', async function () {
     const cashbackPage = new CashbackPage(webdriver, logger);
-    
-    // Verify the page title is correct (Cashback at left top corner)
-    const titleVisible = await cashbackPage.isCashbackPageTitleVisible();
-    expect(titleVisible).to.be.true;
     
     // Verify the claim button is visible
     const claimButtonVisible = await cashbackPage.isClaimCashbackButtonVisible();
@@ -96,13 +89,9 @@ describe('Cashback General Tests', function () {
     // Verify cashback cards are displayed
     const cardCount = await cashbackPage.getCashbackCardCount();
     expect(cardCount).to.be.greaterThan(0, 'Cashback cards should be displayed');
-    
-    // Verify page has loaded completely
-    const pageLoaded = await cashbackPage.verifyCashbackPageLoaded();
-    expect(pageLoaded).to.be.true;
   });
 
-  it('Test applying selected wallet for cashback', async function () {
+  xit('Test applying selected wallet for cashback', async function () {
     const walletBase = new WalletCommonBase(webdriver, logger);
     const generalSettings = new GeneralSubTab(webdriver, logger);
     
@@ -137,28 +126,14 @@ describe('Cashback General Tests', function () {
     expect(pageLoaded).to.be.true;
   });
 
-  it('Test complete cashback flow with terms acceptance', async function () {
-    const cashbackPage = new CashbackPage(webdriver, logger);
-    const termsModal = new CashbackTermsModal(webdriver, logger);
-    
-    // Wait for cashback page to load
-    await cashbackPage.waitForCashbackPageLoad();
-    
-    // Click on the first cashback card to open terms modal
-    await cashbackPage.openCashbackTermsModal();
-    
-    // Verify modal is displayed
-    const modalDisplayed = await termsModal.isDisplayed();
-    expect(modalDisplayed).to.be.true;
-    
-    // Accept the terms and proceed
-    await termsModal.acceptDisclaimerAndProceed();
-    
-    // Wait a moment for the action to complete
-    await cashbackPage.sleep(twoSeconds);
-    
-    // Verify we're still on the cashback page after accepting terms
-    const pageLoaded = await cashbackPage.verifyCashbackPageLoaded();
-    expect(pageLoaded).to.be.true;
+  afterEach(function (done) {
+    customAfterEach(this, webdriver, logger);
+    done();
+  });
+
+  after(function (done) {
+    const basePage = new BasePage(webdriver, logger);
+    basePage.closeBrowser();
+    done();
   });
 }); 

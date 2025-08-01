@@ -14,19 +14,36 @@ class CashbackPage extends WalletCommonBase {
    * Locators for Cashback page elements.
    */
   
+ 
   claimCashbackButtonLocator = {
-    locator: 'button._btn_xnrj2_111._claim_btn_xnrj2_126',
-    method: 'css',
+    locator: '//button[contains(text(), "CLAIM CASHBACK")]',
+    method: 'xpath',
   };
 
-  // Alternative locator using button text (more reliable but slower)
   claimCashbackButtonByTextLocator = {
     locator: '//button[contains(text(), "CLAIM CASHBACK")]',
     method: 'xpath',
   };
 
+  // Alternative locators for the claim button
+  claimCashbackButtonCSSLocator = {
+    locator: 'button._btn_xnrj2_111._claim_btn_xnrj2_126',
+    method: 'css',
+  };
+
+  claimCashbackButtonGenericLocator = {
+    locator: '//*[contains(text(), "CLAIM CASHBACK")]',
+    method: 'xpath',
+  };
+
   cashbackCardContainerLocator = {
     locator: 'div._card_1ix60_1',
+    method: 'css',
+  };
+
+  // More generic card locator that looks for cards with retailer names
+  cashbackCardGenericLocator = {
+    locator: 'div[class*="_card_"]',
     method: 'css',
   };
 
@@ -84,16 +101,28 @@ class CashbackPage extends WalletCommonBase {
    */
   async isClaimCashbackButtonVisible(timeout = twoSeconds) {
     return await this.withLogging('isClaimCashbackButtonVisible', async () => {
-      try {
-        // Try CSS selector first (faster)
-        await this.waitForElement(this.claimCashbackButtonLocator, timeout);
-        return await this.customWaitIsPresented(this.claimCashbackButtonLocator, timeout, quarterSecond);
-      } catch (error) {
-        // Fallback to text-based selector
-        this.logger.info(`CSS selector failed: ${error.message}, trying XPath selector`);
-        await this.waitForElement(this.claimCashbackButtonByTextLocator, timeout);
-        return await this.customWaitIsPresented(this.claimCashbackButtonByTextLocator, timeout, quarterSecond);
+      const locators = [
+        this.claimCashbackButtonLocator,
+        this.claimCashbackButtonCSSLocator,
+        this.claimCashbackButtonGenericLocator
+      ];
+
+      for (let i = 0; i < locators.length; i++) {
+        try {
+          this.logger.info(`Trying locator ${i + 1}: ${JSON.stringify(locators[i])}`);
+          await this.waitForElement(locators[i], timeout);
+          const isPresent = await this.customWaitIsPresented(locators[i], timeout, quarterSecond);
+          if (isPresent) {
+            this.logger.info(`CLAIM CASHBACK button found with locator ${i + 1}`);
+            return true;
+          }
+        } catch (error) {
+          this.logger.info(`Locator ${i + 1} failed: ${error.message}`);
+        }
       }
+      
+      this.logger.warn('CLAIM CASHBACK button not found with any locator');
+      return false;
     });
   }
 
@@ -105,25 +134,30 @@ class CashbackPage extends WalletCommonBase {
     return await this.withLogging('waitForCashbackPageLoad', async () => {
       this.logger.info('Starting Cashback page load verification...');
       
-      // Check title visibility separately
-      this.logger.info('Checking Cashback page title...');
-      const titleVisible = await this.isCashbackPageTitleVisible(timeout);
-      this.logger.info(`Cashback page title visible: ${titleVisible}`);
-      
-      // Check claim button separately
-      this.logger.info('Checking Claim Cashback button...');
-      const buttonLoaded = await this.isClaimCashbackButtonVisible(timeout);
-      this.logger.info(`Claim Cashback button visible: ${buttonLoaded}`);
-      
-      // Final verification
-      const allElementsLoaded = titleVisible && buttonLoaded;
-      this.logger.info(`All Cashback page elements loaded: ${allElementsLoaded}`);
-      
-      if (!allElementsLoaded) {
-        this.logger.warn(`Some Cashback elements not loaded - Title: ${titleVisible}, Button: ${buttonLoaded}`);
+      try {
+        // Check title visibility separately
+        this.logger.info('Checking Cashback page title...');
+        const titleVisible = await this.isCashbackPageTitleVisible(timeout);
+        this.logger.info(`Cashback page title visible: ${titleVisible}`);
+        
+        // Check claim button separately
+        this.logger.info('Checking Claim Cashback button...');
+        const buttonLoaded = await this.isClaimCashbackButtonVisible(timeout);
+        this.logger.info(`Claim Cashback button visible: ${buttonLoaded}`);
+        
+        // Final verification
+        const allElementsLoaded = titleVisible && buttonLoaded;
+        this.logger.info(`All Cashback page elements loaded: ${allElementsLoaded}`);
+        
+        if (!allElementsLoaded) {
+          this.logger.warn(`Some Cashback elements not loaded - Title: ${titleVisible}, Button: ${buttonLoaded}`);
+        }
+        
+        return allElementsLoaded;
+      } catch (error) {
+        this.logger.error(`Error during Cashback page load verification: ${error.message}`);
+        return false;
       }
-      
-      return allElementsLoaded;
     });
   }
 
@@ -177,8 +211,22 @@ class CashbackPage extends WalletCommonBase {
    */
   async getCashbackCardCount() {
     return await this.withLogging('getCashbackCardCount', async () => {
-      const cardElements = await this.findElements(this.cashbackCardContainerLocator);
-      return cardElements.length;
+      try {
+        // Try the specific locator first
+        const cardElements = await this.findElements(this.cashbackCardContainerLocator);
+        this.logger.info(`Found ${cardElements.length} cards with specific locator`);
+        if (cardElements.length > 0) {
+          return cardElements.length;
+        }
+        
+        // Fallback to generic locator
+        const genericCardElements = await this.findElements(this.cashbackCardGenericLocator);
+        this.logger.info(`Found ${genericCardElements.length} cards with generic locator`);
+        return genericCardElements.length;
+      } catch (error) {
+        this.logger.warn(`Error getting cashback card count: ${error.message}`);
+        return 0;
+      }
     });
   }
 
@@ -193,18 +241,6 @@ class CashbackPage extends WalletCommonBase {
         throw new Error(`Card index ${cardIndex} is out of range. Only ${cardElements.length} cards found.`);
       }
       await this.clickElementByScript(cardElements[cardIndex]);
-    });
-  }
-
-  /**
-   * Opens the cashback terms modal by clicking on the first available card.
-   * @returns {Promise<void>}
-   */
-  async openCashbackTermsModal() {
-    return await this.withLogging('openCashbackTermsModal', async () => {
-      await this.clickCashbackCard(0);
-      // Wait a moment for the modal to appear
-      await this.sleep(1000);
     });
   }
 

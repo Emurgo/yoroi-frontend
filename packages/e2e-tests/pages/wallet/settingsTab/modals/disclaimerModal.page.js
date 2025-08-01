@@ -31,41 +31,66 @@ class CashbackTermsModal extends BasePage {
 
   // methods
   async isDisplayed() {
-    return await this.withLogging('isDisplayed', async () => {
-      try {
-        await this.waitForElement(this.disclaimerDialogLocator, twoSeconds);
-        await this.waitForElement(this.disclaimerTitleLocator, twoSeconds);
-        return true;
-      } catch (error) {
-        this.logger.warn(`CashbackTermsModal not displayed: ${error.message}`);
-        return false;
-      }
-    });
+    this.logger.info(`CashbackTermsModal::isDisplayed is called`);
+    try {
+      await this.waitForElement(this.disclaimerDialogLocator, twoSeconds);
+      await this.waitForElement(this.disclaimerTitleLocator, twoSeconds);
+      return true;
+    } catch (error) {
+      this.logger.warn(`CashbackTermsModal not displayed: ${error.message}`);
+      return false;
+    }
   }
 
   async closeCashbackTermsModal() {
-    return await this.withLogging('closeCashbackTermsModal', async () => {
-      await this.click(this.disclaimerCloseBtnLocator);
-    });
+    this.logger.info(`CashbackTermsModal::closeCashbackTermsModal is called`);
+    await this.click(this.disclaimerCloseBtnLocator);
   }
 
   async agreeToDisclaimer() {
-    return await this.withLogging('agreeToDisclaimer', async () => {
-      await this.click(this.disclaimerCheckboxLocator);
-    });
+    this.logger.info(`CashbackTermsModal::agreeToDisclaimer is called`);
+    await this.click(this.disclaimerCheckboxLocator);
   }
 
   async proceedWithDisclaimer() {
-    return await this.withLogging('proceedWithDisclaimer', async () => {
-      await this.click(this.disclaimerProceedBtnLocator);
-    });
+    this.logger.info(`CashbackTermsModal::proceedWithDisclaimer is called`);
+    await this.click(this.disclaimerProceedBtnLocator);
   }
 
   async acceptDisclaimerAndProceed() {
-    return await this.withLogging('acceptDisclaimerAndProceed', async () => {
-      await this.agreeToDisclaimer();
-      await this.proceedWithDisclaimer();
-    });
+    this.logger.info(`CashbackTermsModal::acceptDisclaimerAndProceed is called`);
+    await this.agreeToDisclaimer();
+    await this.proceedWithDisclaimer();
+  }
+
+  async isProceedButtonEnabled() {
+    this.logger.info(`CashbackTermsModal::isProceedButtonEnabled is called`);
+    try {
+      const element = await this.findElement(this.disclaimerProceedBtnLocator);
+      const isEnabled = await element.isEnabled();
+      return isEnabled;
+    } catch (error) {
+      this.logger.warn(`Could not check if proceed button is enabled: ${error.message}`);
+      return false;
+    }
+  }
+
+  async waitForProceedButtonEnabled(timeout = 5) {
+    this.logger.info(`CashbackTermsModal::waitForProceedButtonEnabled is called`);
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeout) {
+      if (await this.isProceedButtonEnabled()) {
+        return true;
+      }
+      await this.sleep(5);
+    }
+    return false;
+  }
+
+  async getDisclaimerText() {
+    this.logger.info(`CashbackTermsModal::getDisclaimerText is called`);
+    const element = await this.findElement(this.disclaimerTitleLocator);
+    return await element.getText();
   }
 }
 
