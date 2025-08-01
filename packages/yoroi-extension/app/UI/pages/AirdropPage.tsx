@@ -29,7 +29,7 @@ type AddressClaimData = {
 interface Props {
   stores: {
     wallets: {
-      selected: null | {
+      selectedOrFail: {
         networkId: number,
         publicDeriverId: number,
         type: 'mnemonic' | 'ledger' | 'trezor',
@@ -56,23 +56,19 @@ const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
 const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io/claims/cardano';
 
-export default function AirdropPage({ stores }: Props) {
+export default function AirdropPage({ stores }: Readonly<Props>) {
 
   const intl = useIntl();
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
-  const [isClaimDialog, setClaimDialog] = useState(false);
-  const [isClaimDone, setClaimDone] = useState(false);
+  const [isClaimDialog, setIsClaimDialog] = useState(false);
+  const [isClaimDone, setIsClaimDone] = useState(false);
 
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
-  const wallet = stores.wallets.selected;
-  if (!wallet) {
-    return null;
-  }
-
+  const wallet = stores.wallets.selectedOrFail;
   const isMainnet = wallet.networkId === 0;
 
   const checkEndpoint = isMainnet ? CHECK_ENDPOINT_MAINNET : CHECK_ENDPOINT_PREPROD;
@@ -83,6 +79,7 @@ export default function AirdropPage({ stores }: Props) {
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
   );
+
   useEffect(() => {
     (async () => {
       const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
@@ -95,7 +92,7 @@ export default function AirdropPage({ stores }: Props) {
       }
 
       if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
-        setClaimDone(true);
+        setIsClaimDone(true);
       }
       setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
       setUnclaimedAddrs(unclaimedAddrs);
@@ -103,24 +100,24 @@ export default function AirdropPage({ stores }: Props) {
     return () => {
       // switch wallet
       setAlloc(null);
-      setClaimDone(false);
+      setIsClaimDone(false);
       setUnclaimedAddrs([]);
     };
   }, [wallet.publicDeriverId]);
 
   const showClaimDialog = async () => {
-    setClaimDialog(true);
+    setIsClaimDialog(true);
   }
 
   const closeClaimDialog = async () => {
-    setClaimDialog(false);
+    setIsClaimDialog(false);
   }
 
   const claim = async (password) => {
     const addr = unclaimedAddrs[0];
     await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
-    setClaimDialog(false);
-    setClaimDone(true);
+    setIsClaimDialog(false);
+    setIsClaimDone(true);
   }
 
   let content;
