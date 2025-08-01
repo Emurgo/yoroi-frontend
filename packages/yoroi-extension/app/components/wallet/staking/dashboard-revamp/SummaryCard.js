@@ -144,7 +144,7 @@ function SummaryCard({
           isDisabled={hasNoRewards(totalRewards)}
         />
       </Box>
-      <Divider sx={{ borderColor: 'ds.gray_200' }}/>
+      <Divider sx={{ borderColor: 'ds.gray_200' }} />
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIconWrapper>
@@ -206,7 +206,7 @@ export default (injectIntl(observer(SummaryCard)): ComponentType<Props>);
 
 const Card = styled(Box)({
   borderRadius: '8px',
-  width: '100%'
+  width: '100%',
 });
 const InfoRow = styled(Box)({
   width: '100%',
