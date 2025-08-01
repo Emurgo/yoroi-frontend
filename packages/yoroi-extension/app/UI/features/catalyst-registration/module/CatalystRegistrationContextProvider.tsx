@@ -2,7 +2,7 @@ import type { StoresMap } from '../../../../stores';
 import * as React from 'react';
 import { observer } from 'mobx-react';
 import { CatalystRegistrationContextType, StepAction, StepStateType, CatalystState } from '../common/types';
-import { ProgressStep } from '../../../../stores/ada/VotingStore';
+import { ProgressStep } from '../common/constants';
 import { getTokenName, genFormatTokenAmount, genLookupOrFail } from '../../../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../../../utils/formatters';
 import { StepState } from '../../../../components/widgets/ProgressSteps';
@@ -28,7 +28,8 @@ function stepReducer(state: StepStateType, action: StepAction): StepStateType {
     case 'NEXT_STEP':
       if (state.currentStep === -1) return state;
 
-      const nextStep = state.currentStep + 1;
+      const stepsAmount = state.currentStep === ProgressStep.CONFIRM && action.selectedWallet.isHardware ? 2 : 1;
+      const nextStep = state.currentStep + stepsAmount;
       if (nextStep > ProgressStep.QR_CODE) return state;
 
       return {
