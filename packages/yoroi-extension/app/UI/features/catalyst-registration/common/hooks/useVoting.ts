@@ -47,8 +47,6 @@ export const useVoting = (): VotingHookType => {
   const cantRegister = !environment.isTest() && balanceAmount.lt(votingMinAmount);
 
   const votingNextStep = async (value: string | null = null) => {
-    console.log('stepState.currentStep:', stepState.currentStep);
-    console.log('value:', value);
     setError(null);
     try {
       if (stepState.currentStep < 0 || stepState.currentStep === ProgressStep.QR_CODE) {
