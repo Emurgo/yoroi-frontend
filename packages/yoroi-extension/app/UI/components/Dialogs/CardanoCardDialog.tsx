@@ -18,7 +18,7 @@ export const CardanoCardDialog = () => {
       const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getCardanoCardModalClosed();
 
-      if (data?.popups?.cardanoCardAnnouncement?.display === false && (wasClosed === undefined || wasClosed === false)) {
+      if (data?.popups?.cardanoCardAnnouncement?.display === true && (wasClosed === undefined || wasClosed === false)) {
         openModal({
           title: strings.cardanoCardTitle,
           height: '550px',
