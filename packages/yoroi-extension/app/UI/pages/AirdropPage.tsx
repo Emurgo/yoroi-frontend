@@ -30,6 +30,7 @@ interface Props {
   stores: {
     wallets: {
       selected: null | {
+        networkId: number,
         publicDeriverId: number,
         type: 'mnemonic' | 'ledger' | 'trezor',
         allAddresses: {
@@ -50,6 +51,10 @@ interface Props {
 }
 
 const NUMBER_OF_NIGHT_DECIMALS = 6;
+const CHECK_ENDPOINT_MAINNET = 'https://proof.provtree-midnight.com';
+const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
+const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
+const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io/claims/cardano';
 
 export default function AirdropPage({ stores }: Props) {
   const intl = useIntl();
@@ -57,6 +62,16 @@ export default function AirdropPage({ stores }: Props) {
   if (!wallet) {
     return null;
   }
+  let checkEndpoint;
+  let claimEndpoint;
+  if (wallet.networkId === 0) {
+    checkEndpoint = CHECK_ENDPOINT_MAINNET;
+    claimEndpoint = CLAIM_ENDPOINT_MAINNET;
+  } else {
+    checkEndpoint = CHECK_ENDPOINT_PREPROD;
+    claimEndpoint = CLAIM_ENDPOINT_PREPROD;
+  }
+
   const isTrezor = wallet.type === 'trezor';
 
   // null means querying
@@ -72,10 +87,10 @@ export default function AirdropPage({ stores }: Props) {
   );
   useEffect(() => {
     (async () => {
-      const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(wallet);
+      const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
       const unclaimedAddrs: AddressClaimData[] = [];
       for (const addr of allocatedAddrs) {
-        const claimed = await checkClaimForAddress(addr.addrBech32);
+        const claimed = await checkClaimForAddress(claimEndpoint, addr.addrBech32);
         if (!claimed) {
           unclaimedAddrs.push(addr);
         }
@@ -105,7 +120,7 @@ export default function AirdropPage({ stores }: Props) {
 
   const claim = async (password) => {
     const addr = unclaimedAddrs[0];
-    await claimForAddress(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+    await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
     setClaimDialog(false);
     setClaimDone(true);
   }

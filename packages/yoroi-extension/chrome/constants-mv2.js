@@ -83,6 +83,8 @@ export function genCSP(request: {|
   // Midnight airdrop
   connectSrc.push('https://mainnet.prod.gd.midnighttge.io');
   connectSrc.push('https://proof.provtree-midnight.com');
+  connectSrc.push('https://proof-staging.provtree-midnight.com');
+  connectSrc.push('https://external-claim.gd.midnighttge.io/');
 
   // wasm-eval is needed to compile WebAssembly in the browser
   // note: wasm-eval is not standardized but empirically works in Firefox & Chrome https://github.com/w3c/webappsec-csp/pull/293

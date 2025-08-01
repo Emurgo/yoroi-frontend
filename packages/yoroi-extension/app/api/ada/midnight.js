@@ -10,9 +10,6 @@ import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
-// remember to change chrome/constants.js
-const CHECK_ENDPOINT = 'https://proof.provtree-midnight.com';
-const CLAIM_ENDPOINT = 'https://mainnet.prod.gd.midnighttge.io';
 
 type AddressClaimData = {|
   addrHex: string,
@@ -21,12 +18,12 @@ type AddressClaimData = {|
   value: number,
 |};
 
-export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<AddressClaimData>> {
+export async function getAllocatedAddresses(checkEndpoint: string, wallet: WalletState): Promise<Array<AddressClaimData>> {
   const result = [];
 
   for (const addr of wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE]) {
     const addrBech32 = addressHexToBech32(addr.address);
-    const resp = await fetch(`${CHECK_ENDPOINT}/check/cardano/${addrBech32}`);
+    const resp = await fetch(`${checkEndpoint}/check/cardano/${addrBech32}`);
     let value;
     if (resp.ok) {
       const respBody = await resp.json();
@@ -51,8 +48,8 @@ export async function getAllocatedAddresses(wallet: WalletState): Promise<Array<
   return result;
 }
 
-export async function checkClaimForAddress(addrBech32: string): Promise<boolean> {
-  const resp = await fetch(`${CLAIM_ENDPOINT}/claims/cardano?address=${addrBech32}`);
+export async function checkClaimForAddress(claimEndpoint: string, addrBech32: string): Promise<boolean> {
+  const resp = await fetch(`${claimEndpoint}/claims/cardano?address=${addrBech32}`);
   if (!resp.ok) {
     return false;
   }
@@ -84,6 +81,7 @@ export function getClaimMessage(value: number, destAddrBech32: string): string {
 }
 
 export async function claimForAddress(
+  claimEndpoint: string,
   wallet: WalletState,
   addrClaimData: AddressClaimData,
   destAddrBech32: string,
@@ -149,7 +147,7 @@ export async function claimForAddress(
     public_key: publicKey,
   };
   const resp = await fetch(
-    `${CLAIM_ENDPOINT}/claims/cardano`,
+    `${claimEndpoint}/claims/cardano`,
     {
       method: 'POST',
       body: JSON.stringify([params]),
