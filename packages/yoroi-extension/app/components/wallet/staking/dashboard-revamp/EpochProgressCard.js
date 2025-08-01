@@ -17,7 +17,7 @@ export function EpochProgressCard({ percentage, days, currentEpoch, startEpochDa
         <Graph value={percentage} days={days} />
         <Stack direction="column" flexGrow="1">
           <Title label="Current Epoch" value={currentEpoch} />
-          <Stack direction="row" spacing={3} mt="50px" justifyContent="space-between">
+          <Stack direction="row" gap={16} mt="50px" justifyContent="space-between">
             <LabelWithValue label="Epoch started at" value={startEpochDate} />
             <LabelWithValue label="Epoch ends at" value={endEpochDate} />
           </Stack>
@@ -47,7 +47,7 @@ type InfoColumnProps = {|
 |};
 const LabelWithValue = ({ label, value }: InfoColumnProps): Node => {
   return (
-    <Box>
+    <Box minWidth="203px">
       <Typography component="div" style={{ textTransform: 'uppercase' }} variant="caption" mb="4px" color="grayscale.600">
         {label}
       </Typography>

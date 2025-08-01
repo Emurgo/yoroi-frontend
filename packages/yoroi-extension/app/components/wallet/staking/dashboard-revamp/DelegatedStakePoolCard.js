@@ -1,7 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { Box, styled } from '@mui/system';
-import { Stack, Typography, useTheme } from '@mui/material';
+import { borderColor, Box, styled } from '@mui/system';
+import { Divider, Stack, Typography, useTheme } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -42,7 +42,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
         paddingBottom: '24px',
       }}
     >
-      <Stack direction="row" px={24} py={16} alignItems="center">
+      <Stack direction="row" pl={24} pr={8} py={10} alignItems="center">
         <Typography component="div" variant="h5" color={theme.palette.ds.text_gray_medium} fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
@@ -56,15 +56,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           socialMediaInfo={{ socialLinks, websiteUrl }}
         />
       </Stack>
-      <Box
-        sx={{
-          borderBottom: '1px solid',
-          borderBottomColor: 'grayscale.200',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      />
+      <Divider sx={{ borderColor: 'ds.gray_200' }} />
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
           {avatar != null ? (

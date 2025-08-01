@@ -2,7 +2,7 @@
 import type { Node, ComponentType } from 'react';
 import { Box, styled } from '@mui/system';
 
-import { Button, Typography } from '@mui/material';
+import { Button, Divider, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { defineMessages, injectIntl } from 'react-intl';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
@@ -124,9 +124,9 @@ function SummaryCard({
     <Card sx={{ border: '1px solid', borderColor: 'grayscale.200', bgcolor: 'ds.bg_color_max' }}>
       <Box
         sx={{
-          padding: '15px 24px',
-          borderBottom: '1px solid',
-          borderColor: 'grayscale.200',
+          pr: '8px',
+          pl: '24px',
+          py: '10px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -144,6 +144,7 @@ function SummaryCard({
           isDisabled={hasNoRewards(totalRewards)}
         />
       </Box>
+      <Divider sx={{ borderColor: 'ds.gray_200' }}/>
       <Box sx={{ display: 'flex' }}>
         <InfoRow sx={{ borderColor: 'grayscale.200' }}>
           <StakingIconWrapper>

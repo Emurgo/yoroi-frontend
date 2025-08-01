@@ -84,10 +84,11 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
       onClick={handleUndelegate}
       disabled={!handleUndelegate}
       sx={{
-        lineHeight: '21px',
+        lineHeight: '22px',
         '&.MuiButton-sizeMedium': {
+          fontSize: '14px',
           height: 'unset',
-          p: '9px 15px',
+          p: '9px 20px',
         },
       }}
     >
