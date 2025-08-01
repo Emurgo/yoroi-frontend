@@ -8,5 +8,6 @@
   "test-BRING_BANNER_CLOSED": "true",
   "test-MIDNIGHT_MODAL_CLOSED": "true",
   "test-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED": "true",
+  "test-CARDANO_CARD_MODAL_CLOSED": "true",
   "SURVEY_DISMISSED": "true"
 }
