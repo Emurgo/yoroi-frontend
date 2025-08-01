@@ -19,8 +19,9 @@ const messages = defineMessages({
   },
   destAddrTooltip: {
     id: 'airdrop.tooltop.destinationAddress',
-    defaultMessage: '!!!A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.',
-  }
+    defaultMessage:
+      '!!!A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.',
+  },
 });
 
 const BoxWithInfo = styled(Box)(({ theme }) => ({
@@ -35,8 +36,8 @@ const BoxWithInfo = styled(Box)(({ theme }) => ({
 }));
 
 interface Props {
-  alloc: string,
-  destAddrBech32: string,
+  alloc: string;
+  destAddrBech32: string;
 }
 
 export function ClaimInfo1(props: Props & { isTrezor: boolean }) {
@@ -54,18 +55,16 @@ export function ClaimInfo1(props: Props & { isTrezor: boolean }) {
         gap: '24px',
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px'}}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
         <Typography variant="body2" color="ds.text_gray_low">
           {intl.formatMessage(messages.size)}
           <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
         </Typography>
         {/*  @ts-ignore */}
-        <Typography variant="h1xl">
-          {alloc} NIGHT
-        </Typography>
+        <Typography variant="h1xl">{alloc} NIGHT</Typography>
       </Box>
       {!isTrezor && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px'}}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <Typography variant="body2" color="ds.text_gray_low">
             {intl.formatMessage(messages.destinationAddress)}
             <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
@@ -87,9 +86,9 @@ export function ClaimInfo2(props: Props) {
 
   return (
     <Stack spacing="24px">
-      <Box  sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
+      <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
         <Stack spacing="16px">
-          <Typography variant="h5"  sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' }}}>
+          <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
             {intl.formatMessage(messages.size)}
             <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
           </Typography>
@@ -106,7 +105,7 @@ export function ClaimInfo2(props: Props) {
       </Box>
       <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
         <Stack spacing="16px">
-          <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' }}}>
+          <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
             {intl.formatMessage(messages.destinationAddress)}
             <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
           </Typography>

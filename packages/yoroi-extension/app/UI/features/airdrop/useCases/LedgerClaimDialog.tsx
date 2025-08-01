@@ -19,14 +19,15 @@ const messages = defineMessages({
   },
   ledgerClaimDialogText: {
     id: 'airdrop.ledgerClaimDialogText',
-    defaultMessage: '!!!Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address',
+    defaultMessage:
+      '!!!Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address',
   },
 });
 
 export default function LedgerClaimDialog(props: {
-  onClose: () => void,
-  message: string,
-  onClaim: (_password: string) => Promise<void>
+  onClose: () => void;
+  message: string;
+  onClaim: (_password: string) => Promise<void>;
 }) {
   const intl = useIntl();
 

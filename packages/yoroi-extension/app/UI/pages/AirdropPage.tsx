@@ -20,33 +20,33 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 
 type AddressClaimData = {
-  addrHex: string,
-  addrBech32: string,
-  path: Array<number>,
-  value: number,
+  addrHex: string;
+  addrBech32: string;
+  path: Array<number>;
+  value: number;
 };
 
 interface Props {
   stores: {
     wallets: {
       selected: null | {
-        publicDeriverId: number,
-        type: 'mnemonic' | 'ledger' | 'trezor',
+        publicDeriverId: number;
+        type: 'mnemonic' | 'ledger' | 'trezor';
         allAddresses: {
           utxoAddresses: {
             address: {
-              Hash: string,
-              IsUsed: boolean,
-              Type: number,
-            }
-          }[],
-        },
-      },
-    },
+              Hash: string;
+              IsUsed: boolean;
+              Type: number;
+            };
+          }[];
+        };
+      };
+    };
     profile: {
-      currentLocale: string,
-    },
-  }
+      currentLocale: string;
+    };
+  };
 }
 
 const NUMBER_OF_NIGHT_DECIMALS = 6;
@@ -68,7 +68,9 @@ export default function AirdropPage({ stores }: Props) {
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
   const destAddrBech32 = addressHexToBech32(
-    forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
+    forceNonNull(
+      wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
+    ).address.Hash
   );
   useEffect(() => {
     (async () => {
@@ -97,32 +99,27 @@ export default function AirdropPage({ stores }: Props) {
 
   const showClaimDialog = async () => {
     setClaimDialog(true);
-  }
+  };
 
   const closeClaimDialog = async () => {
     setClaimDialog(false);
-  }
+  };
 
-  const claim = async (password) => {
+  const claim = async password => {
     const addr = unclaimedAddrs[0];
     await claimForAddress(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
     setClaimDialog(false);
     setClaimDone(true);
-  }
+  };
 
   let content;
 
   if (!alloc) {
-    content = (<LoadingSpinner />);
+    content = <LoadingSpinner />;
   } else if (alloc.isZero()) {
-    content = (<Zero />);
+    content = <Zero />;
   } else if (isClaimDone) {
-    content = (
-      <ClaimDone
-        alloc={formattedAlloc}
-        destAddrBech32={destAddrBech32}
-      />
-    );
+    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={destAddrBech32} />;
   } else {
     content = (
       <ClaimContent
@@ -136,20 +133,17 @@ export default function AirdropPage({ stores }: Props) {
   }
   return (
     <TopBarLayout
-      banner={<BannerContainer stores={stores}/>}
-      sidebar={<SidebarContainer stores={stores}/>}
+      banner={<BannerContainer stores={stores} />}
+      sidebar={<SidebarContainer stores={stores} />}
       navbar={
-        <NavBarContainerRevamp
-          stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.airdrop)}/>}
-        />
+        <NavBarContainerRevamp stores={stores} title={<NavBarTitle title={intl.formatMessage(globalMessages.airdrop)} />} />
       }
       showInContainer
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {content}
-        {isClaimDialog && (
-          wallet.type === 'mnemonic' ? (
+        {isClaimDialog &&
+          (wallet.type === 'mnemonic' ? (
             <ClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
@@ -161,8 +155,7 @@ export default function AirdropPage({ stores }: Props) {
               onClaim={claim}
               message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
-          )
-        )}
+          ))}
       </Box>
     </TopBarLayout>
   );
