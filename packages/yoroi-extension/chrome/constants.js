@@ -59,8 +59,8 @@ export function genCSP(request: {|
   connectSrc.push('https://raw.githubusercontent.com');
 
   // Midnight airdrop
-  connectSrc.push('https://proof-staging.provtree-midnight.com');
-  connectSrc.push('https://preprod.gd.midnighttge.io');
+  connectSrc.push('https://mainnet.prod.gd.midnighttge.io');
+  connectSrc.push('https://proof.provtree-midnight.com');
 
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
