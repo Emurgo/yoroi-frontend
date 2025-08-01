@@ -48,7 +48,7 @@ const CardanoCardContent = ({ onClose }) => {
   return (
     <Stack>
       <Stack direction="column" alignItems="center" justifyContent="center" pb="24px">
-        <Stack my={58}>
+        <Stack my={48}>
           <img src={CardanoCardImage} alt="Midnight Illustration" />
         </Stack>
 
