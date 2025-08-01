@@ -63,7 +63,7 @@ const CardanoCardContent = ({ onClose }) => {
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
         <Link href={CARDANO_CARD_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
           <CustomButton variant="contained" color="primary">
-            {strings.learnMore}
+            {strings.cardanoCardLearnMore}
           </CustomButton>
         </Link>
 

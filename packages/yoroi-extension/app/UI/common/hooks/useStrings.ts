@@ -64,6 +64,10 @@ export const messages = Object.freeze(
       id: 'banners.cardanoCard.join',
       defaultMessage: '!!!Join the future of finance',
     },
+    cardanoCardLearnMore: {
+      id: 'banners.cardanoCard.leanMore',
+      defaultMessage: '!!!Register Interest',
+    },
     receiverFieldLabelUnresolvedAddress: {
       id: 'wallet.send.form.receiver.label.unresolvedAddress',
       defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
@@ -166,5 +170,6 @@ export const useStrings = () => {
     cardanoCard: intl.formatMessage(messages.cardanoCard),
     cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
     cardanoCardJoin: intl.formatMessage(messages.cardanoCardJoin),
+    cardanoCardLearnMore: intl.formatMessage(messages.cardanoCardLearnMore),
   }).current;
 };
