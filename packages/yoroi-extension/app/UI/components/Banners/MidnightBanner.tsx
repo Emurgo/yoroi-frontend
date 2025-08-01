@@ -1,16 +1,18 @@
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
 import { MidnightBannerIllustration } from '../Dialogs/MidnightBannerIllustration';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 
 export const MidnightBanner = ({ onClose }) => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
+  const routes = useNavigateTo();
 
   const handleClose = async () => {
     onClose();
   };
 
   const handleClick = () => {
-    // Redirect to Airdrop page https://emurgo.atlassian.net/browse/YOEXT-2100
+    routes.midnightAirdropClaim();
   };
 
   return (
