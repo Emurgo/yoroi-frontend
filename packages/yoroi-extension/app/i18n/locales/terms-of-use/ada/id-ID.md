@@ -66,9 +66,9 @@ Dengan menggunakan Perangkat Lunak, Pengguna mengakui dan menyetujui: (i) bahwa 
 
 **e. BAHASA.** Semua Terjemahan dalam Perjanjian ini dibuat untuk tujuan rujukan lokal dan jika terjadi ketidakkonsistenan antara versi bahasa Inggris dan non-Inggris, versi bahasa Inggris dari Perjanjian ini yang akan berlaku dan mengatur dalam segala hal.
 
-## 12. Delegation and Staking
+## 12. Delegasi dan Staking
 
-12.1 **Rewards.** The amount of Rewards a User may earn from delegation depends on various factors including, but not limited to, user participation, stakepool profit margins and the volume of ada being delegated. It is possible that delegation generates no Reward for a User due to the above-mentioned factors. Rewards are earned as of the start of the 3rd epoch on the Cardano blockchain.
+12.1 **Reward.** Jumlah Reward yang dapat diperoleh Pengguna dari delegasi bergantung pada berbagai faktor, termasuk namun tidak terbatas pada, partisipasi pengguna, margin keuntungan stakepool, dan volume ADA yang didelegasikan. Ada kemungkinan delegasi tidak menghasilkan Reward bagi Pengguna karena faktor-faktor yang disebutkan di atas. Reward diperoleh sejak awal epoch ke-3 di blockchain Cardano.
 
 12.2 **Delegation.** Users may delegate their stake to one of the various stake pools of the Company or to a third party stake pool. User will have the sole right to determine the volume to be delegated to a stake pool and may increase or decrease its level of participation at any time. Any information Company shares regarding stakepools, including performance metrics and Rewards, will be for indicative purposes only and may not be accurate. Users may only delegate their stake to a stake pool if their ada is in an updated Daedalus or an updated Yoroi wallet at the time of the setup process. User does not acquire any automatic right to Rewards as a result of delegating its stake.
 
