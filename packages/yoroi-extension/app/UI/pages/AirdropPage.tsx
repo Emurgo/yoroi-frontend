@@ -54,7 +54,7 @@ const NUMBER_OF_NIGHT_DECIMALS = 6;
 const CHECK_ENDPOINT_MAINNET = 'https://proof.provtree-midnight.com';
 const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
-const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io/claims/cardano';
+const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 export default function AirdropPage({ stores }: Readonly<Props>) {
 
