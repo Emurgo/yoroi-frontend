@@ -40,6 +40,7 @@ const storageKeys = {
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
   MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
+  CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -153,12 +154,12 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== Midnight Modal ========== //
-  getMidnightModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  // ========== CARDANO_CARD Modal ========== //
+  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
-  setMidnightModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED, closed);
+  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
-  unsetMidnightModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
