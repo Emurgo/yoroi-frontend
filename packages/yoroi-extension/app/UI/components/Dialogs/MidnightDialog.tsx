@@ -23,7 +23,7 @@ export const MidnightDialog = () => {
         openModal({
           title: intl.formatMessage(messages.importantUpdates),
           height: '597px',
-          width: '650px',
+          width: '612px',
           content: (
             <MidnightDialogContent
               onClose={() => {
@@ -48,9 +48,9 @@ const MidnightDialogContent = ({ onClose }) => {
   const intl = useIntl();
   return (
     <Stack>
-      <Stack direction="column" alignItems="center" justifyContent="center" py="24px">
+      <Stack direction="column" alignItems="center" justifyContent="center" pb="13px">
         <MidnightIlustration />
-        <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mt="32px" mb="8px">
+        <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mt="16px" mb="8px">
           {intl.formatMessage(messages.takePartInMidnight)}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium" textAlign="center" mx="24px">
@@ -58,7 +58,7 @@ const MidnightDialogContent = ({ onClose }) => {
         </Typography>
       </Stack>
 
-      <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
+      <Grid justifyContent="space-between" direction="column" style={{ marginTop: 24 }}>
         <Link href={MIDNIGHT_DISTRIBUTION_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
           <CustomButton variant="contained" color="primary">
             {intl.formatMessage(messages.learnMore)}

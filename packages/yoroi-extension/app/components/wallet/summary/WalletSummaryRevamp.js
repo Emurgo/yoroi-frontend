@@ -1,5 +1,5 @@
 // @flow
-import type { Node } from 'react';
+import type { Node, ComponentType } from 'react';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
@@ -20,15 +20,12 @@ import BigNumber from 'bignumber.js';
 import { ReactComponent as ExportTxToFileSvg } from '../../../assets/images/transaction/export.inline.svg';
 import LoadingSpinner from '../../widgets/LoadingSpinner';
 import FullscreenLayout from '../../layout/FullscreenLayout';
-// $FlowIgnore: supressing this error
-import { BringBanner, UsdaBanner, SurveyBanner } from '../../../UI/components/Banners';
-import { ROUTES } from '../../../routes-config';
-import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
 import type { WalletState } from '../../../../chrome/extension/background/types';
-import environment from '../../../environment';
-// $FlowIgnore: suppressing this error
-import { DrepPromotionBanner } from '../../../UI/components/DrepPromotionBanner/DrepPromotionBanner';
 import type { StoresMap } from '../../../stores';
+// $FlowIgnore: suppressing this error
+import { withYoroiRemoteConfig } from '../../../UI/common/helpers/withYoroiRemoteConfig';
+// $FlowIgnore: suppressing this error
+import { BannerVisibilityManager } from '../../../UI/components/Banners/BannerVisibilityManager';
 
 const messages = defineMessages({
   transactionType: {
@@ -58,7 +55,6 @@ type Props = {|
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow>,
   +getHistoricalPrice: (from: string, to: string, timestamp: number) => ?string,
   +shouldShowEmptyBanner: boolean,
-  +emptyBannerComponent: Node,
   +goToRoute: ({| route: string, params?: Object, query?: Object |}) => void,
   +selectedWallet: WalletState,
   +stores: StoresMap,
@@ -69,33 +65,9 @@ type State = {|
   isSurveyVisible: boolean,
 |};
 
-const localStorage = new LocalStorageApi();
-const surveyDismissedFlag = createStorageFlag('SURVEY_DISMISSED', false);
-
 @observer
-export default class WalletSummaryRevamp extends Component<Props, State> {
-  static contextType:any = IntlContext;
-  state: State = {
-    isBannerVisible: false,
-    isSurveyVisible: false,
-  };
-
-  UNSAFE_componentWillMount: void => Promise<void> = async () => {
-    if (!await surveyDismissedFlag.get()) {
-      this.setState({ isSurveyVisible: true });
-      return;
-    }
-
-    const wasClosed = await localStorage.getBringBannerClosed();
-    if (!wasClosed) {
-      this.setState({ isBannerVisible: true });
-    }
-  };
-
-  surveyClose: () => void = () => {
-    surveyDismissedFlag.set(true);
-    this.setState({ isSurveyVisible: false });
-  }
+class WalletSummaryRevamp extends Component<Props, State> {
+  static contextType: any = IntlContext;
 
   renderAmountDisplay: ({|
     shouldHideBalance: boolean,
@@ -211,57 +183,8 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     );
   }
 
-  renderBringBanner(): Node {
-    const { goToRoute, selectedWallet } = this.props;
-    const { isBannerVisible } = this.state;
-
-    const onClose = () => {
-      this.setState({ isBannerVisible: false });
-      localStorage.setBringBannerClosed('true');
-    }
-
-    // <TODO:UNFLAG_LATER>
-    if (!environment.isDev()) return null;
-
-    if (selectedWallet.isTestnet || !isBannerVisible) return null;
-
-    return (
-      <BringBanner
-        onClose={onClose}
-        onClick={() => {
-          goToRoute({ route: ROUTES.CASHBACK.ROOT });
-          onClose();
-        }}
-        displayIllustration={false}
-      />
-    );
-  }
-
-  renderUsdaBanner(): Node {
-    const { goToRoute } = this.props;
-
-    // <TODO:UNBLOCK_LATER>
-    // noinspection PointlessBooleanExpressionJS
-    if (true) return null;
-
-    // noinspection UnreachableCodeJS
-    return (
-      <UsdaBanner
-        onClose={() => {}}
-        onClick={() => goToRoute({ route: ROUTES.SWAP.ROOT })}
-      />
-    );
-  }
-
   render(): Node {
-    const {
-      pendingAmount,
-      isLoadingTransactions,
-      openExportTxToFileDialog,
-      shouldShowEmptyBanner,
-      emptyBannerComponent,
-      stores,
-    } = this.props;
+    const { pendingAmount, isLoadingTransactions, openExportTxToFileDialog, shouldShowEmptyBanner, stores } = this.props;
     const intl = this.context;
 
     const hasPendingAmount = pendingAmount.incoming.length || pendingAmount.outgoing.length;
@@ -316,13 +239,7 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
             {this.renderPendingAmount(pendingAmount.outgoing, intl.formatMessage(messages.pendingOutgoingConfirmationLabel))}
           </Typography>
         </Box>
-        {!this.state.isSurveyVisible && (<DrepPromotionBanner stores={stores} intl={intl} />)}
-        <Box sx={{ display: 'flex', flexDirection: 'row', gap: '24px' }}>
-          {this.renderBringBanner()}
-          {this.renderUsdaBanner()}
-          {this.state.isSurveyVisible && (<SurveyBanner onClose={this.surveyClose} />)}
-        </Box>
-        {shouldShowEmptyBanner && <Box>{emptyBannerComponent}</Box>}
+        <BannerVisibilityManager stores={stores} intl={intl} />
         {!shouldShowEmptyBanner && !isLoadingTransactions && (
           <Grid
             container
@@ -357,6 +274,9 @@ export default class WalletSummaryRevamp extends Component<Props, State> {
     );
   }
 }
+
+export default (withYoroiRemoteConfig(WalletSummaryRevamp): ComponentType<Props>);
+
 
 export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
