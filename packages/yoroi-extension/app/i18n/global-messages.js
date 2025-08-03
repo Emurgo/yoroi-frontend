@@ -1108,6 +1108,10 @@ const globalMessages: * = defineMessages({
     id: 'global.labels.apply',
     defaultMessage: '!!!Apply',
   },
+  airdrop: {
+    id: 'airdrop.label',
+    defaultMessage: '!!!Airdrop',
+  }
 });
 export default globalMessages;
 

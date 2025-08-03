@@ -29,6 +29,7 @@ import { DappConnector } from './DappConnector';
 import { Delete } from './Delete';
 import { Device } from './Device';
 import { Drag } from './Drag';
+import { ErrorTriangle } from './ErrorTriangle';
 import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
 import { GridDefault } from './GridDefault';
@@ -124,6 +125,7 @@ export const Icon = {
   Delete,
   Device,
   Drag,
+  ErrorTriangle,
   ExclamationCircle,
   Expand,
   Explore,
@@ -220,6 +222,7 @@ export enum Icons {
   Delete = 'Delete',
   Device = 'Device',
   Drag = 'Drag',
+  ErrorTriangle = 'ErrorTriangle',
   ExclamationCircle = 'ExclamationCircle',
   Expand = 'Expand',
   Explore = 'Explore',
