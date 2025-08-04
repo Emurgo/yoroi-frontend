@@ -103,4 +103,5 @@ export const ROUTES = {
     FAIL: '/tx-review/failed',
     SUCCESS: '/tx-review/success',
   },
+  AIRDROP: '/airdrop',
 };

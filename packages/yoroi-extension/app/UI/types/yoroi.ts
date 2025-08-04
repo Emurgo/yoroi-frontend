@@ -65,6 +65,9 @@ export type YoroiRemoteConfig = {
     midnightDistribution?: {
       display: boolean;
     };
+    cardanoCardAnnouncement: {
+      display: boolean;
+    };
   };
   dapps?: {
     recommended: {
