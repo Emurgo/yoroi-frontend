@@ -215,14 +215,14 @@ jobs:
             ./packages/e2e-tests/testRunsData_chrome
 
   Trezor:
-    if: github.event.review &&
-      (
-      github.event.review.state == 'approved' ||
-      contains(github.event.review.body, '/check') ||
-      contains(github.event.review.body, '/trezor')
-      )
+    # if: github.event.review &&
+    #   (
+    #   github.event.review.state == 'approved' ||
+    #   contains(github.event.review.body, '/check') ||
+    #   contains(github.event.review.body, '/trezor')
+    #   )
     runs-on: ubuntu-latest
-    needs: [Build-Extension]
+    # needs: [Build-Extension]
 
     steps:
       - name: Cache Trezor user env
