@@ -13,6 +13,7 @@ export const MidnightBanner = ({ onClose }) => {
 
   const handleClick = () => {
     routes.midnightAirdropClaim();
+    onClose();
   };
 
   return (
