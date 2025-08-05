@@ -3,7 +3,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
 interface BringBannerProps {
   onClose: () => void;
-  onClick: () => void;
+  onClick?: () => void;
   displayIllustration?: boolean;
 }
 
@@ -15,7 +15,7 @@ export const BringBanner = ({ onClose, onClick, displayIllustration = true }: Br
   };
 
   const handleClick = () => {
-    onClick();
+    onClick && onClick();
   };
 
   return (
