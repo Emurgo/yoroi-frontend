@@ -1,6 +1,6 @@
 # Paper Wallet
 
-**"Paper Wallet"** adalah sebuah dokumen khusus, yang berisi kata-kata mnemonik rahasia dan sejumlah kumpulan alamat. Ketika paper wallet dibuat **TIDAK disimpan oleh Yoroi**. Dokumen PDF yang dihasilkan adalah satu-satunya salinan yang tersedia untuk wallet ini.
+**"Paper Wallet"** adalah sebuah dokumen khusus, yang berisi kata-kata mnemonik rahasia dan sejumlah kumpulan alamat. Ketika paper wallet dibuat, **TIDAK disimpan oleh Yoroi**. Dokumen PDF yang dihasilkan adalah satu-satunya salinan yang tersedia untuk wallet ini.
 
 Anda dapat menggunakan paper wallet untuk menerima koin menggunakan alamat yang dibuat sebelumnya. Anda dapat mengembalikan paper wallet Anda kapan saja ke dalam Yoroi untuk mengakses uang Anda. Namun, Anda harus berhenti menggunakan paper wallet setelah mengembalikan uang karena itu bukan lagi menjadi sebuah "cold" wallet.
 
