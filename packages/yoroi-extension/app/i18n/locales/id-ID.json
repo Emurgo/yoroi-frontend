@@ -57,7 +57,7 @@
   "api.errors.serverStatusError": "Koneksi ke peladen gagal. Silakan periksa koneksi internet Anda atau hubungi tim support kami <a target='_blank' href='https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'>di sini</a>.",
   "api.errors.unusedAddressesError": "Anda tidak bisa membuat lebih dari 20 alamat yang tidak digunakan secara berturut-turut.",
   "app.errors.storageLoadError": "Gagal mengakses penyimpanan. Yoroi perlu mengakses penyimpanan (\"IndexedDB\") untuk mengelola aplikasi dengan benar. Browser Anda mungkin tidak mendukung IndexedDB atau mungkin dinonaktifkan karena pengaturan privasi Anda (private browsing)",
-  "app.errors.unableToLoad": "Tidak bisa memuat!",
+  "app.errors.unableToLoad": "Tidak bisa memuat wallet. Coba lagi.",
   "app.errors.unexpectedError": "Sesuatu yang tak terduga terjadi. Coba lagi.",
   "app.errors.unknowError": "Terjadi kesalahan yang tidak diketahui.",
   "banners.bring.button": "Jelajahi cashback",
