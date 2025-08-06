@@ -36,10 +36,14 @@ class CreateWalletStepTwo extends AddWalletBase {
 
     return allWords;
   }
-  async closeTipsModalWindow() {
+  async closeTipsModalWindow(modalsExpected = true) {
     this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow is called`);
+    if (!modalsExpected) {
+      this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow skipped - modals not expected`);
+      return;
+    }
     await this.waitPresentedAndAct(
-      this.tipsModalLocator,
+      this.tipModalContinueButtonLocator,
       async () =>
         await this.waitPresentedAndAct(
           this.tipModalContinueButtonLocator,

@@ -51,8 +51,12 @@ class WalletDetails extends AddWalletBase {
 
   // functions
   //
-  async closeTipsModalWindow() {
+  async closeTipsModalWindow(modalsExpected = true) {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
+    if (!modalsExpected) {
+      this.logger.info(`WalletDetails::closeTipsModalWindow skipped - modals not expected`);
+      return;
+    }
     await this.waitPresentedAndAct(this.tipsModalLocator, async () => {
       await this.waitPresentedAndAct(
         this.tipModalContinueButtonLocator,

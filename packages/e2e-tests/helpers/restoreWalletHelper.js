@@ -64,13 +64,13 @@ export const checkCorrectWalletIsDisplayed = async (webdriver, logger, testWalle
   expect(walletInfo.plate, `The wallet plate should be "${testWallet.plate}"`).to.equal(testWallet.plate);
 };
 
-export const createWallet = async (webdriver, logger, testWalletName) => {
+export const createWallet = async (webdriver, logger, testWalletName, modalsExpected = true) => {
   const addNewWalletPage = new AddNewWallet(webdriver, logger);
   await addNewWalletPage.selectCreateNewWallet();
   const createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
   await createWalletStepOnePage.continue();
   const createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
-  await createWalletStepTwoPage.closeTipsModalWindow();
+  await createWalletStepTwoPage.closeTipsModalWindow(modalsExpected);
   await createWalletStepTwoPage.toggleVisibilityOfRecoveryPhrase();
   await createWalletStepTwoPage.saveRecoveryPhrase();
   await createWalletStepTwoPage.continue();
@@ -79,7 +79,7 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   await createWalletStepThreePage.enterRecoveryPhrase(recoveryPhrase);
   await createWalletStepThreePage.continue();
   const walletDetailsPage = new WalletDetails(webdriver, logger);
-  await walletDetailsPage.closeTipsModalWindow();
+  await walletDetailsPage.closeTipsModalWindow(modalsExpected);
   const walletPassword = getPassword();
   await walletDetailsPage.enterWalletName(testWalletName);
   await walletDetailsPage.enterWalletPassword(walletPassword);

@@ -75,18 +75,6 @@ class CashbackTermsModal extends BasePage {
     }
   }
 
-  async waitForProceedButtonEnabled(timeout = 5) {
-    this.logger.info(`CashbackTermsModal::waitForProceedButtonEnabled is called`);
-    const startTime = Date.now();
-    while (Date.now() - startTime < timeout) {
-      if (await this.isProceedButtonEnabled()) {
-        return true;
-      }
-      await this.sleep(5);
-    }
-    return false;
-  }
-
   async getDisclaimerText() {
     this.logger.info(`CashbackTermsModal::getDisclaimerText is called`);
     const element = await this.findElement(this.disclaimerTitleLocator);
