@@ -248,7 +248,6 @@ class GeneralSubTab extends SettingsTab {
       return false;
     }
   }
-
 }
 
 export default GeneralSubTab;
