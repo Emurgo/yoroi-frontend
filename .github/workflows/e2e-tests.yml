@@ -225,15 +225,6 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - name: Cache Trezor user env
-        id: cache-trezor-env
-        uses: actions/cache@v4
-        with:
-          path: ../trezor-user-env
-          key: ${{ runner.os }}-trezor-user-env-${{ github.run_id }}
-          restore-keys: |
-            ${{ runner.os }}-trezor-user-env-
-
       - name: Clone or update trezor-user-env
         run: |
           if [ -d "../trezor-user-env" ]; then
