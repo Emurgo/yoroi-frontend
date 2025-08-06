@@ -56,6 +56,7 @@ for (const model in TrezorModels) {
     it('Approve connection', async function () {
       await windowManager.findNewWindowAndSwitchTo(trezorConnectTabName);
       const trezorConnectPage = new TrezorConnect(webdriver, logger);
+      await trezorConnectPage.pairDeviceIfNecessary();
       await trezorConnectPage.tickCheckbox();
       await trezorConnectPage.allowConnection();
       await trezorConnectPage.allowPubKeysExport();

@@ -3,6 +3,10 @@ import BasePage from './basepage.js';
 
 class TrezorConnect extends BasePage {
   // locators
+  pairDeviceBtnLocator = {
+    locator: '.check-devices',
+    method: 'css',
+  };
   dontAskAgainCheckboxLocator = {
     locator: '.custom-checkbox',
     method: 'css',
@@ -42,6 +46,26 @@ class TrezorConnect extends BasePage {
       await this.clickElementByScript(allCheckboxes[0]);
     } else {
       this.logger.warn(`TrezorConnect::tickCheckbox A correct checkbox is not found`);
+    }
+  }
+  async pairDeviceIfNecessary() {
+    this.logger.info(`TrezorConnect::pairDeviceIfNecessary is called`);
+    const result = await this.customWaiter(
+      async () => {
+        const elAmount = await this.findElements(this.pairDeviceBtnLocator);
+        this.logger.info(`TrezorConnect::pairDeviceIfNecessary. Elements found: ${elAmount.length}`);
+        // this conditions was found empirically
+        return elAmount.length >= 0;
+      },
+      fiveSeconds,
+      halfSecond
+    );
+    if (result) {
+      const allButtons = await this.findElements(this.pairDeviceBtnLocator);
+      // this conditions was found empirically
+      await this.clickElementByScript(allButtons[0]);
+    } else {
+      this.logger.warn(`TrezorConnect::pairDeviceIfNecessary The button is not found`);
     }
   }
   async allowConnection() {
