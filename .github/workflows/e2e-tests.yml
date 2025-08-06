@@ -231,6 +231,7 @@ jobs:
           cd ../trezor-user-env
           git clone https://github.com/trezor/trezor-user-env.git . || true
           sed -i 's|(while ! $(curl $DASHBOARD_URL -s -o /dev/null); do sleep 1; done; $OPEN $DASHBOARD_URL)\&|(while ! $(curl $DASHBOARD_URL -s -o /dev/null); do sleep 1; done; echo -e "${GREEN}Dashboard is ready at: $DASHBOARD_URL${CLEAR}")\&|' run.sh
+          sed -i '65,66d' run.sh
           sudo ./run.sh -r &
           timeout 60 bash -c 'while ! curl -s http://localhost:9002 >/dev/null; do sleep 1; done'
 
