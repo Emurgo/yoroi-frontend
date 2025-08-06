@@ -1,40 +1,39 @@
 import { Typography, Button, Grid, Stack, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useIntl } from 'react-intl';
 import { useModal } from '../modals/ModalContext';
 import { useEffect } from 'react';
-import { MidnightIlustration } from './MidnightIlustration';
+import CardanoCardImage from './CardanoCardImage.png';
 import LocalStorageApi from '../../../api/localStorage/index';
-import { messages } from '../../common/hooks/useStrings';
-import { MIDNIGHT_DISTRIBUTION_URL } from '../../common/constants';
+import { useStrings } from '../../common/hooks/useStrings';
+import { CARDANO_CARD_URL } from '../../common/constants';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 
-export const MidnightDialog = () => {
-  const intl = useIntl();
+export const CardanoCardDialog = () => {
+  const strings = useStrings();
   const { openModal, closeModal } = useModal();
   const { data } = useYoroiRemoteConfig();
 
   useEffect(() => {
     const checkModalState = async () => {
       const localStorage = new LocalStorageApi();
-      const wasClosed = await localStorage.getMidnightModalClosed();
+      const wasClosed = await localStorage.getCardanoCardModalClosed();
 
-      if (data?.popups?.midnightDistribution?.display === true && (wasClosed === undefined || wasClosed === false)) {
+      if (data?.popups?.cardanoCardAnnouncement?.display === true && (wasClosed === undefined || wasClosed === false)) {
         openModal({
-          title: intl.formatMessage(messages.importantUpdates),
-          height: '597px',
-          width: '650px',
+          title: strings.cardanoCardTitle,
+          height: '550px',
+          width: '612px',
           content: (
-            <MidnightDialogContent
+            <CardanoCardContent
               onClose={() => {
-                localStorage.setMidnightModalClosed(true);
+                localStorage.setCardanoCardModalClosed(true);
                 closeModal();
               }}
             />
           ),
-          modalId: 'midnight',
+          modalId: 'cardanoCard',
           onClose: () => {
-            localStorage.setMidnightModalClosed(true);
+            localStorage.setCardanoCardModalClosed(true);
           },
         });
       }
@@ -44,29 +43,32 @@ export const MidnightDialog = () => {
   }, [data]);
 };
 
-const MidnightDialogContent = ({ onClose }) => {
-  const intl = useIntl();
+const CardanoCardContent = ({ onClose }) => {
+  const strings = useStrings();
   return (
     <Stack>
-      <Stack direction="column" alignItems="center" justifyContent="center" py="24px">
-        <MidnightIlustration />
-        <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mt="32px" mb="8px">
-          {intl.formatMessage(messages.takePartInMidnight)}
+      <Stack direction="column" alignItems="center" justifyContent="center" pb="24px">
+        <Stack my={48}>
+          <img src={CardanoCardImage} alt="Midnight Illustration" />
+        </Stack>
+
+        <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mb="8px">
+          {strings.cardanoCardJoin}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium" textAlign="center" mx="24px">
-          {intl.formatMessage(messages.midnightSupport)}
+          {strings.cardanoCard}
         </Typography>
       </Stack>
 
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 18 }}>
-        <Link href={MIDNIGHT_DISTRIBUTION_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
+        <Link href={CARDANO_CARD_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
           <CustomButton variant="contained" color="primary">
-            {intl.formatMessage(messages.learnMore)}
+            {strings.cardanoCardLearnMore}
           </CustomButton>
         </Link>
 
         <CustomButton variant="text" onClick={onClose} sx={{ marginTop: '8px' }}>
-          {intl.formatMessage(messages.skip)}
+          {strings.skip}
         </CustomButton>
       </Grid>
     </Stack>

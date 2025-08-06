@@ -73,6 +73,8 @@ import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
 // $FlowIgnore: suppressing this error
 import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+// $FlowIgnore: suppressing this error
+import AirdropPage from './UI/pages/AirdropPage';
 
 // $FlowIgnore: suppressing this error
 // import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
@@ -282,6 +284,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
+          <Route path={ROUTES.AIRDROP} element={<AirdropPage stores={stores} />} />
         </Routes>
       </Suspense>
     </QueryClientProvider>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNfts } from '../common/hooks/useNfts';
 import { ampli } from '../../../../../ampli';
 import NftsEmptyState from '../common/components/NftsEmptyState';
@@ -7,6 +7,7 @@ import NftsGrid from '../common/components/NftsGrid';
 import NftsHeader from '../common/components/NftsHeader';
 import { debounce } from 'lodash';
 import { ListColumnView } from '../common/types';
+import LocalStorageApi from '../../../../api/localStorage/index';
 
 const listColumnViews: ListColumnView[] = [
   { count: 4, Icon: <IconWrapper icon={Icons.GridDefault} asButton />, imageDims: '264px' },
@@ -16,10 +17,12 @@ const listColumnViews: ListColumnView[] = [
 const SEARCH_ACTIVATE_DEBOUNCE_WAIT = 1000;
 
 const NftGallery = () => {
+  const localStorageApi = new LocalStorageApi();
   const { nftsList, loading } = useNfts();
   const [keyword, setKeyword] = useState('');
+  const [columns, setColumns] = useState<ListColumnView | undefined>(listColumnViews[0]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (loading) return;
 
     ampli.nftGalleryPageViewed({
@@ -27,9 +30,22 @@ const NftGallery = () => {
     });
   }, [loading]);
 
-  const [columns, setColumns] = useState<ListColumnView | undefined>(listColumnViews[0]);
+  useEffect(() => {
+    const loadGridViewState = async () => {
+      const viewInStorage = await localStorageApi.getNftGridViewState();
+      if (viewInStorage) {
+        const savedCount = parseInt(viewInStorage, 10);
+        const savedColumn = listColumnViews.find(view => view.count === savedCount);
+        if (savedColumn) {
+          setColumns(savedColumn);
+        }
+      }
+    };
+    loadGridViewState();
+  }, []);
 
-  const setColumnsAndTrack = function (column: ListColumnView) {
+  const setColumnsAndTrack = async (column: ListColumnView) => {
+    await localStorageApi.setNftGridViewState(column.count.toString());
     setColumns(column);
     ampli.nftGalleryGridViewSelected({
       nft_grid_view: column.count === 4 ? '4_rows' : '6_rows',

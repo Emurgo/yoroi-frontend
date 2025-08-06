@@ -2418,8 +2418,8 @@ export async function walletSignData(
   publicDeriver: PublicDeriver<>,
   password: string,
   address: string,
-  payload: string
-): Promise<{| signature: string, key: string |}> {
+  payload: string,
+): Promise<{| signature: string, key: string, pubKey: string |}> {
   const withSigningKey = asGetSigningKey(publicDeriver);
   if (!withSigningKey) {
     throw new Error('unable to get signing key');
@@ -2449,6 +2449,7 @@ export async function walletSignData(
   return {
     signature: bytesToHex(coseSign1.to_bytes()),
     key: bytesToHex(key.to_bytes()),
+    pubKey: signingKey.to_public().to_hex(),
   };
 }
 

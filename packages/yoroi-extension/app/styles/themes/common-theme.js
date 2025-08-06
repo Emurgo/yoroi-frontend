@@ -112,5 +112,12 @@ export const commonTheme: Object = {
       fontWeight: 400,
       fontFamily,
     },
+    // DS name: heading-1-xl
+    h1xl: {
+      fontSize: '28px',
+      lineHeight: '36px',
+      fontWeight: 500,
+      fontFamily,
+    },
   },
 };
