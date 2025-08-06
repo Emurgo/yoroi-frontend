@@ -63,7 +63,7 @@ class TrezorConnect extends BasePage {
     if (result) {
       const allButtons = await this.findElements(this.pairDeviceBtnLocator);
       // this conditions was found empirically
-      await this.clickElementByScript(allButtons[0]);
+      await this.clickElementByScript(allButtons[1]);
     } else {
       this.logger.warn(`TrezorConnect::pairDeviceIfNecessary The button is not found`);
     }
