@@ -51,6 +51,23 @@ export const messages = Object.freeze(
       id: 'banners.usda.button',
       defaultMessage: '!!!Go to swap',
     },
+    cardanoCard: {
+      id: 'banners.cardanoCard.register',
+      defaultMessage:
+        '!!!Register here for the upcoming Cardano Card — a next-gen crypto card built to make your digital assets more useful in everyday life.',
+    },
+    cardanoCardTitle: {
+      id: 'banners.cardanoCard.title',
+      defaultMessage: '!!!Cardano Card',
+    },
+    cardanoCardJoin: {
+      id: 'banners.cardanoCard.join',
+      defaultMessage: '!!!Join the future of finance',
+    },
+    cardanoCardLearnMore: {
+      id: 'banners.cardanoCard.leanMore',
+      defaultMessage: '!!!Register Interest',
+    },
     receiverFieldLabelUnresolvedAddress: {
       id: 'wallet.send.form.receiver.label.unresolvedAddress',
       defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
@@ -79,15 +96,6 @@ export const messages = Object.freeze(
       id: 'transaction.review.transactionReview',
       defaultMessage: '!!!Transaction Review',
     },
-    takePartInMidnight: {
-      id: 'banners.midnight.takePartInMidnight',
-      defaultMessage: '!!!Take part in the Midnight NIGHT token distribution',
-    },
-    midnightSupport: {
-      id: 'banners.midnight.midnightSupport',
-      defaultMessage:
-        '!!!Yoroi will support Midnight’s multi-phase token distribution — a bold initiative to empower a diverse, global community.',
-    },
     learnMore: {
       id: 'global.labels.LearnMore',
       defaultMessage: '!!!Learn More',
@@ -111,6 +119,18 @@ export const messages = Object.freeze(
     surveyButton: {
       id: 'survey.button',
       defaultMessage: '!!!take survey',
+    },
+    checkEligibility: {
+      id: 'global.labels.checkEligibility',
+      defaultMessage: '!!!Check Eligibility',
+    },
+    claimAnnouncement: {
+      id: 'banners.midnight.claimAnnouncement',
+      defaultMessage: '!!!Claim your NIGHT airdrop directly in Yoroi',
+    },
+    yoroiSupport: {
+      id: 'banners.midnight.yoroiSupport',
+      defaultMessage: '!!!Yoroi now supports the Midnight airdrop. Securely claim your NIGHT tokens today.',
     },
   })
 );
@@ -138,13 +158,18 @@ export const useStrings = () => {
     cardanoCNS: intl.formatMessage(messages.cardanoCNS),
     unstoppableDomains: intl.formatMessage(messages.unstoppableDomains),
     transactionReview: intl.formatMessage(messages.transactionReview),
-    takePartInMidnight: intl.formatMessage(messages.takePartInMidnight),
-    midnightSupport: intl.formatMessage(messages.midnightSupport),
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
     surveyTitle: intl.formatMessage(messages.surveyTitle),
     surveyDescription: intl.formatMessage(messages.surveyDescription),
     surveyButton: intl.formatMessage(messages.surveyButton),
+    claimAnnouncement: intl.formatMessage(messages.claimAnnouncement),
+    yoroiSupport: intl.formatMessage(messages.yoroiSupport),
+    checkEligibility: intl.formatMessage(messages.checkEligibility),
+    cardanoCard: intl.formatMessage(messages.cardanoCard),
+    cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
+    cardanoCardJoin: intl.formatMessage(messages.cardanoCardJoin),
+    cardanoCardLearnMore: intl.formatMessage(messages.cardanoCardLearnMore),
   }).current;
 };
