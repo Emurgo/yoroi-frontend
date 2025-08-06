@@ -44,12 +44,6 @@ class GeneralSubTab extends SettingsTab {
     locator: 'settings:general-commitInfo-text',
     method: 'id',
   };
-  getCashbackWalletMenuItem = walletName => {
-    return {
-      locator: `selectCashbackWallet-${walletName}-menuItem`,
-      method: 'id',
-    };
-  };
   // * links
   twitterLinkLocator = {
     locator: 'settings:general-twitterLink-linkButton',
@@ -181,15 +175,6 @@ class GeneralSubTab extends SettingsTab {
     return result;
   }
 
-  // Wallet selection methods
-  async selectCashBackWalletFromDropdown(walletName) {
-    return await this.withLogging('selectCashBackWalletFromDropdown', async () => {
-      const walletMenuItemLocator = this.getCashbackWalletMenuItem(walletName);
-      await this.waitForElement(walletMenuItemLocator, twoSeconds);
-      await this.click(walletMenuItemLocator);
-      await this.sleep(halfSecond);
-    });
-  }
 }
 
 export default GeneralSubTab;

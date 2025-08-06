@@ -203,19 +203,7 @@ class BasePage {
       throw error;
     }
   }
-
-  /**
-   * Generic tab navigation by visible name.
-   */
-  async navigateToTab(tabName, locatorTemplate = '//div[contains(text(), "${tabName}")]', timeout = 10000) {
-    const tabLocator = {
-      locator: locatorTemplate.replace('${tabName}', tabName),
-      method: 'xpath',
-    };
-    await this.waitForElement(tabLocator, timeout);
-    await this.click(tabLocator);
-    this.logger.info(`Navigated to tab: ${tabName}`);
-  }
+  
   async getAttribute(locator, property) {
     this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
     return await this.driver.findElement(getByLocator(locator)).getAttribute(property);
