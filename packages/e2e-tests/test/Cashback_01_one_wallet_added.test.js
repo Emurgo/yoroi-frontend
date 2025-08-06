@@ -41,7 +41,8 @@ describe('Cashback Tests - One Wallet Added', function () {
     
     const disclaimerText = await termsModal.getDisclaimerText();
     logger.info(`Disclaimer text: ${disclaimerText}`);
-    
+   
+    // Close the modal WITHOUT accepting terms
     await termsModal.closeCashbackTermsModal();
     await walletBase.sleep(twoSeconds);
     const currentTitle = await walletBase.getPageTitle();
@@ -67,7 +68,7 @@ describe('Cashback Tests - One Wallet Added', function () {
     await termsModal.acceptDisclaimerAndProceed();
   });
 
-  it('Check page has cashback cards', async function () {
+  it('Check page is displayed with general markers', async function () {
     const cashbackPage = new CashbackPage(webdriver, logger);
   
     // Verify the claim button is visible
