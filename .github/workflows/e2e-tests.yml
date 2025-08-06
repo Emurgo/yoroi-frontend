@@ -314,7 +314,7 @@ jobs:
           path: |
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_chrome
-            ../trezor-user-env/logs
+            /home/runner/work/yoroi-frontend/yoroi-frontend/trezor-user-env/logs
 
   Ledger:
     if: github.event.review &&
