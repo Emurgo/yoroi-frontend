@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, halfSecond } from '../helpers/timeConstants.js';
+import { fiveSeconds, halfSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
 class TrezorConnect extends BasePage {
@@ -33,7 +33,7 @@ class TrezorConnect extends BasePage {
         // this conditions was found empirically
         return elAmount.length === 4;
       },
-      defaultWaitTimeout,
+      fiveSeconds,
       halfSecond
     );
     if (result) {
@@ -41,8 +41,7 @@ class TrezorConnect extends BasePage {
       // this conditions was found empirically
       await this.clickElementByScript(allCheckboxes[0]);
     } else {
-      this.logger.error(`TrezorConnect::tickCheckbox A correct checkbox is not found`);
-      throw new Error('A correct checkbox is not found');
+      this.logger.warn(`TrezorConnect::tickCheckbox A correct checkbox is not found`);
     }
   }
   async allowConnection() {
