@@ -2418,7 +2418,7 @@ export async function walletSignData(
   publicDeriver: PublicDeriver<>,
   password: string,
   address: string,
-  payload: string,
+  payload: string
 ): Promise<{| signature: string, key: string, pubKey: string |}> {
   const withSigningKey = asGetSigningKey(publicDeriver);
   if (!withSigningKey) {
