@@ -235,7 +235,9 @@ jobs:
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: sudo ./run.sh -r
+        run: |
+          sudo ./run.sh -r &
+          timeout 60 bash -c 'while ! curl -s http://localhost:9002 >/dev/null; do sleep 1; done'
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
