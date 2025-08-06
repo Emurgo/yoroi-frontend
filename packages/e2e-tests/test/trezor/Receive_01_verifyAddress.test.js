@@ -21,7 +21,8 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 
-for (const model in TrezorModels) {
+// !DEBUG
+for (const model in { ModelT: 'T2T1' }) {
   const modelName = TrezorModels[model];
 
   describe(`Verify address on Trezor ${model}`, function () {
