@@ -1,5 +1,4 @@
 import AddWalletBase from './addWalletBase.page.js';
-import { fiveSeconds, quarterSecond } from '../../helpers/timeConstants.js';
 
 class WalletDetails extends AddWalletBase {
   defaultMessage = 'Use a combination of letters, numbers and symbols to make your password stronger';
@@ -51,12 +50,8 @@ class WalletDetails extends AddWalletBase {
 
   // functions
   //
-  async closeTipsModalWindow(modalsExpected = true) {
+  async closeTipsModalWindow() {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
-    if (!modalsExpected) {
-      this.logger.info(`WalletDetails::closeTipsModalWindow skipped - modals not expected`);
-      return;
-    }
     await this.waitPresentedAndAct(this.tipsModalLocator, async () => {
       await this.waitPresentedAndAct(
         this.tipModalContinueButtonLocator,

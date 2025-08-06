@@ -1,4 +1,4 @@
-import { halfSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { halfSecond } from '../../../helpers/timeConstants.js';
 import SettingsTab from './settingsTab.page.js';
 
 class GeneralSubTab extends SettingsTab {

@@ -70,7 +70,9 @@ export const createWallet = async (webdriver, logger, testWalletName, modalsExpe
   const createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
   await createWalletStepOnePage.continue();
   const createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
-  await createWalletStepTwoPage.closeTipsModalWindow(modalsExpected);
+  if (modalsExpected) {
+    await createWalletStepTwoPage.closeTipsModalWindow();
+  }
   await createWalletStepTwoPage.toggleVisibilityOfRecoveryPhrase();
   await createWalletStepTwoPage.saveRecoveryPhrase();
   await createWalletStepTwoPage.continue();
@@ -79,7 +81,9 @@ export const createWallet = async (webdriver, logger, testWalletName, modalsExpe
   await createWalletStepThreePage.enterRecoveryPhrase(recoveryPhrase);
   await createWalletStepThreePage.continue();
   const walletDetailsPage = new WalletDetails(webdriver, logger);
-  await walletDetailsPage.closeTipsModalWindow(modalsExpected);
+  if (modalsExpected) {
+    await walletDetailsPage.closeTipsModalWindow();
+  }
   const walletPassword = getPassword();
   await walletDetailsPage.enterWalletName(testWalletName);
   await walletDetailsPage.enterWalletPassword(walletPassword);

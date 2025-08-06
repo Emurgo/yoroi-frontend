@@ -1,4 +1,3 @@
-import { fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import AddWalletBase from '../addWalletBase.page.js';
 
 class CreateWalletStepTwo extends AddWalletBase {
@@ -36,12 +35,8 @@ class CreateWalletStepTwo extends AddWalletBase {
 
     return allWords;
   }
-  async closeTipsModalWindow(modalsExpected = true) {
+  async closeTipsModalWindow() {
     this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow is called`);
-    if (!modalsExpected) {
-      this.logger.info(`CreateWalletStepTwo::closeTipsModalWindow skipped - modals not expected`);
-      return;
-    }
     await this.waitPresentedAndAct(
       this.tipModalContinueButtonLocator,
       async () =>
