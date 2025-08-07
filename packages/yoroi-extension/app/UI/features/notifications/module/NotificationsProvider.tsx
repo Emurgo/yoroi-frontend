@@ -1,4 +1,4 @@
-import React, {ReactNode, useMemo} from 'react';
+import React, {ReactNode} from 'react';
 import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -247,8 +247,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     []
   );
 
-  const { hasUnreadLoaded, hasUnread } = useModelValue(appState.notifications.hasUnread);
-  const hasUnreadNotifications = hasUnreadLoaded && hasUnread;
+  const { loaded: hasUnreadLoaded, value: hasUnread } = useModelValue(appState.notifications.hasUnread);
+  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread != null;
 
   return <Context.Provider value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value }}>{children}</Context.Provider>;
 }
