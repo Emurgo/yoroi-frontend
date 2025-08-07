@@ -39,10 +39,13 @@ const storageKeys = {
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
+  MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
+  CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
+  NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -154,12 +157,22 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== Midnight Modal ========== //
-  getMidnightModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  // ========== CARDANO_CARD Modal ========== //
+  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
-  setMidnightModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED, closed);
+  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
-  unsetMidnightModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+
+  // ========== Midnight Banner Announcement ========== //
+  getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+
+  setMidnightBannerAnnouncementClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
+
+  unsetMidnightBannerAnnouncementClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
 
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
@@ -317,6 +330,15 @@ export default class LocalStorageApi {
 
   setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
     setLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST, JSON.stringify(value ?? []));
+
+  // ========== NFTs Grid View State  ========== //
+  getNftGridViewState: void => Promise<?string> = async () => {
+    return await getLocalItem(storageKeys.NFTS_GRID_VIEW_STATE);
+  };
+
+  setNftGridViewState: string => Promise<void> = async gridViewState => {
+    await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
+  };
 
   // =========== Common =============== //
 
