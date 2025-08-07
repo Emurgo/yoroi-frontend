@@ -84,7 +84,7 @@ export const lightThemeBase = {
     common: { black: '#000000', white: '#FFFFFF', magenta, cyan, yellow },
     // end legacy props
     gradients: {
-      bg_gradient_1: 'linear-gradient(312.19deg, #C6F7ED 0%, #E4E8F7 100%)',
+      bg_gradient_1: 'linear-gradient(353deg, #C6F7ED 0%, #E4E8F7 100%)',
       bg_gradient_2: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)',
       bg_gradient_3: 'linear-gradient(30.09deg, #244ABF 0%, #4760FF 100%)',
       // legacy ones

@@ -5,6 +5,7 @@ import { useTxReviewModal } from '../../../UI/features/transaction-review/module
 import SeizaFetcher from './SeizaFetcher';
 import { useStrings } from '../../../UI/features/transaction-review/common/hooks/useStrings';
 import BigNumber from 'bignumber.js';
+import { StyledLink } from '../../../components/wallet/staking/dashboard-revamp/StakePool/StakePool.styles';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
@@ -21,7 +22,13 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
       operations: {
         components: [
           {
-            component: <OperationsDetails avatarGenerated={avatarGenerated} poolName={selectedPool?.info.name} />,
+            component: (
+              <OperationsDetails
+                avatarGenerated={avatarGenerated}
+                poolName={selectedPool?.info.name}
+                website={selectedPool.info.homepage}
+              />
+            ),
             duplicated: false,
           },
         ],
@@ -67,7 +74,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
   );
 };
 
-const OperationsDetails = ({ avatarGenerated, poolName }) => {
+const OperationsDetails = ({ avatarGenerated, poolName, website }) => {
   const { isStakeRegistered, stakeKeyDeposit, primaryTokenInfo } = useTxReviewModal();
   const strings = useStrings();
   return (
@@ -93,7 +100,9 @@ const OperationsDetails = ({ avatarGenerated, poolName }) => {
             component="img"
             src={avatarGenerated}
           />
-          <Typography color="ds.text_gray_medium">{poolName}</Typography>
+          <StyledLink href={website} target="_blank" rel="noreferrer noopener">
+            <Typography color="ds.text_gray_medium">{poolName}</Typography>
+          </StyledLink>
         </Stack>
       </Stack>
     </Stack>

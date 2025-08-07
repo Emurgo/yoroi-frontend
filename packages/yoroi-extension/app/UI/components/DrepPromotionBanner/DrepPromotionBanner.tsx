@@ -53,7 +53,7 @@ const useDrepBannerVisibility = (balance: BigNumber, selectedWalletId: number) =
   return { isVisible, dismissBanner };
 };
 
-export const DrepPromotionBanner = observer(({ stores, intl }) => {
+export const DrepPromotionBanner = observer(({ stores, onClose, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
   const theme: any = useTheme();
 
@@ -96,7 +96,10 @@ export const DrepPromotionBanner = observer(({ stores, intl }) => {
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative' }}>
       <Stack sx={{ position: 'absolute', right: 10, top: 10 }}>
         <IconWrapper
-          onClick={dismissBanner}
+          onClick={() => {
+            dismissBanner();
+            onClose();
+          }}
           icon={Icons.CloseCircleIcon}
           iconProps={{ fill: theme.palette.ds.el_gray_max }}
           color="ds.el_gray_max"
