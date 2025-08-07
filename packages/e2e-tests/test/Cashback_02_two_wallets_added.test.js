@@ -31,24 +31,24 @@ describe('Cashback Tests - Two Wallets Added', function () {
   it('Add second wallet before opening Cashback page', async function () {
     const walletBase = new WalletCommonBase(webdriver, logger);
     const addNewWalletPage = new AddNewWallet(webdriver, logger);
-    
+
     // Add a new wallet first
     logger.info('Adding a second wallet for cashback testing');
     await walletBase.addNewWallet();
     await addNewWalletPage.selectCreateNewWallet();
     const createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
     await createWalletStepOnePage.continue();
-    
+
     const createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
     await createWalletStepTwoPage.toggleVisibilityOfRecoveryPhrase();
     await createWalletStepTwoPage.saveRecoveryPhrase();
     await createWalletStepTwoPage.continue();
-    
+
     const createWalletStepThreePage = new CreateWalletStepThree(webdriver, logger);
     const recoveryPhrase = await createWalletStepThreePage.getRecoveryPhraseFromStorage();
     await createWalletStepThreePage.enterRecoveryPhrase(recoveryPhrase);
     await createWalletStepThreePage.continue();
-    
+
     const walletDetailsPage = new WalletDetails(webdriver, logger);
     const newWalletName = 'CashbackTestWallet';
     const walletPassword = getPassword();
@@ -56,11 +56,11 @@ describe('Cashback Tests - Two Wallets Added', function () {
     await walletDetailsPage.enterWalletPassword(walletPassword);
     await walletDetailsPage.repeatWalletPassword(walletPassword);
     await walletDetailsPage.continue();
-    
+
     // Wait for wallet to be ready
     const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
-    
+
     // Verify the second wallet was created successfully
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
@@ -70,7 +70,7 @@ describe('Cashback Tests - Two Wallets Added', function () {
     const walletBase = new WalletCommonBase(webdriver, logger);
     await walletBase.goToCashbackTab();
     await walletBase.sleep(twoSeconds);
-    
+
     // Verify we're on the cashback page
     const currentTitle = await walletBase.getPageTitle();
     expect(currentTitle).to.equal(pageTitle.cashback, `Expected to be on ${pageTitle.cashback} page`);
@@ -83,22 +83,44 @@ describe('Cashback Tests - Two Wallets Added', function () {
     // Verify the disclaimer modal is displayed
     const modalDisplayed = await termsModal.isDisplayed();
     expect(modalDisplayed, 'Terms modal should be displayed').to.be.true;
-    
+
     const disclaimerText = await termsModal.getDisclaimerText();
     logger.info(`Disclaimer text: ${disclaimerText}`);
     await termsModal.acceptDisclaimerAndProceed();
   });
 
-  it('Check page is displayed with general markers', async function () {
+  it('Test wallet switching and cashback wallet modal', async function () {
+    const walletBase = new WalletCommonBase(webdriver, logger);
     const cashbackPage = new CashbackPage(webdriver, logger);
-  
-    // Verify the claim button is visible
-    const claimButtonVisible = await cashbackPage.isClaimCashbackButtonVisible();
-    expect(claimButtonVisible).to.be.true;
+
+    await walletBase.goToWalletTab();
+    await walletBase.sleep(twoSeconds);
+    // Switch to the second wallet
+    logger.info('Switching to the second wallet');
+    await walletBase.switchToWallet({ name: 'CashbackTestWallet' }, 2);
+    await walletBase.sleep(twoSeconds);
     
-    // Verify cashback cards are displayed
-    const cardCount = await cashbackPage.getCashbackCardCount();
-    expect(cardCount).to.be.greaterThan(0, 'Cashback cards should be displayed');
+    // Try to access cashback page - should show the modal
+    logger.info('Accessing cashback page with second wallet - expecting modal');
+    await walletBase.goToCashbackTab();
+    await walletBase.sleep(twoSeconds);
+    
+    // Check if the "SET MY CURRENT WALLET AS MY CASHBACK WALLET" modal appears
+    const modalDisplayed = await cashbackPage.isWrongWalletModalDisplayed();
+    expect(modalDisplayed, 'Wrong wallet modal should be displayed').to.be.true;
+    
+    // Click "YES" to set current wallet as cashback wallet
+    logger.info('Setting current wallet as cashback wallet');
+    await cashbackPage.clickSetThisWallet();
+    await walletBase.sleep(twoSeconds);
+    
+    // Verify modal is closed and we're on cashback page
+    const modalStillDisplayed = await cashbackPage.isWrongWalletModalDisplayed();
+    expect(modalStillDisplayed, 'Modal should be closed after setting wallet').to.be.false;
+    
+    // Verify we're on the cashback page
+    const currentTitle = await walletBase.getPageTitle();
+    expect(currentTitle).to.equal(pageTitle.cashback, `Expected to be on ${pageTitle.cashback} page`);
   });
 
   afterEach(function (done) {

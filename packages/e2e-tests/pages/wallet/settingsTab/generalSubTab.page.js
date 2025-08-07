@@ -73,6 +73,30 @@ class GeneralSubTab extends SettingsTab {
     locator: 'settings:general-githubLink-linkButton',
     method: 'id',
   };
+  
+  // Cashback wallet selection locators
+  cashbackWalletDropdownLocator = {
+    locator: '//div[contains(@class, "MuiSelect-select") and contains(@aria-labelledby, "cashbackWalletId")]',
+    method: 'xpath',
+  };
+  
+  getCashbackWalletMenuItem = walletName => {
+    return {
+      locator: `selectCashbackWallet-${walletName}-menuItem`,
+      method: 'id',
+    };
+  };
+  
+  cashbackWalletSelectedValueLocator = {
+    locator: '//div[contains(@class, "MuiSelect-select") and contains(@aria-labelledby, "cashbackWalletId")]',
+    method: 'xpath',
+  };
+  
+  // Alternative locator for cashback wallet dropdown
+  cashbackWalletDropdownAlternativeLocator = {
+    locator: '//div[contains(@class, "MuiSelect-select") and contains(@role, "button")]',
+    method: 'xpath',
+  };
   // methods
   async openLanguageSelection() {
     this.logger.info(`GeneralSubTab::openLanguageSelection is called`);
@@ -173,6 +197,56 @@ class GeneralSubTab extends SettingsTab {
     const result = await this.getLinkFromComponent(this.githubLinkLocator);
     this.logger.info(`GeneralSubTab::getGithubLink::result ${result}`);
     return result;
+  }
+
+  // Cashback wallet selection methods
+  async openCashbackWalletSelection() {
+    this.logger.info(`GeneralSubTab::openCashbackWalletSelection is called`);
+    try {
+      await this.waitForElement(this.cashbackWalletDropdownLocator);
+      await this.click(this.cashbackWalletDropdownLocator);
+    } catch (error) {
+      this.logger.info(`Primary cashback wallet dropdown not found, trying alternative locator`);
+      await this.waitForElement(this.cashbackWalletDropdownAlternativeLocator);
+      await this.click(this.cashbackWalletDropdownAlternativeLocator);
+    }
+    await this.sleep(halfSecond);
+  }
+
+  async selectCashbackWallet(walletName) {
+    this.logger.info(`GeneralSubTab::selectCashbackWallet is called. Wallet name: "${walletName}"`);
+    await this.openCashbackWalletSelection();
+    const walletLocator = this.getCashbackWalletMenuItem(walletName);
+    await this.scrollIntoView(walletLocator);
+    await this.click(walletLocator);
+    await this.sleep(200);
+  }
+
+  async getSelectedCashbackWallet() {
+    this.logger.info(`GeneralSubTab::getSelectedCashbackWallet is called`);
+    try {
+      await this.waitForElement(this.cashbackWalletSelectedValueLocator);
+      const result = await this.getText(this.cashbackWalletSelectedValueLocator);
+      this.logger.info(`GeneralSubTab::getSelectedCashbackWallet::result ${result}`);
+      return result;
+    } catch (error) {
+      this.logger.info(`Primary cashback wallet selected value not found, trying alternative locator`);
+      await this.waitForElement(this.cashbackWalletDropdownAlternativeLocator);
+      const result = await this.getText(this.cashbackWalletDropdownAlternativeLocator);
+      this.logger.info(`GeneralSubTab::getSelectedCashbackWallet::result ${result}`);
+      return result;
+    }
+  }
+
+  async verifyCashbackWalletIsSelected(expectedWalletName) {
+    this.logger.info(`GeneralSubTab::verifyCashbackWalletIsSelected is called. Expected wallet: "${expectedWalletName}"`);
+    try {
+      const selectedWallet = await this.getSelectedCashbackWallet();
+      return selectedWallet.includes(expectedWalletName);
+    } catch (error) {
+      this.logger.error(`Error verifying cashback wallet selection: ${error.message}`);
+      return false;
+    }
   }
 
 }
