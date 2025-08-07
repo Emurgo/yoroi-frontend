@@ -170,7 +170,7 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
             label={intl.formatMessage(globalMessages.delegateLabel)}
             disabled={isWalletWithNoFunds}
             isTestnet={isTestnet}
-            socialMediaInfo={{ socialLinks, websiteUrl: socialLinks.web ?? websiteUrl }}
+            socialMediaInfo={{ socialLinks, websiteUrl: socialLinks?.web ?? websiteUrl }}
           />
         </Box>
       </Box>
