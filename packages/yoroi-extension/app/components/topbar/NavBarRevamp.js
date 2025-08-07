@@ -28,7 +28,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 
 function NavBarRevamp(props: Props) {
   const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = props;
-  const { setNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
+  const { setIsNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
 
   return (
     <Box
@@ -67,7 +67,7 @@ function NavBarRevamp(props: Props) {
               {children}
               <StyledButton
                 onClick={() => {
-                  setNotificationCenterOpen(true);
+                  setIsNotificationCenterOpen(true);
                 }}
               >
                 <Icon.Bell />

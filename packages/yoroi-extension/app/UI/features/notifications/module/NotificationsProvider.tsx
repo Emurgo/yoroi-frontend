@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, {ReactNode, useMemo} from 'react';
 import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -35,7 +35,7 @@ const initialValue = {
     return;
   },
   isNotificationCenterOpen: false,
-  setNotificationCenterOpen: (_open: boolean) => {},
+  setIsNotificationCenterOpen: (_open: boolean) => {},
   hasUnreadNotifications: false,
 };
 
@@ -74,7 +74,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   const strings = useStrings();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isNotificationCenterOpen, setNotificationCenterOpen] = React.useState<boolean>(false);
+  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = React.useState<boolean>(false);
 
   const getSelectedWalletId = () => walletsStore.selected?.publicDeriverId;
 
@@ -242,15 +242,13 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     () => ({
       showRandomToast,
       createNotification,
-      setNotificationCenterOpen,
+      setIsNotificationCenterOpen: setIsNotificationCenterOpen,
     }),
     []
   );
 
-  const hasUnreadNotifications = (() => {
-    const { loaded, value } = useModelValue(appState.notifications.hasUnread);
-    return loaded && value;
-  })();
+  const { hasUnreadLoaded, hasUnread } = useModelValue(appState.notifications.hasUnread);
+  const hasUnreadNotifications = hasUnreadLoaded && hasUnread;
 
   return <Context.Provider value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value }}>{children}</Context.Provider>;
 }

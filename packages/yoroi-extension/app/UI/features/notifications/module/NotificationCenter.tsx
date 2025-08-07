@@ -26,7 +26,7 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
 
 export const NotificationCenter = () => {
   const strings = useStrings();
-  const { isNotificationCenterOpen, setNotificationCenterOpen } = useNotifications();
+  const { isNotificationCenterOpen, setIsNotificationCenterOpen } = useNotifications();
   const notifications = useModelValue(appState.notifications.all).value;
 
   if (!isNotificationCenterOpen) {
@@ -39,7 +39,7 @@ export const NotificationCenter = () => {
         open
         anchor="right"
         onClose={() => {
-          setNotificationCenterOpen(false);
+          setIsNotificationCenterOpen(false);
         }}
       >
         <Stack direction="row" justifyContent="center">
@@ -48,7 +48,7 @@ export const NotificationCenter = () => {
           </Typography>
           <StyledButton
             onClick={() => {
-              setNotificationCenterOpen(false);
+              setIsNotificationCenterOpen(false);
             }}
             sx={{ right: '24px' }}
             id="notificationCenter-close-button"
