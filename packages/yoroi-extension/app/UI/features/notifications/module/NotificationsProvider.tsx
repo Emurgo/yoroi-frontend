@@ -30,8 +30,8 @@ const initialValue = {
   showRandomToast(): null | Promise<any> {
     return null;
   },
-  createNotification(type: NotificationTypes, id?: string): void {
-    console.log(type, id);
+  createNotification(type: NotificationTypes, id: void | string, tx?: void | any): void {
+    console.log(type, id, tx);
     return;
   },
   isNotificationCenterOpen: false,
@@ -129,7 +129,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     locationRef.current = location;
   }, [location]);
 
-  const createNotification = async (type: NotificationTypes, id: void | string = undefined, tx) => {
+  const createNotification = async (type: NotificationTypes, id: void | string = undefined, tx?: void | any) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
     // Early returns:
@@ -174,7 +174,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
           `${amount} ${unit}`
         );
       } else {
-        title = tx.type === 'income' ? strings.mutipleAssetsReceived : strings.multipleAssetsSent;
+        title = tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
       }
     } else {
       title = notificationTexts[type];
