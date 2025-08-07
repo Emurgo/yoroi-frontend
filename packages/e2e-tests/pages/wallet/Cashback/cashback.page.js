@@ -44,6 +44,7 @@ class CashbackPage extends WalletCommonBase {
     locator: 'dialog-switchwallet-button',
     method: 'id',
   };
+
   setThisWalletButtonNo = {
     locator: 'dialog-no-button',
     method: 'id',
@@ -155,7 +156,6 @@ class CashbackPage extends WalletCommonBase {
     await this.waitForElement(this.setThisWalletButtonLocator);
     await this.click(this.setThisWalletButtonLocator);
     await this.click(this.setThisWalletButtonYes);
-
   }
 
   /**
