@@ -90,16 +90,19 @@ interface Model {
 class AbsentParameter {}
 
 abstract class ModelHelper {
-  listeners: { path: Path; callback: Listener }[] = [];
+  incrementalId = 0;
+  listeners: Map<number, { path: Path; callback: Listener }> = new Map();
 
   listen(path, callback): () => void {
-    this.listeners.push({ path, callback });
-    const index = this.listeners.length - 1;
-    return () => void this.listeners.splice(index, 1);
+    const id = this.incrementalId++;
+    this.listeners.set(id, { path, callback });
+    return () => {
+      this.listeners.delete(id);
+    };
   }
 
   dispatchEvent(event: Event): void {
-    for (const listener of this.listeners) {
+    for (const listener of this.listeners.values()) {
       if (isPrefix(listener.path, event.path)) {
         listener.callback(event);
       }
@@ -466,7 +469,7 @@ export const ALL = -1;
 // todo: explicitly check type
 export function listen<T>(eventTargetAccessor: T extends (...args: any) => any ? never : T, callback: Listener) {
   const { model, path } = (eventTargetAccessor as Accessor)[_GET_ACCESSOR_META];
-  model.listen(path, callback);
+  return model.listen(path, callback);
 }
 
 export function call<F extends (...args: any) => any>(accessor: F, ...args: Parameters<F>): Promise<ReturnType<F>> {
