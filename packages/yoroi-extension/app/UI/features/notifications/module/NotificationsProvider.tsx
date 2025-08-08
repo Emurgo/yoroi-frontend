@@ -10,7 +10,7 @@ import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import LocalStorageApi from '../../../../api/localStorage';
 import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
-import { appState, useModelValue } from '../../../../../api/frontEnd';
+import { appState, useModelValue, call } from '../../../../../api/frontEnd';
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
@@ -87,29 +87,6 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     [NotificationTypes.Cancelled]: strings.txFailed,
   };
 
-  const handleToastClose = props => {
-    toast.update(props.toastId, { data: { event: 'closed' } });
-    toast.dismiss(props.toastId);
-
-    // analytics for close event
-    const { data } = props;
-    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-    ampli.inAppNotificationClosed({ type: analyticsTypeValue });
-  };
-
-  const handleToastClick = props => {
-    toast.update(props.toastId, { data: { event: 'clicked' } });
-    toast.dismiss(props.toastId);
-
-    const { data } = props;
-    // analytics for click event
-    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-    ampli.inAppNotificationOpened({ type: analyticsTypeValue });
-    // redirect after analytics
-    const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
-    navigate(redirectTo);
-  };
-
   const handleToastExpired = () => {
     // do nothing for now
   };
@@ -152,6 +129,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     }
 
     let title;
+    let centerMsgId;
     if (tx && (tx.type === 'income' || tx.type === 'expend')) {
       if (tx.amount.size() === 1) {
         // ADA only
@@ -176,9 +154,46 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
       } else {
         title = tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
       }
+      centerMsgId = `in-app-tx-${tx.txid}`;
+      call(appState.notifications.add, {
+        fcmMessageId: centerMsgId,
+        read: false,
+        title,
+        body: title,
+        time: new Date().toISOString(),
+      });
     } else {
       title = notificationTexts[type];
     }
+
+    const handleToastClose = props => {
+      toast.update(props.toastId, { data: { event: 'closed' } });
+      toast.dismiss(props.toastId);
+
+      // analytics for close event
+      const { data } = props;
+      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+      ampli.inAppNotificationClosed({ type: analyticsTypeValue });
+      if (centerMsgId) {
+        call(appState.notifications.setRead, centerMsgId);
+      }
+    };
+
+    const handleToastClick = props => {
+      toast.update(props.toastId, { data: { event: 'clicked' } });
+      toast.dismiss(props.toastId);
+
+      const { data } = props;
+      // analytics for click event
+      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+      ampli.inAppNotificationOpened({ type: analyticsTypeValue });
+      // redirect after analytics
+      const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
+      navigate(redirectTo);
+      if (centerMsgId) {
+        call(appState.notifications.setRead, centerMsgId);
+      }
+    };
 
     createToast({
       theme,
@@ -281,7 +296,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   );
 
   const { loaded: hasUnreadLoaded, value: hasUnread } = useModelValue(appState.notifications.hasUnread);
-  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread != null;
+  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread;
 
   return <Context.Provider value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value }}>{children}</Context.Provider>;
 }
