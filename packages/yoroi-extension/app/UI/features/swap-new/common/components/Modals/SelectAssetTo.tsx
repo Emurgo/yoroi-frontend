@@ -69,61 +69,34 @@ export const SelectAssetTo = () => {
       return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
 
-  return (
-    <Stack {...atoms.mb_2xl}>
-      <Stack {...atoms.pb_s}>
-        <SearchWrapper>
-          <SearchIconWrapper>
-            <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
-          </SearchIconWrapper>
-          <SearchInput
-            component="input"
-            type="text"
-            placeholder="Search"
-            sx={{
-              borderColor: 'ds.el_gray_min',
-              backgroundColor: 'ds.bg_color_max',
-              color: 'ds.el_gray_low',
-              '&:focus': {
-                borderColor: 'ds.el_gray_max',
-              },
-            }}
-            onChange={e => {
-              setSearchTerm(e.target.value?.trim() ?? '');
-            }}
-          />
-        </SearchWrapper>
-        <AssetCountText variant="body2" color="ds.text_gray_low">
-          {strings.numYourAssets(ftAssetList.length)}
-        </AssetCountText>
-      </Stack>
-      <Stack>
-        {ftAssetList.map(asset => {
-          return (
-            <AssetInfoInRow
-              direction="in"
-              currency={currency}
-              primaryTokenActivity={ptPrice}
-              secondaryToken24Activity={data24h && data24h[asset.info.id]}
-              primaryTokenInfo={primaryTokenInfo}
-              token={{
-                decimals: asset.info.numberOfDecimals,
-                name: asset.info.ticker ?? asset.info.name,
-                id: asset.info.id,
-                formatedAmount: asset.formatedAmount,
-                quantity: asset.quantity,
-                ...asset.info,
+    return (
+      <Stack {...atoms.mb_2xl}>
+        <Stack {...atoms.pb_s}>
+          <SearchWrapper>
+            <SearchIconWrapper>
+              <IconWrapper icon={Icons.Search} color="ds.el_gray_low" />
+            </SearchIconWrapper>
+            <SearchInput
+              component="input"
+              type="text"
+              placeholder="Search"
+              sx={{
+                borderColor: 'ds.el_gray_min',
+                backgroundColor: 'ds.bg_color_max',
+                color: 'ds.el_gray_low',
+                '&:focus': {
+                  borderColor: 'ds.el_gray_max',
+                },
               }}
-              onAssetClick={() => handleAssetClick(asset.info.id)}
+              onChange={e => {
+                setSearchTerm(e.target.value?.trim() ?? '');
+              }}
             />
-          );
-        })}
-      </Stack>
-      <Typography variant="body2" color="ds.text_gray_low" py={8}>
-        All assets ({filteredAssets.length})
-      </Typography>
-
-      <Stack>
+          </SearchWrapper>
+          <AssetCountText variant="body2" color="ds.text_gray_low">
+            {strings.numYourAssets(ftAssetList.length)}
+          </AssetCountText>
+        </Stack>
         {loadingTokenList ? (
           <Stack gap={16}>
             {Array.from({ length: 4 }).map((_, index) => (
@@ -138,28 +111,57 @@ export const SelectAssetTo = () => {
             ))}
           </Stack>
         ) : (
-          filteredAssets.map(asset => {
-            return (
-              <AssetInfoInRow
-                key={asset.id}
-                direction="out"
-                currency={currency}
-                token={{
-                  decimals: asset.decimals,
-                  name: asset.ticker ?? asset.name,
-                  fingerprint: asset.fingerprint,
-                  id: asset.id,
-                  ...asset,
-                }}
-                primaryTokenActivity={ptPrice}
-                secondaryToken24Activity={data24h && data24h[asset.id]}
-                primaryTokenInfo={primaryTokenInfo}
-                onAssetClick={() => handleAssetClick(asset.id)}
-              />
-            );
-          })
+          <>
+            <Stack>
+              {ftAssetList.map(asset => {
+                return (
+                  <AssetInfoInRow
+                    direction="in"
+                    currency={currency}
+                    primaryTokenActivity={ptPrice}
+                    secondaryToken24Activity={data24h && data24h[asset.info.id]}
+                    primaryTokenInfo={primaryTokenInfo}
+                    token={{
+                      decimals: asset.info.numberOfDecimals,
+                      name: asset.info.ticker ?? asset.info.name,
+                      id: asset.info.id,
+                      formatedAmount: asset.formatedAmount,
+                      quantity: asset.quantity,
+                      ...asset.info,
+                    }}
+                    onAssetClick={() => handleAssetClick(asset.info.id)}
+                  />
+                );
+              })}
+            </Stack>
+            <Typography variant="body2" color="ds.text_gray_low" py={8}>
+              All assets ({filteredAssets.length})
+            </Typography>
+
+            <Stack>
+              {filteredAssets.map(asset => {
+                return (
+                  <AssetInfoInRow
+                    key={asset.id}
+                    direction="out"
+                    currency={currency}
+                    token={{
+                      decimals: asset.decimals,
+                      name: asset.ticker ?? asset.name,
+                      fingerprint: asset.fingerprint,
+                      id: asset.id,
+                      ...asset,
+                    }}
+                    primaryTokenActivity={ptPrice}
+                    secondaryToken24Activity={data24h && data24h[asset.id]}
+                    primaryTokenInfo={primaryTokenInfo}
+                    onAssetClick={() => handleAssetClick(asset.id)}
+                  />
+                );
+              })}
+            </Stack>
+          </>
         )}
       </Stack>
-    </Stack>
-  );
+    );
 };

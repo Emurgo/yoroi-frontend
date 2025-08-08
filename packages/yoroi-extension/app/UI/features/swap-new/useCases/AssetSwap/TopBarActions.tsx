@@ -3,9 +3,9 @@ import { useStrings } from '../../common/hooks/useStrings';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { SettingsModalContent } from '../../common/components/SettingsModalContent';
 import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
 import { LIMIT_ORDER } from '../../common/constants';
+import { SettingsModalContent } from '../../common/components/Modals/SettingsModalContent';
 
 export const TopBarActions = () => {
   const { marketTabLabel, limitTabLabel } = useStrings();

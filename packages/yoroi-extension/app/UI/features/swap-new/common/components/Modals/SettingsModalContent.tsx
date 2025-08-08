@@ -1,7 +1,7 @@
 import { Box, Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import React, { useState, useRef } from 'react';
-import { useStrings } from '../hooks/useStrings';
-import { Switch } from '../../../../components/Switch/Switch';
+import { useStrings } from '../../hooks/useStrings';
+import { Switch } from '../../../../../components/Switch/Switch';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
