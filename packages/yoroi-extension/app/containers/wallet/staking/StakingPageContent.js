@@ -300,13 +300,12 @@ const WrapperCards = styled(Box)({
   display: 'flex',
   gap: '24px',
   justifyContent: 'space-between',
-  marginBottom: '40px',
+  marginBottom: '24px',
 });
 
 const RightCardsWrapper = styled(Box)({
   display: 'flex',
-  flex: '1 1 48.5%',
-  maxWidth: '48.5%',
+  width: '100%',
   flexDirection: 'column',
   gap: '24px',
 });
