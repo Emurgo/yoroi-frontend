@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, { ReactNode } from 'react';
 import PubSub from 'pubsub-js';
 import { toast } from 'react-toastify';
 import { useStrings } from '../../../common/hooks/useStrings';
@@ -68,7 +68,13 @@ type Props = {
   tokenInfoStore: any;
 };
 
-export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore, pushNotificationStore, tokenInfoStore }: Props) {
+export default function NotificationsProvider({
+  children,
+  appLoadedSlots = {},
+  walletsStore,
+  pushNotificationStore,
+  tokenInfoStore,
+}: Props) {
   const lsApi = new LocalStorageApi();
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
@@ -133,7 +139,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     if (tx && (tx.type === 'income' || tx.type === 'expend')) {
       if (tx.amount.size() === 1) {
         // ADA only
-        title = (tx.type === 'income' ? strings.assetReceived: strings.assetSent)(
+        title = (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(
           `${tx.amount.getDefault().absoluteValue().shiftedBy(-6).toString()} ADA`
         );
       } else if (tx.amount.size() === 2) {
@@ -143,14 +149,15 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
           getNetworkById(entry.networkId),
           entry.identifier
         );
-        const amount = entry.amount.absoluteValue().shiftedBy(-(decimals ?? 0)).toString();
+        const amount = entry.amount
+          .absoluteValue()
+          .shiftedBy(-(decimals ?? 0))
+          .toString();
         let unit = ticker ?? name ?? entry.identifier;
         if (unit.length > 15) {
           unit = unit.slice(0, 15) + '...';
         }
-        title = (tx.type === 'income' ? strings.assetReceived: strings.assetSent)(
-          `${amount} ${unit}`
-        );
+        title = (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(`${amount} ${unit}`);
       } else {
         title = tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
       }
