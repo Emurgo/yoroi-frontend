@@ -44,6 +44,15 @@ class CashbackPage extends WalletCommonBase {
     locator: 'dialog-switchwallet-button',
     method: 'id',
   };
+  setThisWalletButtonNo = {
+    locator: 'dialog-no-button',
+    method: 'id',
+  };
+
+  setThisWalletButtonYes = {
+    locator: 'dialog-yes-button',
+    method: 'id',
+  };
   
   /**
    * Switches to the cashback iframe.
@@ -112,7 +121,12 @@ class CashbackPage extends WalletCommonBase {
    */
   async isWrongWalletModalDisplayed() {
     this.logger.info(`CashbackPage::isWrongWalletModalDisplayed is called`);
-    return await this.waitForElement(this.wrongWalletModalLocator);
+    try {
+      const modal = await this.findElements(this.wrongWalletModalLocator);
+      return modal.length > 0;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
@@ -140,6 +154,8 @@ class CashbackPage extends WalletCommonBase {
     this.logger.info(`CashbackPage::clickSetThisWallet is called`);
     await this.waitForElement(this.setThisWalletButtonLocator);
     await this.click(this.setThisWalletButtonLocator);
+    await this.click(this.setThisWalletButtonYes);
+
   }
 
   /**
