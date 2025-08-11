@@ -73,7 +73,9 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
     <Button
       variant="primary"
       sx={{
+        lineHeight: '22px',
         '&.MuiButton-sizeMedium': {
+          fontSize: '14px',
           height: 'unset',
           p: '9px 20px',
         },
