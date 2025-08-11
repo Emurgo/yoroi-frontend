@@ -22,7 +22,6 @@ import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
-
 const messages = defineMessages({
   aboutYoroiLabel: {
     id: 'settings.general.aboutYoroi.label',
