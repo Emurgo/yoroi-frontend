@@ -248,7 +248,7 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
   );
 
   const { loaded: hasUnreadLoaded, value: hasUnread } = useModelValue(appState.notifications.hasUnread);
-  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread != null;
+  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread;
 
   return <Context.Provider value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value }}>{children}</Context.Provider>;
 }
