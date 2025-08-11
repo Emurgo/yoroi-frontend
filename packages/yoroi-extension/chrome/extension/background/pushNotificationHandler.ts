@@ -5,24 +5,24 @@ const broadcast = new BroadcastChannel('');
 let currentNotificationId;
 
 interface EventData {
-  data: {
-    action: 'open_screen',
-    screen: 'wallet' | 'stacking_center' | 'swap' | 'cashback' | 'governance',
-  } | {
-  },
+  data:
+    | {
+        action: 'open_screen';
+        screen: 'wallet' | 'stacking_center' | 'swap' | 'cashback' | 'governance';
+      }
+    | {};
   notification: {
-    title: string,
-    body: string,
-  },
-  fcmMessageId: string,
+    title: string;
+    body: string;
+  };
+  fcmMessageId: string;
 }
 
 interface Event {
-  data:
-    | {
-        type: 'push-notification';
-        eventData: EventData;
-      }
+  data: {
+    type: 'push-notification';
+    eventData: EventData;
+  };
 }
 
 self.addEventListener('notificationclick', event => {

@@ -6,7 +6,7 @@ self.addEventListener('push', event => {
     event.waitUntil(
       broadcast.postMessage({
         type: 'push-notification',
-        eventData
+        eventData,
       })
     );
   }
