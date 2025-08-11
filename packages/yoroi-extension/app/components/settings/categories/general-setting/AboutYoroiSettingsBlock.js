@@ -6,12 +6,8 @@ import styles from './AboutYoroiSettingsBlock.scss';
 
 import GridFlexContainer from '../../../layout/GridFlexContainer';
 import { ReactComponent as githubSvg } from '../../../../assets/images/social/github.inline.svg';
-import { ReactComponent as youtubeSvg } from '../../../../assets/images/social/youtube.inline.svg';
-import { ReactComponent as telegramSvg } from '../../../../assets/images/social/telegram.inline.svg';
 import { ReactComponent as twitterSvg } from '../../../../assets/images/social/twitter.inline.svg';
 import { ReactComponent as yoroiSvg } from '../../../../assets/images/yoroi-logo-shape-white.inline.svg';
-import { ReactComponent as facebookSvg } from '../../../../assets/images/social/facebook.inline.svg';
-import { ReactComponent as mediumSvg } from '../../../../assets/images/social/medium.inline.svg';
 
 import environment from '../../../../environment';
 import LinkButton from '../../../widgets/LinkButton';
@@ -25,6 +21,7 @@ import { IconWrapper, Icons } from '../../../../UI/components';
 import { useModal } from '../../../../UI/components/modals/ModalContext';
 import LocalStorageApi from '../../../../api/localStorage';
 import { networks } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+
 
 const messages = defineMessages({
   aboutYoroiLabel: {
@@ -42,22 +39,6 @@ const messages = defineMessages({
   aboutYoroiGithub: {
     id: 'settings.general.aboutYoroi.github',
     defaultMessage: '!!!Yoroi GitHub',
-  },
-  aboutYoroiYoutube: {
-    id: 'settings.general.aboutYoroi.youtube',
-    defaultMessage: '!!!EMURGO YouTube',
-  },
-  aboutEmurgoTelegram: {
-    id: 'settings.general.aboutYoroi.telegram',
-    defaultMessage: '!!!EMURGO Telegram',
-  },
-  aboutYoroiFacebook: {
-    id: 'settings.general.aboutYoroi.facebook',
-    defaultMessage: '!!!Yoroi facebook',
-  },
-  aboutYoroiMedium: {
-    id: 'settings.general.aboutYoroi.medium',
-    defaultMessage: '!!!EMURGO Medium',
   },
   versionLabel: {
     id: 'settings.general.aboutYoroi.versionLabel',
@@ -108,30 +89,6 @@ const socialMediaLinks = [
     svg: yoroiSvg,
     message: messages.aboutYoroiWebsite,
     componentId: `${basePageComponentPath}-yoroiWebsiteLink-linkButton`,
-  },
-  {
-    url: 'https://www.facebook.com/Yoroi-wallet-399386000586822/',
-    svg: facebookSvg,
-    message: messages.aboutYoroiFacebook,
-    componentId: `${basePageComponentPath}-facebookLink-linkButton`,
-  },
-  {
-    url: 'https://www.youtube.com/channel/UCgFQ0hHuPO1QDcyP6t9KZTQ',
-    svg: youtubeSvg,
-    message: messages.aboutYoroiYoutube,
-    componentId: `${basePageComponentPath}-youtubeLink-linkButton`,
-  },
-  {
-    url: 'https://t.me/emurgo',
-    svg: telegramSvg,
-    message: messages.aboutEmurgoTelegram,
-    componentId: `${basePageComponentPath}-telegramLink-linkButton`,
-  },
-  {
-    url: 'https://medium.com/@emurgo_io',
-    svg: mediumSvg,
-    message: messages.aboutYoroiMedium,
-    componentId: `${basePageComponentPath}-mediumLink-linkButton`,
   },
   {
     url: 'https://github.com/Emurgo/yoroi-frontend',
