@@ -29,7 +29,7 @@ describe('Cashback Tests - Two Wallets Added', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Add a new wallet and navigate to Cashback page', async function () {
+  it('Verify that wallet switching works on cashback page', async function () {
     // Add a new wallet
     const walletBase = new WalletCommonBase(webdriver, logger);
     await walletBase.addNewWallet();
