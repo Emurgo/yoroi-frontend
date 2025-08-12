@@ -1107,27 +1107,6 @@ const globalMessages: * = defineMessages({
   airdrop: {
     id: 'airdrop.label',
     defaultMessage: '!!!Airdrop',
-  },
-  // for ../../chrome/extension/background/i18n/index.ts
-  notificationButtonGoToWallet: {
-    id: 'notification.button.wallet',
-    defaultMessage: '!!!Go to the wallet page',
-  },
-  notificationButtonGoToStake: {
-    id: 'notification.button.stakingCenter',
-    defaultMessage: '!!!Go to the staking center',
-  },
-  notificationButtonGoToSwap: {
-    id: 'notification.button.swap',
-    defaultMessage: '!!!Go to the swap page',
-  },
-  notificationButtonGoToCashback: {
-    id: 'notification.button.cashback',
-    defaultMessage: 'Go to the cashback dashboard',
-  },
-  notificationButtonGovernance: {
-    id: 'notification.button.governance',
-    defaultMessage: '!!!Go to the governance center',
   }
 });
 export default globalMessages;

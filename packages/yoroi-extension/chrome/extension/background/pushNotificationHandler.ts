@@ -1,6 +1,5 @@
 import appState from '../../../api/appState';
 import { call } from '../../../api/objectModel';
-import TRANSLATIONS from './i18n';
 import LocalStorageApi from '../../../app/api/localStorage';
 import { ROUTES } from '../../../app/routes-config';
 
@@ -29,30 +28,25 @@ interface Event {
   };
 }
 
-const REDIRECTIONS: { id: Screen, messageId: string, route: string }[] = [
+const REDIRECTIONS: { id: Screen, route: string }[] = [
   {
     id: 'wallet',
-    messageId: 'notification.button.wallet',
     route: ROUTES.WALLETS.ROOT,
   },
   {
     id: 'staking_center',
-    messageId: 'notification.button.stakingCenter',
     route: ROUTES.STAKING,
   },
   {
     id: 'swap',
-    messageId: 'notification.button.swap',
     route: ROUTES.SWAP_REVAMP,
   },
   {
     id: 'cashback',
-    messageId: 'notification.button.cashback',
     route: ROUTES.CASHBACK.ROOT,
   },
   {
     id: 'governance',
-    messageId: 'notification.button.governance',
     route: ROUTES.Governance.ROOT,
   }
 ];
@@ -72,7 +66,6 @@ interface NotificationEvent<DataType> {
 
 // @ts-ignore
 self.addEventListener('notificationclick', (event: NotificationEvent<NotificationData>) => {
-  debugger
   if (event.notification.data.route) {
     chrome.tabs.create({ url: `main_window.html#${event.notification.data.route}` });
   }
@@ -95,33 +88,27 @@ broadcast.onmessage = async (event: Event) => {
     const { eventData } = event.data;
     const locale = await localStorageApi.getUserLocale() ?? 'en-US';;
 
-    let actionButtonTitle = 'OK';
-    let actionButtonRoute: null | string  = null;
+    let redirectionRoute: null | string  = null;
 
     const redirection = (eventData.data.action === 'open_screen') ?
       REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
     if (redirection) {
-      const translation = TRANSLATIONS[locale] ?? TRANSLATIONS['en-US'];
-      actionButtonTitle = translation[redirection.messageId];
-      actionButtonRoute = redirection.route;
+      redirectionRoute = redirection.route;
     }
 
     const title = (eventData.data['title-' + locale]) ?? eventData.notification.title;
     const body = (eventData.data['body-' + locale]) ?? eventData.notification.body;
+    if (typeof title !== 'string' || typeof body !== 'string') {
+      return;
+    }
 
     // @ts-ignore
     self.registration.showNotification(title, {
       body,
-      actions: [
-        {
-          action: 'close', // placeholder value, not used anywhere
-          title: actionButtonTitle,
-          type: 'button',
-        },
-      ],
+      actions: [],
       data: {
         fcmMessageId: eventData.fcmMessageId,
-        route: actionButtonRoute,
+        route: redirectionRoute,
       },
     });
 
