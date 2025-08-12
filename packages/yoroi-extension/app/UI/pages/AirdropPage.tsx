@@ -8,7 +8,13 @@ import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
+import {
+  getAllocatedAddresses,
+  checkClaimForAddress,
+  claimForAddress,
+  getClaimMessage,
+  scanForOriginalDestAddress
+} from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -81,6 +87,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     ).address.Hash
   );
 
+  const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
+
   useEffect(() => {
     (async () => {
       const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
@@ -94,6 +102,18 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
       if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
         setIsClaimDone(true);
+        const result = await scanForOriginalDestAddress(
+          claimEndpoint,
+          destAddrBech32,
+          wallet.allAddresses.utxoAddresses.filter(
+            a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed
+          ).sort(
+            (addr1, addr2) => addr2.path[4] - addr1.path[4]
+          ).map(addr => addressHexToBech32(addr.address.Hash))
+        );
+        if (result) {
+          setOriginalDestAddrBech32(result.destAddr);
+        }
       }
       setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
       setUnclaimedAddrs(unclaimedAddrs);
@@ -128,7 +148,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   } else if (alloc.isZero()) {
     content = <Zero />;
   } else if (isClaimDone) {
-    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={destAddrBech32} />;
+    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={originalDestAddrBech32} />;
   } else {
     content = (
       <ClaimContent

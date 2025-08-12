@@ -147,3 +147,26 @@ export async function claimForAddress(
     throw new Error(`Error ${resp.status} response: ${errorMessage}`);
   }
 }
+
+type ClaimInfo = {|
+  destAddr: string,
+  claimId: string,
+  amount: number,
+|};
+export async function scanForOriginalDestAddress(claimEndpoint: string, unusedAddr: string, usedAddrs: Array<string>): ClaimInfo | null {
+  for (let addr of [unusedAddr, ...usedAddrs]) {
+    const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
+    if (!resp.ok) {
+      return null;
+    }
+    const json = await resp.json();
+    if (json.length === 1) {
+      return {
+        destAddr: addr,
+        claimId: json[0].claim_id,
+        amount: json[0].amount,
+      };
+    }
+  }
+  return null;
+}
