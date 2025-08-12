@@ -10,14 +10,11 @@ const broadcast = new BroadcastChannel('');
 let currentNotificationId;
 
 type Screen = 'wallet' | 'staking_center' | 'swap' | 'cashback' | 'governance';
-
 interface EventData {
-  data:
-    | {
-        action: 'open_screen';
-        screen: Screen;
-      }
-    | {};
+  data: {
+    action?: 'open_screen';
+    screen?: Screen;
+  };
   notification: {
     title: string;
     body: string;
@@ -75,6 +72,7 @@ interface NotificationEvent<DataType> {
 
 // @ts-ignore
 self.addEventListener('notificationclick', (event: NotificationEvent<NotificationData>) => {
+  debugger
   if (event.notification.data.route) {
     chrome.tabs.create({ url: `main_window.html#${event.notification.data.route}` });
   }
@@ -95,23 +93,25 @@ self.addEventListener('notificationclose', (event: NotificationEvent<Notificatio
 broadcast.onmessage = async (event: Event) => {
   if (event.data.type === 'push-notification') {
     const { eventData } = event.data;
+    const locale = await localStorageApi.getUserLocale() ?? 'en-US';;
 
     let actionButtonTitle = 'OK';
-    let route: null | string  = null;
-    // @ts-ignore
+    let actionButtonRoute: null | string  = null;
+
     const redirection = (eventData.data.action === 'open_screen') ?
-      // @ts-ignore
       REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
     if (redirection) {
-      const locale = await localStorageApi.getUserLocale() ?? 'en-US';
       const translation = TRANSLATIONS[locale] ?? TRANSLATIONS['en-US'];
       actionButtonTitle = translation[redirection.messageId];
-      route = redirection.route;
+      actionButtonRoute = redirection.route;
     }
 
+    const title = (eventData.data['title-' + locale]) ?? eventData.notification.title;
+    const body = (eventData.data['body-' + locale]) ?? eventData.notification.body;
+
     // @ts-ignore
-    self.registration.showNotification(eventData.notification.title, {
-      body: eventData.notification.body,
+    self.registration.showNotification(title, {
+      body,
       actions: [
         {
           action: 'close', // placeholder value, not used anywhere
@@ -121,13 +121,13 @@ broadcast.onmessage = async (event: Event) => {
       ],
       data: {
         fcmMessageId: eventData.fcmMessageId,
-        route,
+        route: actionButtonRoute,
       },
     });
 
     call(appState.notifications.add, {
-      title: eventData.notification.title,
-      body: eventData.notification.body,
+      title: title,
+      body: body,
       fcmMessageId: eventData.fcmMessageId,
       read: false,
       time: new Date().toISOString(),
