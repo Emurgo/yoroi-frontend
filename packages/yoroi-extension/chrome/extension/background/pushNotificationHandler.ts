@@ -28,7 +28,7 @@ interface Event {
   };
 }
 
-const REDIRECTIONS: { id: Screen, route: string }[] = [
+const REDIRECTIONS: { id: Screen; route: string }[] = [
   {
     id: 'wallet',
     route: ROUTES.WALLETS.ROOT,
@@ -48,20 +48,20 @@ const REDIRECTIONS: { id: Screen, route: string }[] = [
   {
     id: 'governance',
     route: ROUTES.Governance.ROOT,
-  }
+  },
 ];
 
 interface NotificationData {
-  fcmMessageId: string,
-  route: null | string,
+  fcmMessageId: string;
+  route: null | string;
 }
 
 // missing builtin
 interface NotificationEvent<DataType> {
   notification: {
-    close: () => void,
-    data: DataType,
-  },
+    close: () => void;
+    data: DataType;
+  };
 }
 
 // @ts-ignore
@@ -86,18 +86,18 @@ self.addEventListener('notificationclose', (event: NotificationEvent<Notificatio
 broadcast.onmessage = async (event: Event) => {
   if (event.data.type === 'push-notification') {
     const { eventData } = event.data;
-    const locale = await localStorageApi.getUserLocale() ?? 'en-US';;
+    const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
 
-    let redirectionRoute: null | string  = null;
+    let redirectionRoute: null | string = null;
 
-    const redirection = (eventData.data.action === 'open_screen') ?
-      REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
+    const redirection =
+      eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
     if (redirection) {
       redirectionRoute = redirection.route;
     }
 
-    const title = (eventData.data['title-' + locale]) ?? eventData.notification.title;
-    const body = (eventData.data['body-' + locale]) ?? eventData.notification.body;
+    const title = eventData.data['title-' + locale] ?? eventData.notification.title;
+    const body = eventData.data['body-' + locale] ?? eventData.notification.body;
     if (typeof title !== 'string' || typeof body !== 'string') {
       return;
     }
