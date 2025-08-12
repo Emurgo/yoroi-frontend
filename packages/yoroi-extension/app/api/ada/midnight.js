@@ -84,7 +84,7 @@ export async function claimForAddress(
   destAddrBech32: string,
   password: string, // only for mnemonic wallet
   locale: string // only for Ledger
-): Promise<void> {
+): Promise<{| claimId: string |}> {
   const payload = Buffer.from(getClaimMessage(addrClaimData.value, destAddrBech32), 'ascii').toString('hex');
   let signResult;
   let publicKey;
@@ -146,6 +146,8 @@ export async function claimForAddress(
     }
     throw new Error(`Error ${resp.status} response: ${errorMessage}`);
   }
+  const respBody = await resp.json();
+  return { claimId: respBody[0].claim_id };
 }
 
 type ClaimInfo = {|
@@ -153,7 +155,7 @@ type ClaimInfo = {|
   claimId: string,
   amount: number,
 |};
-export async function scanForOriginalDestAddress(claimEndpoint: string, unusedAddr: string, usedAddrs: Array<string>): ClaimInfo | null {
+export async function scanForOriginalDestAddress(claimEndpoint: string, unusedAddr: string, usedAddrs: Array<string>): Promise<ClaimInfo | null> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {

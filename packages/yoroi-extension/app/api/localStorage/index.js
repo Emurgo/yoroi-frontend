@@ -62,6 +62,7 @@ const storageKeys = {
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SELECTED_WALLET: 'SELECTED_WALLET',
   PUSH_NOTIFICATION_METADATA: 'PUSH_NOTIFICATION_METADATA',
+  AIRDROP_CLAIM_RESULTS: 'AIRDROP_CLAIM_RESULTS',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -79,6 +80,14 @@ export type PushNotificationMetadata = {|
   isEnabled?: boolean,
   fcmToken?: string,
 |};
+
+type WalletClaimResult = {|
+  publicDeriverId: number,
+  destAddr: string,
+  claimId: string,
+  amount: number,
+|};
+
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -509,6 +518,18 @@ export default class LocalStorageApi {
     await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
   };
 
+  getAirdropClaimResults: () => Promise<Array<WalletClaimResult>> = async () => {
+    const raw = await getLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS);
+    if (!raw) {
+      return [];
+    }
+    return JSON.parse(raw);
+  };
+
+  saveAirdropClaimResults: (Array<WalletClaimResult>) => Promise<void> = async results => {
+    await setLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS, JSON.stringify(results));
+  };
+  
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetComplexityLevel();
