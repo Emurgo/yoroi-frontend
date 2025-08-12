@@ -12,6 +12,8 @@ import LocalStorageApi from '../../../../api/localStorage';
 import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
 import { appState, useModelValue, call } from '../../../../../api/frontEnd';
 
+const MAX_TOKEN_SYMBOL_LENGTH = 15;
+
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
   REWARDS: 'REWARDS_RECEIVED',
@@ -112,6 +114,33 @@ export default function NotificationsProvider({
     locationRef.current = location;
   }, [location]);
 
+  const getTitle = async (tx) => {
+    if (tx.amount.size() === 1) {
+      // ADA only
+      return (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(
+        `${tx.amount.getDefault().absoluteValue().shiftedBy(-6).toString()} ADA`
+      );
+    } else if (tx.amount.size() === 2) {
+      // one token
+      const entry = tx.amount.nonDefaultEntries()[0];
+      const { name, ticker, decimals } = await tokenInfoStore.getLocalOrRemoteMetadata(
+        getNetworkById(entry.networkId),
+        entry.identifier
+      );
+      const amount = entry.amount
+        .absoluteValue()
+        .shiftedBy(-(decimals ?? 0))
+        .toString();
+      let unit = ticker ?? name ?? entry.identifier;
+      if (unit.length > MAX_TOKEN_SYMBOL_LENGTH) {
+        unit = unit.slice(0, MAX_TOKEN_SYMBOL_LENGTH) + '...';
+      }
+      return (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(`${amount} ${unit}`);
+    } else {
+      return tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
+    }
+  }
+
   const createNotification = async (type: NotificationTypes, id: void | string = undefined, tx?: void | any) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
@@ -137,31 +166,9 @@ export default function NotificationsProvider({
     let title;
     let centerMsgId;
     if (tx && (tx.type === 'income' || tx.type === 'expend')) {
-      if (tx.amount.size() === 1) {
-        // ADA only
-        title = (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(
-          `${tx.amount.getDefault().absoluteValue().shiftedBy(-6).toString()} ADA`
-        );
-      } else if (tx.amount.size() === 2) {
-        // one token
-        const entry = tx.amount.nonDefaultEntries()[0];
-        const { name, ticker, decimals } = await tokenInfoStore.getLocalOrRemoteMetadata(
-          getNetworkById(entry.networkId),
-          entry.identifier
-        );
-        const amount = entry.amount
-          .absoluteValue()
-          .shiftedBy(-(decimals ?? 0))
-          .toString();
-        let unit = ticker ?? name ?? entry.identifier;
-        if (unit.length > 15) {
-          unit = unit.slice(0, 15) + '...';
-        }
-        title = (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(`${amount} ${unit}`);
-      } else {
-        title = tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
-      }
+      title = await getTitle(tx);
       centerMsgId = `in-app-tx-${tx.txid}`;
+
       call(appState.notifications.add, {
         fcmMessageId: centerMsgId,
         read: false,
@@ -171,6 +178,7 @@ export default function NotificationsProvider({
       });
     } else {
       title = notificationTexts[type];
+      centerMsgId = null;
     }
 
     const handleToastClose = props => {
