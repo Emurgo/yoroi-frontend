@@ -529,7 +529,7 @@ export default class LocalStorageApi {
   saveAirdropClaimResults: (Array<WalletClaimResult>) => Promise<void> = async results => {
     await setLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS, JSON.stringify(results));
   };
-  
+
   async reset(): Promise<void> {
     await this.unsetUserLocale();
     await this.unsetComplexityLevel();

@@ -155,7 +155,11 @@ type ClaimInfo = {|
   claimId: string,
   amount: number,
 |};
-export async function scanForOriginalDestAddress(claimEndpoint: string, unusedAddr: string, usedAddrs: Array<string>): Promise<ClaimInfo | null> {
+export async function scanForOriginalDestAddress(
+  claimEndpoint: string,
+  unusedAddr: string,
+  usedAddrs: Array<string>
+): Promise<ClaimInfo | null> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
