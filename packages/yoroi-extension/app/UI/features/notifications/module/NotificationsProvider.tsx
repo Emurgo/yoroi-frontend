@@ -114,7 +114,7 @@ export default function NotificationsProvider({
     locationRef.current = location;
   }, [location]);
 
-  const getTitle = async (tx) => {
+  const getTitle = async tx => {
     if (tx.amount.size() === 1) {
       // ADA only
       return (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(
@@ -139,7 +139,7 @@ export default function NotificationsProvider({
     } else {
       return tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
     }
-  }
+  };
 
   const createNotification = async (type: NotificationTypes, id: void | string = undefined, tx?: void | any) => {
     const theme = await lsApi.getUserThemeMode();
