@@ -5,7 +5,7 @@ import { Icons, IconWrapper } from '../../../../components';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { SettingsModalContent } from '../../common/components/SettingsModalContent';
 import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
-import { LIMIT_ORDER } from '../../common/constants';
+import { LIMIT_ORDER, MARKET_ORDER } from '../../common/constants';
 
 export const TopBarActions = () => {
   const { marketTabLabel, limitTabLabel } = useStrings();
@@ -35,9 +35,9 @@ export const TopBarActions = () => {
           isActive: swapForm?.orderType === type,
           onClick: () => {
             if (type === LIMIT_ORDER) {
-              swapForm.action({ type: SwapAction.ChangeOrderType, value: 'limit' });
+              swapForm.action({ type: SwapAction.ChangeOrderType, value: LIMIT_ORDER });
             } else {
-              swapForm.action({ type: SwapAction.ChangeOrderType, value: 'market' });
+              swapForm.action({ type: SwapAction.ChangeOrderType, value: MARKET_ORDER });
             }
           },
         }))}

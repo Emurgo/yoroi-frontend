@@ -1,11 +1,13 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box } from '@mui/material';
 import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
+import { useStrings } from '../../hooks/useStrings';
 
 export const LimitDexRouteTable = () => {
+  const strings = useStrings();
   const { primaryTokenInfo, swapForm, limitOptions } = useSwapRevamp();
   const { closeModal } = useModal();
-  const headers = ['Route', 'TVL', 'DEX fee'];
+  const headers = [strings.routeLabel, strings.routeTvl, strings.dexFee];
 
   return (
     <TableContainer sx={{ boxShadow: 'none', border: 'none', padding: '2px' }}>

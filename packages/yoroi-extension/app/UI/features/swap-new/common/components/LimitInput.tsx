@@ -1,18 +1,21 @@
 import { Box, Stack, Typography, styled } from '@mui/material';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
+import { MARKET_ORDER } from '../constants';
+import { useStrings } from '../hooks/useStrings';
 
 export const LimitInput = () => {
+  const strings = useStrings();
   const { swapForm, tokenInfos } = useSwapRevamp();
   const tokenInputInfo = tokenInfos.get(swapForm.tokenOutInput?.tokenId);
 
-  if (swapForm.estimate === undefined || swapForm.orderType === 'market') {
+  if (swapForm.estimate === undefined || swapForm.orderType === MARKET_ORDER) {
     return null;
   }
 
   return (
     <Wrapper>
       <Fieldset component="fieldset">
-        <Legend component="legend">Buy At</Legend>
+        <Legend component="legend">{strings.buyAt}</Legend>
 
         <StyledInput
           // @ts-ignore

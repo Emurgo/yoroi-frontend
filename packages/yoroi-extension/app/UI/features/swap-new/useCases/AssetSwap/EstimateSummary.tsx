@@ -39,29 +39,16 @@ export const EstimateSummary = () => {
   const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
 
   const openRouteModal = () => {
-    if (isLimitOrder) {
-      openModal({
-        title: 'Select Route',
-        content: (
-          <Stack direction="column" width="100%">
-            <LimitDexRouteTable />
-          </Stack>
-        ),
-        height: '327px',
-        width: '824px',
-      });
-    } else {
-      openModal({
-        title: 'Select Route',
-        content: (
-          <Stack direction="column" width="100%">
-            <DexRouteTable data={swapForm.estimate?.splits ?? []} />
-          </Stack>
-        ),
-        height: '327px',
-        width: '824px',
-      });
-    }
+    openModal({
+      title: strings.selectRoute,
+      content: (
+        <Stack direction="column" width="100%">
+          {isLimitOrder ? <LimitDexRouteTable /> : <DexRouteTable data={swapForm.estimate?.splits ?? []} />}
+        </Stack>
+      ),
+      height: '327px',
+      width: '824px',
+    });
   };
 
   return (
