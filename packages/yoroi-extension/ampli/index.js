@@ -8,7 +8,7 @@
  * To update run 'ampli pull extension'
  *
  * Required dependencies: @amplitude/analytics-browser@^1.3.0
- * Tracking Plan Version: 8
+ * Tracking Plan Version: 9
  * Build: 1.0.0
  * Runtime: browser:typescript-ampli-v2
  *
@@ -36,10 +36,10 @@ export var ApiKey = {
  * Default Amplitude configuration options. Contains tracking plan information.
  */
 export var DefaultConfiguration = __assign({ plan: {
-        version: '8',
+        version: '9',
         branch: 'main',
         source: 'extension',
-        versionId: 'cffa4fa2-03a3-4eda-9943-1feccac54d56'
+        versionId: 'da8f83fd-b750-436e-abd1-f46bc2ca4962'
     } }, {
     ingestionMetadata: {
         sourceName: 'browser-typescript-ampli',
@@ -257,8 +257,10 @@ var ExchangeSubmitted = /** @class */ (function () {
 }());
 export { ExchangeSubmitted };
 var GovernanceChooseDrepPageViewed = /** @class */ (function () {
-    function GovernanceChooseDrepPageViewed() {
+    function GovernanceChooseDrepPageViewed(event_properties) {
+        this.event_properties = event_properties;
         this.event_type = 'Governance Choose Drep Page Viewed';
+        this.event_properties = event_properties;
     }
     return GovernanceChooseDrepPageViewed;
 }());
@@ -288,6 +290,15 @@ var GovernanceTransactionSuccessPageViewed = /** @class */ (function () {
     return GovernanceTransactionSuccessPageViewed;
 }());
 export { GovernanceTransactionSuccessPageViewed };
+var GovernanceYoroiDRepSubmitted = /** @class */ (function () {
+    function GovernanceYoroiDRepSubmitted(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Governance Yoroi DRep Submitted';
+        this.event_properties = event_properties;
+    }
+    return GovernanceYoroiDRepSubmitted;
+}());
+export { GovernanceYoroiDRepSubmitted };
 var InAppNotificationClosed = /** @class */ (function () {
     function InAppNotificationClosed(event_properties) {
         this.event_properties = event_properties;
@@ -313,6 +324,43 @@ var InAppNotificationViewed = /** @class */ (function () {
     return InAppNotificationViewed;
 }());
 export { InAppNotificationViewed };
+var MidnightAirdropBannerCheckEligibility = /** @class */ (function () {
+    function MidnightAirdropBannerCheckEligibility() {
+        this.event_type = 'Midnight Airdrop Banner Check Eligibility';
+    }
+    return MidnightAirdropBannerCheckEligibility;
+}());
+export { MidnightAirdropBannerCheckEligibility };
+var MidnightAirdropBannerClosed = /** @class */ (function () {
+    function MidnightAirdropBannerClosed() {
+        this.event_type = 'Midnight Airdrop Banner Closed';
+    }
+    return MidnightAirdropBannerClosed;
+}());
+export { MidnightAirdropBannerClosed };
+var MidnightAirdropLeftMenuClicked = /** @class */ (function () {
+    function MidnightAirdropLeftMenuClicked() {
+        this.event_type = 'Midnight Airdrop Left Menu Clicked';
+    }
+    return MidnightAirdropLeftMenuClicked;
+}());
+export { MidnightAirdropLeftMenuClicked };
+var MidnightAirdropPageViewed = /** @class */ (function () {
+    function MidnightAirdropPageViewed(event_properties) {
+        this.event_properties = event_properties;
+        this.event_type = 'Midnight Airdrop Page Viewed';
+        this.event_properties = event_properties;
+    }
+    return MidnightAirdropPageViewed;
+}());
+export { MidnightAirdropPageViewed };
+var MidnightAirdropSignMessage = /** @class */ (function () {
+    function MidnightAirdropSignMessage() {
+        this.event_type = 'Midnight Airdrop Sign Message';
+    }
+    return MidnightAirdropSignMessage;
+}());
+export { MidnightAirdropSignMessage };
 var NetworkSelected = /** @class */ (function () {
     function NetworkSelected(event_properties) {
         this.event_properties = event_properties;
@@ -1189,10 +1237,11 @@ var Ampli = /** @class */ (function () {
      *
      * This event tracks when user loads the bottom sheet on mobile or the popup on extension to introduce the Drep ID. To arrive to this page the user has to click on “Delegate to a Drep” section.
      *
+     * @param properties The event's properties (e.g. drep_id)
      * @param options Amplitude event options.
      */
-    Ampli.prototype.governanceChooseDrepPageViewed = function (options) {
-        return this.track(new GovernanceChooseDrepPageViewed(), options);
+    Ampli.prototype.governanceChooseDrepPageViewed = function (properties, options) {
+        return this.track(new GovernanceChooseDrepPageViewed(properties), options);
     };
     /**
      * Governance Confirm Transaction Page Viewed
@@ -1231,6 +1280,19 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.governanceTransactionSuccessPageViewed = function (properties, options) {
         return this.track(new GovernanceTransactionSuccessPageViewed(properties), options);
+    };
+    /**
+     * Governance Yoroi DRep Submitted
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Yoroi%20DRep%20Submitted)
+     *
+     * This event tracks when a user clicks the "Delegate to Yoroi DRep" button on the governance dashboard page.
+     *
+     * @param properties The event's properties (e.g. drep_id)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.governanceYoroiDRepSubmitted = function (properties, options) {
+        return this.track(new GovernanceYoroiDRepSubmitted(properties), options);
     };
     /**
      * In App Notification Closed
@@ -1279,6 +1341,67 @@ var Ampli = /** @class */ (function () {
      */
     Ampli.prototype.inAppNotificationViewed = function (options) {
         return this.track(new InAppNotificationViewed(), options);
+    };
+    /**
+     * Midnight Airdrop Banner Check Eligibility
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Banner%20Check%20Eligibility)
+     *
+     * Event is triggered when a user triggers the banner redirection to the airdrop page by clicking on the CTA "check eligibility"
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.midnightAirdropBannerCheckEligibility = function (options) {
+        return this.track(new MidnightAirdropBannerCheckEligibility(), options);
+    };
+    /**
+     * Midnight Airdrop Banner Closed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Banner%20Closed)
+     *
+     * This events is triggered when the user dismisses the banner by cliking on the close CTA of the banner
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.midnightAirdropBannerClosed = function (options) {
+        return this.track(new MidnightAirdropBannerClosed(), options);
+    };
+    /**
+     * Midnight Airdrop Left Menu Clicked
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Left%20Menu%20Clicked)
+     *
+     * This event is triggered when the user clicks on the airdrop entry point located in the left menu of extension
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.midnightAirdropLeftMenuClicked = function (options) {
+        return this.track(new MidnightAirdropLeftMenuClicked(), options);
+    };
+    /**
+     * Midnight Airdrop Page Viewed
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Page%20Viewed)
+     *
+     * This event is triggered when the Airdrop page is displayed to the user
+     *
+     * @param properties The event's properties (e.g. is_claimed?)
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.midnightAirdropPageViewed = function (properties, options) {
+        return this.track(new MidnightAirdropPageViewed(properties), options);
+    };
+    /**
+     * Midnight Airdrop Sign Message
+     *
+     * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Sign%20Message)
+     *
+     * Event is triggered once the user clicks on sign message of the sign message popup dispayed in the Airdrop funnel
+     *
+     * @param options Amplitude event options.
+     */
+    Ampli.prototype.midnightAirdropSignMessage = function (options) {
+        return this.track(new MidnightAirdropSignMessage(), options);
     };
     /**
      * Network Selected

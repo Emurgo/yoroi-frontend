@@ -1,8 +1,10 @@
-The coerce the TypeScript Amplitude wrapper to work with flow, do these:
+This directory contains the amplitude client flow-compatibility layer. To update it, the steps are:
 
 ```
 npm run metrics:pull
 ```
+
+The above command updates the "canonical" Typescript client in the directiory `ampli.ts`.
 
 ```
 cd ampli
@@ -10,7 +12,7 @@ cd ampli
 
 
 ```
-npx -p typescript tsc index.ts  --outDir . -d -m es6
+npx -p typescript tsc ../ampli.ts/index.ts  --outDir . -d -m es6
 ```
 
 ```
@@ -18,7 +20,7 @@ npx flowgen --interface-records --no-inexact --add-flow-header -o index.js.flow 
 ```
 
 ```
-rm *.ts
+rm index.d.ts
 ```
 
 #### Next
