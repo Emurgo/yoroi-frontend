@@ -7,7 +7,6 @@ import driversPoolsManager from '../utils/driversPool.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
-import { pageTitle } from '../helpers/pageTitles.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import { getPassword } from '../helpers/constants.js';
 import AddNewWallet from '../pages/addNewWallet.page.js';
@@ -102,7 +101,8 @@ describe('Cashback Tests - Two Wallets Added', function () {
   
     await walletBase.goToSettingsTab();
     await walletBase.sleep(twoSeconds);
-      // Check that the second wallet is set as the cashback wallet
+    
+    // Check that the second wallet is set as the cashback wallet
     const secondWalletIsCashback = await generalSettings.verifyCashbackWalletIsSelected('CashbackTest');
     expect(secondWalletIsCashback, 'Second wallet should now be set as cashback wallet').to.be.true;
   });
