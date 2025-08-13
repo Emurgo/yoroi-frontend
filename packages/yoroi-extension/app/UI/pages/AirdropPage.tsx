@@ -25,8 +25,11 @@ import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
 import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
+import AbortDialog from '../features/airdrop/useCases/AbortDialog';
 
 const localStorageApi = new LocalStorageApi();
+
+const ALLOW_ABORT_DELAY = 10 * 1000;
 
 type AddressClaimData = {
   addrHex: string;
@@ -75,6 +78,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setIsClaimDialog] = useState(false);
   const [isClaimDone, setIsClaimDone] = useState(false);
+  const [allowAborting, setAllowAborting] = useState(false);
 
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
@@ -156,14 +160,18 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   const claim = async password => {
     const addr = forceNonNull(unclaimedAddrs[0]);
-    const claimResult = await claimForAddress(
-      claimEndpoint,
-      wallet,
-      addr,
-      destAddrBech32,
-      password,
-      stores.profile.currentLocale
-    );
+
+    let claimResult;
+    let allowAbortDelayTimeoutId = setTimeout(() => {
+      setAllowAborting(true);
+    }, ALLOW_ABORT_DELAY);
+
+    try {
+      claimResult = await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+    } finally {
+      clearTimeout(allowAbortDelayTimeoutId);
+      setAllowAborting(false);
+    }
     setOriginalDestAddrBech32(destAddrBech32);
     setIsClaimDialog(false);
     setIsClaimDone(true);
@@ -222,6 +230,16 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
               message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
           ))}
+        {isClaimDialog && allowAborting && (
+          <AbortDialog
+            onClose={() => {
+              history.back();
+            }}
+            onContinue={() => {
+              setAllowAborting(false);
+            }}
+          />
+        )}
       </Box>
     </TopBarLayout>
   );

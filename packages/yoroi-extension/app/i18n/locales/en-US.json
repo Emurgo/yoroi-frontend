@@ -1,6 +1,9 @@
 {
   "aidrop.noAllocText": "None of the addresses provided are eligible for an allocation",
   "aidrop.noAllocTitle": "No eligible addresses found in your wallet",
+  "airdrop.abort.text1": "Loading is taking longer than expected",
+  "airdrop.abort.text2": "Do you want to continue the process?",
+  "airdrop.abort.title": "no response",
   "airdrop.agree": "By checking this box I confirm that I have read and understood the Glacier Drop terms and conditions for this claim.",
   "airdrop.claim": "claim allocation",
   "airdrop.claimDialogTitle": "sign message",
