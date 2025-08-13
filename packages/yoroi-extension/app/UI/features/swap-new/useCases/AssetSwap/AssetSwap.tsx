@@ -44,13 +44,12 @@ export const AssetSwap = () => {
     });
 
     try {
-      // Uncomment the following line to actually send the transaction as is not woking in the current context
-      // await stores.transactionProcessingStore.adaSendAndRefresh({
-      //   wallet,
-      //   signRequest: unisgnedTxRequest,
-      //   password,
-      //   callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      // });
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest: unisgnedTxRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
       showTxResultModal(TransactionResult.SUCCESS);
     } catch (e) {
       showTxResultModal(TransactionResult.FAIL);
