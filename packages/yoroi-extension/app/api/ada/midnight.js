@@ -39,7 +39,7 @@ export async function getAllocatedAddresses(checkEndpoint: string, wallet: Walle
         addrHex: addr.address,
         addrBech32,
         path: addr.addressing.path,
-        value
+        value,
       });
     }
     // seems Cardano airdrop is based on stake address and we only need to claim one base address
@@ -70,10 +70,7 @@ export async function checkClaimForAddress(claimEndpoint: string, addrBech32: st
       }
     ]
   */
-  return Array.isArray(data)
-    && data.length === 1
-    && (data[0].status === 'queued'
-      || data[0].status === 'confirmed');
+  return Array.isArray(data) && data.length === 1 && (data[0].status === 'queued' || data[0].status === 'confirmed');
 }
 
 export function getClaimMessage(value: number, destAddrBech32: string): string {
@@ -86,22 +83,14 @@ export async function claimForAddress(
   addrClaimData: AddressClaimData,
   destAddrBech32: string,
   password: string, // only for mnemonic wallet
-  locale: string, // only for Ledger
+  locale: string // only for Ledger
 ): Promise<void> {
-  const  payload = Buffer.from(
-    getClaimMessage(addrClaimData.value, destAddrBech32),
-    'ascii'
-  ).toString('hex');
+  const payload = Buffer.from(getClaimMessage(addrClaimData.value, destAddrBech32), 'ascii').toString('hex');
   let signResult;
   let publicKey;
   if (wallet.type === 'mnemonic') {
     const publicDeriver = await getPublicDeriverById(wallet.publicDeriverId);
-    signResult  = await walletSignData(
-      publicDeriver,
-      password,
-      wallet.stakingAddress,
-      payload,
-    );
+    signResult = await walletSignData(publicDeriver, password, wallet.stakingAddress, payload);
     publicKey = signResult.pubKey;
   } else if (wallet.type === 'ledger') {
     const ledgerConnect = new LedgerConnect({ locale });
@@ -128,14 +117,8 @@ export async function claimForAddress(
         },
       },
     });
-    signResult = await encodeHardwareWalletSignResult(
-      addressFieldHex,
-      signatureHex,
-      payload,
-      signingPublicKeyHex,
-      false,
-    );
-    publicKey = signingPublicKeyHex
+    signResult = await encodeHardwareWalletSignResult(addressFieldHex, signatureHex, payload, signingPublicKeyHex, false);
+    publicKey = signingPublicKeyHex;
   } else {
     throw new Error('unsupported wallet type');
   }
@@ -146,16 +129,13 @@ export async function claimForAddress(
     dest_address: destAddrBech32,
     public_key: publicKey,
   };
-  const resp = await fetch(
-    `${claimEndpoint}/claims/cardano`,
-    {
-      method: 'POST',
-      body: JSON.stringify([params]),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  const resp = await fetch(`${claimEndpoint}/claims/cardano`, {
+    method: 'POST',
+    body: JSON.stringify([params]),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
   if (!resp.ok) {
     let errorMessage = '';
     try {

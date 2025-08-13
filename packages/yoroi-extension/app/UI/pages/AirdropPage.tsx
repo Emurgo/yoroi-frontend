@@ -20,34 +20,34 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 
 type AddressClaimData = {
-  addrHex: string,
-  addrBech32: string,
-  path: Array<number>,
-  value: number,
+  addrHex: string;
+  addrBech32: string;
+  path: Array<number>;
+  value: number;
 };
 
 interface Props {
   stores: {
     wallets: {
       selectedOrFail: {
-        networkId: number,
-        publicDeriverId: number,
-        type: 'mnemonic' | 'ledger' | 'trezor',
+        networkId: number;
+        publicDeriverId: number;
+        type: 'mnemonic' | 'ledger' | 'trezor';
         allAddresses: {
           utxoAddresses: {
             address: {
-              Hash: string,
-              IsUsed: boolean,
-              Type: number,
-            }
-          }[],
-        },
-      },
-    },
+              Hash: string;
+              IsUsed: boolean;
+              Type: number;
+            };
+          }[];
+        };
+      };
+    };
     profile: {
-      currentLocale: string,
-    },
-  }
+      currentLocale: string;
+    };
+  };
 }
 
 const NUMBER_OF_NIGHT_DECIMALS = 6;
@@ -57,7 +57,6 @@ const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
 const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 export default function AirdropPage({ stores }: Readonly<Props>) {
-
   const intl = useIntl();
 
   // null means querying
@@ -77,7 +76,9 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const isTrezor = wallet.type === 'trezor';
 
   const destAddrBech32 = addressHexToBech32(
-    forceNonNull(wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)).address.Hash
+    forceNonNull(
+      wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
+    ).address.Hash
   );
 
   useEffect(() => {
@@ -107,32 +108,27 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   const showClaimDialog = async () => {
     setIsClaimDialog(true);
-  }
+  };
 
   const closeClaimDialog = async () => {
     setIsClaimDialog(false);
-  }
+  };
 
-  const claim = async (password) => {
+  const claim = async password => {
     const addr = unclaimedAddrs[0];
     await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
     setIsClaimDialog(false);
     setIsClaimDone(true);
-  }
+  };
 
   let content;
 
   if (!alloc) {
-    content = (<LoadingSpinner />);
+    content = <LoadingSpinner />;
   } else if (alloc.isZero()) {
-    content = (<Zero />);
+    content = <Zero />;
   } else if (isClaimDone) {
-    content = (
-      <ClaimDone
-        alloc={formattedAlloc}
-        destAddrBech32={destAddrBech32}
-      />
-    );
+    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={destAddrBech32} />;
   } else {
     content = (
       <ClaimContent
@@ -146,20 +142,17 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   }
   return (
     <TopBarLayout
-      banner={<BannerContainer stores={stores}/>}
-      sidebar={<SidebarContainer stores={stores}/>}
+      banner={<BannerContainer stores={stores} />}
+      sidebar={<SidebarContainer stores={stores} />}
       navbar={
-        <NavBarContainerRevamp
-          stores={stores}
-          title={<NavBarTitle title={intl.formatMessage(globalMessages.airdrop)}/>}
-        />
+        <NavBarContainerRevamp stores={stores} title={<NavBarTitle title={intl.formatMessage(globalMessages.airdrop)} />} />
       }
       showInContainer
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {content}
-        {isClaimDialog && (
-          wallet.type === 'mnemonic' ? (
+        {isClaimDialog &&
+          (wallet.type === 'mnemonic' ? (
             <ClaimDialog
               onClose={closeClaimDialog}
               onClaim={claim}
@@ -171,8 +164,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
               onClaim={claim}
               message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
-          )
-        )}
+          ))}
       </Box>
     </TopBarLayout>
   );

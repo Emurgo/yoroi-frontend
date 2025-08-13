@@ -271,7 +271,6 @@ class WalletSummaryRevamp extends Component<Props, State> {
 
 export default (withYoroiRemoteConfig(WalletSummaryRevamp): ComponentType<Props>);
 
-
 export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },
   status: { flex: '1 1 16%', maxWidth: '16%', textAlign: 'left', color: 'grayscale.600' },
