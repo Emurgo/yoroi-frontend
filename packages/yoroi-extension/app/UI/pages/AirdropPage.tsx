@@ -26,7 +26,7 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
 import AbortDialog from '../features/airdrop/useCases/AbortDialog';
-import { ampli } from '../../../ampli.ts';
+import { ampli } from '../../../ampli';
 
 const localStorageApi = new LocalStorageApi();
 

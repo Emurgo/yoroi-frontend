@@ -2,7 +2,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
 import { MidnightBannerIllustration } from '../Dialogs/MidnightBannerIllustration';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
-import { ampli } from '../../../../ampli.ts';
+import { ampli } from '../../../../ampli';
 
 export const MidnightBanner = ({ onClose }) => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
