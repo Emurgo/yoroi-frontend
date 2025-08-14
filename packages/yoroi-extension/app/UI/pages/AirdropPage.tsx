@@ -143,7 +143,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
       ampli.midnightAirdropPageViewed({
         ['is_eligible?']: allocatedAddrs.length > 0,
-        ['is_claimed?']: allocatedAddrs.length > 0 && unclaimedAddrs.length === 0
+        ['is_claimed?']: allocatedAddrs.length > 0 && unclaimedAddrs.length === 0,
       });
     })();
     return () => {

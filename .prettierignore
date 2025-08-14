@@ -39,4 +39,5 @@ packages/yoroi-extension/webpack-mv2/*
 packages/yoroi-extension/.babelrc.js
 # generated code
 packages/yoroi-extension/ampli.ts/index.ts
+packages/yoroi-extension/ampli.json
 
