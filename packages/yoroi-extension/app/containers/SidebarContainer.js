@@ -8,6 +8,7 @@ import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { ROUTES } from '../routes-config';
 import { runInAction } from 'mobx';
 import type { StoresProps } from '../stores';
+import { ampli } from '../../ampli/index';
 
 type State = {|
   featureFlags: { [string]: boolean },
@@ -63,6 +64,9 @@ export default class SidebarContainer extends Component<StoresProps, State> {
           stores.routing.goToRoute({
             route: category.route,
           });
+          if (category.className === 'airdrop') {
+            ampli.midnightAirdropLeftMenuClicked();
+          }
         }}
         isActiveCategory={category => stores.routing.currentRoute.startsWith(category.route)}
         categories={allCategoriesRevamp.filter(

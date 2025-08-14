@@ -26,6 +26,7 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
 import AbortDialog from '../features/airdrop/useCases/AbortDialog';
+import { ampli } from '../../../ampli.ts';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -139,6 +140,11 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       }
       setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
       setUnclaimedAddrs(unclaimedAddrs);
+
+      ampli.midnightAirdropPageViewed({
+        ['is_eligible?']: allocatedAddrs.length > 0,
+        ['is_claimed?']: allocatedAddrs.length > 0 && unclaimedAddrs.length === 0
+      });
     })();
     return () => {
       // switch wallet
@@ -159,6 +165,12 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   };
 
   const claim = async password => {
+    try {
+      ampli.midnightAirdropSignMessage();
+    } catch {
+      // ignore
+    }
+
     const addr = forceNonNull(unclaimedAddrs[0]);
 
     let claimResult;

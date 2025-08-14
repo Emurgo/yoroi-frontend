@@ -2,6 +2,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
 import { MidnightBannerIllustration } from '../Dialogs/MidnightBannerIllustration';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { ampli } from '../../../../ampli.ts';
 
 export const MidnightBanner = ({ onClose }) => {
   const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
@@ -9,11 +10,13 @@ export const MidnightBanner = ({ onClose }) => {
 
   const handleClose = async () => {
     onClose();
+    ampli.midnightAirdropBannerClosed();
   };
 
   const handleClick = () => {
     routes.midnightAirdropClaim();
     onClose();
+    ampli.midnightAirdropBannerCheckEligibility();
   };
 
   return (
