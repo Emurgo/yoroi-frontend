@@ -8,6 +8,8 @@
   "airdrop.claim": "claim allocation",
   "airdrop.claimDialogTitle": "sign message",
   "airdrop.destinationAddress": "Your destination address",
+  "airdrop.error.403": "Error 403: Unable to claim due to API error",
+  "airdrop.error.notResponding": "Midnight API is not responding, please try again later.",
   "airdrop.label": "Airdrop",
   "airdrop.ledgerClaimDialogText": "Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address",
   "airdrop.ledgerClaimDialogTitle": "sign message { index } of { total }",
