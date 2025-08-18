@@ -8,7 +8,13 @@ import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { getAllocatedAddresses, checkClaimForAddress, claimForAddress, getClaimMessage } from '../../api/ada/midnight';
+import {
+  getAllocatedAddresses,
+  checkClaimForAddress,
+  claimForAddress,
+  getClaimMessage,
+  scanForOriginalDestAddress,
+} from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -18,6 +24,12 @@ import ClaimDialog from '../features/airdrop/useCases/ClaimDialog';
 import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
 import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
+import LocalStorageApi from '../../api/localStorage';
+import AbortDialog from '../features/airdrop/useCases/AbortDialog';
+
+const localStorageApi = new LocalStorageApi();
+
+const ALLOW_ABORT_DELAY = 10 * 1000;
 
 type AddressClaimData = {
   addrHex: string;
@@ -40,6 +52,8 @@ interface Props {
               IsUsed: boolean;
               Type: number;
             };
+            // we deal only with base addresses
+            path: [number, number, number, number, number];
           }[];
         };
       };
@@ -64,6 +78,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
   const [isClaimDialog, setIsClaimDialog] = useState(false);
   const [isClaimDone, setIsClaimDone] = useState(false);
+  const [allowAborting, setAllowAborting] = useState(false);
 
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
@@ -81,6 +96,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     ).address.Hash
   );
 
+  const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
+
   useEffect(() => {
     (async () => {
       const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
@@ -94,6 +111,31 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
       if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
         setIsClaimDone(true);
+
+        const airdropClaims = await localStorageApi.getAirdropClaimResults();
+        const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
+        if (currentWalletClaim) {
+          setOriginalDestAddrBech32(currentWalletClaim.destAddr);
+        } else {
+          const result = await scanForOriginalDestAddress(
+            claimEndpoint,
+            destAddrBech32,
+            wallet.allAddresses.utxoAddresses
+              .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+              .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
+              .map(addr => addressHexToBech32(addr.address.Hash))
+          );
+          if (result) {
+            setOriginalDestAddrBech32(result.destAddr);
+            airdropClaims.push({
+              publicDeriverId: wallet.publicDeriverId,
+              destAddr: result.destAddr,
+              claimId: result.claimId,
+              amount: result.amount,
+            });
+            await localStorageApi.saveAirdropClaimResults(airdropClaims);
+          }
+        }
       }
       setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
       setUnclaimedAddrs(unclaimedAddrs);
@@ -103,6 +145,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       setAlloc(null);
       setIsClaimDone(false);
       setUnclaimedAddrs([]);
+      setOriginalDestAddrBech32('');
+      setIsClaimDialog(false);
     };
   }, [wallet.publicDeriverId]);
 
@@ -115,10 +159,31 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   };
 
   const claim = async password => {
-    const addr = unclaimedAddrs[0];
-    await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+    const addr = forceNonNull(unclaimedAddrs[0]);
+
+    let claimResult;
+    let allowAbortDelayTimeoutId = setTimeout(() => {
+      setAllowAborting(true);
+    }, ALLOW_ABORT_DELAY);
+
+    try {
+      claimResult = await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+    } finally {
+      clearTimeout(allowAbortDelayTimeoutId);
+      setAllowAborting(false);
+    }
+    setOriginalDestAddrBech32(destAddrBech32);
     setIsClaimDialog(false);
     setIsClaimDone(true);
+
+    const airdropClaims = await localStorageApi.getAirdropClaimResults();
+    airdropClaims.push({
+      amount: addr.value,
+      claimId: claimResult.claimId,
+      publicDeriverId: wallet.publicDeriverId,
+      destAddr: destAddrBech32,
+    });
+    await localStorageApi.saveAirdropClaimResults(airdropClaims);
   };
 
   let content;
@@ -128,7 +193,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   } else if (alloc.isZero()) {
     content = <Zero />;
   } else if (isClaimDone) {
-    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={destAddrBech32} />;
+    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={originalDestAddrBech32} />;
   } else {
     content = (
       <ClaimContent
@@ -165,6 +230,16 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
               message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
             />
           ))}
+        {isClaimDialog && allowAborting && (
+          <AbortDialog
+            onClose={() => {
+              history.back();
+            }}
+            onContinue={() => {
+              setAllowAborting(false);
+            }}
+          />
+        )}
       </Box>
     </TopBarLayout>
   );
