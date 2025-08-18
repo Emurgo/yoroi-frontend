@@ -2,53 +2,16 @@
 import type { Node } from 'react';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
-import type { SidebarCategoryRevamp } from '../stores/stateless/sidebarCategories';
 import { allCategoriesRevamp } from '../stores/stateless/sidebarCategories';
 import SidebarRevamp from '../components/topbar/SidebarRevamp';
 import { ROUTES } from '../routes-config';
-import { runInAction } from 'mobx';
 import type { StoresProps } from '../stores';
 
-type State = {|
-  featureFlags: { [string]: boolean },
-|};
-
 @observer
-export default class SidebarContainer extends Component<StoresProps, State> {
-  state: State = {
-    featureFlags: {},
-  };
-
+export default class SidebarContainer extends Component<StoresProps> {
   toggleSidebar: void => Promise<void> = async () => {
     await this.props.stores.profile.toggleSidebar();
   };
-
-  componentDidMount(): * {
-    allCategoriesRevamp.forEach(c => {
-      const feature = c.featureFlagName;
-      if (feature != null) {
-        this.props.stores.wallets
-          .getRemoteFeatureFlag(feature)
-          .then((flag: ?boolean) => {
-            if (flag) {
-              runInAction(() => {
-                this.setState(s => ({
-                  featureFlags: { ...s.featureFlags, [feature]: true },
-                }));
-              });
-            }
-            return null;
-          })
-          .catch(e => {
-            console.error('Failed to resolve remote flag for feature: ' + feature, e);
-          });
-      }
-    });
-  }
-
-  categoryFeatureFlagEnabled(category: SidebarCategoryRevamp): boolean {
-    return category.featureFlagName == null || this.state.featureFlags[category.featureFlagName] === true;
-  }
 
   render(): Node {
     const { stores } = this.props;
@@ -65,14 +28,13 @@ export default class SidebarContainer extends Component<StoresProps, State> {
           });
         }}
         isActiveCategory={category => stores.routing.currentRoute.startsWith(category.route)}
-        categories={allCategoriesRevamp.filter(
-          category =>
-            category.isVisible({
-              hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
-              selected: this.props.stores.wallets.selected,
-              currentRoute: this.props.stores.routing.currentRoute,
-              isRewardWallet: wallet => stores.delegation.isRewardWallet(wallet.publicDeriverId),
-            }) && this.categoryFeatureFlagEnabled(category)
+        categories={allCategoriesRevamp.filter(category =>
+          category.isVisible({
+            hasAnyWallets: this.props.stores.wallets.hasAnyWallets === true,
+            selected: this.props.stores.wallets.selected,
+            currentRoute: this.props.stores.routing.currentRoute,
+            isRewardWallet: wallet => stores.delegation.isRewardWallet(wallet.publicDeriverId),
+          })
         )}
       />
     );
