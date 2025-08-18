@@ -72,6 +72,9 @@ export default ({
       'tabs',
       '*://connect.trezor.io/*',
       'https://emurgo.github.io/yoroi-extension-ledger-connect-vnext/*',
+      // to fetch without CORS (https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/permissions#host_permissions)
+      'https://preprod.gd.midnighttge.io/*',
+      'https://mainnet.prod.gd.midnighttge.io/*'
     ],
     content_scripts: [
       {
