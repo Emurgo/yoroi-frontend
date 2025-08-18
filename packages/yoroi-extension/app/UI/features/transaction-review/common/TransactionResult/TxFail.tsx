@@ -1,8 +1,9 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { FailedIlustration } from './FailedIlustration';
 import { useModal } from '../../../../components/modals/ModalContext';
+import { TransactionResult, TransactionResultType } from '../types';
 
-export const TxFail = () => {
+export const TxFail = ({ result }: { result: TransactionResultType }) => {
   const { closeModal } = useModal();
 
   return (
@@ -12,7 +13,9 @@ export const TxFail = () => {
         Transaction failed
       </Typography>
       <Typography variant="body1" mt="8px" color="ds.text_gray_low" textAlign="center" mb="24px">
-        Your transaction has not been processed properly due to technical issues.
+        {result === TransactionResult.CANCEL
+          ? 'Transaction cancelled by user.'
+          : 'Your transaction has not been processed properly due to technical issues.'}
       </Typography>
       <Button
         //  @ts-ignore

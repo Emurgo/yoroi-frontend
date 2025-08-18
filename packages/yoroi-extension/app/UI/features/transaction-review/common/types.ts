@@ -109,6 +109,7 @@ export type AssertAllImplementedCertTypes = AssertEqual<CertificateType, keyof U
 export const TransactionResult = {
   SUCCESS: 'success', //
   FAIL: 'fail', //
+  CANCEL: 'cancel', //
 } as const;
 
 export type TransactionResultType = (typeof TransactionResult)[keyof typeof TransactionResult];
