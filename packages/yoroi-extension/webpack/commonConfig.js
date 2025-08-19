@@ -218,7 +218,14 @@ const definePlugin = (
   isNightly /*: boolean */,
   isLight /*: boolean */ = false,
   isE2E /*: boolean */,
+  test,
 ) /*: * */ => {
+  console.log(networkName /*: string */,
+    isProd /*: boolean */,
+    isNightly /*: boolean */,
+    isLight /*: boolean */ = false,
+    isE2E /*: boolean */,
+    test)
   return {
     'process.env': {
       NODE_ENV: JSON.stringify(isProd ? 'production' : 'development'),
@@ -234,6 +241,7 @@ const definePlugin = (
       POOLS_UI_URL_FOR_YOROI: JSON.stringify(manifestEnvs.POOLS_UI_URL_FOR_YOROI),
       IS_LIGHT: isLight,
       IS_E2E: isE2E,
+      TEST: test || "-",
     },
   };
 };

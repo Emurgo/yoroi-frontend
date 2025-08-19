@@ -35,6 +35,12 @@ const CONFIG: ConfigType = {
     defaultDuration: 0,
     vapidPublicKey: '',
   },
+  yoroiBackend: {
+    mainnet: '',
+    preprod: '',
+    zeroMainnet: '',
+    zeroPreprod: '',
+  },
 };
 
 global.CONFIG = CONFIG;

@@ -21,7 +21,8 @@ function buildProd(env: string) {
   console.log('[Webpack Build]');
   console.log('-'.repeat(80));
 
-  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()}`);
+  // Here I can read OS var and will have 4 different env vars
+  exec(`npx webpack --config webpack/prodConfig.js --progress --profile --color --env networkName=${argv.env} --env nightly=${isNightly.toString()} --env isLight=${(!shouldInjectConnector).toString()} --env isE2E=${isE2E.toString()} --env testMode=https://preprod-backend.yoroiwallet.com`);
 
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');

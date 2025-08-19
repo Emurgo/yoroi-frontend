@@ -18,10 +18,9 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Mainnet',
     NetworkFeatureName: 'mainnet',
     Backend: {
-      BackendService: 'https://api.yoroiwallet.com',
-      TokenInfoService:
-        'https://cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://zero.yoroiwallet.com',
+      BackendService: CONFIG.yoroiBackend.mainnet,
+      TokenInfoService: 'https://cdn.yoroiwallet.com',
+      BackendServiceZero: CONFIG.yoroiBackend.zeroMainnet,
     },
     BaseConfig: ([
       Object.freeze({
@@ -58,10 +57,9 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preprod Testnet',
     NetworkFeatureName: 'preprod',
     Backend: {
-      BackendService: 'https://preprod-backend.yoroiwallet.com',
-      TokenInfoService:
-        'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-preprod-prod.emurgornd.com',
+      BackendService: environment.test || CONFIG.yoroiBackend.preprod,
+      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
+      BackendServiceZero: CONFIG.yoroiBackend.zeroPreprod,
     },
     BaseConfig: ([
       Object.freeze({
@@ -139,12 +137,10 @@ export function listRelevantNetworksForEnvironment(): Array<{| networkId: number
   const keys = isProduction
     ? ['CardanoMainnet', 'CardanoPreprodTestnet']
     : ['CardanoMainnet', 'CardanoPreprodTestnet', 'CardanoPreviewTestnet'];
-  return keys.map(key => ({ key, networkId: networks[key].NetworkId }))
+  return keys.map(key => ({ key, networkId: networks[key].NetworkId }));
 }
 
-export function isTestnet(
-  network: $ReadOnly<NetworkRow>,
-): boolean {
+export function isTestnet(network: $ReadOnly<NetworkRow>): boolean {
   return network.NetworkId !== networks.CardanoMainnet.NetworkId;
 }
 
@@ -184,11 +180,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
             type: 'Cardano',
             policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
             assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
-            ticker:
-              network === networks.CardanoPreprodTestnet ||
-              network === networks.CardanoPreviewTestnet
-                ? 'TADA'
-                : 'ADA',
+            ticker: network === networks.CardanoPreprodTestnet || network === networks.CardanoPreviewTestnet ? 'TADA' : 'ADA',
             logo: null, // TODO: maybe put built-in ADA logo as base64 here
             longName: null,
             numberOfDecimals: 6,
@@ -200,8 +192,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
   });
 
 export function getDefaultAssetByNetworkId(id: number): $Diff<TokenInsert, {| Digest: number |}> {
-  return defaultAssets.find(asset => asset.NetworkId === id)
-    ?? fail('No default asset found for network ID: ' + id);
+  return defaultAssets.find(asset => asset.NetworkId === id) ?? fail('No default asset found for network ID: ' + id);
 }
 
 export function getDefaultAssetByWallet(wallet: WalletState): $Diff<TokenInsert, {| Digest: number |}> {
