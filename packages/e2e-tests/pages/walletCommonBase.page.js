@@ -26,6 +26,10 @@ export default class WalletCommonBase extends BasePage {
     locator: 'sidebar.voting',
     method: 'id',
   };
+  portfolioTabButtonLocator = {
+    locator: 'sidebar.portfolio',
+    method: 'id',
+  };
   connectorTabButtonLocator = {
     locator: 'connector.appNameShort',
     method: 'id',
@@ -214,6 +218,10 @@ export default class WalletCommonBase extends BasePage {
   async goToNftsTab() {
     this.logger.info(`WalletCommonBase::goToNftsTab is called`);
     await this.click(this.nftsTabButtonLocator);
+  }
+  async goToPortfolioTab() {
+    this.logger.info(`WalletCommonBase::goToPortfolioTab is called`);
+    await this.click(this.portfolioTabButtonLocator);
   }
   async goToVotingTab() {
     this.logger.info(`WalletCommonBase::goToVotingTab is called`);
