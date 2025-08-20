@@ -63,6 +63,7 @@ export default ({
     },
     icons,
     background: {
+      scripts: ['js/background-service-worker.js'],
       service_worker: 'js/background-service-worker.js',
     },
     permissions: [
