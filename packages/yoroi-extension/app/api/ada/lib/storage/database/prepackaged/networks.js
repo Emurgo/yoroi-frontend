@@ -1,7 +1,6 @@
 // @flow
 
 import { CoinTypes } from '../../../../../../config/numbersConfig';
-import environment from '../../../../../../environment';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import type { CardanoHaskellBaseConfig, CardanoHaskellConfig, NetworkRow, TokenInsert } from '../primitives/tables';
 import { fail } from '../../../../../../coreUtils';
@@ -91,52 +90,10 @@ export const networks = Object.freeze({
     CoinType: CoinTypes.CARDANO,
     Fork: CardanoForks.Haskell,
   }: NetworkRow),
-  CardanoPreviewTestnet: ({
-    NetworkId: 3_50,
-    NetworkName: 'Cardano Preview Testnet',
-    NetworkFeatureName: 'preview',
-    Backend: {
-      BackendService: 'https://preview-backend.emurgornd.com',
-      TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-preview.emurgornd.com',
-    },
-    BaseConfig: ([
-      Object.freeze({
-        StartAt: 0,
-        ChainNetworkId: '0',
-        ByronNetworkId: 2,
-        GenesisDate: '1666656000000',
-        SlotsPerEpoch: 21600,
-        SlotDuration: 20,
-      }),
-      Object.freeze({
-        StartAt: 0,
-        SlotsPerEpoch: 86400,
-        SlotDuration: 1,
-        PerEpochPercentageReward: 69344,
-        LinearFee: {
-          coefficient: '44',
-          constant: '155381',
-        },
-        CoinsPerUtxoWord: '34482',
-        MinimumUtxoVal: '1000000',
-        PoolDeposit: '500000000',
-        KeyDeposit: '2000000',
-      }),
-      Object.freeze({
-        CoinsPerUtxoByte: '4310',
-      }),
-    ]: CardanoHaskellBaseConfig),
-    CoinType: CoinTypes.CARDANO,
-    Fork: CardanoForks.Haskell,
-  }: NetworkRow),
 });
 
 export function listRelevantNetworksForEnvironment(): Array<{| networkId: number, key: string |}> {
-  const isProduction = environment.isProduction() && !environment.isNightly();
-  const keys = isProduction
-    ? ['CardanoMainnet', 'CardanoPreprodTestnet']
-    : ['CardanoMainnet', 'CardanoPreprodTestnet', 'CardanoPreviewTestnet'];
+  const keys = ['CardanoMainnet', 'CardanoPreprodTestnet'];
   return keys.map(key => ({ key, networkId: networks[key].NetworkId }));
 }
 
@@ -180,7 +137,7 @@ export const defaultAssets: Array<$Diff<TokenInsert, {| Digest: number |}>> = Ob
             type: 'Cardano',
             policyId: PRIMARY_ASSET_CONSTANTS.Cardano,
             assetName: PRIMARY_ASSET_CONSTANTS.Cardano,
-            ticker: network === networks.CardanoPreprodTestnet || network === networks.CardanoPreviewTestnet ? 'TADA' : 'ADA',
+            ticker: network === networks.CardanoPreprodTestnet ? 'TADA' : 'ADA',
             logo: null, // TODO: maybe put built-in ADA logo as base64 here
             longName: null,
             numberOfDecimals: 6,
