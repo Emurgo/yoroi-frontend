@@ -50,7 +50,7 @@ function ConfirmSwapTransaction({
     onSuccess: data => {
       onRemoteOrderDataResolved(data).catch(e => {
         console.error('Failed to handle remote order resolution', e);
-        if (e?.name === 'NotEnoughMoneyToSendError') {
+        if (e?.id === 'api.errors.NotEnoughMoneyToSendError') {
           setOrderStepValue(0);
           sellFeeAmountErrorChanged(strings.notEnoughBalanceFees);
         } else {
