@@ -130,7 +130,6 @@ function Dialog(props: Props): Node {
             variant="body1"
             className="dialog__title"
             id={String(id) + '-dialogTitle-text'}
-            color="ds.text_gray_medium"
             forceTopDivider={forceTopDivider}
           >
             {title}
@@ -272,6 +271,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
       fontWeight: 500,
       textAlign: 'center',
       textTransform: 'uppercase',
+      color: theme.palette.ds.text_gray_medium,
       letterSpacing: 0,
       display: 'block',
       borderBottom: theme.name === 'classic' || theme.name === 'modern' ? '' : revampBorder,
@@ -283,7 +283,7 @@ export const ModalContainer: any => Node = styled(StyledBox)(({ theme, contentHa
 
 const Title = styled(Typography)(({ theme, forceTopDivider }) => ({
   borderBottom: forceTopDivider ? '1px solid' : '',
-  borderBottomColor: theme.palette.grayscale['200']
+  borderBottomColor: theme.palette.grayscale['200'],
 }));
 
 const ModalContent = styled(Box)(({ theme }) => ({
@@ -318,7 +318,7 @@ const ModalFooter = styled(StyledBox)(({ theme, hasDivider }) => ({
 
 function getBtnVariant(
   danger?: boolean,
-  primary?: boolean,
+  primary?: boolean
 ): {|
   variant: 'contained' | 'outlined' | 'danger' | 'primary' | 'secondary',
   color?: 'primary' | 'secondary' | 'error',

@@ -13,12 +13,7 @@ import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import { isChrome, walletNameShortener } from '../utils/utils.js';
-import {
-  extensionTabName,
-  serviceWorkersLink,
-  serviceWorkersTabName,
-  WindowManager,
-} from './windowManager.js';
+import { extensionTabName, serviceWorkersLink, serviceWorkersTabName, WindowManager } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
 import { WebDriver } from 'selenium-webdriver';
@@ -65,12 +60,8 @@ export const checkCorrectWalletIsDisplayed = async (webdriver, logger, testWalle
   expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
   const walletInfo = await transactionsPage.getSelectedWalletInfo();
   const shortedWalletName = walletNameShortener(testWallet.name);
-  expect(walletInfo.name, `The wallet name should be "${testWallet.name}"`).to.equal(
-    shortedWalletName
-  );
-  expect(walletInfo.plate, `The wallet plate should be "${testWallet.plate}"`).to.equal(
-    testWallet.plate
-  );
+  expect(walletInfo.name, `The wallet name should be "${testWallet.name}"`).to.equal(shortedWalletName);
+  expect(walletInfo.plate, `The wallet plate should be "${testWallet.plate}"`).to.equal(testWallet.plate);
 };
 
 export const createWallet = async (webdriver, logger, testWalletName) => {
@@ -104,12 +95,8 @@ export const createWallet = async (webdriver, logger, testWalletName) => {
   expect(walletInfo.balance, 'The wallet balance should be 0 (zero)').to.equal(0);
   const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
   const shortedWalletName = walletNameShortener(testWalletName);
-  expect(walletInfo.name, `The wallet name should be "${testWalletName}"`).to.equal(
-    shortedWalletName
-  );
-  expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(
-    expWalletPlate
-  );
+  expect(walletInfo.name, `The wallet name should be "${testWalletName}"`).to.equal(shortedWalletName);
+  expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(expWalletPlate);
   return walletInfo;
 };
 
@@ -134,12 +121,7 @@ export const switchToPreprod = async (webdriver, logger, shouldBeModalWindow) =>
   await generalSettingsPage.goToWalletTab();
 };
 
-export const preloadDBAndStorage = async (
-  webdriver,
-  logger,
-  templateName,
-  useGeneralStorageInfo = true
-) => {
+export const preloadDBAndStorage = async (webdriver, logger, templateName, useGeneralStorageInfo = true) => {
   logger.info(`--------------------- preloadDBAndStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
   const state = await addWalletPage.isDisplayed();
@@ -218,19 +200,13 @@ export const collectInfo = async (mochaContext, webdriver, logger) => {
 
 /**
  * The function loads IndexedDB and local storage for the specified wallet
- * @param {WebDriver} webdriver 
- * @param {Logger} logger 
- * @param {string} testWalletName 
- * @param {mocha.Context} mochaContext 
- * @param {boolean} useGeneralStorageInfo 
+ * @param {WebDriver} webdriver
+ * @param {Logger} logger
+ * @param {string} testWalletName
+ * @param {mocha.Context} mochaContext
+ * @param {boolean} useGeneralStorageInfo
  */
-export const prepareWallet = async (
-  webdriver,
-  logger,
-  testWalletName,
-  mochaContext,
-  useGeneralStorageInfo = true
-) => {
+export const prepareWallet = async (webdriver, logger, testWalletName, mochaContext, useGeneralStorageInfo = true) => {
   try {
     await preloadDBAndStorage(webdriver, logger, testWalletName, useGeneralStorageInfo);
     await waitTxPage(webdriver, logger);

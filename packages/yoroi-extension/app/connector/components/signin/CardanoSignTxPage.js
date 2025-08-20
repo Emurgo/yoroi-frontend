@@ -25,7 +25,6 @@ import { SelectedExplorer } from '../../../domain/SelectedExplorer';
 import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import CardanoUtxoDetails from './cardano/UtxoDetails';
 import { Box } from '@mui/system';
-import { WrongPassphraseError } from '../../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { ReactComponent as ExternalLinkIcon } from '../../assets/images/external-link.inline.svg';
 import CardanoSignTx from './cardano/SignTx';
 import CardanoSignTxSummary from './cardano/SignTxSummary';
@@ -36,6 +35,7 @@ import { hexToUtf } from '../../../coreUtils';
 import ConnectionInfo from '../../../UI/features/connector/useCases/ConnectionInfo';
 // $FlowIgnore: suppressing this error
 import SignTxTabs from '../../../UI/features/connector/useCases/SignTxTabs';
+import { IncorrectWalletPasswordError } from '../../../api/common/errors';
 
 const messages = defineMessages({
   incorrectWalletPasswordError: {
@@ -122,7 +122,7 @@ type DisplayAmount = {|
 
 @observer
 class SignTxPage extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isSubmitting: false,
   };
@@ -170,12 +170,8 @@ class SignTxPage extends Component<Props, State> {
               this.setState({ isSubmitting: false });
             })
             .catch(error => {
-              if (error instanceof WrongPassphraseError) {
-                this.form
-                  .$('walletPassword')
-                  .invalidate(
-                    this.context.formatMessage(messages.incorrectWalletPasswordError)
-                  );
+              if (error instanceof IncorrectWalletPasswordError) {
+                this.form.$('walletPassword').invalidate(this.context.formatMessage(messages.incorrectWalletPasswordError));
               } else {
                 throw error;
               }

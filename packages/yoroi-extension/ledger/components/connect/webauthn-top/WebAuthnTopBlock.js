@@ -12,43 +12,32 @@ const messages = defineMessages({
   noteText: {
     id: 'webauthn.note',
     defaultMessage: '!!!Do not press the <strong>Cancel</strong> button',
-  }
+  },
 });
 
 type Props = {|
   showWebAuthnTop: boolean,
-  isFirefox: boolean
-|}
+  isFirefox: boolean,
+|};
 
 @observer
 export default class WebAuthnTopBlock extends React.Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
-    const {
-      showWebAuthnTop,
-      isFirefox
-    } = this.props;
+    const { showWebAuthnTop, isFirefox } = this.props;
 
     if (!showWebAuthnTop) {
       // Do not show this component
-      return (null);
+      return null;
     }
 
-    const styleComponent = isFirefox ?
-      `${styles.component} ${styles.componentFirefox}` :
-      `${styles.component}`;
+    const styleComponent = isFirefox ? `${styles.component} ${styles.componentFirefox}` : `${styles.component}`;
 
     return (
       <div className={styleComponent}>
         <div className={styles.warningBlock}>
-          <img
-            className={styles.warningIcon}
-            src={imgWarningIcon}
-            alt="Warning Icon"
-          />
-          <div className={styles.text}>
-            {<FormattedMessage {...messages.noteText} values={{ strong }}/>}
-          </div>
+          <img className={styles.warningIcon} src={imgWarningIcon} alt="Warning Icon" />
+          <div className={styles.text}>{<FormattedMessage {...messages.noteText} values={{ strong }} />}</div>
         </div>
       </div>
     );

@@ -16,6 +16,8 @@ import LocalStorageApi from '../../../api/localStorage/index';
 import environment from '../../../environment';
 import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
 import type { StoresProps } from '../../../stores';
+// $FlowIgnore: suppressing this error
+import EnableNotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/EnableNotificationsSettings';
 
 // $FlowIgnore[cannot-resolve-module]
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
@@ -61,7 +63,7 @@ const canUseSandbox = environment.isDev() || environment.isNightly();
 
 @observer
 export default class GeneralSettingsPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   componentDidMount() {
     const request = this.props.stores.wallets.getCashbackWalletRequest;
     request.reset();
@@ -137,9 +139,9 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             onSetUseSandbox={
               canUseSandbox
                 ? async useSandbox => {
-                  await profileStore.setBringSandboxRequest.execute(useSandbox);
-                  await profileStore.getBringSandboxRequest.execute();
-                }
+                    await profileStore.setBringSandboxRequest.execute(useSandbox);
+                    await profileStore.getBringSandboxRequest.execute();
+                  }
                 : null
             }
             error={null}
@@ -155,9 +157,13 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             />
           )}
           <ThemeSettingsBlock />
+          <EnableNotificationsSettings
+            isEnabled={stores.pushNotificationStore.isEnabled}
+            toggle={stores.pushNotificationStore.toggleEnabled}
+          />
           <AboutYoroiSettingsBlock
             wallet={stores.wallets.selected}
-            pushSubscription={stores.pushNotificationStore.subscription}
+            fcmToken={stores.pushNotificationStore.fcmToken}
             onSwitchNetwork={() =>
               stores.uiDialogs.open({
                 dialog: SwitchNetworkDialogContainer,
@@ -167,5 +173,5 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
         </Box>
       </ModalProvider>
     );
-}
+  }
 }

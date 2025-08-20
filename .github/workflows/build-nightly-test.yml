@@ -1,0 +1,44 @@
+name: Build Nightly for Testing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-nightly:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Read Node Version from .nvmrc
+        id: nvm
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+
+      - name: Install Dependencies
+        run: |
+          . install-all.sh
+
+      - name: Build Nightly app
+        working-directory: ./packages/yoroi-extension
+        run: |
+          npm run prod:nightly
+
+      - name: Check if the Nightly build output is correct
+        working-directory: ./packages/yoroi-extension/build/js
+        run: |
+          if [ ! -f inject.js ]; then
+            echo "Build failed: inject.js not found"
+            exit 1
+          fi
+
+      - name: Upload Nightly Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yoroi-nightly-build
+          path: ./packages/yoroi-extension/Yoroi\ Nightly.zip

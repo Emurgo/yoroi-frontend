@@ -1,7 +1,5 @@
 // @flow
-import {
-  MultiToken,
-} from '../api/common/lib/MultiToken';
+import { MultiToken } from '../api/common/lib/MultiToken';
 
 type TimestampedAmount = {|
   timestamp: number,

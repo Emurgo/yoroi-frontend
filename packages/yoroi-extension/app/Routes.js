@@ -220,23 +220,11 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
           <Route path={ROUTES.CASHBACK.ROOT} element={<CashbackPage stores={stores} />} />
           <Route path={ROUTES.WALLETS.ADD} element={<AddWalletPage stores={stores} />} />
-          <Route
-            path={ROUTES.WALLETS.RESTORE_WALLET}
-            element={<RestoreWalletPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.WALLETS.CREATE_NEW_WALLET}
-            element={<CreateWalletPage stores={stores} />}
-          />
-          <Route
-            path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES}
-            element={<ConnectedWebsitesPage stores={stores} />}
-          />
+          <Route path={ROUTES.WALLETS.RESTORE_WALLET} element={<RestoreWalletPage stores={stores} />} />
+          <Route path={ROUTES.WALLETS.CREATE_NEW_WALLET} element={<CreateWalletPage stores={stores} />} />
+          <Route path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES} element={<ConnectedWebsitesPage stores={stores} />} />
           <Route element={<DappCenterSubpages stores={stores} />}>
-            <Route
-              path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER}
-              element={<DappCenterPage stores={stores} />}
-            />
+            <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
           </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
@@ -403,13 +391,17 @@ const AssetsSubpages = ({ stores }) => (
 
 const DappCenterSubpages = ({ stores }) => (
   <DappCenterContextProvider stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </DappCenterContextProvider>
 );
 
 const CatalystRegistrationSubpages = ({ stores }) => (
   <CatalystRegistrationContextProvider stores={stores}>
-    <Suspense fallback={null}><Outlet /></Suspense>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
   </CatalystRegistrationContextProvider>
 );
 

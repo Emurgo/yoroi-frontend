@@ -8,14 +8,8 @@ import { StyledLink } from './StakePool/StakePool.styles';
 import { asQuantity } from '../../../../UI/utils/createCurrentWalletInfo';
 
 export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool, poolId, poolName, stores, socialMediaInfo }) => {
-  const {
-    openTxReviewModal,
-    startLoadingTxReview,
-    stakeKeyDeposit,
-    primaryTokenInfo,
-    showTxResultModal,
-    stakingRewards,
-  } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, stakingRewards } =
+    useTxReviewModal();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
 
@@ -90,10 +84,11 @@ export const UndelegateButton = ({ poolTransition, intl, delegateToSpecificPool,
       onClick={handleUndelegate}
       disabled={!handleUndelegate}
       sx={{
-        lineHeight: '21px',
+        lineHeight: '22px',
         '&.MuiButton-sizeMedium': {
+          fontSize: '14px',
           height: 'unset',
-          p: '9px 15px',
+          p: '9px 20px',
         },
       }}
     >
@@ -112,7 +107,7 @@ const OperationsDetails = ({ stakeKeyDeposit, avatarGenerated, poolName, intl, s
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{intl.formatMessage(globalMessages.undelegatePool)}</Typography>
 
-        <Stack direction="row" spacing={1} alignItems="center">
+        <Stack direction="row" spacing={8} alignItems="center">
           <Box
             sx={{
               width: '24px',

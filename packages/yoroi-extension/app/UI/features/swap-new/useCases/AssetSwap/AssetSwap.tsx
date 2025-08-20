@@ -9,10 +9,19 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../../common/constants';
+import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
+import { useEffect } from 'react';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
+import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
+import { ErrorMessage } from '../../common/components/ErrorMessage';
+import { TransactionResult } from '../../../transaction-review/common/types';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
+  const { createOrder, swapForm, tokenInfos, isCreateOrderLoading, stores } = useSwapRevamp();
   const { openModal } = useModal();
+  const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
+  const wallet = stores.wallets.selectedOrFail;
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
@@ -22,6 +31,45 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
+
+  // @ts-ignore
+  const handleSubmitTransaction = async password => {
+    const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
+    // @ts-ignore
+    const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
+      wallet,
+      swapState: swapForm,
+      tokenInfos,
+      parsedCbor,
+    });
+
+    try {
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest: unisgnedTxRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
+      showTxResultModal(TransactionResult.SUCCESS);
+    } catch (e) {
+      showTxResultModal(TransactionResult.FAIL);
+    } finally {
+      swapForm.action({ type: SwapAction.ResetForm });
+      closeTxReviewModal();
+    }
+  };
+
+  useEffect(() => {
+    if (swapForm.createTx?.cbor) {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: passswordInput => {
+          handleSubmitTransaction(passswordInput);
+        },
+        cborTx: swapForm.createTx.cbor,
+      });
+    }
+  }, [swapForm.createTx]);
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
@@ -33,11 +81,16 @@ export const AssetSwap = () => {
         <SwitchAssets />
         <AssetInput direction={ASSET_DIRECTION_OUT} onAssetSelect={() => openSelectAssetModal(ASSET_DIRECTION_OUT)} />
         <Stack {...atoms.pt_lg} />
+        <ErrorMessage />
         <EstimateSummary />
       </Stack>
       <LoadingButton
         //  @ts-ignore
         variant="primary"
+        onClick={() => {
+          createOrder();
+        }}
+        loading={isCreateOrderLoading}
       >
         Swap
       </LoadingButton>

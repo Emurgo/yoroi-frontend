@@ -9,7 +9,6 @@ type Props = {
 };
 
 const GovernanceDelegationFormPage = (props: Props): any => {
-
   const { ampli } = useGovernance();
   React.useEffect(() => {
     // ON MOUNT

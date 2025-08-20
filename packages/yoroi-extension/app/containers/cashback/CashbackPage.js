@@ -382,15 +382,16 @@ const CashbackPageContainer = observer((props: AllProps) => {
   // wallet, to be shown in a warning dialog.
   const [shownCashbackWallet, setShownCashbackWallet] = useState(null);
 
-  const getCashbackWalletRequest = () => stores.wallets.getCashbackWalletRequest
-    .execute()
-    .then(currentCashbackWallet => {
-      if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
-        setShownCashbackWallet(currentCashbackWallet);
-      }
-      return 'nonsense';
-    })
-    .catch(console.error);
+  const getCashbackWalletRequest = () =>
+    stores.wallets.getCashbackWalletRequest
+      .execute()
+      .then(currentCashbackWallet => {
+        if (currentCashbackWallet && currentCashbackWallet !== stores.wallets.selected) {
+          setShownCashbackWallet(currentCashbackWallet);
+        }
+        return 'nonsense';
+      })
+      .catch(console.error);
 
   const [shouldShowDisclaimer, setShouldShowDisclaimer] = useState(false);
 
@@ -403,7 +404,7 @@ const CashbackPageContainer = observer((props: AllProps) => {
           setShouldShowDisclaimer(true);
           return 'nonsense';
         }
-        getCashbackWalletRequest()
+        getCashbackWalletRequest();
         return 'nonsense';
       })
       .catch(console.error);
@@ -553,14 +554,13 @@ const CashbackPageContainer = observer((props: AllProps) => {
   );
 });
 
-
-const CloseButton = ({onClick}) => {
+const CloseButton = ({ onClick }) => {
   return (
     <SIconBtn onClick={onClick}>
       <CloseCrossRevamp />
     </SIconBtn>
-  )
-}
+  );
+};
 
 const SIconBtn = styled(IconButton)(({ theme, active }) => ({
   backgroundColor: active && theme.palette.ds.gray_200,

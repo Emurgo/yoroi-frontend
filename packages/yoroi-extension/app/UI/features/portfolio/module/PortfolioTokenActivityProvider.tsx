@@ -66,21 +66,21 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
   }, [actions, ftAssetList, queryClient]);
 
   // Use `useQuery` hooks to fetch and cache the token activity data for each interval
-  const { data: data24h, isLoading: loading24h, error: data24hError } = useMultiTokenActivity(
-    state.secondaryTokenIds,
-    '24h',
-    backendServiceZero
-  );
-  const { data: data7d, isLoading: loading7d, error: data7dError } = useMultiTokenActivity(
-    state.secondaryTokenIds,
-    '7d',
-    backendServiceZero
-  );
-  const { data: data30d, isLoading: loading30d, error: data30dError } = useMultiTokenActivity(
-    state.secondaryTokenIds,
-    '30d',
-    backendServiceZero
-  );
+  const {
+    data: data24h,
+    isLoading: loading24h,
+    error: data24hError,
+  } = useMultiTokenActivity(state.secondaryTokenIds, '24h', backendServiceZero);
+  const {
+    data: data7d,
+    isLoading: loading7d,
+    error: data7dError,
+  } = useMultiTokenActivity(state.secondaryTokenIds, '7d', backendServiceZero);
+  const {
+    data: data30d,
+    isLoading: loading30d,
+    error: data30dError,
+  } = useMultiTokenActivity(state.secondaryTokenIds, '30d', backendServiceZero);
 
   useEffect(() => {
     if (data24h || data7d || data30d) {

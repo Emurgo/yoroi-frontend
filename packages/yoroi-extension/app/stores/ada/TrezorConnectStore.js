@@ -2,7 +2,7 @@
 // Handles Connect to Trezor Hardware Wallet dialog
 
 import { action, observable } from 'mobx';
-import type { CardanoPublicKey, DeviceEvent, Success, UiEvent, Unsuccessful, } from 'trezor-connect-flow';
+import type { CardanoPublicKey, DeviceEvent, Success, UiEvent, Unsuccessful } from 'trezor-connect-flow';
 import TrezorConnect from 'trezor-connect-flow';
 import Store from '../base/Store';
 import globalMessages from '../../i18n/global-messages';
@@ -15,8 +15,8 @@ import Config from '../../config';
 import { HWConnectStoreTypes, HWDeviceInfo, ProgressInfo, ProgressStep } from '../../types/HWConnectStoreTypes';
 import { StepState } from '../../components/widgets/ProgressSteps';
 import { Logger, stringifyError } from '../../utils/logging';
-import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
-import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
+import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
@@ -28,11 +28,7 @@ type TrezorConnectionResponse = {|
   trezorEventDevice: DeviceEvent,
 |};
 
-
-export default class TrezorConnectStore
-  extends Store<StoresMap>
-  implements HWConnectStoreTypes<TrezorConnectionResponse> {
-
+export default class TrezorConnectStore extends Store<StoresMap> implements HWConnectStoreTypes<TrezorConnectionResponse> {
   // =================== VIEW RELATED =================== //
   /** the only observable which manages state change */
   @observable progressInfo: ProgressInfo;
@@ -55,17 +51,17 @@ export default class TrezorConnectStore
   }
 
   /** device info which will be used to create wallet (except wallet name)
-    * also it holds Trezor device label which is used as default wallet name
-    * final wallet name will be fetched from the user */
+   * also it holds Trezor device label which is used as default wallet name
+   * final wallet name will be fetched from the user */
   hwDeviceInfo: ?HWDeviceInfo;
 
   /** holds Trezor device DeviceMessage event object, device features will be fetched
-    * from this object and will be converted to TrezorDeviceInfo object */
+   * from this object and will be converted to TrezorDeviceInfo object */
   trezorEventDevice: ?DeviceEvent;
   // =================== VIEW RELATED =================== //
 
   /** While trezor wallet creation is taking place, we need to block users from starting a
-    * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
+   * trezor wallet creation on a seperate wallet and explain to them why the action is blocked */
   @observable isCreateHWActive: boolean = false;
   // =================== API RELATED =================== //
 
@@ -81,10 +77,10 @@ export default class TrezorConnectStore
   }
 
   /** setup() is called when stores are being created
-    * _init() is called when connect dialog is about to show */
+   * _init() is called when connect dialog is about to show */
   init: void => void = () => {
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this.init)} called`);
-  }
+  };
 
   teardown(): void {
     this._reset();
@@ -141,34 +137,33 @@ export default class TrezorConnectStore
       this.hwDeviceInfo = undefined;
 
       const trezorResp = await wrapWithFrame(
-        trezor => trezor.cardanoGetPublicKey({
-          path: this.getPath(),
-          showOnTrezor: false
-        }),
+        trezor =>
+          trezor.cardanoGetPublicKey({
+            path: this.getPath(),
+            showOnTrezor: false,
+          }),
         this._onTrezorDeviceEvent,
-        this._onTrezorUIEvent,
+        this._onTrezorUIEvent
       );
 
       const trezorEventDevice = this.trezorEventDevice;
 
       /** Converts a valid hardware wallet response to a common storable format
-        * later the same format will be used to create wallet */
+       * later the same format will be used to create wallet */
       this.hwDeviceInfo = this._normalizeHWResponse({ trezorResp, trezorEventDevice });
 
       // It's a valid trezor device, go to Save Load state
       this._goToSaveLoad();
 
       /** TODO: [TREZOR] handle when user forcefully close Connect to Trezor Hardware Wallet
-        * while connection in is progress */
+       * while connection in is progress */
       Logger.info('Trezor device OK');
     } catch (error) {
       this._handleConnectError(error);
     }
   };
 
-  _normalizeHWResponse: (TrezorConnectionResponse) => HWDeviceInfo = (
-    resp,
-  ) => {
+  _normalizeHWResponse: TrezorConnectionResponse => HWDeviceInfo = resp => {
     this._validateHWResponse(resp);
     if (!resp.trezorResp.success) {
       throw new Error(`${nameof(TrezorConnectStore)}::${nameof(this._normalizeHWResponse)} should never happen`);
@@ -188,12 +183,10 @@ export default class TrezorConnectStore
       },
       defaultName: device?.label || '',
     };
-  }
+  };
 
   /** Validates the compatibility of data which we have received from Trezor device */
-  _validateHWResponse: TrezorConnectionResponse => boolean = (
-    resp,
-  ) => {
+  _validateHWResponse: TrezorConnectionResponse => boolean = resp => {
     const { trezorResp } = resp;
 
     if (trezorResp && !trezorResp.success) {
@@ -210,17 +203,19 @@ export default class TrezorConnectStore
       }
     }
 
-    if (trezorResp == null
-      || trezorResp.payload == null
-      || trezorResp.payload.publicKey == null
-      || trezorResp.payload.publicKey.length <= 0) {
+    if (
+      trezorResp == null ||
+      trezorResp.payload == null ||
+      trezorResp.payload.publicKey == null ||
+      trezorResp.payload.publicKey.length <= 0
+    ) {
       throw new Error('Invalid public key received from Trezor device');
     }
 
     return true;
   };
 
-  _handleConnectError: Error => void = (error) => {
+  _handleConnectError: Error => void = error => {
     Logger.error(`${nameof(TrezorConnectStore)}::${nameof(this._handleConnectError)} ${stringifyError(error)}`);
 
     this.hwDeviceInfo = undefined;
@@ -234,12 +229,12 @@ export default class TrezorConnectStore
     this._goToConnectError();
   };
 
-  _onTrezorDeviceEvent: DeviceEvent => void = (event) => {
+  _onTrezorDeviceEvent: DeviceEvent => void = event => {
     Logger.debug(`TrezorConnectStore:: DEVICE_EVENT: ${event.type}`);
     this.trezorEventDevice = event;
   };
 
-  _onTrezorUIEvent: UiEvent => void = (event) => {
+  _onTrezorUIEvent: UiEvent => void = event => {
     Logger.debug(`TrezorConnectStore:: UI_EVENT: ${event.type}`);
     // TODO: [TREZOR] https://github.com/Emurgo/yoroi-frontend/issues/126
     // if(event.type === CLOSE_UI_WINDOW &&
@@ -261,30 +256,22 @@ export default class TrezorConnectStore
   };
 
   /** SAVE dialog submit (Save button) */
-  @action submitSave: string => Promise<void> = async (
-    walletName,
-  ) => {
+  @action submitSave: string => Promise<void> = async walletName => {
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
 
-    await this._saveHW(
-      walletName,
-    );
+    await this._saveHW(walletName);
     ampli.connectWalletDetailsSubmitted({ hardware_wallet: 'Trezor' });
   };
 
   /** creates new wallet and loads it */
-  _saveHW: string => Promise<void> = async (
-    walletName,
-  )  => {
+  _saveHW: string => Promise<void> = async walletName => {
     try {
       Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._saveHW)}:: stated`);
       this._setIsCreateHWActive(true);
 
-      const reqParams = this._prepareCreateHWReqParams(
-        walletName,
-      );
+      const reqParams = this._prepareCreateHWReqParams(walletName);
 
       const newWallet = await createHardwareWallet(reqParams);
 
@@ -315,12 +302,8 @@ export default class TrezorConnectStore
     }
   };
 
-  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = (
-    walletName,
-  ) => {
-    if (this.hwDeviceInfo == null
-      || this.hwDeviceInfo.publicMasterKey == null
-      || this.hwDeviceInfo.hwFeatures == null) {
+  _prepareCreateHWReqParams: string => CreateHardwareWalletRequest = walletName => {
+    if (this.hwDeviceInfo == null || this.hwDeviceInfo.publicMasterKey == null || this.hwDeviceInfo.hwFeatures == null) {
       throw new Error('Trezor device hardware info not valid');
     }
     const { publicMasterKey, hwFeatures } = this.hwDeviceInfo;
@@ -338,18 +321,18 @@ export default class TrezorConnectStore
       hwFeatures,
       network: selectedNetwork,
     };
-  }
+  };
 
   getPath: void => Array<number> = () => {
     return [WalletTypePurpose.CIP1852, CoinTypes.CARDANO, this.derivationIndex];
-  }
+  };
 
   @action _goToSaveError: void => void = () => {
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.ERROR;
   };
 
-  _onSaveSuccess: (WalletState) => Promise<void> = async (wallet) => {
+  _onSaveSuccess: WalletState => Promise<void> = async wallet => {
     // close the active dialog
     Logger.debug(`${nameof(TrezorConnectStore)}::${nameof(this._onSaveSuccess)} success, closing dialog`);
     this.stores.uiDialogs.closeActiveDialog();
@@ -368,17 +351,18 @@ export default class TrezorConnectStore
   // =================== SAVE =================== //
 
   // =================== API =================== //
-  @action _setIsCreateHWActive: boolean => void = (active) => {
+  @action _setIsCreateHWActive: boolean => void = active => {
     this.isCreateHWActive = active;
   };
 
   // this is used to inject test data
-  setSelectedMockWallet: string => Promise<void> = async (serial) => {
+  // prettier-ignore
+  setSelectedMockWallet: string => Promise<void> = async serial => {
     // $FlowExpectedError[prop-missing] only added in tests
     if (TrezorConnect.setSelectedWallet != null) { // eslint-disable-line no-restricted-properties
       // $FlowExpectedError[not-a-function] only added in tests
       await TrezorConnect.setSelectedWallet(serial); // eslint-disable-line no-restricted-properties
     }
-  }
+  };
   // =================== API =================== //
 }

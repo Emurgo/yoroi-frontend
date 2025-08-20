@@ -127,9 +127,7 @@ class RestoreWalletStepTwo extends AddWalletBase {
   };
   duplicatedWalletDialogIsDisplayed = async () => {
     this.logger.info(`RestoreWalletStepTwo::duplicatedWalletDialogIsDisplayed is called`);
-    const isDisplayed = await (
-      await this.findElement(this.duplicatedWalletDialogLocator)
-    ).isDisplayed();
+    const isDisplayed = await (await this.findElement(this.duplicatedWalletDialogLocator)).isDisplayed();
     return isDisplayed;
   };
   getDuplicatedWalletName = async () => {

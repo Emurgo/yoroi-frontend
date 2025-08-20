@@ -124,7 +124,7 @@ type Props = {|
 
 @observer
 export default class ConnectPage extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
       fields: {
@@ -367,7 +367,7 @@ export default class ConnectPage extends Component<Props> {
                             }),
                           }}
                         >
-                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)} id='connector:connect-walletItem-button'>
+                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)} id="connector:connect-walletItem-button">
                             <ConnectedWallet
                               disabledForReason={isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null}
                               publicDeriver={wallet}

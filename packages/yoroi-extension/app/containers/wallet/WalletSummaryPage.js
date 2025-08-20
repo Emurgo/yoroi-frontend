@@ -35,16 +35,8 @@ export default class WalletSummaryPage extends Component<StoresProps> {
   render(): Node {
     const intl = this.context;
     const { stores } = this.props;
-    const {
-      hasAny,
-      hasMoreToLoad,
-      recent,
-      isLoadingMore,
-      unconfirmedAmount,
-      isExporting,
-      exportError,
-      isLoading,
-    } = stores.transactions;
+    const { hasAny, hasMoreToLoad, recent, isLoadingMore, unconfirmedAmount, isExporting, exportError, isLoading } =
+      stores.transactions;
     const { selected } = stores.wallets;
     let walletTransactions = null;
     // Guard against potential null values
@@ -264,10 +256,7 @@ export default class WalletSummaryPage extends Component<StoresProps> {
     stores.uiDialogs.push({ dialog: ExportTransactionDialog });
   };
 
-  showMemoDialog: ({|
-    continuation: void => void,
-    dialog: any,
-  |}) => void = request => {
+  showMemoDialog: ({| continuation: void => void, dialog: any |}) => void = request => {
     if (this.props.stores.memos.hasSetSelectedExternalStorageProvider) {
       return request.continuation();
     }

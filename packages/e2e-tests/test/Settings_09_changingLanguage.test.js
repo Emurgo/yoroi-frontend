@@ -1,0 +1,102 @@
+import BasePage from '../pages/basepage.js';
+import { customAfterEach } from '../utils/customHooks.js';
+import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
+import { expect } from 'chai';
+import { getTestLogger } from '../utils/utils.js';
+import { oneMinute } from '../helpers/timeConstants.js';
+import SettingsTab from '../pages/wallet/settingsTab/settingsTab.page.js';
+import driversPoolsManager from '../utils/driversPool.js';
+import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
+import { prepareWallet } from '../helpers/restoreWalletHelper.js';
+
+describe('Changing language through the Settings', function () {
+  this.timeout(2 * oneMinute);
+  let webdriver = null;
+  let logger = null;
+
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    logger = getTestLogger(this.test.parent.title);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
+  });
+
+  const testData = [
+    {
+      lang: 'ja-JP',
+      btnTransalation: '一般',
+    },
+    {
+      lang: 'ko-KR',
+      btnTransalation: '일반',
+    },
+    {
+      lang: 'zh-Hans',
+      btnTransalation: '一般',
+    },
+    {
+      lang: 'ru-RU',
+      btnTransalation: 'Общие',
+    },
+    {
+      lang: 'de-DE',
+      btnTransalation: 'Allgemein',
+    },
+    {
+      lang: 'es-ES',
+      btnTransalation: 'General',
+    },
+    {
+      lang: 'fr-FR',
+      btnTransalation: 'Général',
+    },
+    {
+      lang: 'pt-BR',
+      btnTransalation: 'Geral',
+    },
+    {
+      lang: 'id-ID',
+      btnTransalation: 'Umum',
+    },
+    {
+      lang: 'vi-VN',
+      btnTransalation: 'Chung',
+    },
+    {
+      lang: 'en-US',
+      btnTransalation: 'General',
+    },
+  ];
+
+  it('Open General settings', async function () {
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToSettingsTab();
+    const settingsPage = new SettingsTab(webdriver, logger);
+    await settingsPage.goToGeneralSubMenu();
+  });
+
+  for (const testDatum of testData) {
+    describe(`Changing language to ${testDatum.lang}`, function () {
+      it(`Selecting language ${testDatum.lang}`, async function () {
+        const generalSubTab = new GeneralSubTab(webdriver, logger);
+        await generalSubTab.selectLanguage(testDatum.lang);
+      });
+
+      it(`Checking translation on the button ${testDatum.lang}`, async function () {
+        const settingsPage = new SettingsTab(webdriver, logger);
+        const btnText = await settingsPage.getGeneralSubTabText();
+        expect(btnText).to.equal(testDatum.btnTransalation);
+      });
+    });
+  }
+
+  afterEach(function (done) {
+    customAfterEach(this, webdriver, logger);
+    done();
+  });
+
+  after(function (done) {
+    const basePage = new BasePage(webdriver, logger);
+    basePage.closeBrowser();
+    done();
+  });
+});

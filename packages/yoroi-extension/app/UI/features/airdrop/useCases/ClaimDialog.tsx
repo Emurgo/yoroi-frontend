@@ -21,12 +21,14 @@ const messages = defineMessages({
   },
   mnemonicClaimDialogText: {
     id: 'airdrop.mnemonicClaimDialogText',
-    defaultMessage: '!!!Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.',
+    defaultMessage:
+      '!!!Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.',
   },
 });
 
-
-export default function ClaimDialog(props: Readonly<{ onClose: () => void, onClaim: (password: string) => Promise<void>, message: string }>) {
+export default function ClaimDialog(
+  props: Readonly<{ onClose: () => void; onClaim: (password: string) => Promise<void>; message: string }>
+) {
   const intl = useIntl();
   const wrongPasswordErrorMessage = intl.formatMessage(messages.wrongPassword);
   const [password, setPassword] = useState('');
@@ -61,7 +63,7 @@ export default function ClaimDialog(props: Readonly<{ onClose: () => void, onCla
         {
           label: intl.formatMessage(messages.claimDialogTitle),
           primary: true,
-          disabled: (password.length === 0) || isClaiming,
+          disabled: password.length === 0 || isClaiming,
           onClick: onClaim,
         },
       ]}

@@ -7,8 +7,6 @@ import TextField from '../../common/TextField';
 import { defineMessages, IntlContext } from 'react-intl';
 import ReactToolboxMobxForm from '../../../utils/ReactToolboxMobxForm';
 import vjf from 'mobx-react-form/lib/validators/VJF';
-import BorderedBox from '../../widgets/BorderedBox';
-import styles from './DelegationSendForm.scss';
 import globalMessages from '../../../i18n/global-messages';
 import WarningBox from '../../widgets/WarningBox';
 import LocalizableError from '../../../i18n/LocalizableError';
@@ -33,6 +31,7 @@ type Props = {|
   +poolName: string,
   +selectedPoolId: ?string,
   +stores: StoresMap,
+  +isTestnet: boolean,
 |};
 
 function validateAndSetPool(poolId: string, updatePool: (void | string) => void): boolean {
@@ -60,7 +59,7 @@ function validateAndSetPool(poolId: string, updatePool: (void | string) => void)
 
 @observer
 export default class DelegationSendForm extends Component<Props> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   // FORM VALIDATION
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(
     {
@@ -106,29 +105,29 @@ export default class DelegationSendForm extends Component<Props> {
     const poolIdField = form.$('poolId');
 
     const pendingTxWarningComponent = (
-      <div className={styles.warningBox}>
+      <Box mb="30px">
         <WarningBox>{intl.formatMessage(globalMessages.pendingTxWarning)}</WarningBox>
-      </div>
+      </Box>
     );
 
     const poolQueryError =
-      this.props.poolQueryError == null ? this.props.poolQueryError : intl.formatMessage(this.props.poolQueryError);
+      this.props.poolQueryError !== null && !this.props.isTestnet ? intl.formatMessage(this.props.poolQueryError) : null;
 
     return (
-      <Box className={styles.component}>
+      <Box>
         {this.props.hasAnyPending && pendingTxWarningComponent}
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(globalMessages.delegationById)}
         </Typography>
-        <BorderedBox>
-          <div className={styles.poolInput}>
+        <Box>
+          <Box position="relative">
             <TextField
-              className="poolId"
               {...poolIdField.bind()}
               error={poolIdField.error || poolQueryError}
               done={poolIdField.isValid}
+              sx={{ paddingBottom: '0px', mt: '8px', mb: '1px' }}
             />
-          </div>
+          </Box>
           <CreateInvokeConfirmationButton
             intl={intl}
             btnDisabled={
@@ -145,7 +144,7 @@ export default class DelegationSendForm extends Component<Props> {
             poolName={this.props.poolName}
             stores={this.props.stores}
           />
-        </BorderedBox>
+        </Box>
       </Box>
     );
   }
@@ -153,7 +152,7 @@ export default class DelegationSendForm extends Component<Props> {
 
 const CreateInvokeConfirmationButton = observer(({ intl, btnDisabled, selectedPoolId, poolName, stores }) => {
   return (
-    <Stack alignItems="center" justifyContent="center">
+    <Stack alignItems="center" justifyContent="center" pb="20px">
       <DelegateButton
         stores={stores}
         label={intl.formatMessage(globalMessages.nextButtonLabel)}

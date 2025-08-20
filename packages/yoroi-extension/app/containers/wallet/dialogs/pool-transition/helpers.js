@@ -10,7 +10,5 @@ export const formatTimeSpan = (futureMilliseconds: number, currentMilliseconds: 
   const hours = duration.hours();
   const minutes = duration.minutes();
 
-  return `${days > 0 ? days + 'd' : ''}${hours > 0 ? ' ' + hours + 'h' : ''}${
-    minutes > 0 ? ' ' + minutes + 'm' : ''
-  }`;
+  return `${days > 0 ? days + 'd' : ''}${hours > 0 ? ' ' + hours + 'h' : ''}${minutes > 0 ? ' ' + minutes + 'm' : ''}`;
 };

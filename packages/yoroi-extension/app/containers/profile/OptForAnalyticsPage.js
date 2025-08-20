@@ -11,18 +11,17 @@ import OptForAnalyticsForm from '../../components/profile/terms-of-use/OptForAna
 
 @observer
 export default class OptForAnalyticsPage extends Component<StoresProps> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   render(): Node {
-
     return (
       <Box height="100vh" paddingBottom="24px" sx={{ overflowY: 'auto' }}>
         <IntroBanner isNightly={environment.isNightly()} />
-          <OptForAnalyticsForm
-            onOpt={this.props.stores.profile.onOptForAnalytics}
-            variant="startup"
-            isOptedIn={false}
-            privacyNotice={this.props.stores.profile.privacyNotice}
-          />
+        <OptForAnalyticsForm
+          onOpt={this.props.stores.profile.onOptForAnalytics}
+          variant="startup"
+          isOptedIn={false}
+          privacyNotice={this.props.stores.profile.privacyNotice}
+        />
       </Box>
     );
   }

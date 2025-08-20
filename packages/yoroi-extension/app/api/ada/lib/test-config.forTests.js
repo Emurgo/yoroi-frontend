@@ -24,12 +24,20 @@ const CONFIG: ConfigType = {
   bring: {
     baseUrl: '',
     identifier: '',
-    apiEndpoint: ''
+    apiEndpoint: '',
   },
   bringSandbox: {
     baseUrl: '',
     identifier: '',
-    apiEndpoint: ''
+    apiEndpoint: '',
+  },
+  fcm: {
+    apiKey: '',
+    authDomain: '',
+    projectId: '',
+    storageBucket: '',
+    messagingSenderId: '',
+    appId: '',
   },
   notifications: {
     defaultDuration: 0,

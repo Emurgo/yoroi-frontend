@@ -1,6 +1,7 @@
 import type { PublicDeriver } from '../../../../api/ada/lib/storage/models/PublicDeriver';
 import type { VotingStore } from '../../../../stores/ada/VotingStore';
 import { StepState } from '../../../../components/widgets/ProgressSteps';
+import { BigNumber } from 'bignumber.js';
 
 export type StepAction =
   | { type: 'START_REGISTRATION' }
@@ -8,11 +9,11 @@ export type StepAction =
   | { type: 'PREVIOUS_STEP' }
   | { type: 'RESET' }
   | { type: 'SET_ERROR'; error: string | null }
-  | { type: 'SET_STEP_STATE'; stepState: typeof StepState[keyof typeof StepState] };
+  | { type: 'SET_STEP_STATE'; stepState: (typeof StepState)[keyof typeof StepState] };
 
 export type StepStateType = {
   currentStep: number;
-  stepState: typeof StepState[keyof typeof StepState];
+  stepState: (typeof StepState)[keyof typeof StepState];
   error: string | null;
 };
 
@@ -22,7 +23,12 @@ type CatalystRegistrationState = {
   isDelegating: boolean;
   stepState: StepStateType;
   registrationState: any;
+  shouldHideBalance: boolean;
   votingRegTx: any;
+  tokenDecimals: number;
+  tokenName: string;
+  balanceAmount: BigNumber;
+  votingMinAmount: BigNumber;
   dispatch: (action: StepAction) => void;
 };
 

@@ -1,39 +1,32 @@
 // @flow
-import { observable, } from 'mobx';
+import { observable } from 'mobx';
 import BigNumber from 'bignumber.js';
 import Store from '../base/Store';
 import Request from '../lib/LocalizedRequest';
-import type { TransferTx, } from '../../types/TransferTypes';
+import type { TransferTx } from '../../types/TransferTypes';
 import { yoroiTransferTxFromAddresses } from '../../api/ada/transactions/transfer/legacyYoroi';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { generateWalletRootKey, } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
-import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose, } from '../../config/numbersConfig';
-import type {
-  RestoreWalletForTransferFunc,
-  RestoreWalletForTransferResponse,
-  TransferToCip1852Func,
-} from '../../api/ada/index';
-import { Bip44DerivationLevels, } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
+import { generateWalletRootKey } from '../../api/ada/lib/cardanoCrypto/cryptoWallet';
+import { CoinTypes, HARD_DERIVATION_START, WalletTypePurpose } from '../../config/numbersConfig';
+import type { RestoreWalletForTransferFunc, RestoreWalletForTransferResponse, TransferToCip1852Func } from '../../api/ada/index';
+import { Bip44DerivationLevels } from '../../api/ada/lib/storage/database/walletTypes/bip44/api/utils';
 import { getCardanoHaskellBaseConfig } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { Address, Addressing } from '../../api/ada/lib/storage/models/PublicDeriver/interfaces';
 import type { StoresMap } from '../index';
 
 export default class AdaYoroiTransferStore extends Store<StoresMap> {
+  @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc> = new Request(
+    this.api.ada.restoreWalletForTransfer
+  );
+  @observable transferRequest: Request<TransferToCip1852Func> = new Request<TransferToCip1852Func>(
+    this.api.ada.transferToCip1852.bind(this.api.ada)
+  );
 
-  @observable restoreForTransferRequest: Request<RestoreWalletForTransferFunc>
-    = new Request(this.api.ada.restoreWalletForTransfer);
-  @observable transferRequest: Request<TransferToCip1852Func>
-    = new Request<TransferToCip1852Func>(
-      this.api.ada.transferToCip1852.bind(this.api.ada)
-    );
-
-  _restoreWalletForTransfer: {|
+  _restoreWalletForTransfer: ({|
     rootPk: RustModule.WalletV4.Bip32PrivateKey,
     accountIndex: number,
-  |} => Promise<RestoreWalletForTransferResponse> = async (
-    request
-  ) => {
+  |}) => Promise<RestoreWalletForTransferResponse> = async request => {
     const accountPubKey = request.rootPk
       .derive(WalletTypePurpose.BIP44)
       .derive(CoinTypes.CARDANO)
@@ -56,11 +49,11 @@ export default class AdaYoroiTransferStore extends Store<StoresMap> {
   };
 
   // <TODO:PENDING_REMOVAL> paper
-  generateTransferTxForByron: {|
+  generateTransferTxForByron: ({|
     recoveryPhrase: string,
     updateStatusCallback: void => void,
     getDestinationAddress: void => Promise<{| ...Address, ...InexactSubset<Addressing> |}>,
-  |} => Promise<TransferTx> = async (request) => {
+  |}) => Promise<TransferTx> = async request => {
     const rootPk = generateWalletRootKey(request.recoveryPhrase);
 
     // 1) get receive address
@@ -77,10 +70,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap> {
 
     // 3) Calculate private keys for restored wallet utxo
 
-    const accountKey = rootPk
-      .derive(WalletTypePurpose.BIP44)
-      .derive(CoinTypes.CARDANO)
-      .derive(accountIndex);
+    const accountKey = rootPk.derive(WalletTypePurpose.BIP44).derive(CoinTypes.CARDANO).derive(accountIndex);
 
     // 4) generate transaction
 
@@ -99,13 +89,12 @@ export default class AdaYoroiTransferStore extends Store<StoresMap> {
       keyLevel: Bip44DerivationLevels.ACCOUNT.level,
       signingKey: accountKey,
       network: selectedNetwork,
-      getUTXOsForAddresses:
-        this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
+      getUTXOsForAddresses: this.stores.substores.ada.stateFetchStore.fetcher.getUTXOsForAddresses,
       protocolParams: {
         keyDeposit: RustModule.WalletV4.BigNum.from_str(config.KeyDeposit),
         linearFee: RustModule.WalletV4.LinearFee.new(
           RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+          RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant)
         ),
         coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
         poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
@@ -116,7 +105,7 @@ export default class AdaYoroiTransferStore extends Store<StoresMap> {
     });
     // Possible exception: NotEnoughMoneyToSendError
     return transferTx;
-  }
+  };
 
   reset(): void {
     this.restoreForTransferRequest.reset();

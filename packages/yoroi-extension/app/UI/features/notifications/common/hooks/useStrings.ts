@@ -10,8 +10,7 @@ export const messages = Object.freeze(
     },
     notifSettingsDesc: {
       id: 'notifications.settings.description',
-      defaultMessage:
-        '!!!Allow display of in-app notifications for key transactions',
+      defaultMessage: '!!!Allow display of in-app notifications for key transactions',
     },
     duration: {
       id: 'notifications.settings.duration',
@@ -20,6 +19,14 @@ export const messages = Object.freeze(
     durationDescription: {
       id: 'notifications.settings.durationDescription',
       defaultMessage: '!!!Display during {duration} seconds',
+    },
+    enablePushNotificationsTitle: {
+      id: 'notifications.settings.enablePushNotificationsTitle',
+      defaultMessage: '!!!Push notifications',
+    },
+    enablePushNotificationsDesc: {
+      id: 'notifications.settings.enablePushNotificationsDesc',
+      defaultMessage: '!!!Allow push notifications',
     },
   })
 );
@@ -32,5 +39,7 @@ export const useStrings = () => {
     notifSettingsDesc: intl.formatMessage(messages.notifSettingsDesc),
     duration: intl.formatMessage(messages.duration),
     durationDescription: (duration: number) => intl.formatMessage(messages.durationDescription, { duration }),
+    enablePushNotificationsTitle: intl.formatMessage(messages.enablePushNotificationsTitle),
+    enablePushNotificationsDesc: intl.formatMessage(messages.enablePushNotificationsDesc),
   }).current;
 };

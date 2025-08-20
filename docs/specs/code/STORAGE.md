@@ -228,14 +228,6 @@ These aren’t available for
 1. Hardware wallets
 2. Address checkers
 
-### Bip44Wrapper Table
-
-This table allows us to decouple settings for a Bip44 wallet from the ConceptualWallet. Necessary to support non-UTXO wallets.
-
-Note: although we don’t need to enforce that all the derivations associated to a conceptual wallet are of the same derivation level, this spec enforces this with a `PublicDeriverLevel` field that specifies the derivation level for the wallet. Allowing varying levels could make for a confusing UX and more importantly it would be slower because to detect what derivation level to display on a wallet UI, you’d have to try and union the Bip44DerivationId with every table to see which matches for each PublicDeriver.
-
-Note: having Version inside this table and not ConceptualWallet allow adhoc derivation to have different versions within the same ConceptualWallet. This is possible undesirable,
-
 ### Separation of PrivateDeriverLevel and PublicDeriverLevel
 
 PrivateDeriverLevel points to which key level to use when the user wants to generate a new account.

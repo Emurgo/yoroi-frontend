@@ -1,11 +1,7 @@
 // @flow
 
 import typeof * as WasmV2 from 'cardano-wallet-browser';
-import type {
-  BigNum,
-  LinearFee,
-  TransactionBuilder
-} from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
+import type { BigNum, LinearFee, TransactionBuilder } from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmV4 from '@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib';
 import typeof * as WasmMessageSigning from '@emurgo/cardano-message-signing-browser/cardano_message_signing';
 import typeof * as CrossCsl from '@emurgo/cross-csl-browser';
@@ -15,7 +11,7 @@ const MAX_VALUE_BYTES = 5000;
 const MAX_TX_BYTES = 16384;
 
 function isWasmPointer(o: ?any): boolean {
-  return o != null && (typeof o.__wbg_ptr === 'number') && (typeof o.free === 'function');
+  return o != null && typeof o.__wbg_ptr === 'number' && typeof o.free === 'function';
 }
 
 /*
@@ -30,21 +26,18 @@ function isNonProxyClass(o: any): boolean {
 
 function isProxyCompatibleType(o: any): boolean {
   // We only proxy objects and functions, the check is mostly for primitive values
-  return typeof o === 'object' || typeof o === 'function'
+  return typeof o === 'object' || typeof o === 'function';
 }
 
 /* Fake flag name used to identify our own proxies  */
 const WASM_PROXY_FAKE_FLAG_NAME = '____is_wasm_proxy';
 function isNotAlreadyAProxy(o: any): boolean {
   // Make sure the original object is not already a proxy
-  return o[WASM_PROXY_FAKE_FLAG_NAME] !== true
+  return o[WASM_PROXY_FAKE_FLAG_NAME] !== true;
 }
 
 function isProxiable(o: ?any): boolean {
-  return o != null
-    && isProxyCompatibleType(o)
-    && !isNonProxyClass(o)
-    && isNotAlreadyAProxy(o);
+  return o != null && isProxyCompatibleType(o) && !isNonProxyClass(o) && isNotAlreadyAProxy(o);
 }
 
 /**
@@ -114,13 +107,13 @@ function createWasmScope(): {|
             // The result of the function call is then also recursively proxied.
             // Whether it's a wasm object or not.
             return recursiveProxy(res);
-          }
+          };
         }
         /* If the real value of the field ISN'T a function or IS a class,
          * then we just want to recursively wrap it in a similar proxy.
          */
         return recursiveProxy(realValue);
-      }
+      },
     };
     // $FlowFixMe[incompatible-return]
     return new Proxy<E>(originalObject, proxyHandler);
@@ -134,13 +127,13 @@ function createWasmScope(): {|
       scope.forEach(x => {
         // Checking just to avoid a null-pointer crash
         if (x.__wbg_ptr !== 0) {
-          x.free()
+          x.free();
         }
       });
     },
     size: () => scope.length,
     isFree: () => scope.every(x => x.__wbg_ptr === 0),
-  }
+  };
 }
 
 class Module {
@@ -150,12 +143,7 @@ class Module {
   _crossCsl: CrossCsl;
 
   async load(): Promise<void> {
-    if (
-      this._wasmv2 != null
-        || this._wasmv4 != null
-        || this._messageSigning != null
-        || this._crossCsl != null
-    ) return;
+    if (this._wasmv2 != null || this._wasmv4 != null || this._messageSigning != null || this._crossCsl != null) return;
     this._wasmv2 = await import('cardano-wallet-browser');
     this._wasmv4 = await import('@emurgo/cardano-serialization-lib-browser/cardano_serialization_lib');
     this._messageSigning = await import('@emurgo/cardano-message-signing-browser/cardano_message_signing');
@@ -190,10 +178,13 @@ class Module {
     let result;
     try {
       result = callback(scope.RustModule);
-    } catch (e) { onFailure(e); throw e; }
-    return (result instanceof Promise)
-      // $FlowFixMe[incompatible-exact]
-      ? result.then(onSuccess, onFailure)
+    } catch (e) {
+      onFailure(e);
+      throw e;
+    }
+    return result instanceof Promise
+      ? // $FlowFixMe[incompatible-exact]
+        result.then(onSuccess, onFailure)
       : onSuccess(result);
   }
 
@@ -217,7 +208,7 @@ class Module {
    * callback promise resolves.
    */
   WasmScope<T>(callback: Module => T): T {
-    const scopedResult =  this.__WasmScopeInternal(callback);
+    const scopedResult = this.__WasmScopeInternal(callback);
     if (scopedResult instanceof Promise) {
       return scopedResult.then(r => r.result);
     }
@@ -232,7 +223,7 @@ class Module {
         wasmMap: f => InternalMonad(M => f(mapper(M), M)),
         // $FlowIgnore[escaped-generic]
         unwrap: f => WS(M => f(mapper(M), M)),
-      }
+      };
     }
     return InternalMonad<T>(callback);
   }
@@ -252,7 +243,7 @@ class Module {
     +LinearFee: {|
       +coefficient: string,
       +constant: string,
-    |};
+    |},
     +CoinsPerUtxoByte: string,
     +PoolDeposit: string,
     +KeyDeposit: string,
@@ -261,7 +252,7 @@ class Module {
     return this.WalletV4TxBuilder({
       linearFee: RustModule.WalletV4.LinearFee.new(
         RustModule.WalletV4.BigNum.from_str(config.LinearFee.coefficient),
-        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant),
+        RustModule.WalletV4.BigNum.from_str(config.LinearFee.constant)
       ),
       coinsPerUtxoByte: RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte),
       poolDeposit: RustModule.WalletV4.BigNum.from_str(config.PoolDeposit),
@@ -269,21 +260,25 @@ class Module {
     });
   }
   // Need to expose through a getter to get Flow to detect the type correctly
-  WalletV4TxBuilder(params: {
-    linearFee: LinearFee,
-    coinsPerUtxoByte: BigNum,
-    poolDeposit: BigNum,
-    keyDeposit: BigNum,
-    maxValueBytes: ?number,
-    maxTxBytes: ?number,
-    ...
-  } | {
-    linearFee: LinearFee,
-    coinsPerUtxoByte: BigNum,
-    poolDeposit: BigNum,
-    keyDeposit: BigNum,
-    ...
-  }): TransactionBuilder {
+  WalletV4TxBuilder(
+    params:
+      | {
+          linearFee: LinearFee,
+          coinsPerUtxoByte: BigNum,
+          poolDeposit: BigNum,
+          keyDeposit: BigNum,
+          maxValueBytes: ?number,
+          maxTxBytes: ?number,
+          ...
+        }
+      | {
+          linearFee: LinearFee,
+          coinsPerUtxoByte: BigNum,
+          poolDeposit: BigNum,
+          keyDeposit: BigNum,
+          ...
+        }
+  ): TransactionBuilder {
     const {
       linearFee,
       coinsPerUtxoByte,
@@ -304,16 +299,12 @@ class Module {
         .coins_per_utxo_byte(coinsPerUtxoByte)
         .max_value_size(maxValueBytes ?? MAX_VALUE_BYTES)
         .max_tx_size(maxTxBytes ?? MAX_TX_BYTES)
-        .ex_unit_prices(w4.ExUnitPrices.new(
-          w4.UnitInterval.new(
-            w4.BigNum.from_str('577'),
-            w4.BigNum.from_str('10000'),
-          ),
-          w4.UnitInterval.new(
-            w4.BigNum.from_str('721'),
-            w4.BigNum.from_str('10000000'),
-          ),
-        ))
+        .ex_unit_prices(
+          w4.ExUnitPrices.new(
+            w4.UnitInterval.new(w4.BigNum.from_str('577'), w4.BigNum.from_str('10000')),
+            w4.UnitInterval.new(w4.BigNum.from_str('721'), w4.BigNum.from_str('10000000'))
+          )
+        )
         .prefer_pure_change(true)
         .build()
     );
@@ -325,9 +316,9 @@ class Module {
 }
 
 export type WasmMonad<T> = {|
-  wasmMap<R>(f: (T, Module) => R): WasmMonad<R>;
-  unwrap<R>(f: (T, Module) => R): R;
-|}
+  wasmMap<R>(f: (T, Module) => R): WasmMonad<R>,
+  unwrap<R>(f: (T, Module) => R): R,
+|};
 
 // Need this otherwise Wallet's flow type isn't properly exported
 export const RustModule: Module = new Module();

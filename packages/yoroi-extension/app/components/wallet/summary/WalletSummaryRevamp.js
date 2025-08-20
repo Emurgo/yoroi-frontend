@@ -69,10 +69,7 @@ type State = {|
 class WalletSummaryRevamp extends Component<Props, State> {
   static contextType: any = IntlContext;
 
-  renderAmountDisplay: ({|
-    shouldHideBalance: boolean,
-    amount: MultiToken,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| shouldHideBalance: boolean, amount: MultiToken |}) => Node = request => {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
@@ -98,10 +95,7 @@ class WalletSummaryRevamp extends Component<Props, State> {
     );
   };
 
-  getWalletBalance: ({|
-    shouldHideBalance: boolean,
-    amount: MultiToken,
-  |}) => Node = request => {
+  getWalletBalance: ({| shouldHideBalance: boolean, amount: MultiToken |}) => Node = request => {
     const defaultEntry = request.amount.getDefaultEntry();
     const tokenInfo = this.props.getTokenInfo(defaultEntry);
 
@@ -276,7 +270,6 @@ class WalletSummaryRevamp extends Component<Props, State> {
 }
 
 export default (withYoroiRemoteConfig(WalletSummaryRevamp): ComponentType<Props>);
-
 
 export const columnTXStyles = {
   transactionType: { flex: '1 1 30%', maxWidth: '30%', textAlign: 'left', color: 'grayscale.600' },

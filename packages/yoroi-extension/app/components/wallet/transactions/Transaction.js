@@ -250,7 +250,7 @@ type State = {|
 
 @observer
 export default class Transaction extends Component<Props, State> {
-  static contextType:any = IntlContext;
+  static contextType: any = IntlContext;
   state: State = {
     isExpanded: false,
   };
@@ -329,9 +329,7 @@ export default class Transaction extends Component<Props, State> {
     throw new Error(`${nameof(this.getStatusString)} unexpected state ` + state);
   }
 
-  renderAmountDisplay: ({|
-    entry: TokenEntry,
-  |}) => Node = request => {
+  renderAmountDisplay: ({| entry: TokenEntry |}) => Node = request => {
     if (this.props.shouldHideBalance) {
       return <span>{hiddenAmount}</span>;
     }
@@ -352,10 +350,7 @@ export default class Transaction extends Component<Props, State> {
     );
   };
 
-  renderAmountWithUnitOfAccount: ({|
-    entry: TokenEntry,
-    timestamp: number,
-  |}) => ?Node = request => {
+  renderAmountWithUnitOfAccount: ({| entry: TokenEntry, timestamp: number |}) => ?Node = request => {
     const { currency } = this.props.unitOfAccountSetting;
 
     if (false && /* temporarily disable */ this.props.unitOfAccountSetting.enabled) {
@@ -415,11 +410,7 @@ export default class Transaction extends Component<Props, State> {
     );
   };
 
-  renderFeeDisplay: ({|
-    amount: MultiToken,
-    type: TransactionDirectionType,
-    timestamp: number,
-  |}) => Node = request => {
+  renderFeeDisplay: ({| amount: MultiToken, type: TransactionDirectionType, timestamp: number |}) => Node = request => {
     if (request.type === transactionTypes.INCOME) {
       return <span>-</span>;
     }
@@ -493,9 +484,7 @@ export default class Transaction extends Component<Props, State> {
     return undefined;
   };
 
-  renderAssets: ({|
-    assets: Array<TokenEntry>,
-  |}) => Node = request => {
+  renderAssets: ({| assets: Array<TokenEntry> |}) => Node = request => {
     if (request.assets.length === 0) {
       return null;
     }

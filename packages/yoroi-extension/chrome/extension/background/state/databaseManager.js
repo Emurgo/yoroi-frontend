@@ -1,10 +1,10 @@
 // @flow
 import { environment } from '../../../../app/environment';
 import { schema } from 'lovefield';
-import { loadLovefieldDB, } from '../../../../app/api/ada/lib/storage/database/index';
+import { loadLovefieldDB } from '../../../../app/api/ada/lib/storage/database/index';
 import { migrateNoRefresh } from '../../../../app/api/common/migration';
 import LocalStorageApi from '../../../../app/api/localStorage/index';
-import type { lf$Database, } from 'lovefield';
+import type { lf$Database } from 'lovefield';
 
 let loadDbPromiseCache = null;
 let migratePromiseCache = null;
@@ -19,7 +19,7 @@ export async function getDb(): Promise<lf$Database> {
   const db = await loadDbPromiseCache;
 
   if (!migratePromiseCache) {
-    migratePromiseCache =  migrateNoRefresh({
+    migratePromiseCache = migrateNoRefresh({
       localStorageApi,
       persistentDb: db,
       currVersion: environment.getVersion(),

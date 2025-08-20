@@ -50,6 +50,7 @@ export function genCSP(request: {|
   connectSrc.push('https://api-us.dexhunterv3.app/');
   connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
   connectSrc.push('https://*.yoroiwallet.com');
+  connectSrc.push('https://api-us.dexhunterv3.app/swap/');
 
   // Bringweb3
   frameSrc.push('https://*.bringweb3.io/');
@@ -62,7 +63,7 @@ export function genCSP(request: {|
   connectSrc.push('https://proof.provtree-midnight.com');
   connectSrc.push('https://proof-staging.provtree-midnight.com');
   connectSrc.push('https://preprod.gd.midnighttge.io');
-  
+
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [

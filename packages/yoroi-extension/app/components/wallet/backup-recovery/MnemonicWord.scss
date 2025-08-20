@@ -1,7 +1,7 @@
 .component {
-  background-color: var(--yoroi-mnemonic-background-color)!important;
-  font-weight: 400!important;
-  color: var(--yoroi-palette-gray-900)!important;
+  background-color: var(--yoroi-mnemonic-background-color) !important;
+  font-weight: 400 !important;
+  color: var(--yoroi-palette-gray-900) !important;
 
   &.disabled {
     cursor: default;
@@ -29,10 +29,10 @@
       opacity: 0.3;
     }
   }
-
 }
 
-:global(.YoroiModern), :global(.YoroiRevamp) {
+:global(.YoroiModern),
+:global(.YoroiRevamp) {
   .component {
     font-size: 14px;
     margin: 5px 10px 5px 0;
@@ -45,5 +45,4 @@
       opacity: 0;
     }
   }
-
 }

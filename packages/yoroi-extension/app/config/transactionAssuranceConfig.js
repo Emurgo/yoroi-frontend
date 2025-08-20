@@ -3,7 +3,7 @@
 // Transaction assurance represents the chance a transaction won’t be canceled by some fork.
 // Read more at https://cardanodocs.com/cardano/transaction-assurance/
 
-import type { AssuranceLevel, AssuranceMode, } from '../types/transactionAssurance.types';
+import type { AssuranceLevel, AssuranceMode } from '../types/transactionAssurance.types';
 
 type AssuranceModeOption = 'CWANormal' | 'CWAStrict';
 
@@ -11,7 +11,8 @@ export const assuranceModeOptions: {|
   NORMAL: AssuranceModeOption,
   STRICT: AssuranceModeOption,
 |} = {
-  NORMAL: 'CWANormal', STRICT: 'CWAStrict',
+  NORMAL: 'CWANormal',
+  STRICT: 'CWAStrict',
 };
 
 export const assuranceModes: {|
@@ -27,7 +28,7 @@ export const assuranceModes: {|
   STRICT: {
     low: 5,
     medium: 15,
-  }
+  },
 };
 
 export const assuranceLevels: {|
@@ -35,5 +36,7 @@ export const assuranceLevels: {|
   MEDIUM: AssuranceLevel,
   HIGH: AssuranceLevel,
 |} = {
-  LOW: 'low', MEDIUM: 'medium', HIGH: 'high',
+  LOW: 'low',
+  MEDIUM: 'medium',
+  HIGH: 'high',
 };

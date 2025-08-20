@@ -1,25 +1,14 @@
 // @flow
 
 import { getInitialSeeds } from './initialSeed';
-import {
-  schema,
-} from 'lovefield';
-import type {
-  lf$Database,
-  lf$raw$BackStore,
-  lf$lovefieldExport,
-} from 'lovefield';
-import {
-  getAllSchemaTables,
-  raii,
-  promisifyDbCall,
-} from './utils';
-import { GetEncryptionMeta, } from './primitives/api/read';
-import { ModifyEncryptionMeta, ModifyNetworks, ModifyToken, } from './primitives/api/write';
-import { ModifyExplorers, } from './explorers/api/write';
+import { schema } from 'lovefield';
+import type { lf$Database, lf$raw$BackStore, lf$lovefieldExport } from 'lovefield';
+import { getAllSchemaTables, raii, promisifyDbCall } from './utils';
+import { GetEncryptionMeta } from './primitives/api/read';
+import { ModifyEncryptionMeta, ModifyNetworks, ModifyToken } from './primitives/api/write';
+import { ModifyExplorers } from './explorers/api/write';
 import { populatePrimitivesDb, TransactionType } from './primitives/tables';
 import { populateCommonDb } from './walletTypes/common/tables';
-import { populateBip44Db } from './walletTypes/bip44/tables';
 import { populateCip1852Db } from './walletTypes/cip1852/tables';
 import { populateUtxoTransactionsDb } from './transactionModels/utxo/tables';
 import { populateAccountingTransactionsDb } from './transactionModels/account/tables';
@@ -40,112 +29,70 @@ import type { TokenRow } from './primitives/tables';
 declare var indexedDB: IDBFactory;
 const schemaName = 'yoroi-schema';
 
-const deleteDb = () => new Promise(resolve => {
-  const deleteRequest = indexedDB.deleteDatabase(schemaName);
-  deleteRequest.onsuccess = () => resolve();
-  deleteRequest.onerror = () => resolve();
-});
+const deleteDb = () =>
+  new Promise(resolve => {
+    const deleteRequest = indexedDB.deleteDatabase(schemaName);
+    deleteRequest.onsuccess = () => resolve();
+    deleteRequest.onerror = () => resolve();
+  });
 
-const populateEncryptionDefault = async (
-  db: lf$Database,
-): Promise<void> => {
+const populateEncryptionDefault = async (db: lf$Database): Promise<void> => {
   const deps = Object.freeze({
     GetEncryptionMeta,
     ModifyEncryptionMeta,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  await raii(
-    db,
-    depTables,
-    async tx => {
-      const EncryptionMetaId = 0;
-      const initial = getInitialSeeds();
-      const metaRow = await deps.GetEncryptionMeta.getOrInitial(
-        db, tx,
-        { ...initial, EncryptionMetaId },
-      );
-      await deps.ModifyEncryptionMeta.upsert(
-        db, tx,
-        {
-          ...metaRow,
-          EncryptionMetaId
-        }
-      );
-    }
-  );
+  await raii(db, depTables, async tx => {
+    const EncryptionMetaId = 0;
+    const initial = getInitialSeeds();
+    const metaRow = await deps.GetEncryptionMeta.getOrInitial(db, tx, { ...initial, EncryptionMetaId });
+    await deps.ModifyEncryptionMeta.upsert(db, tx, {
+      ...metaRow,
+      EncryptionMetaId,
+    });
+  });
 };
-const populateNetworkDefaults = async (
-  db: lf$Database,
-): Promise<void> => {
+const populateNetworkDefaults = async (db: lf$Database): Promise<void> => {
   const deps = Object.freeze({
     GetEncryptionMeta,
     ModifyEncryptionMeta,
     ModifyNetworks,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  await raii(
-    db,
-    depTables,
-    async tx => deps.ModifyNetworks.upsert(
+  await raii(db, depTables, async tx =>
+    deps.ModifyNetworks.upsert(
       db,
       tx,
       Object.keys(networks).map(network => networks[network])
     )
   );
 };
-const populateExplorerDefaults = async (
-  db: lf$Database,
-): Promise<void> => {
+const populateExplorerDefaults = async (db: lf$Database): Promise<void> => {
   const deps = Object.freeze({
     GetEncryptionMeta,
     ModifyEncryptionMeta,
     ModifyExplorers,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  await raii(
-    db,
-    depTables,
-    async tx => deps.ModifyExplorers.upsert(
-      db,
-      tx,
-      [...prepackagedExplorers.values()].flat(),
-    )
-  );
+  await raii(db, depTables, async tx => deps.ModifyExplorers.upsert(db, tx, [...prepackagedExplorers.values()].flat()));
 };
-const populateAssetDefaults = async (
-  db: lf$Database,
-): Promise<void> => {
+const populateAssetDefaults = async (db: lf$Database): Promise<void> => {
   const deps = Object.freeze({
     ModifyToken,
   });
-  const depTables = Object
-    .keys(deps)
+  const depTables = Object.keys(deps)
     .map(key => deps[key])
     .flatMap(table => getAllSchemaTables(db, table));
-  await raii(
-    db,
-    depTables,
-    async tx => deps.ModifyToken.upsert(
-      db,
-      tx,
-      defaultAssets,
-    )
-  );
+  await raii(db, depTables, async tx => deps.ModifyToken.upsert(db, tx, defaultAssets));
 };
 
-
-export const loadLovefieldDB = async (
-  storeType: $Values<typeof schema.DataStoreType>
-): Promise<lf$Database> => {
+export const loadLovefieldDB = async (storeType: $Values<typeof schema.DataStoreType>): Promise<lf$Database> => {
   const db = await populateAndCreate(storeType);
 
   await populateEncryptionDefault(db);
@@ -158,7 +105,7 @@ export const loadLovefieldDB = async (
 
 export const loadLovefieldDBFromDump = async (
   storeType: $Values<typeof schema.DataStoreType>,
-  dump: Object,
+  dump: Object
 ): Promise<lf$Database> => {
   const db = await populateAndCreate(storeType);
 
@@ -168,10 +115,7 @@ export const loadLovefieldDBFromDump = async (
 };
 
 /** deletes the old database and returns the new database to use */
-export async function importOldDb(
-  oldDb: lf$Database,
-  data: lf$lovefieldExport,
-): Promise<lf$Database> {
+export async function importOldDb(oldDb: lf$Database, data: lf$lovefieldExport): Promise<lf$Database> {
   // we need to delete the database before we import
   // because indexedDB uses schema versions
   // and you can't import an old schema.
@@ -186,9 +130,7 @@ export async function importOldDb(
   return db;
 }
 
-export async function copyDbToMemory(
-  db: lf$Database
-): Promise<lf$Database> {
+export async function copyDbToMemory(db: lf$Database): Promise<lf$Database> {
   const data = await db.export();
 
   const schemaBuilder = schema.create(data.name, data.version);
@@ -200,16 +142,13 @@ export async function copyDbToMemory(
   return inMemoryDb;
 }
 
-const populateAndCreate = async (
-  storeType: $Values<typeof schema.DataStoreType>
-): Promise<lf$Database> => {
-  const schemaVersion = 18;
+const populateAndCreate = async (storeType: $Values<typeof schema.DataStoreType>): Promise<lf$Database> => {
+  const schemaVersion = 19;
   const schemaBuilder = schema.create(schemaName, schemaVersion);
 
   populatePrimitivesDb(schemaBuilder);
   populateWalletDb(schemaBuilder);
   populateCommonDb(schemaBuilder);
-  populateBip44Db(schemaBuilder);
   populateCip1852Db(schemaBuilder);
   populateUtxoTransactionsDb(schemaBuilder);
   populateAccountingTransactionsDb(schemaBuilder);
@@ -236,9 +175,7 @@ const populateAndCreate = async (
 };
 
 async function fixLovefieldDuplicatePrimaryKey(errorMessage: string): Promise<void> {
-  const makeError = (message) => new Error(
-    `Error when fixing ${errorMessage}: ${message}`
-  );
+  const makeError = message => new Error(`Error when fixing ${errorMessage}: ${message}`);
   const params = new URL(errorMessage).searchParams;
   const [storeName, keyName] = String(params.get('p0')).split('.');
   if (keyName !== 'pk' + storeName) {
@@ -247,42 +184,28 @@ async function fixLovefieldDuplicatePrimaryKey(errorMessage: string): Promise<vo
   const fieldName = storeName + 'Id';
   const dupVal = params.get('p1');
 
-  const toPromise = (request, errMsg) => new Promise((resolve, reject) => {
-    request.onerror = (_event) => {
-      reject(makeError(errMsg));
-    };
-    request.onsuccess = (_event) => {
-      resolve(request.result);
-    };
-  });
+  const toPromise = (request, errMsg) =>
+    new Promise((resolve, reject) => {
+      request.onerror = _event => {
+        reject(makeError(errMsg));
+      };
+      request.onsuccess = _event => {
+        resolve(request.result);
+      };
+    });
 
-  const db = await toPromise(
-    window.indexedDB.open('yoroi-schema'),
-    'could not open DB',
-  );
+  const db = await toPromise(window.indexedDB.open('yoroi-schema'), 'could not open DB');
 
-  const store = db
-    .transaction([storeName], 'readwrite')
-    .objectStore(storeName);
+  const store = db.transaction([storeName], 'readwrite').objectStore(storeName);
 
-  const allObjects = await toPromise(
-    store.getAll(),
-    'could not get all objects',
-  );
-  const dupObjects = allObjects.filter(
-    obj => String(obj.value[fieldName]) === dupVal
-  );
+  const allObjects = await toPromise(store.getAll(), 'could not get all objects');
+  const dupObjects = allObjects.filter(obj => String(obj.value[fieldName]) === dupVal);
   for (const dupObj of dupObjects.slice(1)) {
-    await toPromise(
-      store.delete(dupObj.id),
-      'could not delete duplicate object',
-    );
+    await toPromise(store.delete(dupObj.id), 'could not delete duplicate object');
   }
 }
 
-export async function clear(
-  db: lf$Database,
-): Promise<void> {
+export async function clear(db: lf$Database): Promise<void> {
   const tx = db.createTransaction();
   await tx.begin(db.getSchema().tables());
 
@@ -292,9 +215,7 @@ export async function clear(
   await tx.commit();
 }
 
-async function deleteTxTables(
-  rawDb: lf$raw$BackStore,
-): Promise<void> {
+async function deleteTxTables(rawDb: lf$raw$BackStore): Promise<void> {
   // note: no need to commit for raw transactions
   const tx = rawDb.getRawTransaction();
 
@@ -311,18 +232,26 @@ async function deleteTxTables(
     'Token',
   ];
   const lastSyncBackingStore = tx.objectStore('LastSyncInfo');
-  const allLastSync = await promisifyDbCall<$ReadOnlyArray<$ReadOnly<{|
-    id: number,
-    value: $ReadOnly<LastSyncInfoRow>
-  // $FlowExpectedError[prop-missing] missing function in Flow built-in types
-  |}>>>(lastSyncBackingStore.getAll());
+  const allLastSync = await promisifyDbCall<
+    $ReadOnlyArray<
+      $ReadOnly<{|
+        id: number,
+        value: $ReadOnly<LastSyncInfoRow>,
+      |}>,
+    >,
+    // $FlowExpectedError[prop-missing] missing function in Flow built-in types
+  >(lastSyncBackingStore.getAll());
 
   const tokenBackingStore = tx.objectStore('Token');
-  const allTokens = await promisifyDbCall<$ReadOnlyArray<$ReadOnly<{|
-    id: number,
-    value: $ReadOnly<TokenRow>
-  // $FlowExpectedError[prop-missing] missing function in Flow built-in types
-  |}>>>(tokenBackingStore.getAll());
+  const allTokens = await promisifyDbCall<
+    $ReadOnlyArray<
+      $ReadOnly<{|
+        id: number,
+        value: $ReadOnly<TokenRow>,
+      |}>,
+    >,
+    // $FlowExpectedError[prop-missing] missing function in Flow built-in types
+  >(tokenBackingStore.getAll());
 
   for (const table of tablesToDelete) {
     try {
@@ -333,24 +262,28 @@ async function deleteTxTables(
   // add back all the lastSyncInfo entries which need to exist for every public deriver
   for (const lastSyncRow of allLastSync) {
     const tableBackingStore = tx.objectStore('LastSyncInfo');
-    await promisifyDbCall<void>(tableBackingStore.put({
-      id: lastSyncRow.id,
-      value: {
-        LastSyncInfoId: lastSyncRow.value.LastSyncInfoId,
-        Time: new Date(Date.now()).getTime(),
-        SlotNum: null,
-        Height: 0,
-        BlockHash: null,
-      },
-    }));
+    await promisifyDbCall<void>(
+      tableBackingStore.put({
+        id: lastSyncRow.id,
+        value: {
+          LastSyncInfoId: lastSyncRow.value.LastSyncInfoId,
+          Time: new Date(Date.now()).getTime(),
+          SlotNum: null,
+          Height: 0,
+          BlockHash: null,
+        },
+      })
+    );
   }
   // add back the default tokens
   for (const tokenRow of allTokens.filter(row => row.value.IsDefault === true)) {
     const tableBackingStore = tx.objectStore('Token');
-    await promisifyDbCall<void>(tableBackingStore.put({
-      id: tokenRow.id,
-      value: tokenRow.value,
-    }));
+    await promisifyDbCall<void>(
+      tableBackingStore.put({
+        id: tokenRow.id,
+        value: tokenRow.value,
+      })
+    );
   }
   // note: no need to commit for raw transactions
 }
@@ -362,9 +295,7 @@ async function deleteTxTables(
  */
 export const dumpByVersion: { [tableName: string]: Array<any>, ... } = {};
 
-async function onUpgrade(
-  rawDb: lf$raw$BackStore,
-): Promise<void> {
+async function onUpgrade(rawDb: lf$raw$BackStore): Promise<void> {
   const version = rawDb.getVersion();
   if (version === 0) {
     // defaults to 0 when first time launching ever
@@ -409,11 +340,7 @@ async function onUpgrade(
     // therefore the single wallet always has its root key as derivation id 1
     // and we only launched the new DB for the Jormungandr Shelley testnet
     // so there are only Cip1852 wallets
-    await rawDb.addTableColumn(
-      'Cip1852Wrapper',
-      'RootKeyDerivationId',
-      1
-    );
+    await rawDb.addTableColumn('Cip1852Wrapper', 'RootKeyDerivationId', 1);
   }
   if (version === 6 || version === 7) {
     // fix mistake of assuming tx hash was always unencrypted
@@ -424,28 +351,15 @@ async function onUpgrade(
   }
 
   if (version >= 3 && version <= 9) {
-    await rawDb.dropTableColumn(
-      'Bip44Wrapper',
-      'Bip44WrapperId',
-    );
-    await rawDb.dropTableColumn(
-      'Cip1852Wrapper',
-      'Cip1852WrapperId',
-    );
+    await rawDb.dropTableColumn('Bip44Wrapper', 'Bip44WrapperId');
+    await rawDb.dropTableColumn('Cip1852Wrapper', 'Cip1852WrapperId');
   }
 
   if (version >= 3 && version <= 10) {
-    await rawDb.addTableColumn(
-      'Key',
-      'Type',
-      KeyKind.BIP32ED25519,
-    );
+    await rawDb.addTableColumn('Key', 'Type', KeyKind.BIP32ED25519);
   }
   if (version >= 3 && version <= 11) {
-    await rawDb.dropTableColumn(
-      'ConceptualWallet',
-      'CoinType',
-    );
+    await rawDb.dropTableColumn('ConceptualWallet', 'CoinType');
     await rawDb.addTableColumn(
       'ConceptualWallet',
       'NetworkId',
@@ -484,10 +398,9 @@ async function onUpgrade(
     await deleteTxTables(rawDb);
   }
   if (version < 18) {
-    await rawDb.addTableColumn(
-      'Address',
-      'IsUsed',
-      false
-    );
+    await rawDb.addTableColumn('Address', 'IsUsed', false);
+  }
+  if (version < 19) {
+    await rawDb.dropTable('Bip44Wrapper');
   }
 }

@@ -33,18 +33,18 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
     height: 64,
   });
 
-  if (!info?.id) {
+  if (!info?.id || uri === undefined) {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={Icons.Assets} />
+        <IconWrapper icon={fallback ? Icons.AdaToken : Icons.Assets} />
       </StyledIconBox>
     );
   }
 
-  if (fallback || !uri) {
+  if (isAda) {
     return (
       <StyledIconBox size={dimension} bg={isAda ? theme.palette.ds.primary_500 : theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={isAda ? Icons.AdaToken : Icons.Assets} />
+        <IconWrapper icon={Icons.AdaToken} />
       </StyledIconBox>
     );
   }

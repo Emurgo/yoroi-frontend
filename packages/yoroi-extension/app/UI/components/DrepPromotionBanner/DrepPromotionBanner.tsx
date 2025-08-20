@@ -61,9 +61,10 @@ export const DrepPromotionBanner = observer(({ stores, onClose, intl }) => {
     return null;
   }
 
-  const balance = useMemo(() => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6), [
-    selectedWallet,
-  ]);
+  const balance = useMemo(
+    () => new BigNumber(selectedWallet?.balance?.getDefaultEntry()?.amount || 0).shiftedBy(-6),
+    [selectedWallet]
+  );
   const selectedWalletId = selectedWallet.publicDeriverId;
 
   const { isVisible, dismissBanner } = useDrepBannerVisibility(balance, selectedWalletId);

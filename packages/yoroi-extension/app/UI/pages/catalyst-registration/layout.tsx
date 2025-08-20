@@ -8,7 +8,7 @@ type Props = {
   children: ReactNode;
 };
 
-const CatalystRegistrationLayout = ({ stores, children }: Props): JSX.Element => {
+const CatalystRegistrationLayout = ({ stores, children }: Props): ReactNode => {
   return (
     <GeneralPageLayout
       stores={stores}

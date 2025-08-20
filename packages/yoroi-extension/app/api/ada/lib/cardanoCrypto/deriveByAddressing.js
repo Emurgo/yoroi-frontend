@@ -13,11 +13,7 @@ export function derivePublicByAddressing(request: {|
     throw new Error(`${nameof(derivePublicByAddressing)} keyLevel < startLevel`);
   }
   let derivedKey = request.startingFrom.key;
-  for (
-    let i = request.startingFrom.level - request.addressing.startLevel + 1;
-    i < request.addressing.path.length;
-    i++
-  ) {
+  for (let i = request.startingFrom.level - request.addressing.startLevel + 1; i < request.addressing.path.length; i++) {
     derivedKey = derivedKey.derive(request.addressing.path[i]);
   }
   return derivedKey;
@@ -34,11 +30,7 @@ export function derivePrivateByAddressing(request: {|
     throw new Error(`${nameof(derivePrivateByAddressing)} keyLevel < startLevel`);
   }
   let derivedKey = request.startingFrom.key;
-  for (
-    let i = request.startingFrom.level - request.addressing.startLevel + 1;
-    i < request.addressing.path.length;
-    i++
-  ) {
+  for (let i = request.startingFrom.level - request.addressing.startLevel + 1; i < request.addressing.path.length; i++) {
     derivedKey = derivedKey.derive(request.addressing.path[i]);
   }
   return derivedKey;

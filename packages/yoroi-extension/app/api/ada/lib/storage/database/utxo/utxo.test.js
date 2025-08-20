@@ -1,6 +1,6 @@
 // @flow
 
-import { schema, } from 'lovefield';
+import { schema } from 'lovefield';
 import { loadLovefieldDBFromDump } from '../index';
 import { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from './api/read';
 import { ModifyUtxoAtSafePoint, ModifyUtxoDiffToBestBlock } from './api/write';
@@ -17,8 +17,8 @@ const UTXO_AT_SAFE_BLOCK_1 = {
       receiver: 'receiver1',
       amount: '42',
       assets: [],
-      blockNum: 1
-    }
+      blockNum: 1,
+    },
   ],
 };
 
@@ -32,8 +32,8 @@ const UTXO_AT_SAFE_BLOCK_2 = {
       receiver: 'receiver2',
       amount: '42',
       assets: [],
-      blockNum: 2
-    }
+      blockNum: 2,
+    },
   ],
 };
 
@@ -48,8 +48,8 @@ const UTXO_DIFF_TO_BEST_BLOCK_1 = {
       receiver: 'receiver3',
       amount: '42',
       assets: [],
-      blockNum: 3
-    }
+      blockNum: 3,
+    },
   ],
 };
 
@@ -64,8 +64,8 @@ const UTXO_DIFF_TO_BEST_BLOCK_2 = {
       receiver: 'receiver4',
       amount: '42',
       assets: [],
-      blockNum: 4
-    }
+      blockNum: 4,
+    },
   ],
 };
 
@@ -80,85 +80,37 @@ beforeAll(async () => {
 
 test('UtxoAtSafePoint', async () => {
   // add
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoAtSafePoint),
-    async tx => {
-      await ModifyUtxoAtSafePoint.addOrReplace(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_AT_SAFE_BLOCK_1,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoAtSafePoint), async tx => {
+    await ModifyUtxoAtSafePoint.addOrReplace(db, tx, publicDeriverId, UTXO_AT_SAFE_BLOCK_1);
+  });
 
   // check
-  let result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoAtSafePoint),
-    tx => GetUtxoAtSafePoint.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  let result = await raii(db, getAllSchemaTables(db, GetUtxoAtSafePoint), tx =>
+    GetUtxoAtSafePoint.forWallet(db, tx, publicDeriverId)
   );
 
-  expect(result).toEqual(
-    expect.objectContaining({ UtxoAtSafePoint: UTXO_AT_SAFE_BLOCK_1 })
-  );
+  expect(result).toEqual(expect.objectContaining({ UtxoAtSafePoint: UTXO_AT_SAFE_BLOCK_1 }));
 
   // replace
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoAtSafePoint),
-    async tx => {
-      await ModifyUtxoAtSafePoint.addOrReplace(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_AT_SAFE_BLOCK_2,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoAtSafePoint), async tx => {
+    await ModifyUtxoAtSafePoint.addOrReplace(db, tx, publicDeriverId, UTXO_AT_SAFE_BLOCK_2);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoAtSafePoint),
-    tx => GetUtxoAtSafePoint.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoAtSafePoint), tx =>
+    GetUtxoAtSafePoint.forWallet(db, tx, publicDeriverId)
   );
 
-  expect(result).toEqual(
-    expect.objectContaining({ UtxoAtSafePoint: UTXO_AT_SAFE_BLOCK_2 })
-  );
+  expect(result).toEqual(expect.objectContaining({ UtxoAtSafePoint: UTXO_AT_SAFE_BLOCK_2 }));
 
   // remove
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoAtSafePoint),
-    async tx => {
-      await ModifyUtxoAtSafePoint.remove(
-        db,
-        tx,
-        publicDeriverId,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoAtSafePoint), async tx => {
+    await ModifyUtxoAtSafePoint.remove(db, tx, publicDeriverId);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoAtSafePoint),
-    tx => GetUtxoAtSafePoint.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoAtSafePoint), tx =>
+    GetUtxoAtSafePoint.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toBe(undefined);
@@ -166,173 +118,77 @@ test('UtxoAtSafePoint', async () => {
 
 test('UtxoDiffToBestBlock', async () => {
   // initially empty
-  let result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  let result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([]);
 
   // add
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.add(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_DIFF_TO_BEST_BLOCK_1,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.add(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_1);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([UTXO_DIFF_TO_BEST_BLOCK_1]);
 
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.findLastBestBlockHash(
-      db,
-      tx,
-      publicDeriverId,
-      UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.findLastBestBlockHash(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash)
   );
 
   expect(result).toEqual(UTXO_DIFF_TO_BEST_BLOCK_1);
 
   // add duplicate
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.add(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_DIFF_TO_BEST_BLOCK_1,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.add(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_1);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([UTXO_DIFF_TO_BEST_BLOCK_1]);
 
   // remove
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.remove(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.remove(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_1.lastBestBlockHash);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([]);
 
   // add two
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.add(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_DIFF_TO_BEST_BLOCK_1,
-      );
-    }
-  );
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.add(
-        db,
-        tx,
-        publicDeriverId,
-        UTXO_DIFF_TO_BEST_BLOCK_2,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.add(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_1);
+  });
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.add(db, tx, publicDeriverId, UTXO_DIFF_TO_BEST_BLOCK_2);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([UTXO_DIFF_TO_BEST_BLOCK_1, UTXO_DIFF_TO_BEST_BLOCK_2]);
 
   // remove all
-  await raii(
-    db,
-    getAllSchemaTables(db, ModifyUtxoDiffToBestBlock),
-    async tx => {
-      await ModifyUtxoDiffToBestBlock.removeAll(
-        db,
-        tx,
-        publicDeriverId,
-      );
-    }
-  );
+  await raii(db, getAllSchemaTables(db, ModifyUtxoDiffToBestBlock), async tx => {
+    await ModifyUtxoDiffToBestBlock.removeAll(db, tx, publicDeriverId);
+  });
 
   // check
-  result = await raii(
-    db,
-    getAllSchemaTables(db, GetUtxoDiffToBestBlock),
-    tx => GetUtxoDiffToBestBlock.forWallet(
-      db,
-      tx,
-      publicDeriverId,
-    )
+  result = await raii(db, getAllSchemaTables(db, GetUtxoDiffToBestBlock), tx =>
+    GetUtxoDiffToBestBlock.forWallet(db, tx, publicDeriverId)
   );
 
   expect(result).toEqual([]);
