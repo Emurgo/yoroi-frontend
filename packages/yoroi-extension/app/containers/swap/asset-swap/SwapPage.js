@@ -392,6 +392,7 @@ function SwapPage(props: StoresProps & Intl): Node {
           )}
           {orderStep === 1 && (
             <ConfirmSwapTransaction
+              swapStore={stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}

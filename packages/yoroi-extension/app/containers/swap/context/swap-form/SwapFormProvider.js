@@ -80,6 +80,7 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
         break;
       case SwapFormActionTypeValues.SellInputValueChanged:
         draft.sellQuantity.displayValue = (state.sellQuantity.isTouched && action.value) || '';
+        draft.sellQuantity.feeError = null;
         break;
       case SwapFormActionTypeValues.BuyInputValueChanged:
         draft.buyQuantity.displayValue = (state.buyQuantity.isTouched && action.value) || '';
@@ -89,6 +90,9 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
         break;
       case SwapFormActionTypeValues.SellAmountErrorChanged:
         draft.sellQuantity.error = action.error || null;
+        break;
+      case SwapFormActionTypeValues.SellFeeAmountErrorChanged:
+        draft.sellQuantity.feeError = action.error || null;
         break;
       case SwapFormActionTypeValues.BuyAmountErrorChanged:
         draft.buyQuantity.error = action.error || null;
@@ -134,6 +138,8 @@ export default function SwapFormProvider({ swapStore, children }: Props): Node {
       dispatch({ type: SwapFormActionTypeValues.LimitPriceInputValueChanged, value }),
     buyAmountErrorChanged: (error: string | null) => dispatch({ type: SwapFormActionTypeValues.BuyAmountErrorChanged, error }),
     sellAmountErrorChanged: (error: string | null) => dispatch({ type: SwapFormActionTypeValues.SellAmountErrorChanged, error }),
+    sellFeeAmountErrorChanged: (error: string | null) =>
+      dispatch({ type: SwapFormActionTypeValues.SellFeeAmountErrorChanged, error }),
   };
 
   /**
