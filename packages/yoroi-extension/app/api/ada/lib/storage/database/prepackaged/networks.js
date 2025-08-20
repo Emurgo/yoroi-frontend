@@ -57,7 +57,7 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preprod Testnet',
     NetworkFeatureName: 'preprod',
     Backend: {
-      BackendService: environment.test || CONFIG.yoroiBackend.preprod,
+      BackendService: CONFIG.yoroiBackend.preprod,
       TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
       BackendServiceZero: CONFIG.yoroiBackend.zeroPreprod,
     },
