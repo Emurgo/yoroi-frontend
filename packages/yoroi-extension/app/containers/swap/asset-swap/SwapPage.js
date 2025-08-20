@@ -280,12 +280,12 @@ function SwapPage(props: StoresProps & Intl): Node {
     setOpenedDialog('loadingOverlay');
 
     try {
-      // await stores.transactionProcessingStore.adaSendAndRefresh({
-      //   wallet,
-      //   signRequest,
-      //   password,
-      //   callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      // });
+      await stores.transactionProcessingStore.adaSendAndRefresh({
+        wallet,
+        signRequest,
+        password,
+        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
+      });
 
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);
@@ -392,6 +392,7 @@ function SwapPage(props: StoresProps & Intl): Node {
           )}
           {orderStep === 1 && (
             <ConfirmSwapTransaction
+              swapStore={stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
