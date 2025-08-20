@@ -392,6 +392,7 @@ function SwapPage(props: StoresProps & Intl): Node {
           )}
           {orderStep === 1 && (
             <ConfirmSwapTransaction
+              swapStore={stores.substores.ada.swapStore}
               slippageValue={slippageValue}
               walletAddress={selectedWalletAddress}
               priceImpactState={priceImpactState}
@@ -434,7 +435,7 @@ function SwapPage(props: StoresProps & Intl): Node {
               onClick={processSwapOrder}
               sx={{ minWidth: '128px', minHeight: '48px' }}
               variant="primary"
-              disabled={!isSwapEnabled || isButtonLoader}
+              disabled={!isSwapEnabled || isButtonLoader || orderLimitPrice === '0'}
             >
               {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
             </Button>

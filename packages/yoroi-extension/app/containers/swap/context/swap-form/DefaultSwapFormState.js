@@ -6,6 +6,7 @@ export const defaultSwapFormState: SwapFormState = Object.freeze({
     isTouched: false,
     disabled: false,
     error: null,
+    feeError: null,
     displayValue: '',
   },
   buyQuantity: {
