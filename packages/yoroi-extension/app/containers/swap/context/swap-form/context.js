@@ -23,6 +23,7 @@ const initialSwapFormContext: SwapFormContext = {
   limitPriceInputValueChanged: missingInit,
   buyAmountErrorChanged: missingInit,
   sellAmountErrorChanged: missingInit,
+  sellFeeAmountErrorChanged: missingInit,
   canSwapChanged: missingInit,
   sellFocusState: ConstantState(false),
   buyFocusState: ConstantState(false),
