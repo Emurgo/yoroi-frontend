@@ -1,5 +1,6 @@
 // @flow
 
+import type { ConfigType } from '../../../../../../../config/config-types';
 import { CoinTypes } from '../../../../../../config/numbersConfig';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import type { CardanoHaskellBaseConfig, CardanoHaskellConfig, NetworkRow, TokenInsert } from '../primitives/tables';
@@ -10,6 +11,9 @@ import type { WalletState } from '../../../../../../../chrome/extension/backgrou
 export const CardanoForks = Object.freeze({
   Haskell: 0,
 });
+
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
 
 export const networks = Object.freeze({
   CardanoMainnet: ({
