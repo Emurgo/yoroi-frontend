@@ -41,7 +41,7 @@ const baseDevConfig = (
   },
   plugins: [
     ...commonConfig.plugins('dev', networkName),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E), "-")),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/\S+.prod$/,
@@ -109,7 +109,7 @@ const backgroundServiceWorkerConfig = (
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E), "-")),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.IgnorePlugin({
       resourceRegExp: /[^/]+\/\S+.prod$/,
     }),
@@ -183,7 +183,7 @@ const bringContentScriptConfig = (
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
-    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E), "-")),
+    new webpack.DefinePlugin(commonConfig.definePlugin(networkName, false, isNightly, Boolean(isLight), Boolean(isE2E))),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/}),
   ],
   module: {

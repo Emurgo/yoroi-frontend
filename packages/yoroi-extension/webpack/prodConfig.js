@@ -51,7 +51,6 @@ const baseProdConfig = (env /*: EnvParams */) /*: * */ => ({
       JSON.parse(env.nightly),
       JSON.parse(env.isLight),
       JSON.parse(env.isE2E),
-      "test" //env.testMode || "a",
     )),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],
@@ -106,7 +105,6 @@ const backgroundServiceWorkerConfig = (env /*: EnvParams */) /*: * */ => ({
       JSON.parse(env.nightly),
       JSON.parse(env.isLight),
       JSON.parse(env.isE2E),
-      "test" //env.testMode || "a",
     )),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
     new webpack.optimize.LimitChunkCountPlugin({
@@ -174,7 +172,6 @@ const bringContentScriptConfig = (env /*: EnvParams */) /*: * */ => ({
       JSON.parse(env.nightly),
       JSON.parse(env.isLight),
       JSON.parse(env.isE2E),
-      "test" //env.testMode || "a",
     )),
     new webpack.IgnorePlugin({ resourceRegExp: /[^/]+\/\S+.dev$/ }),
   ],

@@ -126,8 +126,7 @@ export const environment = ((
             return FIREFOX_PRIVACY_POLICY_URL;
         }
         return null;
-    },
-    test: process.env.TEST || ""
+    }
   }
 ): {
   getNetworkName: void => Network,
@@ -151,7 +150,6 @@ export const environment = ((
   isChrome: void => boolean,
   canRegisterProtocol: void => boolean,
   externalPrivacyPolicyURL: void => ?string,
-  test: string,
   ...
 });
 
