@@ -21,6 +21,7 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
   onError: () => void,
+  swapStore: any,
 |};
 
 function ConfirmSwapTransaction({
