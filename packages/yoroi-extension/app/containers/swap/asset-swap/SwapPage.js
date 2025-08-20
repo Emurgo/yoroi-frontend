@@ -374,107 +374,107 @@ function SwapPage(props: StoresProps & Intl): Node {
     if (walletType === 'trezor') return sendUsingTrezorT;
     return props.intl.formatMessage(globalMessages.confirm);
   }
-
-  return (
-    <>
-      <Box display="flex" flexDirection="column" height="100%">
-        <Box sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }} borderBottom="1px solid" borderColor="grayscale.200">
-          {orderStep === 0 && (
-            <CreateSwapOrder
-              swapStore={stores.substores.ada.swapStore}
-              slippageValue={slippageValue}
-              onSetNewSlippage={onSetNewSlippage}
-              defaultTokenInfo={defaultTokenInfo}
-              getTokenInfo={getTokenInfo}
-              getTokenInfoBatch={getTokenInfoBatch}
-              priceImpactState={priceImpactState}
-            />
-          )}
-          {orderStep === 1 && (
-            <ConfirmSwapTransaction
-              swapStore={stores.substores.ada.swapStore}
-              slippageValue={slippageValue}
-              walletAddress={selectedWalletAddress}
-              priceImpactState={priceImpactState}
-              onRemoteOrderDataResolved={onRemoteOrderDataResolved}
-              defaultTokenInfo={defaultTokenInfo}
-              getTokenInfo={getTokenInfo}
-              getFormattedPairingValue={getFormattedPairingValue}
-              onError={() => {
-                stores.routing.goToRoute({ route: ROUTES.SWAP.ERROR });
-              }}
-            />
-          )}
-          {orderStep === 2 && (
-            <TxSubmittedStep
-              txSubmitErrorState={txSubmitErrorState}
-              onTryAgain={processBackToStart}
-              onSuccess={() => {
-                stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
-              }}
-              onDownloadLogs={downloadLogs}
-            />
-          )}
-        </Box>
-        {orderStep < 2 && (
-          <Box
-            flexShrink={0}
-            gap="24px"
-            p="24px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            sx={{ height: '97px' }}
-          >
-            {orderStep === 1 && (
-              <Button onClick={processBackToStart} sx={{ minWidth: '128px', minHeight: '48px' }} variant="secondary">
-                {back}
-              </Button>
-            )}
-            <Button
-              onClick={processSwapOrder}
-              sx={{ minWidth: '128px', minHeight: '48px' }}
-              variant="primary"
-              disabled={!isSwapEnabled || isButtonLoader}
-            >
-              {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
-            </Button>
-          </Box>
+  
+return (
+  <>
+    <Box display="flex" flexDirection="column" height="100%">
+      <Box sx={{ flexGrow: '1', overflowY: 'auto', p: '24px' }} borderBottom="1px solid" borderColor="grayscale.200">
+        {orderStep === 0 && (
+          <CreateSwapOrder
+            swapStore={stores.substores.ada.swapStore}
+            slippageValue={slippageValue}
+            onSetNewSlippage={onSetNewSlippage}
+            defaultTokenInfo={defaultTokenInfo}
+            getTokenInfo={getTokenInfo}
+            getTokenInfoBatch={getTokenInfoBatch}
+            priceImpactState={priceImpactState}
+          />
+        )}
+        {orderStep === 1 && (
+          <ConfirmSwapTransaction
+            swapStore={stores.substores.ada.swapStore}
+            slippageValue={slippageValue}
+            walletAddress={selectedWalletAddress}
+            priceImpactState={priceImpactState}
+            onRemoteOrderDataResolved={onRemoteOrderDataResolved}
+            defaultTokenInfo={defaultTokenInfo}
+            getTokenInfo={getTokenInfo}
+            getFormattedPairingValue={getFormattedPairingValue}
+            onError={() => {
+              stores.routing.goToRoute({ route: ROUTES.SWAP.ERROR });
+            }}
+          />
+        )}
+        {orderStep === 2 && (
+          <TxSubmittedStep
+            txSubmitErrorState={txSubmitErrorState}
+            onTryAgain={processBackToStart}
+            onSuccess={() => {
+              stores.routing.goToRoute({ route: ROUTES.WALLETS.ROOT });
+            }}
+            onDownloadLogs={downloadLogs}
+          />
         )}
       </Box>
-
-      {openedDialog === 'loadingOverlay' && <LoadingOverlay />}
-
-      {openedDialog === 'limitOrderWarning' && (
-        <LimitOrderWarningDialog
-          onContinue={() => {
-            setOrderStepValue(1);
-            setOpenedDialog('');
-          }}
-          onCancel={() => setOpenedDialog('')}
-        />
+      {orderStep < 2 && (
+        <Box
+          flexShrink={0}
+          gap="24px"
+          p="24px"
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          sx={{ height: '97px' }}
+        >
+          {orderStep === 1 && (
+            <Button onClick={processBackToStart} sx={{ minWidth: '128px', minHeight: '48px' }} variant="secondary">
+              {back}
+            </Button>
+          )}
+          <Button
+            onClick={processSwapOrder}
+            sx={{ minWidth: '128px', minHeight: '48px' }}
+            variant="primary"
+            disabled={!isSwapEnabled || isButtonLoader || orderLimitPrice === '0'}
+          >
+            {(isButtonLoader && <LoadingSpinner small color={3} />) || (orderStep === 0 ? swap : confirmationButtonMessage())}
+          </Button>
+        </Box>
       )}
+    </Box>
 
-      {openedDialog === 'priceImpactAlert' && (
-        <PriceImpactAlert
-          onContinue={() => {
-            setOrderStepValue(1);
-            setOpenedDialog('');
-          }}
-          onCancel={() => setOpenedDialog('')}
-        />
-      )}
+    {openedDialog === 'loadingOverlay' && <LoadingOverlay />}
 
-      {disclaimerStatus === false && (
-        <SwapDisclaimerDialog
-          onDialogConfirm={onAcceptDisclaimer}
-          onDialogRefuse={() => {
-            stores.routing.replaceRoute({ route: ROUTES.WALLETS.ROOT });
-          }}
-        />
-      )}
-    </>
-  );
+    {openedDialog === 'limitOrderWarning' && (
+      <LimitOrderWarningDialog
+        onContinue={() => {
+          setOrderStepValue(1);
+          setOpenedDialog('');
+        }}
+        onCancel={() => setOpenedDialog('')}
+      />
+    )}
+
+    {openedDialog === 'priceImpactAlert' && (
+      <PriceImpactAlert
+        onContinue={() => {
+          setOrderStepValue(1);
+          setOpenedDialog('');
+        }}
+        onCancel={() => setOpenedDialog('')}
+      />
+    )}
+
+    {disclaimerStatus === false && (
+      <SwapDisclaimerDialog
+        onDialogConfirm={onAcceptDisclaimer}
+        onDialogRefuse={() => {
+          stores.routing.replaceRoute({ route: ROUTES.WALLETS.ROOT });
+        }}
+      />
+    )}
+  </>
+);
 }
 
 export default (injectIntl(observer(SwapPage)): React$ComponentType<StoresProps>);
