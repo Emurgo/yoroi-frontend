@@ -94,6 +94,8 @@ import { Wallets } from './Wallets';
 import { Refresh } from './Refresh';
 import { Swap } from './Swap';
 import { AdaToken } from './AdaToken';
+import { Bell } from './Bell';
+import { Notification } from './Notification';
 
 export const Icon = {
   Assets,
@@ -190,6 +192,8 @@ export const Icon = {
   Wallet,
   Wallets,
   Swap,
+  Bell,
+  Notification,
 };
 
 export enum Icons {

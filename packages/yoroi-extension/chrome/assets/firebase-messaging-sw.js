@@ -1,10 +1,12 @@
+const broadcast = new BroadcastChannel('');
+
 self.addEventListener('push', event => {
   if (event && event.data) {
-    const data = event.data.json();
+    const eventData = event.data.json();
     event.waitUntil(
-      self.registration.showNotification(data.notification.title, {
-        body: data.notification.body,
-        //icon:
+      broadcast.postMessage({
+        type: 'push-notification',
+        eventData,
       })
     );
   }

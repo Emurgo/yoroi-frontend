@@ -4,12 +4,14 @@ import NotificationsStyles, { FadeInOut } from './NotificationsStyles';
 import { Box, Button } from '@mui/material';
 import environment from '../../../../environment';
 import { NotificationTypes } from '../../../types/notifications'; */
+import { NotificationCenter } from '../module/NotificationCenter';
 
 export default function NotificationsManager() {
   // const { createNotification } = useNotifications();
 
   return (
     <>
+      <NotificationCenter />
       <NotificationsStyles />
       <ToastContainer
         position="top-right"

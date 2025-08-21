@@ -132,6 +132,22 @@ export const messages = Object.freeze(
       id: 'banners.midnight.yoroiSupport',
       defaultMessage: '!!!Yoroi now supports the Midnight airdrop. Securely claim your NIGHT tokens today.',
     },
+    assetReceived: {
+      id: 'notification.assetReceived',
+      defaultMessage: '!!!{ asset } received',
+    },
+    assetSent: {
+      id: 'notification.assetSent',
+      defaultMessage: '!!!{ asset } sent',
+    },
+    multipleAssetsReceived: {
+      id: 'notification.multipleAssetsReceived',
+      defaultMessage: '!!!Multiple assets received',
+    },
+    multipleAssetsSent: {
+      id: 'notification.multiplesAssetSent',
+      defaultMessage: '!!!Multiple assets sent',
+    },
   })
 );
 
@@ -171,5 +187,9 @@ export const useStrings = () => {
     cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
     cardanoCardJoin: intl.formatMessage(messages.cardanoCardJoin),
     cardanoCardLearnMore: intl.formatMessage(messages.cardanoCardLearnMore),
+    assetReceived: (asset: string) => intl.formatMessage(messages.assetReceived, { asset }),
+    assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
+    multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
+    multipleAssetsSent: intl.formatMessage(messages.multipleAssetsSent),
   }).current;
 };
