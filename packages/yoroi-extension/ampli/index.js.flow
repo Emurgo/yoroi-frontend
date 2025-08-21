@@ -115,6 +115,12 @@ export type ExchangeSubmittedProperties = {|
    */
   ramp_type: "Buy" | "Sell",
 |};
+export type GovernanceChooseDrepPageViewedProperties = {|
+  /**
+   * This is the drep ID that the user inputs. This data can be obtained when the user opens the select a drep screen (a popup on extension and a bottom sheet on mobile) and inputting a drep ID.
+   */
+  drep_id?: string,
+|};
 export type GovernanceConfirmTransactionPageViewedProperties = {|
   /**
    * | Rule | Value |
@@ -131,6 +137,12 @@ export type GovernanceTransactionSuccessPageViewedProperties = {|
    */
   governance_selection: "Delegate" | "Abstain" | "No Confidence",
 |};
+export type GovernanceYoroiDRepSubmittedProperties = {|
+  /**
+   * This is the drep ID that the user inputs. This data can be obtained when the user opens the select a drep screen (a popup on extension and a bottom sheet on mobile) and inputting a drep ID.
+   */
+  drep_id?: string,
+|};
 export type InAppNotificationClosedProperties = {|
   type: string,
 |};
@@ -141,6 +153,17 @@ export type InAppNotificationOpenedProperties = {|
    * | Enum Values | tx_received, staking_rewards |
    */
   type?: "tx_received" | "staking_rewards",
+|};
+export type MidnightAirdropPageViewedProperties = {|
+  /**
+   * True if user has already claimed, false if user has not claimed
+   */
+  "is_claimed?"?: boolean,
+
+  /**
+   * True if user has eligible claim and false if not
+   */
+  "is_eligible?"?: boolean,
 |};
 export type NetworkSelectedProperties = {|
   /**
@@ -1006,7 +1029,11 @@ declare export class ExchangeSubmitted mixins BaseEvent {
   constructor(event_properties: ExchangeSubmittedProperties): this;
 }
 declare export class GovernanceChooseDrepPageViewed mixins BaseEvent {
+  event_properties?: GovernanceChooseDrepPageViewedProperties;
   event_type: string;
+  constructor(
+    event_properties?: GovernanceChooseDrepPageViewedProperties
+  ): this;
 }
 declare export class GovernanceConfirmTransactionPageViewed mixins BaseEvent {
   event_properties: GovernanceConfirmTransactionPageViewedProperties;
@@ -1025,6 +1052,11 @@ declare export class GovernanceTransactionSuccessPageViewed mixins BaseEvent {
     event_properties: GovernanceTransactionSuccessPageViewedProperties
   ): this;
 }
+declare export class GovernanceYoroiDRepSubmitted mixins BaseEvent {
+  event_properties?: GovernanceYoroiDRepSubmittedProperties;
+  event_type: string;
+  constructor(event_properties?: GovernanceYoroiDRepSubmittedProperties): this;
+}
 declare export class InAppNotificationClosed mixins BaseEvent {
   event_properties: InAppNotificationClosedProperties;
   event_type: string;
@@ -1036,6 +1068,23 @@ declare export class InAppNotificationOpened mixins BaseEvent {
   constructor(event_properties?: InAppNotificationOpenedProperties): this;
 }
 declare export class InAppNotificationViewed mixins BaseEvent {
+  event_type: string;
+}
+declare export class MidnightAirdropBannerCheckEligibility mixins BaseEvent {
+  event_type: string;
+}
+declare export class MidnightAirdropBannerClosed mixins BaseEvent {
+  event_type: string;
+}
+declare export class MidnightAirdropLeftMenuClicked mixins BaseEvent {
+  event_type: string;
+}
+declare export class MidnightAirdropPageViewed mixins BaseEvent {
+  event_properties?: MidnightAirdropPageViewedProperties;
+  event_type: string;
+  constructor(event_properties?: MidnightAirdropPageViewedProperties): this;
+}
+declare export class MidnightAirdropSignMessage mixins BaseEvent {
   event_type: string;
 }
 declare export class NetworkSelected mixins BaseEvent {
@@ -1662,9 +1711,11 @@ declare export class Ampli {
    * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Choose%20Drep%20Page%20Viewed)
    *
    * This event tracks when user loads the bottom sheet on mobile or the popup on extension to introduce the Drep ID. To arrive to this page the user has to click on “Delegate to a Drep” section.
+   * @param properties The event's properties (e.g. drep_id)
    * @param options Amplitude event options.
    */
   governanceChooseDrepPageViewed(
+    properties?: GovernanceChooseDrepPageViewedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1705,6 +1756,20 @@ declare export class Ampli {
    */
   governanceTransactionSuccessPageViewed(
     properties: GovernanceTransactionSuccessPageViewedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Governance Yoroi DRep Submitted
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Governance%20Yoroi%20DRep%20Submitted)
+   *
+   * This event tracks when a user clicks the "Delegate to Yoroi DRep" button on the governance dashboard page.
+   * @param properties The event's properties (e.g. drep_id)
+   * @param options Amplitude event options.
+   */
+  governanceYoroiDRepSubmitted(
+    properties?: GovernanceYoroiDRepSubmittedProperties,
     options?: EventOptions
   ): PromiseResult<any>;
 
@@ -1755,6 +1820,68 @@ declare export class Ampli {
    * @param options Amplitude event options.
    */
   inAppNotificationViewed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Midnight Airdrop Banner Check Eligibility
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Banner%20Check%20Eligibility)
+   *
+   * Event is triggered when a user triggers the banner redirection to the airdrop page by clicking on the CTA "check eligibility"
+   * @param options Amplitude event options.
+   */
+  midnightAirdropBannerCheckEligibility(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Midnight Airdrop Banner Closed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Banner%20Closed)
+   *
+   * This events is triggered when the user dismisses the banner by cliking on the close CTA of the banner
+   * @param options Amplitude event options.
+   */
+  midnightAirdropBannerClosed(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Midnight Airdrop Left Menu Clicked
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Left%20Menu%20Clicked)
+   *
+   * This event is triggered when the user clicks on the airdrop entry point located in the left menu of extension
+   * @param options Amplitude event options.
+   */
+  midnightAirdropLeftMenuClicked(
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Midnight Airdrop Page Viewed
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Page%20Viewed)
+   *
+   * This event is triggered when the Airdrop page is displayed to the user
+   * @param properties The event's properties (e.g. is_claimed?)
+   * @param options Amplitude event options.
+   */
+  midnightAirdropPageViewed(
+    properties?: MidnightAirdropPageViewedProperties,
+    options?: EventOptions
+  ): PromiseResult<any>;
+
+  /**
+   * Midnight Airdrop Sign Message
+   *
+   * [View in Tracking Plan](https://data.amplitude.com/emurgo/Yoroi/events/main/latest/Midnight%20Airdrop%20Sign%20Message)
+   *
+   * Event is triggered once the user clicks on sign message of the sign message popup dispayed in the Airdrop funnel
+   * @param options Amplitude event options.
+   */
+  midnightAirdropSignMessage(
     options?: EventOptions
   ): PromiseResult<any>;
 

@@ -18,7 +18,7 @@ npx flowgen --interface-records --no-inexact --add-flow-header -o index.js.flow 
 ```
 
 ```
-rm *.ts
+rm index.ts
 ```
 
 #### Next
