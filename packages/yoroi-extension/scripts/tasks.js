@@ -43,13 +43,8 @@ const buildManifest = (
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = (
-  isDebug: boolean,
-  isNightly: boolean,
-  shouldInjectConnector: boolean,
-  isFirefox: boolean
-) => {
-  manifestTypes.forEach((type) => {
+exports.buildManifests = (isDebug: boolean, isNightly: boolean, shouldInjectConnector: boolean, isFirefox: boolean) => {
+  manifestTypes.forEach(type => {
     buildManifest(type, isDebug, isNightly, shouldInjectConnector, isFirefox);
   });
 };

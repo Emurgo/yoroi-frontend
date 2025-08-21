@@ -51,7 +51,7 @@ export class PublicDeriver<+Parent: ConceptualWallet = ConceptualWallet> impleme
     this.derivationId = data.derivationId;
 
     const { BackendService } = data.parent.getNetworkInfo().Backend;
-    if (!BackendService) {
+    if (BackendService == null) {
       throw new Error('missing backend service URL');
     }
     const utxoApi = new UtxoApi(BackendService);
