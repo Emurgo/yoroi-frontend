@@ -69,6 +69,13 @@ export const SelectAssetTo = () => {
       return `${a.name};[${a.id}];${a.id};${a.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
     }) || [];
 
+  const filteredYourAssets =
+    ftAssetList.filter(a => {
+      if (a == null) return false;
+      if (!searchTerm) return true;
+      return `${a.info.name};[${a.info.id}];${a.id};${a.info.fingerprint}`.toLowerCase().includes(searchTerm.toLowerCase());
+    }) || [];
+
   return (
     <Stack {...atoms.mb_2xl}>
       <Stack {...atoms.pb_s}>
@@ -98,7 +105,7 @@ export const SelectAssetTo = () => {
         </AssetCountText>
       </Stack>
       <Stack>
-        {ftAssetList.map(asset => {
+        {filteredYourAssets.map(asset => {
           return (
             <AssetInfoInRow
               direction="in"
@@ -120,7 +127,7 @@ export const SelectAssetTo = () => {
         })}
       </Stack>
       <Typography variant="body2" color="ds.text_gray_low" py={8}>
-        All assets ({filteredAssets.length})
+        {strings.allAssets} ({filteredAssets.length})
       </Typography>
 
       <Stack>

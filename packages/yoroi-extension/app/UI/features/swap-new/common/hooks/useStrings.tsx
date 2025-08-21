@@ -113,6 +113,10 @@ export const messages = Object.freeze(
       id: 'swap.placeOrder',
       defaultMessage: '!!! Place Order',
     },
+    allAssets: {
+      id: 'swap.allAssets',
+      defaultMessage: '!!! All Assets',
+    },
   })
 );
 
@@ -145,6 +149,7 @@ export const useStrings = () => {
     placeOrder: intl.formatMessage(messages.placeOrder),
     selectRoute: intl.formatMessage(messages.selectRoute),
     buyAt: intl.formatMessage(messages.buyAt),
+    allAssets: intl.formatMessage(messages.allAssets),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
