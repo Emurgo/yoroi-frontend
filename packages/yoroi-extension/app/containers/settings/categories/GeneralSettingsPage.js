@@ -157,10 +157,10 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             />
           )}
           <ThemeSettingsBlock />
-          <EnableNotificationsSettings
+          {/*<EnableNotificationsSettings
             isEnabled={stores.pushNotificationStore.isEnabled}
             toggle={stores.pushNotificationStore.toggleEnabled}
-          />
+          />*/}
           <AboutYoroiSettingsBlock
             wallet={stores.wallets.selected}
             fcmToken={stores.pushNotificationStore.fcmToken}
