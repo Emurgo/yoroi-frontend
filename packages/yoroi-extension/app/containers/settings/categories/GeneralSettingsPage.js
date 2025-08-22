@@ -17,7 +17,7 @@ import environment from '../../../environment';
 import SwitchNetworkDialogContainer from './SwitchNetworkDialogContainer';
 import type { StoresProps } from '../../../stores';
 // $FlowIgnore: suppressing this error
-import EnableNotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/EnableNotificationsSettings';
+//import EnableNotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/EnableNotificationsSettings';
 
 // $FlowIgnore[cannot-resolve-module]
 import { ModalProvider } from '../../../UI/components/modals/ModalContext';
