@@ -69,6 +69,7 @@ export type SwapFormActions = {|
   sellInputValueChanged: (value: string) => void,
   limitPriceInputValueChanged: (value: string) => void,
   buyAmountErrorChanged: (error: string | null) => void,
+  sellFeeAmountErrorChanged: (error: string | null) => void,
   sellAmountErrorChanged: (error: string | null) => void,
   sellFeeAmountErrorChanged: (error: string | null) => void,
 |};

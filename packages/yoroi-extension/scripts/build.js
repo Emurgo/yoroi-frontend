@@ -9,7 +9,7 @@ process.env.NODE_CONFIG_ENV = argv.env;
 function buildProd(env: string) {
   console.log('[Build manifest]');
   console.log('-'.repeat(80));
-  tasks.buildManifests(false, isNightly, shouldInjectConnector);
+  tasks.buildManifests(false, isNightly, shouldInjectConnector, argv.platform === 'ff');
 
   console.log('[Copy assets]', env);
   console.log('-'.repeat(80));
