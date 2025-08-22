@@ -23,6 +23,10 @@ export const messages = Object.freeze(
       id: 'global.labels.route',
       defaultMessage: '!!!route',
     },
+    routeTvl: {
+      id: 'global.labels.tvl',
+      defaultMessage: '!!!TVL',
+    },
     routePath: {
       id: 'swap.routePath',
       defaultMessage: '!!!routePath',
@@ -93,6 +97,26 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!When the slippage tolerance is set really high, it allows the transaction to still complete despite large price swings. This can open the door to front-running and sandwich attacks.',
     },
+    swapLabel: {
+      id: 'swap.swapLabel',
+      defaultMessage: '!!! Swap',
+    },
+    buyAt: {
+      id: 'swap.buyAt',
+      defaultMessage: '!!! Buy At',
+    },
+    selectRoute: {
+      id: 'swap.selectRoute',
+      defaultMessage: '!!! Select Route',
+    },
+    placeOrder: {
+      id: 'swap.placeOrder',
+      defaultMessage: '!!! Place Order',
+    },
+    allAssets: {
+      id: 'swap.allAssets',
+      defaultMessage: '!!! All Assets',
+    },
   })
 );
 
@@ -104,6 +128,7 @@ export const useStrings = () => {
     limitTabLabel: intl.formatMessage(messages.limitTabLabel),
     marketTabLabel: intl.formatMessage(messages.marketTabLabel),
     routeLabel: intl.formatMessage(messages.routeLabel),
+    routeTvl: intl.formatMessage(messages.routeTvl),
     priceLabel: intl.formatMessage(messages.priceLabel),
     routePath: intl.formatMessage(messages.routePath),
     dexFee: intl.formatMessage(messages.dexFee),
@@ -120,6 +145,11 @@ export const useStrings = () => {
     routingPreferance: intl.formatMessage(messages.routingPreferance),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
+    swapLabel: intl.formatMessage(messages.swapLabel),
+    placeOrder: intl.formatMessage(messages.placeOrder),
+    selectRoute: intl.formatMessage(messages.selectRoute),
+    buyAt: intl.formatMessage(messages.buyAt),
+    allAssets: intl.formatMessage(messages.allAssets),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
