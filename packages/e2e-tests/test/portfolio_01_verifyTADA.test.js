@@ -46,10 +46,10 @@ describe('Portfolio - verify values are loaded', function () {
 
   it('Portfolio values should be loaded and displayed', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    
+
     // Wait for data to load
     await new Promise(resolve => setTimeout(resolve, 3000));
-    
+
     // Verify all value columns have valid data loaded
     const allValuesLoaded = await portfolioPage.areAllValuesLoaded();
     expect(allValuesLoaded, 'One or more value columns are missing valid data').to.be.true;
@@ -80,5 +80,3 @@ describe('Portfolio - verify values are loaded', function () {
     basePage.closeBrowser();
   });
 });
-
-

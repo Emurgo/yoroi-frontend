@@ -33,14 +33,14 @@ describe('Portfolio - verify TADA details', function () {
 
   it('Search for TADA and click to open details', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    
+
     // Search for TADA on the main portfolio page
     logger.info('Searching for TADA in portfolio...');
     await portfolioPage.searchForAsset('TADA');
-    
+
     // Wait a moment for search results to load
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     // Verify TADA is displayed after search
     const tadaExists = await portfolioPage.isAssetDisplayed('TADA');
     expect(tadaExists, 'TADA row is not displayed after search').to.be.true;
@@ -48,11 +48,11 @@ describe('Portfolio - verify TADA details', function () {
     // Click on TADA to open details
     logger.info('Clicking on TADA to open details');
     await portfolioPage.clickAssetByName('TADA');
-    
+
     // Wait longer for navigation to details page
     logger.info('Waiting for navigation to details page...');
     await new Promise(resolve => setTimeout(resolve, 5000));
-    
+
     // Check current URL to see if navigation worked
     const currentUrl = await webdriver.getCurrentUrl();
     logger.info(`Current URL after clicking: ${currentUrl}`);
