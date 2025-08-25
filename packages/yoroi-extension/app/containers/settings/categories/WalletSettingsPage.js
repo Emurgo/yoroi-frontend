@@ -21,6 +21,8 @@ import globalMessages from '../../../i18n/global-messages';
 import NotificationsSettings from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationsSettings';
 // $FlowIgnore: suppressing this error
 import NotificationDurationDialog from '../../../UI/features/notifications/useCases/NotificationsSettings/NotificationDurationDialog';
+// $FlowIgnore: suppressing this error
+import EnableSingleAddressSettings from '../../../UI/features/single-address/useCases/SingleAddressSettings/EnableSingleAddressSettings';
 
 @observer
 export default class WalletSettingsPage extends Component<StoresProps> {
@@ -72,6 +74,9 @@ export default class WalletSettingsPage extends Component<StoresProps> {
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
+        {selectedWalletId != null ? (
+          <EnableSingleAddressSettings isEnabled={true} toggle={(a, b, c) => console.log(a, b, c)} />
+        ) : null}
         {selectedWalletId != null ? (
           <NotificationsSettings
             selectedWalletId={selectedWalletId}
