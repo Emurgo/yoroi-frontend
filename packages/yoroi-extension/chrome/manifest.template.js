@@ -22,6 +22,7 @@ export default ({
   version,
   enableProtocolHandlers,
   shouldInjectConnector,
+  isFirefox
 } /*: {|
   description: string,
   defaultTitle: string,
@@ -34,6 +35,7 @@ export default ({
   version: string,
   enableProtocolHandlers: boolean,
   shouldInjectConnector: boolean,
+  isFirefox: boolean,
 |} */
 )/* : * */ => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
@@ -45,6 +47,14 @@ export default ({
       /* eslint-enable quote-props */
     }
     : iconOverride;
+  let background = {
+    service_worker: 'js/background-service-worker.js',
+  };
+
+  if (isFirefox) {
+    background =  { scripts: ['js/background-service-worker.js']}
+  }
+
   const base = {
     version,
     // the name shown in chrome://extensions
@@ -62,9 +72,7 @@ export default ({
       },
     },
     icons,
-    background: {
-      service_worker: 'js/background-service-worker.js',
-    },
+    background,
     permissions: [
       'storage',
       'tabs',

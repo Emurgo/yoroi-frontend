@@ -39,5 +39,11 @@
   "notifications": {
     "defaultDuration": 4,
     "vapidPublicKey": "BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M"
+  },
+  "yoroiBackend": {
+    "mainnet": "https://api.yoroiwallet.com",
+    "preprod": "https://preprod-backend.yoroiwallet.com",
+    "zeroMainnet": "https://zero.yoroiwallet.com",
+    "zeroPreprod": "https://yoroi-backend-zero-preprod-prod.emurgornd.com"
   }
 }

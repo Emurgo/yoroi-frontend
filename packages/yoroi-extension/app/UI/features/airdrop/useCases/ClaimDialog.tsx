@@ -24,6 +24,14 @@ const messages = defineMessages({
     defaultMessage:
       '!!!Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.',
   },
+  error403: {
+    id: 'airdrop.error.403',
+    defaultMessage: '!!!Error 403: Unable to claim due to API error',
+  },
+  errorNotResponding: {
+    id: 'airdrop.error.notResponding',
+    defaultMessage: '!!!Midnight API is not responding, please try again later.',
+  },
 });
 
 export default function ClaimDialog(
@@ -45,7 +53,11 @@ export default function ClaimDialog(
       if (error instanceof WrongPassphraseError) {
         setPasswordError(wrongPasswordErrorMessage);
       } else if (error instanceof Error) {
-        setError(error.message);
+        if (error.message.startsWith('Error 403')) {
+          setError(intl.formatMessage(messages.error403));
+        } else {
+          setError(intl.formatMessage(messages.errorNotResponding));
+        }
       } else {
         setError(String(error));
       }

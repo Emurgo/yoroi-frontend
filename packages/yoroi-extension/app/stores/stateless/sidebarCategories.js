@@ -31,7 +31,6 @@ export type SidebarCategoryRevamp = {|
   +icon: string,
   +label?: MessageDescriptor,
   +isVisible: isVisibleFunc,
-  +featureFlagName?: string,
 |};
 
 const always = () => true;
@@ -67,7 +66,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: airdropIcon,
     label: globalMessages.airdrop,
     isVisible: existsSelectedWallet,
-    featureFlagName: 'airdrop',
   },
   {
     className: 'swap',

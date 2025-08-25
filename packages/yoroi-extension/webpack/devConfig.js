@@ -124,7 +124,7 @@ const backgroundServiceWorkerConfig = (
     rules: [
       ...commonConfig.rules(true),
       {
-        test: /\.js$/,
+        test: /\.(js|ts)$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {

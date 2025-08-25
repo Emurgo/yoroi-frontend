@@ -1,5 +1,6 @@
 // @flow
 
+import '../../../test-config.forTests';
 import { RustModule } from '../../../cardanoCrypto/rustLoader';
 import { normalizeToAddress } from '../utils';
 
