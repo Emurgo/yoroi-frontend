@@ -1,5 +1,5 @@
 import BasePage from '../../../basepage.js';
-import { twoSeconds } from '../../../../helpers/timeConstants.js';
+import { quarterSecond, twoSeconds } from '../../../../helpers/timeConstants.js';
 
 /**
  * Page Object for the Cashback Terms Modal that appears when clicking on a cashback card.
@@ -7,7 +7,6 @@ import { twoSeconds } from '../../../../helpers/timeConstants.js';
  */
 class CashbackTermsModal extends BasePage {
   // locators - Updated for actual cashback terms modal
-  
   disclaimerDialogLocator = {
     locator: 'disclaimer-dialogWindow-modalWindow',
     method: 'id',
@@ -45,6 +44,7 @@ class CashbackTermsModal extends BasePage {
   async closeCashbackTermsModal() {
     this.logger.info(`CashbackTermsModal::closeCashbackTermsModal is called`);
     await this.click(this.disclaimerCloseBtnLocator);
+    return await this.customWaitIsNotPresented(this.disclaimerDialogLocator, twoSeconds, quarterSecond);
   }
 
   async agreeToDisclaimer() {
@@ -61,24 +61,26 @@ class CashbackTermsModal extends BasePage {
     this.logger.info(`CashbackTermsModal::acceptDisclaimerAndProceed is called`);
     await this.agreeToDisclaimer();
     await this.proceedWithDisclaimer();
+    return await this.customWaitIsNotPresented(this.disclaimerDialogLocator, twoSeconds, quarterSecond);
   }
 
   async isProceedButtonEnabled() {
     this.logger.info(`CashbackTermsModal::isProceedButtonEnabled is called`);
     try {
       const element = await this.findElement(this.disclaimerProceedBtnLocator);
-      const isEnabled = await element.isEnabled();
-      return isEnabled;
+      return await element.isEnabled();
     } catch (error) {
       this.logger.warn(`Could not check if proceed button is enabled: ${error.message}`);
       return false;
     }
   }
 
-  async getDisclaimerText() {
+  async getDisclaimerTitleText() {
     this.logger.info(`CashbackTermsModal::getDisclaimerText is called`);
     const element = await this.findElement(this.disclaimerTitleLocator);
-    return await element.getText();
+    const result = await element.getText();
+    this.logger.info(`CashbackTermsModal::getDisclaimerText The disclaimer text is "${result}"`);
+    return result;
   }
 }
 
