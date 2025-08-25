@@ -7,14 +7,14 @@ export default class PortfolioMainPage extends WalletCommonBase {
 
   /** @type {ElementLocator} */
   portfolioBalanceLocator = {
-    locator: '//h2[contains(@class, "MuiTypography-h2")]',
-    method: 'xpath',
+    locator: 'portfolio-balance-text',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioSearchInputLocator = {
-    locator: '//input[@placeholder="Search by asset name or ID"]',
-    method: 'xpath',
+    locator: 'portfolio-search-input',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
@@ -171,5 +171,168 @@ export default class PortfolioMainPage extends WalletCommonBase {
       if (!displayed) return false;
     }
     return true;
+  }
+
+  /**
+   * Searches for an asset in the portfolio search input
+   * @param {string} searchTerm
+   * @returns {Promise<void>}
+   */
+  async searchForAsset(searchTerm) {
+    this.logger.info(`PortfolioMainPage::searchForAsset is called with term: "${searchTerm}"`);
+    await this.clearInput(this.portfolioSearchInputLocator);
+    await this.input(this.portfolioSearchInputLocator, searchTerm);
+  }
+
+  /**
+   * Clears the search input
+   * @returns {Promise<void>}
+   */
+  async clearSearch() {
+    this.logger.info(`PortfolioMainPage::clearSearch is called`);
+    await this.clearInput(this.portfolioSearchInputLocator);
+  }
+
+  /**
+   * Verifies that price values are displayed (not empty or just dashes)
+   * @returns {Promise<boolean>}
+   */
+  async arePriceValuesDisplayed() {
+    this.logger.info(`PortfolioMainPage::arePriceValuesDisplayed is called`);
+    
+    // Get all price cells (column 2)
+    const priceLocator = {
+      locator: '//tbody/tr/td[2]',
+      method: 'xpath',
+    };
+    
+    const priceElements = await this.findElements(priceLocator);
+    
+    for (const element of priceElements) {
+      const text = await element.getText();
+      // Check if price is not empty and not just a dash
+      if (!text || text.trim() === '-' || text.trim() === '') {
+        this.logger.info(`Price value is empty or dash: "${text}"`);
+        return false;
+      }
+      // Check if it contains USD (indicating a valid price)
+      if (!text.includes('USD')) {
+        this.logger.info(`Price value doesn't contain USD: "${text}"`);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * Verifies that 24H change values are displayed (not empty or just dashes)
+   * @returns {Promise<boolean>}
+   */
+  async are24HChangeValuesDisplayed() {
+    this.logger.info(`PortfolioMainPage::are24HChangeValuesDisplayed is called`);
+    
+    // Get all 24H change cells (column 3)
+    const change24HLocator = {
+      locator: '//tbody/tr/td[3]',
+      method: 'xpath',
+    };
+    
+    const changeElements = await this.findElements(change24HLocator);
+    
+    for (const element of changeElements) {
+      const text = await element.getText();
+      // Check if 24H change is not empty and not just a dash
+      if (!text || text.trim() === '-' || text.trim() === '') {
+        this.logger.info(`24H change value is empty or dash: "${text}"`);
+        return false;
+      }
+      // Check if it contains % (indicating a valid percentage)
+      if (!text.includes('%')) {
+        this.logger.info(`24H change value doesn't contain %: "${text}"`);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * Verifies that portfolio percentage values are displayed (not empty or just dashes)
+   * @returns {Promise<boolean>}
+   */
+  async arePortfolioPercentageValuesDisplayed() {
+    this.logger.info(`PortfolioMainPage::arePortfolioPercentageValuesDisplayed is called`);
+    
+    // Get all portfolio % cells (column 6)
+    const portfolioLocator = {
+      locator: '//tbody/tr/td[6]',
+      method: 'xpath',
+    };
+    
+    const portfolioElements = await this.findElements(portfolioLocator);
+    
+    for (const element of portfolioElements) {
+      const text = await element.getText();
+      // Check if portfolio % is not empty and not just a dash
+      if (!text || text.trim() === '-' || text.trim() === '') {
+        this.logger.info(`Portfolio % value is empty or dash: "${text}"`);
+        return false;
+      }
+      // Check if it contains % (indicating a valid percentage)
+      if (!text.includes('%')) {
+        this.logger.info(`Portfolio % value doesn't contain %: "${text}"`);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * Verifies that total amount values are displayed (not empty or just dashes)
+   * @returns {Promise<boolean>}
+   */
+  async areTotalAmountValuesDisplayed() {
+    this.logger.info(`PortfolioMainPage::areTotalAmountValuesDisplayed is called`);
+    
+    // Get all total amount cells (column 7)
+    const amountLocator = {
+      locator: '//tbody/tr/td[7]',
+      method: 'xpath',
+    };
+    
+    const amountElements = await this.findElements(amountLocator);
+    
+    for (const element of amountElements) {
+      const text = await element.getText();
+      // Check if total amount is not empty and not just a dash
+      if (!text || text.trim() === '-' || text.trim() === '') {
+        this.logger.info(`Total amount value is empty or dash: "${text}"`);
+        return false;
+      }
+      // Check if it contains a number (indicating a valid amount)
+      if (!/\d/.test(text)) {
+        this.logger.info(`Total amount value doesn't contain numbers: "${text}"`);
+        return false;
+      }
+    }
+    
+    return true;
+  }
+
+  /**
+   * Verifies that all value columns have valid data loaded
+   * @returns {Promise<boolean>}
+   */
+  async areAllValuesLoaded() {
+    this.logger.info(`PortfolioMainPage::areAllValuesLoaded is called`);
+    
+    const priceValuesOk = await this.arePriceValuesDisplayed();
+    const change24HValuesOk = await this.are24HChangeValuesDisplayed();
+    const portfolioValuesOk = await this.arePortfolioPercentageValuesDisplayed();
+    const amountValuesOk = await this.areTotalAmountValuesDisplayed();
+    
+    return priceValuesOk && change24HValuesOk && portfolioValuesOk && amountValuesOk;
   }
 }

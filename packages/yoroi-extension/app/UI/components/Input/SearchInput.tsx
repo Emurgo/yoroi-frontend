@@ -30,6 +30,7 @@ export const SearchInput = (props: InputProps) => {
   return (
     <StyledInput
       inputRef={ref}
+      id={props.id}
       startAdornment={
         <InputAdornment
           position="start"

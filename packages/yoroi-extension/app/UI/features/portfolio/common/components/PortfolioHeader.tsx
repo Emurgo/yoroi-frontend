@@ -137,7 +137,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax" id="portfolio-balance-text">
               <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
                 {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
               </HiddenAmount>
@@ -169,7 +169,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
         </Stack>
       </Stack>
 
-      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
+      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id="portfolio-search-input" />
     </Stack>
   );
 });
