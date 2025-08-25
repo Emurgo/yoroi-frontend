@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
 import CashbackPage from '../pages/wallet/Cashback/cashback.page.js';
-import CashbackTermsModal from '../pages/wallet/settingsTab/modals/disclaimerModal.page.js';
+import CashbackTermsModal from '../pages/wallet/Cashback/modals/disclaimerModal.page.js';
 import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { customAfterEach } from '../utils/customHooks.js';
