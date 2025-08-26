@@ -71,7 +71,6 @@ export type SwapFormActions = {|
   buyAmountErrorChanged: (error: string | null) => void,
   sellFeeAmountErrorChanged: (error: string | null) => void,
   sellAmountErrorChanged: (error: string | null) => void,
-  sellFeeAmountErrorChanged: (error: string | null) => void,
 |};
 
 export type State<S> = {| value: S, update: ((S => S) | S) => void |};
