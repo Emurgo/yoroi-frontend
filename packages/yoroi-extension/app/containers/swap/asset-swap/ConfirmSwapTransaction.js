@@ -10,6 +10,7 @@ import type { PriceImpact } from '../../../components/swap/types';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { SwapTxInfo } from './SwapTxInfo';
+import { observer } from 'mobx-react';
 
 type Props = {|
   slippageValue: string,
@@ -20,22 +21,25 @@ type Props = {|
   getTokenInfo: string => Promise<RemoteTokenInfo>,
   getFormattedPairingValue: (amount: string) => string,
   onError: () => void,
+  swapStore: any,
 |};
 
-export default function ConfirmSwapTransaction({
+function ConfirmSwapTransaction({
   slippageValue,
   walletAddress,
   priceImpactState,
   onRemoteOrderDataResolved,
   defaultTokenInfo,
   getTokenInfo,
+  swapStore,
   onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
   const {
     selectedPoolCalculation: { pool },
   } = orderData;
-  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity } = useSwapForm();
+  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity, sellFeeAmountErrorChanged } = useSwapForm();
+  const { setOrderStepValue } = swapStore;
   const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
@@ -46,7 +50,12 @@ export default function ConfirmSwapTransaction({
     onSuccess: data => {
       onRemoteOrderDataResolved(data).catch(e => {
         console.error('Failed to handle remote order resolution', e);
-        onError();
+        if (e?.id === 'api.errors.NotEnoughMoneyToSendError') {
+          setOrderStepValue(0);
+          sellFeeAmountErrorChanged(strings.notEnoughBalanceFees);
+        } else {
+          onError();
+        }
       });
     },
     onError: error => {
@@ -98,3 +107,5 @@ export default function ConfirmSwapTransaction({
     </Box>
   );
 }
+
+export default (observer(ConfirmSwapTransaction): React$ComponentType<any>);
