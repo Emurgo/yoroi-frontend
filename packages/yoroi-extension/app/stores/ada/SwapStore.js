@@ -291,7 +291,11 @@ export default class SwapStore extends Store<StoresMap> {
     }
 
     const protocolParameters = await getProtocolParameters(wallet);
-
+    console.log('createSimpleTx', {
+      entries,
+      metadata,
+      protocolParameters,
+    });
     return await this.api.ada.createSimpleTx({
       publicDeriver: wallet,
       entries,

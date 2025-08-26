@@ -16,7 +16,7 @@ type Props = {|
 export default function EditSellAmount({ onAssetSelect, defaultTokenInfo, getTokenInfo }: Props): Node {
   const { orderData } = useSwap();
   const {
-    sellQuantity: { displayValue: sellDisplayValue, error },
+    sellQuantity: { displayValue: sellDisplayValue, error, feeError },
     sellTokenInfo = {},
     buyTokenInfo = {},
     onChangeSellQuantity,
@@ -40,7 +40,7 @@ export default function EditSellAmount({ onAssetSelect, defaultTokenInfo, getTok
         getTokenInfo={getTokenInfo}
         onAssetSelect={onAssetSelect}
         focusState={sellFocusState}
-        error={error}
+        error={error || feeError}
         showMax
       />
     </Box>

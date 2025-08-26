@@ -74,7 +74,7 @@ export default class LoadingStore extends BaseLoadingStore<StoresMap> {
     // Save the landing route and go to the route that shows the loading screen
     runInAction(() => {
       this._originRoute = {
-        route: this.stores.routing.currentRoute,
+        route: window.location.hash.replace(/^#/, ''),
         location: window.location.href,
       };
     });

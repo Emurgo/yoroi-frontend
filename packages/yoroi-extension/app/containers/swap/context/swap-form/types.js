@@ -16,6 +16,7 @@ export const SwapFormActionTypeValues = Object.freeze({
   SellInputValueChanged: 'sellInputValueChanged',
   LimitPriceInputValueChanged: 'limitPriceInputValueChanged',
   SellAmountErrorChanged: 'sellAmountErrorChanged',
+  SellFeeAmountErrorChanged: 'sellFeeAmountErrorChanged',
   BuyAmountErrorChanged: 'buyAmountErrorChanged',
 });
 
@@ -27,6 +28,7 @@ export type SwapFormState = {|
     isTouched: boolean,
     disabled: boolean,
     error: string | null,
+    feeError: string | null,
     displayValue: string,
   |},
   buyTokenInfo: Object,
@@ -67,6 +69,7 @@ export type SwapFormActions = {|
   sellInputValueChanged: (value: string) => void,
   limitPriceInputValueChanged: (value: string) => void,
   buyAmountErrorChanged: (error: string | null) => void,
+  sellFeeAmountErrorChanged: (error: string | null) => void,
   sellAmountErrorChanged: (error: string | null) => void,
 |};
 
