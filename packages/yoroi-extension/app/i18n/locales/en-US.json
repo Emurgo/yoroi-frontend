@@ -1461,5 +1461,8 @@
   "transaction.review.takeHardwareWallet": "Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.",
   "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.",
   "transaction.review.forgotPassword": "Forgot your password?",
-  "transaction.review.howToRestorePassword": "how to restore it."
+  "transaction.review.howToRestorePassword": "how to restore it.",
+  "transaction.fail.title": "Transaction failed",
+  "transaction.fail.cancelByUser": "Transaction cancelled by user",
+  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues."
 }
