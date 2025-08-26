@@ -24,6 +24,7 @@ chrome.runtime.onMessage.addListener(msg => {
   }
 });
 
+// @ts-ignore
 export const appState = cache(modelAccessor);
 
 type RetT<T> = { loaded: false; value: undefined } | { loaded: true; value: T };
