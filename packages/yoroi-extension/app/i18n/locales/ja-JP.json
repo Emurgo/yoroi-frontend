@@ -1459,5 +1459,7 @@
   "transaction.review.collateralInfo": "Cardano上の特定のスマートコントラクトとやり取りする際には担保が必須です。取引の検証に失敗した場合に限り、ADAが担保から差し引かれます。",
   "transaction.review.interactWithOperations": "あなたは、ガバナンスや様々なブロックチェーン活動で使用される重要なコンポーネントであるオペレーションとやり取りしようとしています。これには、CIP-0095に概説されているように、ガバナンス取引を促進するCardanoガバナンス証明書が含まれます。",
   "transaction.review.takeHardwareWallet": "ハードウェアウォレットデバイスを取り出し、そこに表示される指示に従ってください。信頼できる操作であることを確認してください。",
-  "transaction.review.rewardsWithdraw": "ステークプールから委任を解除すると、報酬は自動的に引き出されます。また、2 ADA のステークデポジットも返却されます。別のステークプールを選択したい場合は、委任を解除せずに設定を変更することができます。"
+  "transaction.review.rewardsWithdraw": "ステークプールから委任を解除すると、報酬は自動的に引き出されます。また、2 ADA のステークデポジットも返却されます。別のステークプールを選択したい場合は、委任を解除せずに設定を変更することができます。",
+  "transaction.review.forgotPassword": "Forgot your password?",
+  "transaction.review.howToRestorePassword": "how to restore it."
 }
