@@ -1,5 +1,6 @@
 // @flow
 
+import '../../../test-config.forTests';
 import { schema } from 'lovefield';
 import { loadLovefieldDBFromDump } from '../index';
 import { GetUtxoAtSafePoint, GetUtxoDiffToBestBlock } from './api/read';

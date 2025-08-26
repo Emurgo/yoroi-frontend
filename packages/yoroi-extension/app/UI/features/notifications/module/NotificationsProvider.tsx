@@ -10,6 +10,9 @@ import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import LocalStorageApi from '../../../../api/localStorage';
 import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
+import { appState, useModelValue, call } from '../../../../../api/frontEnd';
+
+const MAX_TOKEN_SYMBOL_LENGTH = 15;
 
 export const NotificationTopics = {
   NEW_TX: 'NEW_TX',
@@ -29,10 +32,13 @@ const initialValue = {
   showRandomToast(): null | Promise<any> {
     return null;
   },
-  createNotification(type: NotificationTypes, id?: string): void {
-    console.log(type, id);
+  createNotification(type: NotificationTypes, id: void | string, tx?: void | any): void {
+    console.log(type, id, tx);
     return;
   },
+  isNotificationCenterOpen: false,
+  setIsNotificationCenterOpen: (_open: boolean) => {},
+  hasUnreadNotifications: false,
 };
 
 function getRandomNotification() {
@@ -61,15 +67,23 @@ type Props = {
   pushNotificationStore: {
     duration: number;
   };
+  tokenInfoStore: any;
 };
 
-export default function NotificationsProvider({ children, appLoadedSlots = {}, walletsStore, pushNotificationStore }: Props) {
+export default function NotificationsProvider({
+  children,
+  appLoadedSlots = {},
+  walletsStore,
+  pushNotificationStore,
+  tokenInfoStore,
+}: Props) {
   const lsApi = new LocalStorageApi();
   const [notifLimitSlots] = React.useState<Object>(appLoadedSlots);
   const [toastQueue, setToastQueue] = React.useState<any>([]);
   const strings = useStrings();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isNotificationCenterOpen, setIsNotificationCenterOpen] = React.useState<boolean>(false);
 
   const getSelectedWalletId = () => walletsStore.selected?.publicDeriverId;
 
@@ -79,29 +93,6 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     [NotificationTypes.Income]: strings.assetsReceived,
     [NotificationTypes.Outcome]: strings.assetsSent,
     [NotificationTypes.Cancelled]: strings.txFailed,
-  };
-
-  const handleToastClose = props => {
-    toast.update(props.toastId, { data: { event: 'closed' } });
-    toast.dismiss(props.toastId);
-
-    // analytics for close event
-    const { data } = props;
-    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-    ampli.inAppNotificationClosed({ type: analyticsTypeValue });
-  };
-
-  const handleToastClick = props => {
-    toast.update(props.toastId, { data: { event: 'clicked' } });
-    toast.dismiss(props.toastId);
-
-    const { data } = props;
-    // analytics for click event
-    const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-    ampli.inAppNotificationOpened({ type: analyticsTypeValue });
-    // redirect after analytics
-    const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
-    navigate(redirectTo);
   };
 
   const handleToastExpired = () => {
@@ -123,7 +114,34 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     locationRef.current = location;
   }, [location]);
 
-  const createNotification = async (type: NotificationTypes, id?: string) => {
+  const getTitle = async tx => {
+    if (tx.amount.size() === 1) {
+      // ADA only
+      return (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(
+        `${tx.amount.getDefault().absoluteValue().shiftedBy(-6).toString()} ADA`
+      );
+    } else if (tx.amount.size() === 2) {
+      // one token
+      const entry = tx.amount.nonDefaultEntries()[0];
+      const { name, ticker, decimals } = await tokenInfoStore.getLocalOrRemoteMetadata(
+        getNetworkById(entry.networkId),
+        entry.identifier
+      );
+      const amount = entry.amount
+        .absoluteValue()
+        .shiftedBy(-(decimals ?? 0))
+        .toString();
+      let unit = ticker ?? name ?? entry.identifier;
+      if (unit.length > MAX_TOKEN_SYMBOL_LENGTH) {
+        unit = unit.slice(0, MAX_TOKEN_SYMBOL_LENGTH) + '...';
+      }
+      return (tx.type === 'income' ? strings.assetReceived : strings.assetSent)(`${amount} ${unit}`);
+    } else {
+      return tx.type === 'income' ? strings.multipleAssetsReceived : strings.multipleAssetsSent;
+    }
+  };
+
+  const createNotification = async (type: NotificationTypes, id: void | string = undefined, tx?: void | any) => {
     const theme = await lsApi.getUserThemeMode();
     const notifyWallet = await isActiveSettingsForWallet();
     // Early returns:
@@ -145,11 +163,58 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
         break;
     }
 
+    let title;
+    let centerMsgId;
+    if (tx && (tx.type === 'income' || tx.type === 'expend')) {
+      title = await getTitle(tx);
+      centerMsgId = `in-app-tx-${tx.txid}`;
+
+      call(appState.notifications.add, {
+        fcmMessageId: centerMsgId,
+        read: false,
+        title,
+        body: title,
+        time: new Date().toISOString(),
+      });
+    } else {
+      title = notificationTexts[type];
+      centerMsgId = null;
+    }
+
+    const handleToastClose = props => {
+      toast.update(props.toastId, { data: { event: 'closed' } });
+      toast.dismiss(props.toastId);
+
+      // analytics for close event
+      const { data } = props;
+      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+      ampli.inAppNotificationClosed({ type: analyticsTypeValue });
+      if (centerMsgId) {
+        call(appState.notifications.setRead, centerMsgId);
+      }
+    };
+
+    const handleToastClick = props => {
+      toast.update(props.toastId, { data: { event: 'clicked' } });
+      toast.dismiss(props.toastId);
+
+      const { data } = props;
+      // analytics for click event
+      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
+      ampli.inAppNotificationOpened({ type: analyticsTypeValue });
+      // redirect after analytics
+      const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
+      navigate(redirectTo);
+      if (centerMsgId) {
+        call(appState.notifications.setRead, centerMsgId);
+      }
+    };
+
     createToast({
       theme,
       onClick: handleToastClick,
       onClose: handleToastClose,
-      title: notificationTexts[type],
+      title,
       subtitle: strings.clickToView,
       type,
       id: id || String(Date.now()),
@@ -171,6 +236,8 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
 
     let notifType = notifTypeByTopic[topic] || NotificationTypes.Cancelled;
 
+    let tx = undefined;
+
     // We only have epoch for rewards notifications
     if (topic === NotificationTopics.REWARDS) {
       const epoch = data.reward[0];
@@ -186,10 +253,11 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
       return;
     } else if (topic === NotificationTopics.NEW_TX) {
       const txType = data.tx.type as TransactionType;
+      tx = data.tx;
       notifType = TransactionTypeMap[txType] || NotificationTypes.Cancelled;
     }
 
-    await createNotification(notifType, data.txid);
+    await createNotification(notifType, data.txid, tx);
   };
 
   const showRandomToast = async () => {
@@ -237,11 +305,15 @@ export default function NotificationsProvider({ children, appLoadedSlots = {}, w
     () => ({
       showRandomToast,
       createNotification,
+      setIsNotificationCenterOpen: setIsNotificationCenterOpen,
     }),
     []
   );
 
-  return <Context.Provider value={value}>{children}</Context.Provider>;
+  const { loaded: hasUnreadLoaded, value: hasUnread } = useModelValue(appState.notifications.hasUnread);
+  const hasUnreadNotifications: boolean = hasUnreadLoaded && hasUnread;
+
+  return <Context.Provider value={{ isNotificationCenterOpen, hasUnreadNotifications, ...value }}>{children}</Context.Provider>;
 }
 
 export const useNotifications = () => {
