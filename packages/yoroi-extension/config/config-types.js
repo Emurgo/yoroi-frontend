@@ -8,6 +8,14 @@ export type ConfigType = {|
   bringSandbox: BringConfigType,
   fcm: FCMConfig,
   notifications: NotificationsConfigType,
+  yoroiBackend: YoroiBackendType,
+|};
+
+export type YoroiBackendType = {|
+  mainnet: string,
+  zeroMainnet: string,
+  preprod: string,
+  zeroPreprod: string,
 |};
 
 export type NotificationsConfigType = {|
