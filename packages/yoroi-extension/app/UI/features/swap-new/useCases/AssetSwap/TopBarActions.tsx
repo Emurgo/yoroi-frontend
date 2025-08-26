@@ -1,16 +1,17 @@
 import { Stack, useTheme } from '@mui/material';
-import React from 'react';
 import { useStrings } from '../../common/hooks/useStrings';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { SettingsModalContent } from '../../common/components/SettingsModalContent';
+import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
+import { LIMIT_ORDER, MARKET_ORDER } from '../../common/constants';
 
 export const TopBarActions = () => {
-  const [orderType, setOrderType] = React.useState('market');
   const { marketTabLabel, limitTabLabel } = useStrings();
   const { atoms }: any = useTheme();
   const { openModal } = useModal();
+  const { swapForm } = useSwapRevamp();
 
   const orderTypeTabs = [
     { type: 'market', label: marketTabLabel },
@@ -31,8 +32,14 @@ export const TopBarActions = () => {
       <Tabs
         tabs={orderTypeTabs.map(({ type, label }) => ({
           label,
-          isActive: orderType === type,
-          onClick: () => setOrderType(type),
+          isActive: swapForm?.orderType === type,
+          onClick: () => {
+            if (type === LIMIT_ORDER) {
+              swapForm.action({ type: SwapAction.ChangeOrderType, value: LIMIT_ORDER });
+            } else {
+              swapForm.action({ type: SwapAction.ChangeOrderType, value: MARKET_ORDER });
+            }
+          },
         }))}
       />
 

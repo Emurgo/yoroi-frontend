@@ -64,6 +64,9 @@ export function genCSP(request: {|
   connectSrc.push('https://proof-staging.provtree-midnight.com');
   connectSrc.push('https://preprod.gd.midnighttge.io');
 
+  // FCM
+  connectSrc.push('https://firebaseinstallations.googleapis.com');
+
   // unsafe-inline is unfortunately required by style-loader (even in production builds)
   const evalStyle = "'unsafe-inline'";
   return [

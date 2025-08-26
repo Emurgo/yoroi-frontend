@@ -13,7 +13,7 @@ process.env.NODE_CONFIG_ENV = argv.env;
 function devMainWindow(env: string) {
   console.log('[Build manifest]');
   console.log('-'.repeat(80));
-  tasks.buildManifests(true, isNightly, shouldInjectConnector);
+  tasks.buildManifests(true, isNightly, shouldInjectConnector, false);
 
   console.log('[Copy assets]');
   console.log('-'.repeat(80));

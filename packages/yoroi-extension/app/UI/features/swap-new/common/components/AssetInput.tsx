@@ -221,6 +221,7 @@ const Wrapper = styled(Box, {
     borderColor: !hasError && theme.palette.ds.el_gray_max,
     borderWidth: 2,
   },
+  marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
 }));
 
 const Label = styled(Typography)(({ theme }: any) => ({
