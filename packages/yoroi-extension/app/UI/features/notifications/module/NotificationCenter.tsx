@@ -35,7 +35,7 @@ const NotificationList = () => {
       <>
         <Stack spacing="16px" sx={{ padding: '16px' }}>
           {notifications?.map(notification => (
-            <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', gap: '16px' }} key={notification.fcmMessageId}>
               <Box>
                 <Icon.Notification />
               </Box>
