@@ -1,8 +1,9 @@
-import { Box, Typography, styled, Stack } from '@mui/material';
+import { Box, Typography, styled, Stack, Divider } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 import CopyableText from '../../../components/CopyableText';
 import globalMessages from '../../../../i18n/global-messages';
+import { constructPlate } from '../../../../components/topbar/WalletCard';
 
 const messages = defineMessages({
   size: {
@@ -22,6 +23,23 @@ const messages = defineMessages({
     defaultMessage:
       '!!!A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.',
   },
+  allocation: {
+    id: 'airdrop.success.allocation',
+    defaultMessage: '!!!Your successfully claimed allocation',
+  },
+  next1: {
+    id: 'airdrop.next1',
+    defaultMessage: '!!!What’s next?',
+  },
+  next2: {
+    id: 'airdrop.next2',
+    defaultMessage: '!!!After this claim phase ends, a second claim phase (Scavenger Mine) will start.',
+  },
+  next3: {
+    id: 'airdrop.next3',
+    defaultMessage:
+      "!!!When that phase ends, the Redemption period will start, and you'll be able to redeem your claimed allocations as they thaw.",
+  },
 });
 
 const BoxWithInfo = styled(Box)(({ theme }) => ({
@@ -35,12 +53,13 @@ const BoxWithInfo = styled(Box)(({ theme }) => ({
   },
 }));
 
-interface Props {
+interface Props1 {
   alloc: string;
   destAddrBech32: string;
+  isTrezor: boolean;
 }
 
-export function ClaimInfo1(props: Readonly<Props & { isTrezor: boolean }>) {
+export function ClaimInfo1(props: Readonly<Props1>) {
   const intl = useIntl();
   const { alloc, destAddrBech32, isTrezor } = props;
 
@@ -80,16 +99,30 @@ export function ClaimInfo1(props: Readonly<Props & { isTrezor: boolean }>) {
   );
 }
 
-export function ClaimInfo2(props: Readonly<Props>) {
+interface Props2 {
+  alloc: string;
+  destAddrBech32: string;
+  walletPlate: unknown;
+  walletName: string;
+}
+
+export function ClaimInfo2(props: Readonly<Props2>) {
   const intl = useIntl();
-  const { alloc, destAddrBech32 } = props;
+  const { alloc, destAddrBech32, walletPlate, walletName } = props;
+  const [accountPlateId, iconComponent] = constructPlate(walletPlate, {
+    saturationFactor: 0,
+    size: 8,
+    scalePx: 3,
+    iconSize: 24,
+    borderRadius: 4,
+  });
 
   return (
     <Stack spacing="24px">
-      <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
-        <Stack spacing="16px">
+      <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px' }}>
+        <Stack spacing="16px" sx={{ padding: '16px' }}>
           <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
-            {intl.formatMessage(messages.size)}
+            {intl.formatMessage(messages.allocation)}
             <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
           </Typography>
           <Box>
@@ -102,6 +135,18 @@ export function ClaimInfo2(props: Readonly<Props>) {
             </Typography>
           </Box>
         </Stack>
+        <Divider />
+        <Box sx={{ padding: '16px', display: 'flex', flexDirection: 'row' }}>
+          <Typography variant="body1" color="ds.text_gray_low">
+            {intl.formatMessage(globalMessages.walletLabel)}
+          </Typography>
+          <div style={{ width: '18px' }} />
+          {iconComponent}
+          <div style={{ width: '8px' }} />
+          <Typography variant="body1" sx={{ fontWeight: 500 }} color="ds.text_gray_low">
+            {walletName} | {accountPlateId}
+          </Typography>
+        </Box>
       </Box>
       <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
         <Stack spacing="16px">
@@ -109,16 +154,29 @@ export function ClaimInfo2(props: Readonly<Props>) {
             {intl.formatMessage(messages.destinationAddress)}
             <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
           </Typography>
-          <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            {intl.formatMessage(globalMessages.addressLabel)}
-          </Typography>
-          <CopyableText value={destAddrBech32} copyButtonFollowText>
-            <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
-              {destAddrBech32}
+          <Box>
+            <Typography variant="body1" sx={{ fontWeight: 500 }}>
+              {intl.formatMessage(globalMessages.addressLabel)}
             </Typography>
-          </CopyableText>
+            <CopyableText value={destAddrBech32} copyButtonFollowText>
+              <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
+                {destAddrBech32}
+              </Typography>
+            </CopyableText>
+          </Box>
         </Stack>
       </Box>
+      <Stack spacing="4px">
+        <Typography variant="body1" color="ds.text_gray_low">
+          {intl.formatMessage(messages.next1)}
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {intl.formatMessage(messages.next2)}
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_medium">
+          {intl.formatMessage(messages.next3)}
+        </Typography>
+      </Stack>
     </Stack>
   );
 }
