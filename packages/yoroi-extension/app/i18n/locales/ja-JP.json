@@ -15,7 +15,11 @@
   "airdrop.ledgerClaimDialogTitle": "{ total } 件中 { index } 件目のメッセージに署名します",
   "airdrop.messageLabel": "メッセージ",
   "airdrop.mnemonicClaimDialogText": "このメッセージに署名することで、ご自身のアセットの所有者であることの証明となります。署名によってウォレットの残高に影響が及ぶことはなく、手数料も一切発生しません。",
+  "airdrop.next1": "What’s next?",
+  "airdrop.next2": "After this claim phase ends, a second claim phase (Scavenger Mine) will start.",
+  "airdrop.next3": "When that phase ends, the Redemption period will start, and you'll be able to redeem your claimed allocations as they thaw.",
   "airdrop.size": "割り当てのサイズ",
+  "airdrop.success.allocation": "Your successfully claimed allocation",
   "airdrop.terms": "サービス規約",
   "airdrop.terms.header1": "1. 利用規約への同意",
   "airdrop.terms.section1_1": "「Midnight Glacier エアドロップ」（以下「本エアドロップ」）に参加することにより、あなた（以下「参加者」）は、本利用規約（以下「本規約」）に同意したものとみなされます。\n\n本規約に同意いただけない場合は、本エアドロップへの参加をお控えください。",
@@ -1461,5 +1465,8 @@
   "transaction.review.takeHardwareWallet": "ハードウェアウォレットデバイスを取り出し、そこに表示される指示に従ってください。信頼できる操作であることを確認してください。",
   "transaction.review.rewardsWithdraw": "ステークプールから委任を解除すると、報酬は自動的に引き出されます。また、2 ADA のステークデポジットも返却されます。別のステークプールを選択したい場合は、委任を解除せずに設定を変更することができます。",
   "transaction.review.forgotPassword": "パスワードをお忘れですか？",
-  "transaction.review.howToRestorePassword": "復元方法"
+  "transaction.review.howToRestorePassword": "復元方法",
+  "transaction.fail.title": "Transaction failed",
+  "transaction.fail.cancelByUser": "Transaction cancelled by user",
+  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues."
 }
