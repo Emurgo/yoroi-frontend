@@ -156,6 +156,14 @@ export const messages = Object.freeze(
       id: 'global.receive',
       defaultMessage: '!!!receive',
     },
+    forgotPassword: {
+      id: 'transaction.review.forgotPassword',
+      defaultMessage: '!!!Forgot your password?',
+    },
+    howToRestorePassword: {
+      id: 'transaction.review.howToRestorePassword',
+      defaultMessage: '!!!how to restore it.',
+    },
   })
 );
 
@@ -199,5 +207,7 @@ export const useStrings = () => {
     associatedAddress: intl.formatMessage(messages.associatedAddress),
     yourWallet: intl.formatMessage(messages.yourWallet),
     receiveLabel: intl.formatMessage(messages.receiveLabel),
+    forgotPassword: intl.formatMessage(messages.forgotPassword),
+    howToRestorePassword: intl.formatMessage(messages.howToRestorePassword),
   }).current;
 };

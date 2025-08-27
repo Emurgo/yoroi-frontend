@@ -1459,5 +1459,7 @@
   "transaction.review.collateralInfo": "Collateral wajib diberikan saat berinteraksi dengan smart contract tertentu di Cardano. ADA hanya akan dipotong dari collateral Anda jika validasi transaksi gagal.",
   "transaction.review.interactWithOperations": "Anda akan berinteraksi dengan operasi, yang merupakan komponen kunci yang digunakan dalam governance dan berbagai aktivitas blockchain. Termasuk Sertifikat Governance Cardano seperti dalam CIP-0095, yang memfasilitasi transaksi governance.",
   "transaction.review.takeHardwareWallet": "Siapkan hardware wallet Anda dan ikuti petunjuknya. Pastikan Anda mengonfirmasi tindakan yang tepercaya.",
-  "transaction.review.rewardsWithdraw": "Reward stake pool Anda akan ditarik secara otomatis saat Anda membatalkan delegasi. Anda akan mendapatkan kembali deposit staking sebesar 2 ADA. Anda dapat mengganti stake pool tanpa membatalkan delegasi."
+  "transaction.review.rewardsWithdraw": "Reward stake pool Anda akan ditarik secara otomatis saat Anda membatalkan delegasi. Anda akan mendapatkan kembali deposit staking sebesar 2 ADA. Anda dapat mengganti stake pool tanpa membatalkan delegasi.",
+  "transaction.review.forgotPassword": "Lupa kata sandi Anda?",
+  "transaction.review.howToRestorePassword": "cara memulihkannya."
 }
