@@ -111,30 +111,28 @@ export const NotificationCenter = () => {
   }
 
   return (
-    <>
-      <StyledDrawer
-        open
-        anchor="right"
-        onClose={() => {
-          setIsNotificationCenterOpen(false);
-        }}
-      >
-        <Stack direction="row" justifyContent="center">
-          <Typography variant="button" my="24px" textAlign="center" id="notificationCenter-title-text">
-            {strings.notificationCenterTitle}
-          </Typography>
-          <StyledButton
-            onClick={() => {
-              setIsNotificationCenterOpen(false);
-            }}
-            sx={{ right: '24px' }}
-            id="notificationCenter-close-button"
-          >
-            <Icon.CloseIcon />
-          </StyledButton>
-        </Stack>
-        <NotificationList />
-      </StyledDrawer>
-    </>
+    <StyledDrawer
+      open
+      anchor="right"
+      onClose={() => {
+        setIsNotificationCenterOpen(false);
+      }}
+    >
+      <Stack direction="row" justifyContent="center">
+        <Typography variant="button" my="24px" textAlign="center" id="notificationCenter-title-text">
+          {strings.notificationCenterTitle}
+        </Typography>
+        <StyledButton
+          onClick={() => {
+            setIsNotificationCenterOpen(false);
+          }}
+          sx={{ right: '24px' }}
+          id="notificationCenter-close-button"
+        >
+          <Icon.CloseIcon />
+        </StyledButton>
+      </Stack>
+      <NotificationList />
+    </StyledDrawer>
   );
 };
