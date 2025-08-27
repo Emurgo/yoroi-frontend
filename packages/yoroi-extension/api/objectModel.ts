@@ -326,7 +326,9 @@ class CacheModel extends ModelHelper implements Model {
       let visit = this;
       // todo: more sophisticated patching when event.newValue is present
       for (let pathComponent of ['cache', ...event.path]) {
-        if (visit[pathComponent] instanceof CachedValue) {
+        if (visit[pathComponent] === undefined) {
+          break;
+        } else if (visit[pathComponent] instanceof CachedValue) {
           visit[pathComponent] = undefined;
           break;
         } else {
