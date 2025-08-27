@@ -296,14 +296,14 @@ const Handlers = Object.freeze({
 
     const network = wallet.getParent().getNetworkInfo();
     const config = getCardanoHaskellBaseConfig(network).reduce((acc, next) => Object.assign(acc, next), {});
-    const coinsPerUtxoWord = RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoWord);
+    const coinsPerUtxoByte = RustModule.WalletV4.BigNum.from_str(config.CoinsPerUtxoByte);
     try {
       // fixme: put in wasmscope
       const utxos = await transformCardanoUtxos(
-        await connectorGetUtxosCardano(wallet, valueExpected, paginate, coinsPerUtxoWord),
+        await connectorGetUtxosCardano(wallet, valueExpected, paginate, coinsPerUtxoByte),
         message.returnType === 'cbor'
       );
-      coinsPerUtxoWord.free();
+      coinsPerUtxoByte.free();
       return { ok: utxos };
     } catch (e) {
       if (e instanceof NotEnoughMoneyToSendError) {
