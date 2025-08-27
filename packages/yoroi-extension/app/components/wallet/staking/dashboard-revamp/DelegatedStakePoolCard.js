@@ -23,7 +23,7 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateToSpecificPool, stores }: Props & Intl): Node {
-  const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
+  const { id, name, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const theme = useTheme();
   const avatarGenerated = getAvatarFromPoolId(id);
   const selectedWallet = stores.wallets.selected;
