@@ -57,7 +57,7 @@ const NotificationList = () => {
                 <Box
                   sx={{
                     height: '6px',
-                    width: '6px',
+                    minWidth: '6px',
                     borderRadius: '50%',
                     backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
                     marginLeft: 'auto',
