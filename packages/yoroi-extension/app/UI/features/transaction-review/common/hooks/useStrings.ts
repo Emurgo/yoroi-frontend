@@ -164,6 +164,22 @@ export const messages = Object.freeze(
       id: 'transaction.review.howToRestorePassword',
       defaultMessage: '!!!how to restore it.',
     },
+    failTitle: {
+      id: 'transaction.fail.title',
+      defaultMessage: '!!!Transaction failed',
+    },
+    failCancelByUser: {
+      id: 'transaction.fail.cancelByUser',
+      defaultMessage: '!!!Transaction cancelled by user.',
+    },
+    failError: {
+      id: 'transaction.fail.error',
+      defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
+    },
+    failClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
   })
 );
 
@@ -209,5 +225,9 @@ export const useStrings = () => {
     receiveLabel: intl.formatMessage(messages.receiveLabel),
     forgotPassword: intl.formatMessage(messages.forgotPassword),
     howToRestorePassword: intl.formatMessage(messages.howToRestorePassword),
+    failTitle: intl.formatMessage(messages.failTitle),
+    failCancelByUser: intl.formatMessage(messages.failCancelByUser),
+    failError: intl.formatMessage(messages.failError),
+    failClose: intl.formatMessage(messages.failClose),
   }).current;
 };
