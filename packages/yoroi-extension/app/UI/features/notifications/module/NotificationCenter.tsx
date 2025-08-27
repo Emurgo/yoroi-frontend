@@ -66,8 +66,13 @@ export const NotificationCenter = () => {
                   </Box>
                   <Box>
                     <Typography variant="body1" color="ds.text_gray_medium">
-                      {notification.body}
+                      {notification.title}
                     </Typography>
+                    {notification.body !== notification.title && (
+                      <Typography variant="body1" color="ds.text_gray_medium">
+                        {notification.body}
+                      </Typography>
+                    )}
                     {/* @ts-ignore */}
                     <Typography variant="caption1" color="ds.text_gray_low">
                       {new Date(notification.time).toLocaleString()}
@@ -81,7 +86,6 @@ export const NotificationCenter = () => {
                         borderRadius: '50%',
                         backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
                         marginLeft: 'auto',
-                        marginTop: 'auto',
                         marginBottom: 'auto',
                       }}
                     />
