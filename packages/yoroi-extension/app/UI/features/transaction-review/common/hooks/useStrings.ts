@@ -180,6 +180,18 @@ export const messages = Object.freeze(
       id: 'global.labels.close',
       defaultMessage: '!!!Close',
     },
+    successTitle: {
+      id: 'transaction.success.title',
+      defaultMessage: '!!!Transaction signed',
+    },
+    successDescription: {
+      id: 'transaction.success.description',
+      defaultMessage: '!!!It may take a few minutes to display it in the list of wallet transactions.',
+    },
+    successClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
   })
 );
 
@@ -229,5 +241,8 @@ export const useStrings = () => {
     failCancelByUser: intl.formatMessage(messages.failCancelByUser),
     failError: intl.formatMessage(messages.failError),
     failClose: intl.formatMessage(messages.failClose),
+    successTitle: intl.formatMessage(messages.successTitle),
+    successDescription: intl.formatMessage(messages.successDescription),
+    successClose: intl.formatMessage(messages.successClose),
   }).current;
 };
