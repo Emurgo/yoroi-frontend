@@ -22,6 +22,10 @@ export const useSyncedTokenInfos = ({
     queryKey: ['syncedTokenInfos', networkId, primaryTokenInfo.id, ...excludedTokens],
 
     queryFn: async () => {
+      // Hardcoded dexhunter because museliswap is returning 20000 tokens - something is wrong with it
+      await swapManager.assignSettings({
+        routingPreference: 'dexhunter',
+      });
       const res = await swapManager.api.tokens();
       if (!isRight(res)) return { tokenIds: [], tokenInfosArray: [] };
 

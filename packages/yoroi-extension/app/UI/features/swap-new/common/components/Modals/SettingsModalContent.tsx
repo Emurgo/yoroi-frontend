@@ -1,12 +1,18 @@
 import { Box, Button, Stack, Typography, styled, useTheme } from '@mui/material';
-import React, { useState, useRef } from 'react';
-import { useStrings } from '../hooks/useStrings';
-import { Switch } from '../../../../components/Switch/Switch';
+import React, { useState, useRef, useEffect } from 'react';
+import { useStrings } from '../../hooks/useStrings';
+import { Switch } from '../../../../../components/Switch/Switch';
+import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
+import { useModal } from '../../../../../components/modals/ModalContext';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
 export const SettingsModalContent = () => {
-  const [selectedSlippage, setSelectedSlippage] = useState('1');
+  const { swapManager, swapForm } = useSwapRevamp();
+  const { closeModal } = useModal();
+  console.log('swapForm', swapForm);
+  const [routingPreferance, setRoutingPreferance] = useState<any>(swapForm.selectedProtocol.value || 'auto');
+  const [selectedSlippage, setSelectedSlippage] = useState(String(swapForm.slippageInput.value || '1'));
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(selectedSlippage));
 
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -18,6 +24,16 @@ export const SettingsModalContent = () => {
     setTimeout(() => {
       inputRef.current?.focus();
     }, 0);
+  };
+
+  const applyChanges = async () => {
+    await swapForm.action({ type: SwapAction.ProtocolChanged, value: routingPreferance });
+    await swapForm.action({ type: SwapAction.SlippageInputChanged, value: Number(selectedSlippage) });
+    await swapManager.assignSettings({
+      slippage: Number(selectedSlippage),
+      routingPreferance,
+    });
+    closeModal();
   };
 
   return (
@@ -40,11 +56,11 @@ export const SettingsModalContent = () => {
         <Typography variant="body1" color="ds.text_gray_medium" my={16}>
           {strings.routingPreferance}
         </Typography>
-        <RoutingPreferance />
+        <RoutingPreferance setRoutingPreferance={setRoutingPreferance} routingPreferance={routingPreferance} />
       </Box>
       {/* @ts-ignore */}
-      <SButton fullWidth variant="primary">
-        Apply
+      <SButton fullWidth variant="primary" onClick={applyChanges}>
+        {strings.applyLabel}
       </SButton>
     </Box>
   );
@@ -81,30 +97,50 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
     </Box>
   );
 };
-const RoutingPreferance = () => {
+const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
   const [autoSelected, setAutoSelected] = useState(true);
   const [dexHunter, setDexHunter] = useState(true);
-  const [muesliswap, setMuesliswap] = useState(true); // Both true by default when auto is off
+  const [muesliswap, setMuesliswap] = useState(true);
   const strings = useStrings();
 
-  const handleDexHunterToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    if (routingPreferance === 'auto') {
+      setDexHunter(true);
+      setMuesliswap(true);
+    }
+    if (routingPreferance === 'dexhunter') {
+      setDexHunter(true);
+      setMuesliswap(false);
+      setAutoSelected(false);
+    }
+    if (routingPreferance === 'muesliswap') {
+      setDexHunter(false);
+      setMuesliswap(true);
+      setAutoSelected(false);
+    }
+  }, []);
+  console.log('routingPreferance', { routingPreferance, autoSelected, dexHunter, muesliswap });
+
+  const handleDexHunterToggle = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
     if (!value && !muesliswap) {
       setMuesliswap(true);
     }
     setDexHunter(value);
+    setRoutingPreferance('dexhunter');
   };
 
-  const handleMuesliswapToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMuesliswapToggle = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
 
     if (!value && !dexHunter) {
       setDexHunter(true);
     }
     setMuesliswap(value);
+    setRoutingPreferance('muesliswap');
   };
 
-  const handleAutoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAutoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
     setAutoSelected(value);
     if (value) {
