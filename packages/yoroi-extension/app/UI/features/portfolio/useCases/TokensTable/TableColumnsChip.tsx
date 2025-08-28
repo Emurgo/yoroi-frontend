@@ -136,13 +136,9 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
           <Typography color="ds.text_gray_normal">
             {0} {token.info.name}
           </Typography>
-          {token.info.name === accountPair?.from.name ? (
-            <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}></Typography>
-          ) : (
-            <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
-              {0} {accountPair?.to.name ?? DEFAULT_FIAT_PAIR}
-            </Typography>
-          )}
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+            {token.info.name !== accountPair?.from.name && `0 ${accountPair?.from.name ?? DEFAULT_FIAT_PAIR}`}
+          </Typography>
         </Stack>
       </Stack>
     );
