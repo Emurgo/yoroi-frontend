@@ -3,7 +3,7 @@ import { TransactionResult } from '../../../UI/features/transaction-review/commo
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
 import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
-import { isTxCancelledByUser } from '../hwConnect/common/util';
+import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
 
 export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
@@ -26,6 +26,12 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
     });
   };
 
+  const getFailResult = error => {
+    if (isTxCancelledByUser(error)) return TransactionResult.CANCEL;
+    if (isCardanoAppNotRunning(error)) return TransactionResult.NO_CARDANO_RUNNING;
+    return TransactionResult.FAIL;
+  };
+
   const submitTx = async (password, signRequest) => {
     try {
       startLoadingTxReview();
@@ -41,7 +47,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
       });
     } catch (error) {
       console.log('Send Sign Error', error);
-      showTxResultModal(isTxCancelledByUser(error) ? TransactionResult.CANCEL : TransactionResult.FAIL);
+      showTxResultModal(getFailResult(error));
     }
   };
 

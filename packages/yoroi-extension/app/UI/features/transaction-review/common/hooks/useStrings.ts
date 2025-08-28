@@ -180,6 +180,10 @@ export const messages = Object.freeze(
       id: 'global.labels.close',
       defaultMessage: '!!!Close',
     },
+    failLedgerAppNotRunning: {
+      id: 'wallet.hw.ledger.app.not.running',
+      defaultMessage: '!!!The Cardano App is not running on your Ledger',
+    },
   })
 );
 
@@ -229,5 +233,6 @@ export const useStrings = () => {
     failCancelByUser: intl.formatMessage(messages.failCancelByUser),
     failError: intl.formatMessage(messages.failError),
     failClose: intl.formatMessage(messages.failClose),
+    failLedgerAppNotRunning: intl.formatMessage(messages.failLedgerAppNotRunning),
   }).current;
 };
