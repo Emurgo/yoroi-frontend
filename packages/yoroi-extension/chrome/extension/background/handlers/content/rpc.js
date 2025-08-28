@@ -40,7 +40,6 @@ import {
   assetToRustMultiasset,
 } from '../../../connector/api';
 import { authSignHexPayload } from '../../../../../app/connector/api';
-import { getCardanoHaskellBaseConfig } from '../../../../../app/api/ada/lib/storage/database/prepackaged/networks';
 import { sendToInjector, getBoundsForTabWindow, popupProps } from './utils';
 import { asGetAllUtxos } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/traits';
 import { asAddressedUtxo as asAddressedUtxoCardano } from '../../../../../app/api/ada/transactions/utils';
