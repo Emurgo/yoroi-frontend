@@ -317,26 +317,14 @@ class AddCollateralPage extends Component<Props, State> {
             }}
           >
             <Button
-              sx={{
-                // width: '144px',
-                height: '40px',
-                minWidth: 'unset',
-                minHeight: 'unset',
-                fontSize: '14px',
-                lineHeight: '15px',
-              }}
-              disableRipple={false}
-              variant="outlined"
-              color="primary"
+              variant="secondary"
               onClick={onCancel}
               id="cancelButton"
             >
-              {intl.formatMessage(globalMessages.backButtonLabel)}
+              {intl.formatMessage(globalMessages.cancel)}
             </Button>
             <LoadingButton
-              sx={{ minWidth: 'auto' }}
-              variant="contained"
-              fullWidth
+              variant="primary"
               disabled={walletType === 'mnemonic' && !walletPasswordField.isValid}
               onClick={this.submit.bind(this)}
               loading={isSubmitting}
