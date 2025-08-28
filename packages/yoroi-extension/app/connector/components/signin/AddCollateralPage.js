@@ -316,11 +316,7 @@ class AddCollateralPage extends Component<Props, State> {
               padding: '32px',
             }}
           >
-            <Button
-              variant="secondary"
-              onClick={onCancel}
-              id="cancelButton"
-            >
+            <Button variant="secondary" onClick={onCancel} id="cancelButton">
               {intl.formatMessage(globalMessages.cancel)}
             </Button>
             <LoadingButton
