@@ -1468,5 +1468,7 @@
   "transaction.review.howToRestorePassword": "cara memulihkannya.",
   "transaction.fail.title": "Transaksi gagal",
   "transaction.fail.cancelByUser": "Transaksi dibatalkan oleh pengguna",
-  "transaction.fail.error": "Transaksi Anda tidak diproses dengan benar karena masalah teknis."
+  "transaction.fail.error": "Transaksi Anda tidak diproses dengan benar karena masalah teknis.",
+  "transaction.success.title": "Transaction signed",
+  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
 }
