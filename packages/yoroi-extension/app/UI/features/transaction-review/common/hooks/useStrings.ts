@@ -183,6 +183,7 @@ export const messages = Object.freeze(
     failLedgerAppNotRunning: {
       id: 'wallet.hw.ledger.app.not.running',
       defaultMessage: '!!!The Cardano App is not running on your Ledger',
+    },
     successTitle: {
       id: 'transaction.success.title',
       defaultMessage: '!!!Transaction signed',
