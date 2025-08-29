@@ -1468,5 +1468,7 @@
   "transaction.review.howToRestorePassword": "how to restore it.",
   "transaction.fail.title": "Transaction failed",
   "transaction.fail.cancelByUser": "Transaction cancelled by user",
-  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues."
+  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues.",
+  "transaction.success.title": "Transaction signed",
+  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
 }
