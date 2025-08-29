@@ -8,6 +8,8 @@ import { getNetworkById } from './lib/storage/database/prepackaged/networks';
 import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
+import { CardanoDerivationType } from 'trezor-connect-flow';
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 
@@ -86,6 +88,9 @@ export async function claimForAddress(
   locale: string // only for Ledger
 ): Promise<{| claimId: string |}> {
   const payload = Buffer.from(getClaimMessage(addrClaimData.value, destAddrBech32), 'ascii').toString('hex');
+  const network = getNetworkById(wallet.networkId);
+  const config = network.BaseConfig[0];
+
   let signResult;
   let publicKey;
   if (wallet.type === 'mnemonic') {
@@ -94,8 +99,6 @@ export async function claimForAddress(
     publicKey = signResult.pubKey;
   } else if (wallet.type === 'ledger') {
     const ledgerConnect = new LedgerConnect({ locale });
-    const network = getNetworkById(wallet.networkId);
-    const config = network.BaseConfig[0];
     const hashPayload = false;
     const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
       serial: null,
@@ -119,6 +122,24 @@ export async function claimForAddress(
     });
     signResult = await encodeHardwareWalletSignResult(addressFieldHex, signatureHex, payload, signingPublicKeyHex, false);
     publicKey = signingPublicKeyHex;
+  } else if (wallet.type === 'trezor') {
+    const resp = await wrapWithFrame(trezor =>
+      trezor.cardanoSignMessage({
+        path: wallet.stakingAddressing.addressing.path,
+        payload,
+        preferHexDisplay: false,
+        derivationType: CardanoDerivationType.ICARUS_TREZOR,
+        protocolMagic: config.ByronNetworkId,
+        networkId: Number(config.ChainNetworkId),
+      })
+    );
+    if (!resp.success) {
+      // todo: handle insufficient firmware version
+      throw new Error(`Trezor signing error: ${resp.payload.error} (code=${String(resp.payload.code)})`);
+    }
+    const { signature, pubKey, headers: { protected: { address } } } = resp.payload;
+    signResult = await encodeHardwareWalletSignResult(address, signature, payload, pubKey, false);
+    publicKey = pubKey;
   } else {
     throw new Error('unsupported wallet type');
   }

@@ -90,8 +90,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const checkEndpoint = isMainnet ? CHECK_ENDPOINT_MAINNET : CHECK_ENDPOINT_PREPROD;
   const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
 
-  const isTrezor = wallet.type === 'trezor';
-
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
@@ -211,7 +209,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     content = (
       <ClaimContent
         alloc={formattedAlloc}
-        isTrezor={isTrezor}
         destAddrBech32={destAddrBech32}
         isClaimDialog={isClaimDialog}
         showClaimDialog={showClaimDialog}

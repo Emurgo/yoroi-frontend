@@ -56,12 +56,11 @@ const BoxWithInfo = styled(Box)(({ theme }) => ({
 interface Props1 {
   alloc: string;
   destAddrBech32: string;
-  isTrezor: boolean;
 }
 
 export function ClaimInfo1(props: Readonly<Props1>) {
   const intl = useIntl();
-  const { alloc, destAddrBech32, isTrezor } = props;
+  const { alloc, destAddrBech32 } = props;
 
   return (
     <BoxWithInfo
@@ -82,19 +81,18 @@ export function ClaimInfo1(props: Readonly<Props1>) {
         {/*  @ts-ignore */}
         <Typography variant="h1xl">{alloc} NIGHT</Typography>
       </Box>
-      {!isTrezor && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {intl.formatMessage(messages.destinationAddress)}
-            <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
+
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <Typography variant="body2" color="ds.text_gray_low">
+          {intl.formatMessage(messages.destinationAddress)}
+          <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
+        </Typography>
+        <CopyableText value={destAddrBech32} copyButtonFollowText>
+          <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
+            {destAddrBech32}
           </Typography>
-          <CopyableText value={destAddrBech32} copyButtonFollowText>
-            <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-              {destAddrBech32}
-            </Typography>
-          </CopyableText>
-        </Box>
-      )}
+        </CopyableText>
+      </Box>
     </BoxWithInfo>
   );
 }
