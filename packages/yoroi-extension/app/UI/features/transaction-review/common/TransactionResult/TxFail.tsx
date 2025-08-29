@@ -8,6 +8,12 @@ export const TxFail = ({ result }: { result: TransactionResultType }) => {
   const { closeModal } = useModal();
   const strings = useStrings();
 
+  const failMessage = (result: TransactionResultType) => {
+    if (result === TransactionResult.CANCEL) return strings.failCancelByUser;
+    if (result === TransactionResult.NO_CARDANO_RUNNING) return strings.failLedgerAppNotRunning;
+    return strings.failError;
+  };
+
   return (
     <Stack width="100%" alignItems="center">
       <FailedIlustration />
@@ -15,7 +21,7 @@ export const TxFail = ({ result }: { result: TransactionResultType }) => {
         {strings.failTitle}
       </Typography>
       <Typography variant="body1" mt="8px" color="ds.text_gray_low" textAlign="center" mb="24px">
-        {result === TransactionResult.CANCEL ? strings.failCancelByUser : strings.failError}
+        {failMessage(result)}
       </Typography>
       <Button
         //  @ts-ignore
