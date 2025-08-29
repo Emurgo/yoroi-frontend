@@ -579,6 +579,7 @@ async function __connectorSignCardanoTx(
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_BASE,
+        ignoreCutoff: true,
       });
     }
     return Promise.resolve([]);
@@ -589,6 +590,7 @@ async function __connectorSignCardanoTx(
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_REWARD,
+        ignoreCutoff: true,
       });
     }
     return Promise.resolve([]);
