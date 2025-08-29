@@ -15,7 +15,11 @@
   "airdrop.ledgerClaimDialogTitle": "sign message { index } of { total }",
   "airdrop.messageLabel": "Message",
   "airdrop.mnemonicClaimDialogText": "Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.",
+  "airdrop.next1": "What’s next?",
+  "airdrop.next2": "After this claim phase ends, a second claim phase (Scavenger Mine) will start.",
+  "airdrop.next3": "When that phase ends, the Redemption period will start, and you'll be able to redeem your claimed allocations as they thaw.",
   "airdrop.size": "Your allocation size",
+  "airdrop.success.allocation": "Your successfully claimed allocation",
   "airdrop.terms": "Terms & Conditions",
   "airdrop.terms.header1": "1. Acceptance of Terms",
   "airdrop.terms.section1_1": "By participating in the Midnight Glacier Airdrop (\"Airdrop\"), you (\"Participant\") agree to be bound by these Terms of Use (\"Terms\"). If you do not agree with these Terms, do not participate in the Airdrop.",
@@ -1460,6 +1464,13 @@
   "transaction.review.interactWithOperations": "You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.",
   "transaction.review.takeHardwareWallet": "Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.",
   "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.",
+  "transaction.review.forgotPassword": "Forgot your password?",
+  "transaction.review.howToRestorePassword": "how to restore it.",
+  "transaction.fail.title": "Transaction failed",
+  "transaction.fail.cancelByUser": "Transaction cancelled by user",
+  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues.",
+  "transaction.success.title": "Transaction signed",
+  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
   "singleAddress.settings.title": "Single address mode",
-  "singleAddress.settings.description": "Single address mode means your wallet will only maintain one address, use it for all transactions both as input and return change, and never generate other addresses. This simplifies interaction with some dApps."
+  "singleAddress.settings.description": "Single address mode means your wallet will only maintain one address, use it for all transactions both as input and return change, and never generate other addresses. This simplifies interaction with some dApps.",
 }

@@ -56,6 +56,8 @@ interface Props {
             path: [number, number, number, number, number];
           }[];
         };
+        name: string;
+        plate: unknown;
       };
     };
     profile: {
@@ -193,7 +195,14 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   } else if (alloc.isZero()) {
     content = <Zero />;
   } else if (isClaimDone) {
-    content = <ClaimDone alloc={formattedAlloc} destAddrBech32={originalDestAddrBech32} />;
+    content = (
+      <ClaimDone
+        alloc={formattedAlloc}
+        destAddrBech32={originalDestAddrBech32}
+        walletPlate={wallet.plate}
+        walletName={wallet.name}
+      />
+    );
   } else {
     content = (
       <ClaimContent
