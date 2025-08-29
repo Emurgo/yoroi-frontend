@@ -10,7 +10,7 @@ const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
-  console.log('swapForm', swapForm);
+
   const [routingPreferance, setRoutingPreferance] = useState<any>(swapForm.selectedProtocol.value || 'auto');
   const [selectedSlippage, setSelectedSlippage] = useState(String(swapForm.slippageInput.value || '1'));
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(selectedSlippage));
@@ -119,9 +119,8 @@ const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
       setAutoSelected(false);
     }
   }, []);
-  console.log('routingPreferance', { routingPreferance, autoSelected, dexHunter, muesliswap });
 
-  const handleDexHunterToggle = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDexHunterToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
     if (!value && !muesliswap) {
       setMuesliswap(true);
@@ -130,7 +129,7 @@ const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
     setRoutingPreferance('dexhunter');
   };
 
-  const handleMuesliswapToggle = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMuesliswapToggle = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
 
     if (!value && !dexHunter) {
@@ -140,7 +139,7 @@ const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
     setRoutingPreferance('muesliswap');
   };
 
-  const handleAutoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAutoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.checked;
     setAutoSelected(value);
     if (value) {
