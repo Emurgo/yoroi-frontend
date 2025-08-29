@@ -389,7 +389,7 @@ export default class ConnectorStore extends Store<StoresMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx, partialSign, /* tabId */ } = signingMessage.sign.tx;
+    const { tx, partialSign /* tabId */ } = signingMessage.sign.tx;
 
     const network = getNetworkById(connectedWallet.networkId);
 
@@ -509,7 +509,9 @@ export default class ConnectorStore extends Store<StoresMap> {
           if (partialSign) {
             console.log(`Foreign utxo '${foreignUtxoId}' cannot be resolved, but this is ignored due to the partial sign mode`);
           } else {
-            console.error(`Foreign utxo '${foreignUtxoId}' cannot be resolved, this is a critical failure in a NON-partial sign mode.`);
+            console.error(
+              `Foreign utxo '${foreignUtxoId}' cannot be resolved, this is a critical failure in a NON-partial sign mode.`
+            );
             signFail({
               errorType: 'missing_utxo',
               data: foreignUtxoId,
@@ -524,7 +526,9 @@ export default class ConnectorStore extends Store<StoresMap> {
             if (partialSign) {
               console.log(`Foreign utxo '${foreignUtxoId}' is already spent, but this is ignored due to the partial sign mode`);
             } else {
-              console.error(`Foreign utxo '${foreignUtxoId}' is already spent, this is a critical failure in a NON-partial sign mode.`);
+              console.error(
+                `Foreign utxo '${foreignUtxoId}' is already spent, this is a critical failure in a NON-partial sign mode.`
+              );
               signFail({
                 errorType: 'spent_utxo',
                 data: foreignUtxoId,
