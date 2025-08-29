@@ -91,16 +91,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
     ).address.Hash
   );
-  console.log(
-    '>>>',
-    JSON.stringify(
-      wallet.allAddresses.utxoAddresses
-        .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE)
-        .map(a => [a.path.slice(-2).join(','), addressHexToBech32(a.address.Hash), a.address.IsUsed]),
-      null,
-      2
-    )
-  );
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
 
   useEffect(() => {
