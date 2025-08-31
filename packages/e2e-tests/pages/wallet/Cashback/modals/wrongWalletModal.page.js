@@ -5,32 +5,32 @@ import BasePage from '../../../basepage.js';
 class WrongWalletModal extends BasePage {
   // locators
   wrongWalletModalLocator = {
-    locator: 'cashbackWrongWallet-dialogWindow-modalWindow',
+    locator: 'dialog-dialogWindow-modalWindow',
     method: 'id',
   };
 
   wrongWalletModalTitleLocator = {
-    locator: 'cashbackWrongWallet-dialogTitle-text',
+    locator: 'dialog-dialogTitle-text',
     method: 'id',
   };
 
   setThisWalletButtonLocator = {
-    locator: 'cashbackWrongWallet-setthiswallet-button',
+    locator: 'dialog-setthiswallet-button',
     method: 'id',
   };
 
   switchWalletButtonLocator = {
-    locator: 'cashbackWrongWallet-switchwallet-button',
+    locator: 'dialog-switchwallet-button',
     method: 'id',
   };
 
   setThisWalletButtonNo = {
-    locator: 'cashbackWrongWallet-no-button',
+    locator: 'dialog-no-button',
     method: 'id',
   };
 
   setThisWalletButtonYes = {
-    locator: 'cashbackWrongWallet-yes-button',
+    locator: 'dialog-yes-button',
     method: 'id',
   };
 
