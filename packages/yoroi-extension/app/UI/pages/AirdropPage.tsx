@@ -97,7 +97,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
     ).address.Hash
   );
-
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
 
   useEffect(() => {
@@ -119,13 +118,16 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
         if (currentWalletClaim) {
           setOriginalDestAddrBech32(currentWalletClaim.destAddr);
         } else {
+          const usedAddresses = wallet.allAddresses.utxoAddresses
+            .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+            .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+          const unusedAddresses = wallet.allAddresses.utxoAddresses.filter(
+            a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed
+          );
           const result = await scanForOriginalDestAddress(
             claimEndpoint,
             destAddrBech32,
-            wallet.allAddresses.utxoAddresses
-              .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-              .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
-              .map(addr => addressHexToBech32(addr.address.Hash))
+            [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
           );
           if (result) {
             setOriginalDestAddrBech32(result.destAddr);
