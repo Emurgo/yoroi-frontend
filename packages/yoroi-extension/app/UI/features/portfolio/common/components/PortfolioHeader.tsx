@@ -131,13 +131,13 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
   }
 
   return (
-    <Stack direction="row" justifyContent="space-between">
-      <Stack direction="column">
-        <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end">
+    <Stack direction="row" justifyContent="space-between" id="portfolio:header-portfolioHeader-container">
+      <Stack direction="column" id="portfolio:header-portfolioBalanceInfo-balanceStack">
+        <Stack direction="row" spacing={theme.spacing(4)} alignItems="flex-end" id="portfolio:header-portfolioBalance-balanceRow">
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax" id="portfolio-balance-text">
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax" id="portfolio:header-portfolioBalance-balanceText">
               <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
                 {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
               </HiddenAmount>
@@ -149,7 +149,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
           />
         </Stack>
 
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }} id="portfolio:header-portfolioPriceInfo-priceRow">
           {loading || isLoading ? (
             <Skeleton width="64px" height="13px" />
           ) : (
@@ -169,7 +169,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
         </Stack>
       </Stack>
 
-      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id="portfolio-search-input" />
+      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id="portfolio:header-portfolioSearch-searchInput" />
     </Stack>
   );
 });

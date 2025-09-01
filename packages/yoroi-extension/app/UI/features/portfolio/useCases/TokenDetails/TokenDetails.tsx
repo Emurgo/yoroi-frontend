@@ -32,10 +32,10 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
   const { isTestnet } = usePortfolio();
 
   return (
-    <Box sx={{ width: '100%' }} id="portfolio-token-details">
-      <Header id="portfolio-token-details-header">
+    <Box sx={{ width: '100%' }} id="portfolio:tokenDetails-tokenDetailsPage-container">
+      <Header id="portfolio:tokenDetails-tokenDetailsHeader-header">
         <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
-        <Stack direction="row" spacing={theme.spacing(16)} id="portfolio-token-details-actions">
+        <Stack direction="row" spacing={theme.spacing(16)} id="portfolio:tokenDetails-tokenDetailsActions-actionsStack">
           {isTestnet ? null : (
             <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
           )}
@@ -44,9 +44,9 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
         </Stack>
       </Header>
 
-      <Stack direction="column" spacing={theme.spacing(24)} sx={{ marginTop: theme.spacing(16) }} id="portfolio-token-details-content">
-        <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(24)} id="portfolio-token-details-info">
-          <Card id="portfolio-token-details-card">
+      <Stack direction="column" spacing={theme.spacing(24)} sx={{ marginTop: theme.spacing(16) }} id="portfolio:tokenDetails-tokenDetailsContent-contentStack">
+        <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(24)} id="portfolio:tokenDetails-tokenDetailsInfo-infoStack">
+          <Card id="portfolio:tokenDetails-tokenDetailsCard-card">
             <HeaderSection tokenInfo={tokenInfo} stores={stores} />
             <Divider />
             <TokenChartInterval tokenInfo={tokenInfo} />
