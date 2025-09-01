@@ -165,7 +165,7 @@ export async function scanForOriginalDestAddress(
   claimEndpoint: string,
   unusedAddr: string,
   usedAddrs: Array<string>
-): Promise<ClaimResult | null> {
+): Promise<ScanResult | null> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
