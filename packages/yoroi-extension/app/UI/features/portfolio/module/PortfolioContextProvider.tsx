@@ -106,7 +106,7 @@ export const PortfolioContextProvider = ({
           openDialogWrapper(BuySellDialog);
         }
       },
-      showWelcomeBanner: ftAssetList.length === 1,
+      showWelcomeBanner: ftAssetList.length === 1 && walletBalance.ada === '0',
       backendServiceZero: backendServiceZero,
       explorer,
       isTestnet: selectedWallet.isTestnet,
