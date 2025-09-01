@@ -33,9 +33,12 @@ const Table = ({
   const strings = useStrings();
 
   return data.length > 0 ? (
-    <MuiTable aria-label={`${name} table`}>
+    <MuiTable 
+      aria-label={`${name} table`}
+      id={`portfolio-${name}-table`}
+    >
       <SortableTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
-      <TableBody>
+      <TableBody id={`portfolio-${name}-table-body`}>
         {isLoading ? Array.from({ length: 6 }).map((_, index) => cloneElement(TableRowSkeleton, { key: index })) : children}
       </TableBody>
     </MuiTable>

@@ -70,20 +70,21 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
   const ptValue = accountPair?.from.name === primaryTokenInfo.name ? accountPair?.to.value : accountPair?.from.value;
 
   return (
-    <Stack direction="column" spacing={theme.spacing(16)} sx={{ padding: theme.spacing(24) }}>
-      <Typography variant="h5" fontWeight="500" color="ds.gray_900">
+    <Stack direction="column" spacing={theme.spacing(16)} sx={{ padding: theme.spacing(24) }} id="portfolio-token-header-section">
+      <Typography variant="h5" fontWeight="500" color="ds.gray_900" id="portfolio-token-balance-label">
         {strings.balance}
       </Typography>
 
-      <Stack direction="column" spacing={theme.spacing(4)}>
-        <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
-          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
+      <Stack direction="column" spacing={theme.spacing(4)} id="portfolio-token-balance-content">
+        <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start" id="portfolio-token-balance-row">
+          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium" id="portfolio-token-balance-amount">
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
           <Typography
             variant="body2"
             fontWeight="500"
             color="ds.text_gray_medium"
+            id="portfolio-token-name"
             sx={{
               paddingTop: `${theme.spacing(18)}`,
             }}
@@ -92,7 +93,7 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600">
+        <Typography color="ds.gray_600" id="portfolio-token-balance-value">
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
           <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>

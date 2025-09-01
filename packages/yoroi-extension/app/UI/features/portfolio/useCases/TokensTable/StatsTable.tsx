@@ -86,17 +86,30 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
       isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(assetFormatedList).map((row: any) => (
-        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)}>
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+      {getSortedData(assetFormatedList).map((row: any, rowIndex: number) => (
+        <STableRow 
+          key={row.id} 
+          id={`portfolio-table-row-${row.id}`}
+          onClick={() => navigateTo.portfolioDetail(row.id)}
+        >
+          <STableCell 
+            id={`portfolio-table-cell-name-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenDisplay token={row} />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell 
+            id={`portfolio-table-cell-price-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell 
+            id={`portfolio-table-cell-24h-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -104,7 +117,10 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
+          <STableCell 
+            id={`portfolio-table-cell-1w-${row.id}`}
+            sx={{ padding: '16.8px 1rem', border: '1px solid red' }}
+          >
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -113,7 +129,10 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell 
+            id={`portfolio-table-cell-1m-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -122,11 +141,17 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell 
+            id={`portfolio-table-cell-portfolio-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenProcentage procentage={row.percentage} />
           </STableCell>
 
-          <STableCell sx={{ padding: '16.8px 1rem' }}>
+          <STableCell 
+            id={`portfolio-table-cell-total-${row.id}`}
+            sx={{ padding: '16.8px 1rem' }}
+          >
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} stores={stores} />
           </STableCell>
         </STableRow>

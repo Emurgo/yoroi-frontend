@@ -341,7 +341,7 @@ class BasePage {
     this.logger.info(`BasePage::waitEnable is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     const condition = until.elementIsEnabled(element);
-    return this.driver.wait(condition);
+    return await this.driver.wait(condition);
   }
   async buttonIsEnabled(locator) {
     this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
@@ -360,7 +360,7 @@ class BasePage {
     this.logger.info(`BasePage::waitDisabled is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     const condition = until.elementIsDisabled(element);
-    return this.driver.wait(condition);
+    return await this.driver.wait(condition);
   }
   async waitForElementNotPresent(locator) {
     this.logger.info(`BasePage::waitForElementNotPresent is called. Value: ${JSON.stringify(locator)}`);

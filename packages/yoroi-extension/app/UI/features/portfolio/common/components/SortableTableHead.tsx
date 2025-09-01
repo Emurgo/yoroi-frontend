@@ -15,6 +15,7 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
 
   return (
     <TableHead
+      id="portfolio-table-head"
       sx={{
         '& .MuiTableCell-head': {
           borderBottom: '1px solid',
@@ -22,10 +23,15 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
         },
       }}
     >
-      <TableRow>
+      <TableRow id="portfolio-table-head-row">
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
-            <TableCell key={id} align={align} sx={{ padding: `11.8px ${theme.spacing(16)}` }}>
+            <TableCell 
+              key={id} 
+              align={align} 
+              id={`portfolio-table-header-${id}`}
+              sx={{ padding: `11.8px ${theme.spacing(16)}` }}
+            >
               <Stack
                 direction="row"
                 alignItems="center"
@@ -39,12 +45,17 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                   width: isPadding ? '100%' : 'fit-content',
                 }}
               >
-                <Typography variant="body2" color="ds.gray_600" sx={{ userSelect: 'none' }}>
+                <Typography 
+                  variant="body2" 
+                  color="ds.gray_600" 
+                  id={`portfolio-table-header-text-${id}`}
+                  sx={{ userSelect: 'none' }}
+                >
                   {label}
                 </Typography>
                 {disabledSort ? null : (
                   <SortIcon
-                    id={id}
+                    id={`portfolio-table-sort-icon-${id}`}
                     order={order}
                     orderBy={orderBy}
                     style={{ cursor: 'pointer' }}

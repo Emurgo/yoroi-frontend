@@ -18,15 +18,69 @@ export default class PortfolioMainPage extends WalletCommonBase {
   };
 
   /** @type {ElementLocator} */
+  portfolioTableLocator = {
+    locator: 'portfolio-stat-table',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioTableBodyLocator = {
+    locator: 'portfolio-stat-table-body',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioTableHeadLocator = {
+    locator: 'portfolio-table-head',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
   portfolioAssetItemLocator = {
-    locator: '//table[@aria-label="stat table"]//tbody//tr',
-    method: 'xpath',
+    locator: '[data-testid^="portfolio-table-row-"]',
+    method: 'css',
   };
 
   /** @type {ElementLocator} */
   portfolioAssetsListLocator = {
-    locator: '//table[@aria-label="stat table"]//tbody',
-    method: 'xpath',
+    locator: 'portfolio-stat-table-body',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioPriceColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-price-"]',
+    method: 'css',
+  };
+
+  /** @type {ElementLocator} */
+  portfolio24HChangeColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-24h-"]',
+    method: 'css',
+  };
+
+  /** @type {ElementLocator} */
+  portfolio1WChangeColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-1w-"]',
+    method: 'css',
+  };
+
+  /** @type {ElementLocator} */
+  portfolio1MChangeColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-1m-"]',
+    method: 'css',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioPercentageColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-portfolio-"]',
+    method: 'css',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioTotalAmountColumnLocator = {
+    locator: '[data-testid*="portfolio-table-cell-total-"]',
+    method: 'css',
   };
 
   /**
@@ -36,8 +90,8 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   getAssetItemLocator(assetIndex) {
     return {
-      locator: `(//table[@aria-label="stat table"]//tbody//tr)[${assetIndex + 1}]`,
-      method: 'xpath',
+      locator: `[data-testid^="portfolio-table-row-"]:nth-child(${assetIndex + 1})`,
+      method: 'css',
     };
   }
 
@@ -48,8 +102,8 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   getAssetByNameLocator(assetName) {
     return {
-      locator: `//table[@aria-label="stat table"]//tr[.//p[normalize-space()='${assetName}']]`,
-      method: 'xpath',
+      locator: `portfolio-table-row-${assetName}`,
+      method: 'id',
     };
   }
 
@@ -59,23 +113,53 @@ export default class PortfolioMainPage extends WalletCommonBase {
    * @returns {ElementLocator}
    */
   getHeaderByLabelLocator(label) {
+    const headerIdMap = {
+      'Name': 'name',
+      'Price': 'price',
+      '24H': '24h',
+      '1W': '1W',
+      '1M': '1M',
+      'Portfolio %': 'portfolioPercents',
+      'Total amount': 'totalAmount'
+    };
+    const headerId = headerIdMap[label];
     return {
-      locator: `//table[@aria-label='stat table']//thead//th//p[normalize-space()='${label}']`,
-      method: 'xpath',
+      locator: `portfolio-table-header-${headerId}`,
+      method: 'id',
     };
   }
 
   /**
-   * Get locator for a specific cell in an asset row by name and 1-based column index
+   * Get locator for a specific cell in an asset row by name and column type
+   * @param {string} assetName
+   * @param {string} columnType - 'name', 'price', '24h', '1w', '1m', 'portfolio', 'total'
+   * @returns {ElementLocator}
+   */
+  getAssetRowCellByTypeLocator(assetName, columnType) {
+    return {
+      locator: `portfolio-table-cell-${columnType}-${assetName}`,
+      method: 'id',
+    };
+  }
+
+  /**
+   * Get locator for a specific cell in an asset row by name and 1-based column index (legacy method)
    * @param {string} assetName
    * @param {number} columnIndex
    * @returns {ElementLocator}
    */
   getAssetRowCellByIndexLocator(assetName, columnIndex) {
-    return {
-      locator: `//table[@aria-label="stat table"]//tr[.//p[normalize-space()='${assetName}']]/td[${columnIndex}]`,
-      method: 'xpath',
+    const columnTypeMap = {
+      1: 'name',
+      2: 'price',
+      3: '24h',
+      4: '1w',
+      5: '1m',
+      6: 'portfolio',
+      7: 'total'
     };
+    const columnType = columnTypeMap[columnIndex];
+    return this.getAssetRowCellByTypeLocator(assetName, columnType);
   }
 
   /**
@@ -100,7 +184,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
    * @returns {Promise<string>}
    */
   async getPortfolioBalance() {
-    return this.getText(this.portfolioBalanceLocator);
+    return await this.getText(this.portfolioBalanceLocator);
   }
 
   /**
@@ -139,7 +223,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   async isAssetDisplayed(assetName) {
     const locator = this.getAssetByNameLocator(assetName);
-    return this.customWaitIsPresented(locator);
+    return await this.customWaitIsPresented(locator);
   }
 
   /**
@@ -158,15 +242,14 @@ export default class PortfolioMainPage extends WalletCommonBase {
 
   /**
    * Checks that key cells for an asset row are present (Name, Price, 24H, 1W, 1M, Portfolio %, Total amount)
-   * Column indexes are 1-based in DOM order
    * @param {string} assetName
    * @returns {Promise<boolean>}
    */
   async areAssetKeyCellsDisplayed(assetName) {
-    // Columns: 1 Name, 2 Price, 3 24H, 4 1W, 5 1M, 6 Portfolio %, 7 Total amount
-    const requiredColumns = [1, 2, 3, 4, 5, 6, 7];
-    for (const col of requiredColumns) {
-      const locator = this.getAssetRowCellByIndexLocator(assetName, col);
+    // Column types: name, price, 24h, 1w, 1m, portfolio, total
+    const requiredColumnTypes = ['name', 'price', '24h', '1w', '1m', 'portfolio', 'total'];
+    for (const columnType of requiredColumnTypes) {
+      const locator = this.getAssetRowCellByTypeLocator(assetName, columnType);
       const displayed = await this.customWaitIsPresented(locator);
       if (!displayed) return false;
     }
@@ -200,13 +283,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async arePriceValuesDisplayed() {
     this.logger.info(`PortfolioMainPage::arePriceValuesDisplayed is called`);
 
-    // Get all price cells (column 2)
-    const priceLocator = {
-      locator: '//tbody/tr/td[2]',
-      method: 'xpath',
-    };
-
-    const priceElements = await this.findElements(priceLocator);
+    const priceElements = await this.findElements(this.portfolioPriceColumnLocator);
 
     for (const element of priceElements) {
       const text = await element.getText();
@@ -232,13 +309,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async are24HChangeValuesDisplayed() {
     this.logger.info(`PortfolioMainPage::are24HChangeValuesDisplayed is called`);
 
-    // Get all 24H change cells (column 3)
-    const change24HLocator = {
-      locator: '//tbody/tr/td[3]',
-      method: 'xpath',
-    };
-
-    const changeElements = await this.findElements(change24HLocator);
+    const changeElements = await this.findElements(this.portfolio24HChangeColumnLocator);
 
     for (const element of changeElements) {
       const text = await element.getText();
@@ -264,13 +335,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async arePortfolioPercentageValuesDisplayed() {
     this.logger.info(`PortfolioMainPage::arePortfolioPercentageValuesDisplayed is called`);
 
-    // Get all portfolio % cells (column 6)
-    const portfolioLocator = {
-      locator: '//tbody/tr/td[6]',
-      method: 'xpath',
-    };
-
-    const portfolioElements = await this.findElements(portfolioLocator);
+    const portfolioElements = await this.findElements(this.portfolioPercentageColumnLocator);
 
     for (const element of portfolioElements) {
       const text = await element.getText();
@@ -296,13 +361,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async areTotalAmountValuesDisplayed() {
     this.logger.info(`PortfolioMainPage::areTotalAmountValuesDisplayed is called`);
 
-    // Get all total amount cells (column 7)
-    const amountLocator = {
-      locator: '//tbody/tr/td[7]',
-      method: 'xpath',
-    };
-
-    const amountElements = await this.findElements(amountLocator);
+    const amountElements = await this.findElements(this.portfolioTotalAmountColumnLocator);
 
     for (const element of amountElements) {
       const text = await element.getText();

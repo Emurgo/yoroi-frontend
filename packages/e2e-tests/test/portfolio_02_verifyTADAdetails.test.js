@@ -58,7 +58,7 @@ describe('Portfolio - verify TADA details', function () {
     logger.info(`Current URL after clicking: ${currentUrl}`);
   });
 
-  it('Verify ADA details page elements are displayed', async function () {
+  it('Verify TADA details page elements are displayed', async function () {
     const portfolioDetailPage = new PortfolioDetailPage(webdriver, logger);
 
     // Check current URL first
@@ -71,24 +71,28 @@ describe('Portfolio - verify TADA details', function () {
     logger.info(`Detail page displayed: ${isDetailPageDisplayed}`);
     expect(isDetailPageDisplayed, 'Portfolio detail page is not displayed').to.be.true;
 
-    // Verify individual elements for better error reporting
-    const adaLogoDisplayed = await portfolioDetailPage.isAdaLogoDisplayed();
-    expect(adaLogoDisplayed, 'ADA logo is not displayed').to.be.true;
+    // Verify new ID-based elements for better reliability
+    const tokenBalanceLabelDisplayed = await portfolioDetailPage.isTokenBalanceLabelDisplayed();
+    expect(tokenBalanceLabelDisplayed, 'Token balance label is not displayed').to.be.true;
 
-    const adaNameDisplayed = await portfolioDetailPage.isAdaNameDisplayed();
-    expect(adaNameDisplayed, 'ADA name is not displayed').to.be.true;
+    const tokenBalanceAmountDisplayed = await portfolioDetailPage.isTokenBalanceAmountDisplayed();
+    expect(tokenBalanceAmountDisplayed, 'Token balance amount is not displayed').to.be.true;
 
-    const infoSectionDisplayed = await portfolioDetailPage.isInfoSectionDisplayed();
-    expect(infoSectionDisplayed, 'Info section is not displayed').to.be.true;
+    const tokenNameDisplayed = await portfolioDetailPage.isTokenNameDisplayed();
+    expect(tokenNameDisplayed, 'Token name is not displayed').to.be.true;
 
-    const websiteLinkDisplayed = await portfolioDetailPage.isWebsiteLinkDisplayed();
-    expect(websiteLinkDisplayed, 'Website link is not displayed').to.be.true;
+    const tokenBalanceValueDisplayed = await portfolioDetailPage.isTokenBalanceValueDisplayed();
+    expect(tokenBalanceValueDisplayed, 'Token balance value is not displayed').to.be.true;
 
-    const cardanoScanLinkDisplayed = await portfolioDetailPage.isCardanoScanLinkDisplayed();
-    expect(cardanoScanLinkDisplayed, 'CardanoScan link is not displayed').to.be.true;
-
-    const timeSelectorsDisplayed = await portfolioDetailPage.areTimeSelectorsDisplayed();
-    expect(timeSelectorsDisplayed, 'Time selectors are not displayed').to.be.true;
+    // Get and log token information for verification
+    const tokenName = await portfolioDetailPage.getTokenName();
+    logger.info(`Token name: ${tokenName}`);
+    
+    const balanceAmount = await portfolioDetailPage.getTokenBalanceAmount();
+    logger.info(`Balance amount: ${balanceAmount}`);
+    
+    const balanceValue = await portfolioDetailPage.getTokenBalanceValue();
+    logger.info(`Balance value: ${balanceValue}`);
   });
 
   afterEach(async function () {
