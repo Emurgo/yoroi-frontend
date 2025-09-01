@@ -49,7 +49,11 @@ describe('Cashback Do Not Switch Cashback Wallet', function () {
     const wrongWalletModal = new WrongWalletModal(webdriver, logger);
     const modalDisplayed = await wrongWalletModal.isDisplayed();
     expect(modalDisplayed, 'Wrong wallet modal should be displayed').to.be.true;
-    await wrongWalletModal.click(wrongWalletModal.switchWalletButtonLocator);
+    await wrongWalletModal.clickSwitchWallet();
+    await wrongWalletModal.modalIsClosed();
+    const walletInfoAfter = await walletTabPage.getSelectedWalletInfo();
+    logger.info(`Current wallet after switch: ${walletInfoAfter.name} (${walletInfoAfter.plate})`);
+    expect(walletInfoAfter.name, 'Switched wallet should be the second wallet').to.equal(testWallet1Mainnet.name);
   });
 
   it('Verify cashback wallet remains unchanged', async function () {
