@@ -129,7 +129,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
             destAddrBech32,
             [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
           );
-          if (result) {
+          if (result && result.success) {
             setOriginalDestAddrBech32(result.destAddr);
             airdropClaims.push({
               publicDeriverId: wallet.publicDeriverId,
@@ -138,6 +138,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
               amount: result.amount,
             });
             await localStorageApi.saveAirdropClaimResults(airdropClaims);
+          } else if (result) {
+            setOriginalDestAddrBech32(result.error);
           }
         }
       }
