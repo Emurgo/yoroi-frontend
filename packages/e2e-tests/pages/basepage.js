@@ -203,7 +203,7 @@ class BasePage {
       throw error;
     }
   }
-  
+
   async getAttribute(locator, property) {
     this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
     return await this.driver.findElement(getByLocator(locator)).getAttribute(property);

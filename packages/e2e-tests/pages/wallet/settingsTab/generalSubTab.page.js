@@ -73,25 +73,25 @@ class GeneralSubTab extends SettingsTab {
     locator: 'settings:general-githubLink-linkButton',
     method: 'id',
   };
-  
+
   // Cashback wallet selection locators
   cashbackWalletDropdownLocator = {
     locator: '//div[contains(@class, "MuiSelect-select") and contains(@aria-labelledby, "cashbackWalletId")]',
     method: 'xpath',
   };
-  
+
   getCashbackWalletMenuItem = walletName => {
     return {
       locator: `selectCashbackWallet-${walletName}-menuItem`,
       method: 'id',
     };
   };
-  
+
   cashbackWalletSelectedValueLocator = {
     locator: '//div[contains(@class, "MuiSelect-select") and contains(@aria-labelledby, "cashbackWalletId")]',
     method: 'xpath',
   };
-  
+
   // Alternative locator for cashback wallet dropdown
   cashbackWalletDropdownAlternativeLocator = {
     locator: '//div[contains(@class, "MuiSelect-select") and contains(@role, "button")]',

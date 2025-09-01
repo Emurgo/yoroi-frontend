@@ -75,5 +75,3 @@ describe('Cashback Do Not Switch Cashback Wallet', function () {
     done();
   });
 });
-
-

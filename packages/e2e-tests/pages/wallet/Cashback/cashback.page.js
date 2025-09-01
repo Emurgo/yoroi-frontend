@@ -6,7 +6,6 @@ import { pageTitle } from '../../../helpers/pageTitles.js';
  * Page Object for the Cashback page
  */
 class CashbackPage extends WalletCommonBase {
-  
   // Main locators
   claimCashbackButton = {
     locator: 'button._btn_xnrj2_111._claim_btn_xnrj2_126',
@@ -29,17 +28,17 @@ class CashbackPage extends WalletCommonBase {
     locator: 'dialog-dialogWindow-modalWindow',
     method: 'id',
   };
-  
+
   wrongWalletModalTitleLocator = {
     locator: 'dialog-dialogTitle-text',
     method: 'id',
   };
-  
+
   setThisWalletButtonLocator = {
     locator: 'dialog-setthiswallet-button',
     method: 'id',
   };
-  
+
   switchWalletButtonLocator = {
     locator: 'dialog-switchwallet-button',
     method: 'id',
@@ -54,7 +53,7 @@ class CashbackPage extends WalletCommonBase {
     locator: 'dialog-yes-button',
     method: 'id',
   };
-  
+
   /**
    * Switches to the cashback iframe.
    */

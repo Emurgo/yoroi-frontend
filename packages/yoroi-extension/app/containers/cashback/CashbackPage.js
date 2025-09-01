@@ -151,7 +151,7 @@ const NotCurrentWalletModal = injectIntl(
               onClick: props.onSwitchToCashbackWallet,
             },
           ]}
-          id='cashbackWrongWallet'
+          id="cashbackWrongWallet"
         >
           <Typography sx={{ fontSize: '16px', lineHeight: '24px' }} color="ds.text_gray_medium">
             {intl.formatMessage(messages.chooseText1)}
@@ -179,7 +179,7 @@ const NotCurrentWalletModal = injectIntl(
             onClick: props.onSetCurrentAsCashbackWallet,
           },
         ]}
-        id='cashbackWrongWallet'
+        id="cashbackWrongWallet"
       >
         <Typography sx={{ fontSize: '16px', lineHeight: '24px' }} color="ds.text_gray_medium">
           {intl.formatMessage(messages.switchText)}
