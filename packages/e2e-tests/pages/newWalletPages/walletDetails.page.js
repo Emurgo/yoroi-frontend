@@ -1,5 +1,4 @@
 import AddWalletBase from './addWalletBase.page.js';
-import { fiveSeconds, quarterSecond } from '../../helpers/timeConstants.js';
 
 class WalletDetails extends AddWalletBase {
   defaultMessage = 'Use a combination of letters, numbers and symbols to make your password stronger';
