@@ -5,13 +5,10 @@ import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 import { UndelegateButton } from './UndelegateButton';
-import { truncateAddress } from '../../../../utils/formatters';
-import { poolIdHexToBech32 } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { getDefaultAssetByWallet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
@@ -26,7 +23,7 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateToSpecificPool, stores }: Props & Intl): Node {
-  const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
+  const { id, name, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const theme = useTheme();
   const avatarGenerated = getAvatarFromPoolId(id);
   const selectedWallet = stores.wallets.selected;
@@ -64,13 +61,6 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
             <AvatarImg src={avatarGenerated} alt="stake pool logo" />
           )}
         </AvatarWrapper>
-        <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography component="div" color={theme.palette.ds.text_primary_medium} variant="body1" fontWeight="medium" mb="3px">
-            {ticker != null ? `[${ticker}]` : ''} {name && name !== '' ? name : truncateAddress(poolIdHexToBech32(id))}
-          </Typography>
-          <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
-          <br />
-        </Box>
       </Wrapper>
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>
         {roa != null ? (

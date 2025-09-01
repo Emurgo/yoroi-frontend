@@ -15,7 +15,11 @@
   "airdrop.ledgerClaimDialogTitle": "sign message { index } of { total }",
   "airdrop.messageLabel": "Message",
   "airdrop.mnemonicClaimDialogText": "Please sign message to prove ownership of your assets. Signing this message will not affect your wallet’s balance in any way and does not require you to pay any fees.",
+  "airdrop.next1": "What’s next?",
+  "airdrop.next2": "After this claim phase ends, a second claim phase (Scavenger Mine) will start.",
+  "airdrop.next3": "When that phase ends, the Redemption period will start, and you'll be able to redeem your claimed allocations as they thaw.",
   "airdrop.size": "Your allocation size",
+  "airdrop.success.allocation": "Your successfully claimed allocation",
   "airdrop.terms": "Terms & Conditions",
   "airdrop.terms.header1": "1. Acceptance of Terms",
   "airdrop.terms.section1_1": "By participating in the Midnight Glacier Airdrop (\"Airdrop\"), you (\"Participant\") agree to be bound by these Terms of Use (\"Terms\"). If you do not agree with these Terms, do not participate in the Airdrop.",
@@ -1459,5 +1463,12 @@
   "transaction.review.collateralInfo": "在 Cardano 上与某些智能合约进行交互时，必须提供抵押。只有当交易验证失败时，才会从您的抵押中扣除 ADA。",
   "transaction.review.interactWithOperations": "您即将与运营模块进行交互，这些模块是治理及各类区块链活动中的核心组件。其中包括根据 CIP-0095 规范设计的 Cardano 治理证书，该证书用于支持治理交易的执行。",
   "transaction.review.takeHardwareWallet": "取出您的硬件钱包设备，并按照设备上的指示操作。请确保您进行的是可信操作。",
-  "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation."
+  "transaction.review.rewardsWithdraw": "Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.",
+  "transaction.review.forgotPassword": "Forgot your password?",
+  "transaction.review.howToRestorePassword": "how to restore it.",
+  "transaction.fail.title": "Transaction failed",
+  "transaction.fail.cancelByUser": "Transaction cancelled by user",
+  "transaction.fail.error": "Your transaction has not been processed properly due to technical issues.",
+  "transaction.success.title": "Transaction signed",
+  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
 }

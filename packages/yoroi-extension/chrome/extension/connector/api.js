@@ -164,7 +164,7 @@ export async function connectorGetUtxosCardano(
   wallet: PublicDeriver<>,
   valueExpected: ?Value,
   paginate: ?Paginate,
-  coinsPerUtxoWord: RustModule.WalletV4.BigNum
+  coinsPerUtxoByte: RustModule.WalletV4.BigNum
 ): Promise<Array<RemoteUnspentOutput>> {
   const withUtxos = asGetAllUtxos(wallet);
   if (withUtxos == null) {
@@ -195,9 +195,10 @@ export async function connectorGetUtxosCardano(
 
   const utxoSet = new LibUtxoSet(await Promise.all(formattedUtxos.map(toLibUTxO)));
   const value = stringToLibValue(valueStr);
+  const coinsPerUtxoByteStr = coinsPerUtxoByte.to_str();
   let selectedUtxos;
   try {
-    selectedUtxos = (await coinSelectionClassificationStrategy(utxoSet, [value], coinsPerUtxoWord.to_str())).selectedUtxos;
+    selectedUtxos = (await coinSelectionClassificationStrategy(utxoSet, [value], coinsPerUtxoByteStr)).selectedUtxos;
   } catch (error) {
     if (error instanceof LibNotEnoughMoneyToSendError) {
       throw new NotEnoughMoneyToSendError();
@@ -579,6 +580,7 @@ async function __connectorSignCardanoTx(
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_BASE,
+        ignoreCutoff: true,
       });
     }
     return Promise.resolve([]);
@@ -589,6 +591,7 @@ async function __connectorSignCardanoTx(
       return getAllAddressesForDisplay({
         publicDeriver,
         type: CoreAddressTypes.CARDANO_REWARD,
+        ignoreCutoff: true,
       });
     }
     return Promise.resolve([]);

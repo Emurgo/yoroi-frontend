@@ -76,7 +76,7 @@ export const ReviewTxProvider = ({
       title: 'Transaction results',
       height: '440px',
       width: '612px',
-      content: result === TransactionResult.SUCCESS ? <TxSuccess /> : <TxFail />,
+      content: result === TransactionResult.SUCCESS ? <TxSuccess /> : <TxFail result={result} />,
       modalId: result === TransactionResult.SUCCESS ? 'txSuccess' : 'txFail',
     });
   };
