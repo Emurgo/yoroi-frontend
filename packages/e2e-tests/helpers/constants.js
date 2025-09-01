@@ -131,6 +131,7 @@ export const getSnapshotedMemo = () => {
 
 export const handlesEndpoints = Object.freeze({
   'ADA Handle': 'https://api.handle.me/handles/svinkopepo',
-  'Cardano Name Service (CNS)': 'https://api.yoroiwallet.com/api/asset/accounts?policy=e0c4c2d7c4a0ed2cf786753fd845dee82c45512cee03e92adfd3fb8d&asset=726168756c2e616461',
+  'Cardano Name Service (CNS)':
+    'https://api.yoroiwallet.com/api/asset/accounts?policy=e0c4c2d7c4a0ed2cf786753fd845dee82c45512cee03e92adfd3fb8d&asset=726168756c2e616461',
   'Unstoppable Domains': 'https://api.unstoppabledomains.com/resolve/domains/stackchain.blockchain',
 });
