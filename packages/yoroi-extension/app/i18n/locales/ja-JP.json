@@ -1469,6 +1469,6 @@
   "transaction.fail.title": "取引が失敗しました",
   "transaction.fail.cancelByUser": "取引はユーザーによってキャンセルされました",
   "transaction.fail.error": "技術的な問題により、取引を正常に処理できませんでした。",
-  "transaction.success.title": "Transaction signed",
-  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
+  "transaction.success.title": "取引が完了しました",
+  "transaction.success.description": "取引一覧に反映されるまで数分かかる場合があります。"
 }
