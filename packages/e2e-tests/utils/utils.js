@@ -1,5 +1,5 @@
 import { By } from 'selenium-webdriver';
-import { dbSnapshotsDir, TargetBrowser, testRunDir } from '../helpers/constants.js';
+import { dbSnapshotsDir, handlesEndpoints, TargetBrowser, testRunDir } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
@@ -284,6 +284,22 @@ export const getCurrenciesPrices = async () => {
     return reqResponse.data.ticker.prices;
   } catch (error) {
     throw new Error(`Error happen while getting currencies prices. Error: ${error}`);
+  }
+};
+
+export const resolverEndpointIsAvailable = async endpoint => {
+  try {
+    let reqResponse;
+    if (endpoint === handlesEndpoints.UnstoppableDomains) {
+      const token = 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh';
+      reqResponse = await axios.get(endpoint, { headers: { Authorization: `Bearer ${token}` } });
+    } else {
+      reqResponse = await axios.get(endpoint);
+    }
+    return reqResponse.status == 200;
+  } catch (error) {
+    console.error(error.status, error.code);
+    return false;
   }
 };
 

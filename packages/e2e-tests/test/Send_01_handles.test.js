@@ -4,12 +4,12 @@ import BasePage from '../pages/basepage.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { getTestLogger, isLocalRun } from '../utils/utils.js';
+import { getTestLogger, isLocalRun, resolverEndpointIsAvailable } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import TxReviewOverviewTab from '../pages/transactionReviewPages/txReviewOverviewTab.page.js';
-import { getTestString } from '../helpers/constants.js';
+import { getTestString, handlesEndpoints } from '../helpers/constants.js';
 import { ADA_HANDLE_UNEXPECTED_ERROR, RECEIVER_DOESNT_EXIST } from '../helpers/messages.js';
 
 describe('Handle handles', function () {
@@ -54,9 +54,6 @@ describe('Handle handles', function () {
   ];
 
   for (const testDatum of testDataPositive) {
-    if (testDatum.provider === 'Unstoppable Domains' && isLocalRun()) {
-      continue;
-    }
     describe(`Positive case, ${testDatum.provider}`, function () {
       it(`Refresh page, ${testDatum.provider}`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
@@ -69,6 +66,13 @@ describe('Handle handles', function () {
         const sendPage = new SendSubTab(webdriver, logger);
         const stepOneDisplayed = await sendPage.stepOneIsDisplayed();
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
+      });
+
+      it('Check endpoint availability', async function () {
+        const resolverAvailable = await resolverEndpointIsAvailable(handlesEndpoints[testDatum.provider]);
+        if (!resolverAvailable) {
+          this.skip();
+        }
       });
 
       it(`Enter the value, ${testDatum.provider}`, async function () {

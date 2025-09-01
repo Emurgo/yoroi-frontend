@@ -155,6 +155,8 @@ class SendSubTab extends WalletTab {
   async clickNextToStep2() {
     this.logger.info(`SendSubTab::clickNextToStep2 is called.`);
     const nextButtonIsEnabled = await this.buttonIsEnabled(this.nextToStep2ButtonLocator);
+    // We need this sleep to be sure the data is passed correctly on the next step
+    await this.sleep(halfSecond);
     if (nextButtonIsEnabled) {
       await this.click(this.nextToStep2ButtonLocator);
     } else {
