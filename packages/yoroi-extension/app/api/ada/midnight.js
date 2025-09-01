@@ -150,24 +150,34 @@ export async function claimForAddress(
   return { claimId: respBody[0].claim_id };
 }
 
-type ClaimInfo = {|
-  destAddr: string,
-  claimId: string,
-  amount: number,
-|};
+type ScanResult =
+  | {|
+      success: true,
+      destAddr: string,
+      claimId: string,
+      amount: number,
+    |}
+  | {|
+      success: false,
+      error: string,
+    |};
 export async function scanForOriginalDestAddress(
   claimEndpoint: string,
   unusedAddr: string,
   usedAddrs: Array<string>
-): Promise<ClaimInfo | null> {
+): Promise<ClaimResult | null> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
-      return null;
+      return {
+        success: false,
+        error: 'failed to fetch the destination address due to network error',
+      };
     }
     const json = await resp.json();
     if (json.length === 1) {
       return {
+        success: true,
         destAddr: addr,
         claimId: json[0].claim_id,
         amount: json[0].amount,
