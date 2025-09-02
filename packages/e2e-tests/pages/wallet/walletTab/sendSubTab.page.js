@@ -156,8 +156,6 @@ class SendSubTab extends WalletTab {
     this.logger.info(`SendSubTab::clickNextToStep2 is called.`);
     const nextButtonIsEnabled = await this.buttonIsEnabled(this.nextToStep2ButtonLocator);
     if (nextButtonIsEnabled) {
-      // We need this sleep to be sure the data is passed correctly on the next step
-      await this.sleep(halfSecond);
       await this.click(this.nextToStep2ButtonLocator);
     } else {
       throw new Error('The Next button is disabled');
