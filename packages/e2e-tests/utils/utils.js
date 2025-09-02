@@ -288,11 +288,16 @@ export const getCurrenciesPrices = async () => {
 };
 
 export const resolverEndpointIsAvailable = async endpoint => {
+  const token = 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh';
   try {
     let reqResponse;
-    if (endpoint === handlesEndpoints.UnstoppableDomains) {
-      const token = 'czsajliz-wxgu6tujd1zqq7hey_pclfqhdjsqolsxjfsurgh';
-      reqResponse = await axios.get(endpoint, { headers: { Authorization: `Bearer ${token}` } });
+    if (endpoint === handlesEndpoints['Unstoppable Domains']) {
+      reqResponse = await axios.get(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
     } else {
       reqResponse = await axios.get(endpoint);
     }
