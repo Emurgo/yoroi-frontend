@@ -7,13 +7,13 @@ export default class PortfolioDetailPage extends WalletCommonBase {
 
   /** @type {ElementLocator} */
   portfolioTokenDetailsLocator = {
-    locator: 'portfolio-token-details',
+    locator: 'portfolio:tokenDetails-tokenDetailsPage-container',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioTokenHeaderSectionLocator = {
-    locator: 'portfolio-token-header-section',
+    locator: 'portfolio:tokenDetails-tokenDetailsHeader-header',
     method: 'id',
   };
 
@@ -25,8 +25,8 @@ export default class PortfolioDetailPage extends WalletCommonBase {
 
   /** @type {ElementLocator} */
   portfolioTokenBalanceAmountLocator = {
-    locator: 'portfolio-token-balance-amount',
-    method: 'id',
+    locator: '//*[@id="portfolio:tokenDetails-tokenDetailsHeader-header"]/button/p',
+    method: 'xpath',
   };
 
   /** @type {ElementLocator} */
@@ -41,7 +41,29 @@ export default class PortfolioDetailPage extends WalletCommonBase {
     method: 'id',
   };
 
+  /** @type {ElementLocator} */
+  portfolioBackButtonLocator = {
+    locator: '//*[@id="portfolio:tokenDetails-tokenDetailsHeader-header"]/button/p',
+    method: 'xpath',
+  };
 
+  /** @type {ElementLocator} */
+  portfolioSendButtonLocator = {
+    locator: 'portfolio:tokenDetails-sendButton-sendButton',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioReceiveButtonLocator = {
+    locator: 'portfolio:tokenDetails-receiveButton-receiveButton',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioSwapButtonLocator = {
+    locator: 'portfolio:tokenDetails-swapButton-swapButton',
+    method: 'id',
+  };
 
   /**
    * Checks if the portfolio detail page is displayed
@@ -53,8 +75,6 @@ export default class PortfolioDetailPage extends WalletCommonBase {
     const headerSectionIsDisplayed = await this.customWaitIsPresented(this.portfolioTokenHeaderSectionLocator);
     return tokenDetailsIsDisplayed && headerSectionIsDisplayed;
   }
-
-
 
   /**
    * Checks if token balance label is displayed on details page
@@ -117,5 +137,50 @@ export default class PortfolioDetailPage extends WalletCommonBase {
   async getTokenBalanceValue() {
     this.logger.info(`PortfolioDetailPage::getTokenBalanceValue is called`);
     return await this.getText(this.portfolioTokenBalanceValueLocator);
+  }
+
+  /**
+   * Clicks the back button to return to portfolio
+   * @returns {Promise<void>}
+   */
+  async clickBackButton() {
+    this.logger.info(`PortfolioDetailPage::clickBackButton is called`);
+    await this.click(this.portfolioBackButtonLocator);
+  }
+
+  /**
+   * Clicks the Send button
+   * @returns {Promise<void>}
+   */
+  async clickSendButton() {
+    this.logger.info(`PortfolioDetailPage::clickSendButton is called`);
+    await this.click(this.portfolioSendButtonLocator);
+  }
+
+  /**
+   * Clicks the Receive button
+   * @returns {Promise<void>}
+   */
+  async clickReceiveButton() {
+    this.logger.info(`PortfolioDetailPage::clickReceiveButton is called`);
+    await this.click(this.portfolioReceiveButtonLocator);
+  }
+
+  /**
+   * Clicks the Swap button
+   * @returns {Promise<void>}
+   */
+  async clickSwapButton() {
+    this.logger.info(`PortfolioDetailPage::clickSwapButton is called`);
+    await this.click(this.portfolioSwapButtonLocator);
+  }
+
+  /**
+   * Checks if Swap button is available
+   * @returns {Promise<boolean>}
+   */
+  async isSwapButtonAvailable() {
+    this.logger.info(`PortfolioDetailPage::isSwapButtonAvailable is called`);
+    return await this.customWaitIsPresented(this.portfolioSwapButtonLocator);
   }
 }

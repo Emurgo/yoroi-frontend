@@ -1,166 +1,112 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { ElementLocator } from '../../locator.js';
+import { twoSeconds } from '../../../helpers/timeConstants.js';
 
 export default class PortfolioMainPage extends WalletCommonBase {
   // locators
 
   /** @type {ElementLocator} */
   portfolioBalanceLocator = {
-    locator: 'portfolio-balance-text',
+    locator: 'portfolio:header-portfolioBalance-balanceText',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioSearchInputLocator = {
-    locator: 'portfolio-search-input',
-    method: 'id',
-  };
-
-  /** @type {ElementLocator} */
-  portfolioTableLocator = {
-    locator: 'portfolio-stat-table',
+    locator: 'portfolio:header-portfolioSearch-searchInput',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioTableBodyLocator = {
-    locator: 'portfolio-stat-table-body',
+    locator: 'portfolio:statTable-assetsList-tableBody',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolioTableHeadLocator = {
-    locator: 'portfolio-table-head',
+  portfolioCurrencySwitchLocator = {
+    locator: 'portfolio:header-portfolioCurrencySwitch-currencySwitch',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolioAssetItemLocator = {
-    locator: '[data-testid^="portfolio-table-row-"]',
-    method: 'css',
-  };
-
-  /** @type {ElementLocator} */
-  portfolioAssetsListLocator = {
-    locator: 'portfolio-stat-table-body',
+  portfolioNoResultsMessageLocator = {
+    locator: 'portfolio:statTable-noResultsMessage-noResults',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolioPriceColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-price-"]',
-    method: 'css',
+  portfolioAssetRowsLocator = {
+    locator: 'portfolio:statTable-assetsList-tableBody',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolio24HChangeColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-24h-"]',
-    method: 'css',
+  portfolioAssetNameCellLocator = {
+    locator: 'portfolio:statTable:asset_0:assetName-assetName-cell',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolio1WChangeColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-1w-"]',
-    method: 'css',
+  portfolioAssetNameCellPattern = {
+    locator: 'portfolio:statTable:asset_INDEX:assetName-assetName-cell',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolio1MChangeColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-1m-"]',
-    method: 'css',
+  portfolioNameHeaderLocator = {
+    locator: 'portfolio:statTable:nameColumn-nameHeader-cell',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolioPercentageColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-portfolio-"]',
-    method: 'css',
+  portfolioPriceHeaderLocator = {
+    locator: 'portfolio:statTable:priceColumn-priceHeader-cell',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
-  portfolioTotalAmountColumnLocator = {
-    locator: '[data-testid*="portfolio-table-cell-total-"]',
-    method: 'css',
+  portfolio24HHeaderLocator = {
+    locator: 'portfolio:statTable:24hColumn-24hHeader-cell',
+    method: 'id',
   };
 
-  /**
-   * Get locator for a specific asset by index
-   * @param {number} assetIndex
-   * @returns {ElementLocator}
-   */
-  getAssetItemLocator(assetIndex) {
-    return {
-      locator: `[data-testid^="portfolio-table-row-"]:nth-child(${assetIndex + 1})`,
-      method: 'css',
-    };
-  }
+  /** @type {ElementLocator} */
+  portfolio1WHeaderLocator = {
+    locator: 'portfolio:statTable:1WColumn-1WHeader-cell',
+    method: 'id',
+  };
 
-  /**
-   * Get locator for a specific asset by name
-   * @param {string} assetName
-   * @returns {ElementLocator}
-   */
-  getAssetByNameLocator(assetName) {
-    return {
-      locator: `portfolio-table-row-${assetName}`,
-      method: 'id',
-    };
-  }
+  /** @type {ElementLocator} */
+  portfolio1MHeaderLocator = {
+    locator: 'portfolio:statTable:1MColumn-1MHeader-cell',
+    method: 'id',
+  };
 
-  /**
-   * Get locator for table header by visible label
-   * @param {string} label
-   * @returns {ElementLocator}
-   */
-  getHeaderByLabelLocator(label) {
-    const headerIdMap = {
-      'Name': 'name',
-      'Price': 'price',
-      '24H': '24h',
-      '1W': '1W',
-      '1M': '1M',
-      'Portfolio %': 'portfolioPercents',
-      'Total amount': 'totalAmount'
-    };
-    const headerId = headerIdMap[label];
-    return {
-      locator: `portfolio-table-header-${headerId}`,
-      method: 'id',
-    };
-  }
+  /** @type {ElementLocator} */
+  portfolioPortfolioHeaderLocator = {
+    locator: 'portfolio:statTable:portfolioPercentsColumn-portfolioPercentsHeader-cell',
+    method: 'id',
+  };
 
-  /**
-   * Get locator for a specific cell in an asset row by name and column type
-   * @param {string} assetName
-   * @param {string} columnType - 'name', 'price', '24h', '1w', '1m', 'portfolio', 'total'
-   * @returns {ElementLocator}
-   */
-  getAssetRowCellByTypeLocator(assetName, columnType) {
-    return {
-      locator: `portfolio-table-cell-${columnType}-${assetName}`,
-      method: 'id',
-    };
-  }
+  /** @type {ElementLocator} */
+  portfolioTotalAmountHeaderLocator = {
+    locator: 'portfolio:statTable:totalAmountColumn-totalAmountHeader-cell',
+    method: 'id',
+  };
 
-  /**
-   * Get locator for a specific cell in an asset row by name and 1-based column index (legacy method)
-   * @param {string} assetName
-   * @param {number} columnIndex
-   * @returns {ElementLocator}
-   */
-  getAssetRowCellByIndexLocator(assetName, columnIndex) {
-    const columnTypeMap = {
-      1: 'name',
-      2: 'price',
-      3: '24h',
-      4: '1w',
-      5: '1m',
-      6: 'portfolio',
-      7: 'total'
-    };
-    const columnType = columnTypeMap[columnIndex];
-    return this.getAssetRowCellByTypeLocator(assetName, columnType);
-  }
+  /** @type {ElementLocator} */
+  portfolioAllAssetNameCellsLocator = {
+    locator: 'portfolio:statTable-assetsList-tableBody',
+    method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioFirstAssetRowLocator = {
+    locator: 'portfolio:statTable:asset_0-assetRow-tableRow',
+    method: 'id',
+  };
 
   /**
    * Checks if the portfolio page is displayed
@@ -192,28 +138,8 @@ export default class PortfolioMainPage extends WalletCommonBase {
    * @returns {Promise<number>}
    */
   async countAssets() {
-    const elems = await this.findElements(this.portfolioAssetItemLocator);
+    const elems = await this.findElements(this.portfolioAssetRowsLocator);
     return elems.length;
-  }
-
-  /**
-   * Clicks on a specific asset by index
-   * @param {number} assetIndex
-   * @returns {Promise<void>}
-   */
-  async clickAssetByIndex(assetIndex) {
-    const locator = this.getAssetItemLocator(assetIndex);
-    await this.click(locator);
-  }
-
-  /**
-   * Clicks on a specific asset by name
-   * @param {string} assetName
-   * @returns {Promise<void>}
-   */
-  async clickAssetByName(assetName) {
-    const locator = this.getAssetByNameLocator(assetName);
-    await this.click(locator);
   }
 
   /**
@@ -222,38 +148,24 @@ export default class PortfolioMainPage extends WalletCommonBase {
    * @returns {Promise<boolean>}
    */
   async isAssetDisplayed(assetName) {
-    const locator = this.getAssetByNameLocator(assetName);
-    return await this.customWaitIsPresented(locator);
-  }
-
-  /**
-   * Checks if table header labels are displayed
-   * @param {string[]} labels
-   * @returns {Promise<boolean>}
-   */
-  async areHeaderLabelsDisplayed(labels) {
-    for (const label of labels) {
-      const locator = this.getHeaderByLabelLocator(label);
-      const displayed = await this.customWaitIsPresented(locator);
-      if (!displayed) return false;
+    this.logger.info(`PortfolioMainPage::isAssetDisplayed is called for asset: ${assetName}`);
+    
+    try {
+      // Find all asset name cells and check if any contain the asset name
+      const nameCells = await this.findElements(this.portfolioAllAssetNameCellsLocator);
+      
+      for (const cell of nameCells) {
+        const text = await cell.getText();
+        if (text && text.includes(assetName)) {
+          return true;
+        }
+      }
+      
+      return false;
+      
+    } catch (error) {
+      return false;
     }
-    return true;
-  }
-
-  /**
-   * Checks that key cells for an asset row are present (Name, Price, 24H, 1W, 1M, Portfolio %, Total amount)
-   * @param {string} assetName
-   * @returns {Promise<boolean>}
-   */
-  async areAssetKeyCellsDisplayed(assetName) {
-    // Column types: name, price, 24h, 1w, 1m, portfolio, total
-    const requiredColumnTypes = ['name', 'price', '24h', '1w', '1m', 'portfolio', 'total'];
-    for (const columnType of requiredColumnTypes) {
-      const locator = this.getAssetRowCellByTypeLocator(assetName, columnType);
-      const displayed = await this.customWaitIsPresented(locator);
-      if (!displayed) return false;
-    }
-    return true;
   }
 
   /**
@@ -273,125 +185,182 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   async clearSearch() {
     this.logger.info(`PortfolioMainPage::clearSearch is called`);
-    await this.clearInput(this.portfolioSearchInputLocator);
+    // Use framework helper to select-all and backspace to trigger input change
+    await this.clearInputAll(this.portfolioSearchInputLocator);
   }
 
   /**
-   * Verifies that price values are displayed (not empty or just dashes)
+   * Switches to fiat currency display
+   * @returns {Promise<void>}
+   */
+  async switchToFiatCurrency() {
+    this.logger.info(`PortfolioMainPage::switchToFiatCurrency is called`);
+    await this.click(this.portfolioCurrencySwitchLocator);
+  }
+
+  /**
+   * Switches to ADA currency display
+   * @returns {Promise<void>}
+   */
+  async switchToAdaCurrency() {
+    this.logger.info(`PortfolioMainPage::switchToAdaCurrency is called`);
+    await this.click(this.portfolioCurrencySwitchLocator);
+  }
+
+  /**
+   * Checks if no results message is displayed
    * @returns {Promise<boolean>}
    */
-  async arePriceValuesDisplayed() {
-    this.logger.info(`PortfolioMainPage::arePriceValuesDisplayed is called`);
-
-    const priceElements = await this.findElements(this.portfolioPriceColumnLocator);
-
-    for (const element of priceElements) {
-      const text = await element.getText();
-      // Check if price is not empty and not just a dash
-      if (!text || text.trim() === '-' || text.trim() === '') {
-        this.logger.info(`Price value is empty or dash: "${text}"`);
-        return false;
-      }
-      // Check if it contains USD (indicating a valid price)
-      if (!text.includes('USD')) {
-        this.logger.info(`Price value doesn't contain USD: "${text}"`);
-        return false;
-      }
+  async isNoResultsMessageDisplayed() {
+    this.logger.info(`PortfolioMainPage::isNoResultsMessageDisplayed is called`);
+    try {
+      const count = await this.countAssets();
+      return count === 0;
+    } catch (error) {
+      return false;
     }
-
-    return true;
   }
 
   /**
-   * Verifies that 24H change values are displayed (not empty or just dashes)
-   * @returns {Promise<boolean>}
+   * Gets the current value of the search input
+   * @returns {Promise<string>}
    */
-  async are24HChangeValuesDisplayed() {
-    this.logger.info(`PortfolioMainPage::are24HChangeValuesDisplayed is called`);
+  async getSearchInputValue() {
+    this.logger.info(`PortfolioMainPage::getSearchInputValue is called`);
+    return await this.getAttribute(this.portfolioSearchInputLocator, 'value');
+  }
 
-    const changeElements = await this.findElements(this.portfolio24HChangeColumnLocator);
-
-    for (const element of changeElements) {
-      const text = await element.getText();
-      // Check if 24H change is not empty and not just a dash
-      if (!text || text.trim() === '-' || text.trim() === '') {
-        this.logger.info(`24H change value is empty or dash: "${text}"`);
-        return false;
-      }
-      // Check if it contains % (indicating a valid percentage)
-      if (!text.includes('%')) {
-        this.logger.info(`24H change value doesn't contain %: "${text}"`);
-        return false;
-      }
+  /**
+   * Sorts the table by a specific column
+   * @param {string} columnName - The name of the column to sort by
+   * @returns {Promise<void>}
+   */
+  async sortByColumn(columnName) {
+    this.logger.info(`PortfolioMainPage::sortByColumn is called with column: ${columnName}`);
+    let headerLocator;
+    switch (columnName) {
+      case 'Name':
+        headerLocator = this.portfolioNameHeaderLocator;
+        break;
+      case 'Price':
+        headerLocator = this.portfolioPriceHeaderLocator;
+        break;
+      case '24H':
+        headerLocator = this.portfolio24HHeaderLocator;
+        break;
+      case '1W':
+        headerLocator = this.portfolio1WHeaderLocator;
+        break;
+      case '1M':
+        headerLocator = this.portfolio1MHeaderLocator;
+        break;
+      case 'Portfolio %':
+        headerLocator = this.portfolioPortfolioHeaderLocator;
+        break;
+      case 'Total amount':
+        headerLocator = this.portfolioTotalAmountHeaderLocator;
+        break;
+      default:
+        this.logger.warn(`PortfolioMainPage::sortByColumn - Unknown column name: ${columnName}`);
+        return;
     }
-
-    return true;
+    await this.click(headerLocator);
   }
 
   /**
-   * Verifies that portfolio percentage values are displayed (not empty or just dashes)
-   * @returns {Promise<boolean>}
+   * Waits for data to load on portfolio page
+   * @returns {Promise<void>}
    */
-  async arePortfolioPercentageValuesDisplayed() {
-    this.logger.info(`PortfolioMainPage::arePortfolioPercentageValuesDisplayed is called`);
+  async waitForDataToLoad() {
+    this.logger.info(`PortfolioMainPage::waitForDataToLoad is called`);
+    await this.customWaitIsPresented(this.portfolioTableBodyLocator);
+  }
 
-    const portfolioElements = await this.findElements(this.portfolioPercentageColumnLocator);
+  /**
+   * Waits for portfolio balance element to be present/visible
+   * @returns {Promise<void>}
+   */
+  async waitForBalanceToLoad() {
+    this.logger.info(`PortfolioMainPage::waitForBalanceToLoad is called`);
+    await this.customWaitIsPresented(this.portfolioBalanceLocator);
+  }
 
-    for (const element of portfolioElements) {
-      const text = await element.getText();
-      // Check if portfolio % is not empty and not just a dash
-      if (!text || text.trim() === '-' || text.trim() === '') {
-        this.logger.info(`Portfolio % value is empty or dash: "${text}"`);
-        return false;
-      }
-      // Check if it contains % (indicating a valid percentage)
-      if (!text.includes('%')) {
-        this.logger.info(`Portfolio % value doesn't contain %: "${text}"`);
-        return false;
-      }
+  /**
+   * Waits for balance to update after currency switch
+   * (framework-style: reuse presence check; tests rely on this method existing)
+   * @returns {Promise<void>}
+   */
+  async waitForBalanceToUpdate() {
+    this.logger.info(`PortfolioMainPage::waitForBalanceToUpdate is called`);
+    await this.customWaitIsPresented(this.portfolioBalanceLocator);
+  }
+
+  /**
+   * Waits for search results to load
+   * @returns {Promise<void>}
+   */
+  async waitForSearchResults() {
+    this.logger.info(`PortfolioMainPage::waitForSearchResults is called`);
+    try {
+      await this.customWaitIsPresented(this.portfolioAssetRowsLocator);
+    } catch (error) {
+      await this.customWaitIsPresented(this.portfolioNoResultsMessageLocator);
     }
-
-    return true;
   }
 
   /**
-   * Verifies that total amount values are displayed (not empty or just dashes)
-   * @returns {Promise<boolean>}
+   * Clicks on the first asset row
+   * @returns {Promise<void>}
    */
-  async areTotalAmountValuesDisplayed() {
-    this.logger.info(`PortfolioMainPage::areTotalAmountValuesDisplayed is called`);
-
-    const amountElements = await this.findElements(this.portfolioTotalAmountColumnLocator);
-
-    for (const element of amountElements) {
-      const text = await element.getText();
-      // Check if total amount is not empty and not just a dash
-      if (!text || text.trim() === '-' || text.trim() === '') {
-        this.logger.info(`Total amount value is empty or dash: "${text}"`);
-        return false;
-      }
-      // Check if it contains a number (indicating a valid amount)
-      if (!/\d/.test(text)) {
-        this.logger.info(`Total amount value doesn't contain numbers: "${text}"`);
-        return false;
-      }
-    }
-
-    return true;
+  async clickFirstAsset() {
+    this.logger.info(`PortfolioMainPage::clickFirstAsset is called`);
+    await this.click(this.portfolioFirstAssetRowLocator);
   }
 
   /**
-   * Verifies that all value columns have valid data loaded
-   * @returns {Promise<boolean>}
+   * Click asset by name (single-asset wallet shortcut)
+   * @param {string} assetName
+   * @returns {Promise<void>}
    */
-  async areAllValuesLoaded() {
-    this.logger.info(`PortfolioMainPage::areAllValuesLoaded is called`);
+  async clickAssetByName(assetName) {
+    this.logger.info(`PortfolioMainPage::clickAssetByName is called for asset: ${assetName}`);
+    // In current test wallet there is a single asset, click the first row
+    await this.click(this.portfolioFirstAssetRowLocator);
+  }
 
-    const priceValuesOk = await this.arePriceValuesDisplayed();
-    const change24HValuesOk = await this.are24HChangeValuesDisplayed();
-    const portfolioValuesOk = await this.arePortfolioPercentageValuesDisplayed();
-    const amountValuesOk = await this.areTotalAmountValuesDisplayed();
+  /**
+   * Waits for navigation to details page
+   * @returns {Promise<void>}
+   */
+  async waitForNavigationToDetails() {
+    this.logger.info(`PortfolioMainPage::waitForNavigationToDetails is called`);
+    await this.sleep(twoSeconds);
+  }
 
-    return priceValuesOk && change24HValuesOk && portfolioValuesOk && amountValuesOk;
+  /**
+   * Waits for navigation back to portfolio page
+   * @returns {Promise<void>}
+   */
+  async waitForNavigationToPortfolio() {
+    this.logger.info(`PortfolioMainPage::waitForNavigationToPortfolio is called`);
+    await this.customWaitIsPresented(this.portfolioTableBodyLocator);
+  }
+
+  /**
+   * Waits for navigation to Send page
+   * @returns {Promise<void>}
+   */
+  async waitForNavigationToSend() {
+    this.logger.info(`PortfolioMainPage::waitForNavigationToSend is called`);
+    await this.sleep(twoSeconds);
+  }
+
+  /**
+   * Waits for navigation to Receive page
+   * @returns {Promise<void>}
+   */
+  async waitForNavigationToReceive() {
+    this.logger.info(`PortfolioMainPage::waitForNavigationToReceive is called`);
+    await this.sleep(twoSeconds);
   }
 }

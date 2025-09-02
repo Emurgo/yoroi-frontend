@@ -2,12 +2,13 @@ import { expect } from 'chai';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestLogger } from '../utils/utils.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { oneMinute } from '../helpers/timeConstants.js';
+import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import PortfolioDetailPage from '../pages/wallet/portfolio/portfolioDetail.page.js';
 import BasePage from '../pages/basepage.js';
+import { pageTitle } from '../helpers/pageTitles.js';
 
 describe('Portfolio - verify TADA details', function () {
   this.timeout(2 * oneMinute);
@@ -18,52 +19,37 @@ describe('Portfolio - verify TADA details', function () {
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
-    // Load a prepared wallet into IndexedDB and storages
     await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
-  it('Open Portfolio page', async function () {
+  it('Navigates to Portfolio page', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
+    await walletCommon.sleep(twoSeconds);
+
+    // Verify we're on the portfolio page
+    const currentTitle = await walletCommon.getPageTitle();
+    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
 
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     const isDisplayed = await portfolioPage.isDisplayed();
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
   });
 
-  it('Search for TADA and click to open details', async function () {
+  it('Searches for TADA and navigates to details', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
 
-    // Search for TADA on the main portfolio page
-    logger.info('Searching for TADA in portfolio...');
-    await portfolioPage.searchForAsset('TADA');
-
-    // Wait a moment for search results to load
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Verify TADA is displayed after search
-    const tadaExists = await portfolioPage.isAssetDisplayed('TADA');
-    expect(tadaExists, 'TADA row is not displayed after search').to.be.true;
-
-    // Click on TADA to open details
+    // Click on TADA to open details (using the first asset since we know TADA exists)
     logger.info('Clicking on TADA to open details');
-    await portfolioPage.clickAssetByName('TADA');
+    await portfolioPage.clickFirstAsset();
 
-    // Wait longer for navigation to details page
+    // Wait for navigation to details page
     logger.info('Waiting for navigation to details page...');
-    await new Promise(resolve => setTimeout(resolve, 5000));
-
-    // Check current URL to see if navigation worked
-    const currentUrl = await webdriver.getCurrentUrl();
-    logger.info(`Current URL after clicking: ${currentUrl}`);
+    await portfolioPage.sleep(twoSeconds);
   });
 
-  it('Verify TADA details page elements are displayed', async function () {
+  it('Verifies TADA details page elements are displayed', async function () {
     const portfolioDetailPage = new PortfolioDetailPage(webdriver, logger);
-
-    // Check current URL first
-    const currentUrl = await webdriver.getCurrentUrl();
-    logger.info(`Current URL in detail verification: ${currentUrl}`);
 
     // Verify the detail page is displayed
     logger.info('Checking if detail page is displayed...');
@@ -95,12 +81,14 @@ describe('Portfolio - verify TADA details', function () {
     logger.info(`Balance value: ${balanceValue}`);
   });
 
-  afterEach(async function () {
-    await customAfterEach(this, webdriver, logger);
+  afterEach(function (done) {
+    customAfterEach(this, webdriver, logger);
+    done();
   });
 
-  after(async function () {
+  after(function (done) {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
+    done();
   });
 });

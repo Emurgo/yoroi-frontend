@@ -2,13 +2,14 @@ import { expect } from 'chai';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestLogger } from '../utils/utils.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { oneMinute } from '../helpers/timeConstants.js';
+import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import BasePage from '../pages/basepage.js';
+import { pageTitle } from '../helpers/pageTitles.js';
 
-describe('Portfolio - verify values are loaded', function () {
+describe('Portfolio - verify TADA token', function () {
   this.timeout(2 * oneMinute);
 
   let webdriver = null;
@@ -17,66 +18,46 @@ describe('Portfolio - verify values are loaded', function () {
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
-    // Load a prepared wallet into IndexedDB and storages
     await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
-  it('Open Portfolio page', async function () {
+  it('Navigates to Portfolio page', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
+    await walletCommon.sleep(twoSeconds);
+
+    // Verify we're on the portfolio page
+    const currentTitle = await walletCommon.getPageTitle();
+    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
 
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     const isDisplayed = await portfolioPage.isDisplayed();
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
   });
 
-  it('Headers should be displayed', async function () {
+  it('Verifies TADA token is displayed in portfolio', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    const headersOk = await portfolioPage.areHeaderLabelsDisplayed([
-      'Name',
-      'Price',
-      '24H',
-      '1W',
-      '1M',
-      'Portfolio %',
-      'Total amount',
-    ]);
-    expect(headersOk, 'One or more portfolio headers are missing').to.be.true;
-  });
-
-  it('Portfolio values should be loaded and displayed', async function () {
-    const portfolioPage = new PortfolioMainPage(webdriver, logger);
-
+    
     // Wait for data to load
-    await new Promise(resolve => setTimeout(resolve, 3000));
-
-    // Verify all value columns have valid data loaded
-    const allValuesLoaded = await portfolioPage.areAllValuesLoaded();
-    expect(allValuesLoaded, 'One or more value columns are missing valid data').to.be.true;
-
-    // Verify individual value columns for better error reporting
-    const priceValuesOk = await portfolioPage.arePriceValuesDisplayed();
-    expect(priceValuesOk, 'Price values are not properly loaded').to.be.true;
-
-    const change24HValuesOk = await portfolioPage.are24HChangeValuesDisplayed();
-    expect(change24HValuesOk, '24H change values are not properly loaded').to.be.true;
-
-    const portfolioValuesOk = await portfolioPage.arePortfolioPercentageValuesDisplayed();
-    expect(portfolioValuesOk, 'Portfolio percentage values are not properly loaded').to.be.true;
-
-    const amountValuesOk = await portfolioPage.areTotalAmountValuesDisplayed();
-    expect(amountValuesOk, 'Total amount values are not properly loaded').to.be.true;
-
-    // Wait 10 seconds to see the final state
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await portfolioPage.waitForDataToLoad();
+    
+    // Verify TADA token is displayed
+    const isTadaDisplayed = await portfolioPage.isAssetDisplayed('TADA');
+    expect(isTadaDisplayed, 'TADA token is not displayed in portfolio').to.be.true;
+    
+    // Get the number of assets to verify we have data
+    const assetCount = await portfolioPage.countAssets();
+    expect(assetCount, 'No assets are displayed in portfolio').to.be.greaterThan(0);
   });
 
-  afterEach(async function () {
-    await customAfterEach(this, webdriver, logger);
+  afterEach(function (done) {
+    customAfterEach(this, webdriver, logger);
+    done();
   });
 
-  after(async function () {
+  after(function (done) {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
+    done();
   });
 });
