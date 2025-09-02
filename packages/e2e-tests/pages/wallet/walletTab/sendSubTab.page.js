@@ -138,7 +138,7 @@ class SendSubTab extends WalletTab {
         const currentText = await this.getReceiverHelperText();
         return currentText === expectedText;
       },
-      2* oneMinute,
+      2 * oneMinute,
       halfSecond
     );
   }
