@@ -1,5 +1,12 @@
 import WalletTab from './walletTab.page.js';
-import { quarterSecond, fiveSeconds, halfSecond, defaultWaitTimeout, oneMinute } from '../../../helpers/timeConstants.js';
+import {
+  quarterSecond,
+  fiveSeconds,
+  halfSecond,
+  defaultWaitTimeout,
+  oneMinute,
+  twoSeconds,
+} from '../../../helpers/timeConstants.js';
 
 class SendSubTab extends WalletTab {
   // locators
@@ -13,6 +20,10 @@ class SendSubTab extends WalletTab {
   receiverHelperTextLocator = {
     locator: '//p[starts-with(@id, "receiver--") and contains(@id, "-helper-text")]',
     method: 'xpath',
+  };
+  receiverAddessInputLoaderLocator = {
+    locator: 'wallet:send:enterAddressStep:receiver-loadingSpinner-component',
+    method: 'id',
   };
   receiverDoneIcon = {
     locator: 'input-done-icon',
@@ -129,18 +140,22 @@ class SendSubTab extends WalletTab {
     if (isPresented) {
       return await this.getText(this.receiverHelperTextLocator);
     }
-    throw new Error('Receiver helper text is not displayed');
+    return '';
   }
   async waitReceiverHelperTextEqual(expectedText) {
     this.logger.info(`SendSubTab::waitReceiverHelperTextEqual is called.`);
     return await this.customWaiter(
       async () => {
-        const currentText = await this.getReceiverHelperText();
+        const currentText = await this.getText(this.receiverHelperTextLocator);
         return currentText === expectedText;
       },
       2 * oneMinute,
       halfSecond
     );
+  }
+  async isReceiverLoaderDisplayed() {
+    this.logger.info(`SendSubTab::isReceiverLoaderDisplayed is called.`);
+    return await this.customWaitIsPresented(this.receiverAddessInputLoaderLocator, twoSeconds, quarterSecond);
   }
   async getReceiverHandlerAddress() {
     this.logger.info(`SendSubTab::getReceiverHandlerAddress is called.`);

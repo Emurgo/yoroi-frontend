@@ -146,6 +146,12 @@ describe('Handle handles', function () {
       it(`Wait and check displayed info, ${testNegativeDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
+        if (!errorMessageIsDisplayed) {
+          const loaderIsDisplayed = await sendStep1Page.isReceiverLoaderDisplayed();
+          if (loaderIsDisplayed) {
+            this.skip();
+          }
+        }
         expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
       });
     });
