@@ -295,7 +295,7 @@ export const resolverEndpointIsAvailable = async endpoint => {
       reqResponse = await axios.get(endpoint, {
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
     } else {
