@@ -180,6 +180,22 @@ export const messages = Object.freeze(
       id: 'global.labels.close',
       defaultMessage: '!!!Close',
     },
+    failLedgerAppNotRunning: {
+      id: 'wallet.hw.ledger.app.not.running',
+      defaultMessage: '!!!The Cardano App is not running on your Ledger',
+    },
+    successTitle: {
+      id: 'transaction.success.title',
+      defaultMessage: '!!!Transaction signed',
+    },
+    successDescription: {
+      id: 'transaction.success.description',
+      defaultMessage: '!!!It may take a few minutes to display it in the list of wallet transactions.',
+    },
+    successClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
   })
 );
 
@@ -229,5 +245,9 @@ export const useStrings = () => {
     failCancelByUser: intl.formatMessage(messages.failCancelByUser),
     failError: intl.formatMessage(messages.failError),
     failClose: intl.formatMessage(messages.failClose),
+    failLedgerAppNotRunning: intl.formatMessage(messages.failLedgerAppNotRunning),
+    successTitle: intl.formatMessage(messages.successTitle),
+    successDescription: intl.formatMessage(messages.successDescription),
+    successClose: intl.formatMessage(messages.successClose),
   }).current;
 };

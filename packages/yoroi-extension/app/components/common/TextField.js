@@ -28,6 +28,7 @@ type Props = {|
   placeholder?: string,
   QRHandler?: Function,
   isLoading?: boolean,
+  componentId?: string,
 |};
 
 const SIconButton = styled(IconButton)(({ theme }) => ({
@@ -57,6 +58,7 @@ function TextField({
   QRHandler,
   placeholder,
   isLoading,
+  componentId,
   ...props
 }: Props): Node {
   const appTheme = useTheme();
@@ -117,7 +119,7 @@ function TextField({
         sx: value.length === 0 ? { color: 'grayscale.900 !important' } : null,
         endAdornment: isLoading ? (
           <InputAdornment position="end" sx={{ marginTop: '-26px' }}>
-            <LoadingSpinner small />
+            <LoadingSpinner small id={componentId} />
           </InputAdornment>
         ) : type === 'password' ? (
           <InputAdornment position="end" sx={{ minWidth: '52px', display: 'flex', justifyContent: 'flex-end' }}>

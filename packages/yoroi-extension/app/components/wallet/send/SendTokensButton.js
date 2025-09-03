@@ -1,13 +1,15 @@
 import { Button, styled } from '@mui/material';
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
-import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
+// Сommented until better times
+// import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
-import { isTxCancelledByUser } from '../hwConnect/common/util';
+import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
 
-export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
+export const SendTokensButton = ({ disabled, onSuccess, label, stores, domainResolverResult }) => {
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
-  const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
+  // Сommented until better times
+  // const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -18,12 +20,18 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
       operations: {
         kind: 'send',
       },
-      receiverCustomTitle: resolvedNameServer && {
-        to: <CopyableText value={receiverHandler}>{receiverHandler}</CopyableText>,
-        associatedAddress: resolvedAddress,
+      receiverCustomTitle: domainResolverResult && {
+        to: <CopyableText value={domainResolverResult.handle}>{domainResolverResult.handle}</CopyableText>,
+        associatedAddress: domainResolverResult.address,
       },
       unsignedTx: signTxRequest.unsignedTx,
     });
+  };
+
+  const getFailResult = error => {
+    if (isTxCancelledByUser(error)) return TransactionResult.CANCEL;
+    if (isCardanoAppNotRunning(error)) return TransactionResult.NO_CARDANO_RUNNING;
+    return TransactionResult.FAIL;
   };
 
   const submitTx = async (password, signRequest) => {
@@ -41,7 +49,7 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
       });
     } catch (error) {
       console.log('Send Sign Error', error);
-      showTxResultModal(isTxCancelledByUser(error) ? TransactionResult.CANCEL : TransactionResult.FAIL);
+      showTxResultModal(getFailResult(error));
     }
   };
 

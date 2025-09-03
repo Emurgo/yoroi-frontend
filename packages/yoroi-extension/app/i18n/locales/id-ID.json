@@ -629,7 +629,7 @@
   "wallet.add.optionDialog.connect.hw.ledger.title": "Hardware Wallet Ledger",
   "wallet.add.optionDialog.connect.hw.trezor.learnMoreText": "Wallet perangkat keras Trezor adalah perangkat USB kecil yang menambah tingkat keamanan ekstra pada wallet Anda. Wallet ini lebih aman karena private key Anda tidak pernah meninggalkan wallet perangkat keras. Dana Anda akan terlindungi bahkan dalam keadaan komputer Anda terserang oleh malware, upaya phishing, dll.",
   "wallet.add.optionDialog.connect.hw.trezor.title": "Hardware Wallet Trezor",
-  "wallet.add.optionDialog.restore.dialogTitle": "Kembalikan wallet",
+  "wallet.add.optionDialog.restore.dialogTitle": "Pulihkan wallet",
   "wallet.add.optionDialog.restore.normalWallet.description": "Jika Anda memiliki frasa permulihan berjumlah {length} kata, pilih opsi ini untuk memulihkan wallet Anda.",
   "wallet.add.optionDialog.restore.normalWallet.title": "Masukkan {length} kata frasa permulihan",
   "wallet.add.optionDialog.restore.paperWallet.description": "Jika Anda sudah membuat paper wallet Yoroi (yang biasanya dicetak dan disimpan secara offline), Anda dapat memilih opsi ini untuk mengimpor dana dari paper wallet Yoroi Anda.",
@@ -961,8 +961,8 @@
   "wallet.restore.dialog.recovery.phrase.input.hint": "Masukkan frasa pemulihan",
   "wallet.restore.dialog.recovery.phrase.input.label": "Frasa pemulihan",
   "wallet.restore.dialog.recovery.phrase.input.noResults": "Tidak ada hasil",
-  "wallet.restore.dialog.restore.wallet.button.label": "Kembalikan wallet",
-  "wallet.restore.dialog.title.label": "Kembalikan wallet",
+  "wallet.restore.dialog.restore.wallet.button.label": "Pulihkan wallet",
+  "wallet.restore.dialog.title.label": "Pulihkan wallet",
   "wallet.restore.dialog.title.verify.label": "Verifikasi wallet Yoroi",
   "wallet.restore.dialog.upgrade.noop": "Wallet Anda tidak perlu ditingkatkan",
   "wallet.restore.dialog.verify.accountId.label": "Checksum Akun Wallet Anda:",
@@ -1468,5 +1468,7 @@
   "transaction.review.howToRestorePassword": "cara memulihkannya.",
   "transaction.fail.title": "Transaksi gagal",
   "transaction.fail.cancelByUser": "Transaksi dibatalkan oleh pengguna",
-  "transaction.fail.error": "Transaksi Anda tidak diproses dengan benar karena masalah teknis."
+  "transaction.fail.error": "Transaksi Anda tidak diproses dengan benar karena masalah teknis.",
+  "transaction.success.title": "Transaksi ditandatangani",
+  "transaction.success.description": "Mungkin butuh waktu beberapa menit untuk menampilkannya dalam daftar transaksi."
 }
