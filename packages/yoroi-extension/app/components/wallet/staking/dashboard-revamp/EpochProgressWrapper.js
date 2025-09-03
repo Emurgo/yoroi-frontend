@@ -1,8 +1,7 @@
 // @flow
 import type { ComponentType, Node } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
-import { Box, styled } from '@mui/system';
-import { Typography } from '@mui/material';
+import { Box, Divider, styled, Typography } from '@mui/material';
 import { observer } from 'mobx-react';
 import { injectIntl } from 'react-intl';
 import { EpochProgressCard } from './EpochProgressCard';
@@ -34,17 +33,12 @@ function EpochProgressWrapper({ epochProgress, intl }: Props & Intl): Node {
         bgcolor: 'ds.bg_color_max',
       }}
     >
-      <Box
-        sx={{
-          padding: '15px 24px',
-          borderBottom: '1px solid',
-          borderColor: 'grayscale.200',
-        }}
-      >
+      <Box sx={{ padding: '17px 24px' }}>
         <Typography component="div" variant="h5" color="ds.text_gray_medium" fontWeight={500}>
           {intl.formatMessage(globalMessages.epochProgress)}
         </Typography>
       </Box>
+      <Divider sx={{ borderColor: 'ds.gray_200' }} />
       <Box sx={{ padding: '24px' }}>
         <EpochProgressCard
           percentage={epochProgress.percentage}

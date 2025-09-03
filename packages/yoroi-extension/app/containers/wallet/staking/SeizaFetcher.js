@@ -18,6 +18,7 @@ export type SocialLinks = {|
   tg?: string,
   di?: string,
   yt?: string,
+  web?: string,
   icon?: string,
 |};
 export type PoolData = {|

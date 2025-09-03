@@ -28,6 +28,18 @@ export const messages = Object.freeze(
       id: 'notifications.settings.enablePushNotificationsDesc',
       defaultMessage: '!!!Allow push notifications',
     },
+    notificationCenterTitle: {
+      id: 'notifications.center.title',
+      defaultMessage: '!!!notifications',
+    },
+    readAll: {
+      id: 'notifications.center.markAllAsRead',
+      defaultMessage: '!!!mark all as read',
+    },
+    noNotification: {
+      id: 'notifications.center.noNotification',
+      defaultMessage: '!!!No notification yet',
+    },
   })
 );
 
@@ -41,5 +53,8 @@ export const useStrings = () => {
     durationDescription: (duration: number) => intl.formatMessage(messages.durationDescription, { duration }),
     enablePushNotificationsTitle: intl.formatMessage(messages.enablePushNotificationsTitle),
     enablePushNotificationsDesc: intl.formatMessage(messages.enablePushNotificationsDesc),
+    notificationCenterTitle: intl.formatMessage(messages.notificationCenterTitle),
+    readAll: intl.formatMessage(messages.readAll),
+    noNotification: intl.formatMessage(messages.noNotification),
   }).current;
 };

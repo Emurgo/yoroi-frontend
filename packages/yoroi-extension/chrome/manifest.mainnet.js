@@ -16,7 +16,7 @@ import config from 'config';
 // `config` is available only in the build script, not in the bundle
 const fcmProjectId = config.fcm?.projectId;
 
-export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildManifest({
+export default (isDebug: boolean, shouldInjectConnector: boolean, isFirefox: boolean): * => buildManifest({
   description: 'A simple, secure and fast Cardano ADA wallet.',
   defaultTitle: 'Yoroi',
   titleOverride: true,
@@ -40,4 +40,5 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
   enableProtocolHandlers: true,
   shouldInjectConnector,
+  isFirefox,
 });

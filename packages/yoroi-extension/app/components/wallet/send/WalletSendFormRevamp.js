@@ -617,6 +617,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                componentId="wallet:send:enterAddressStep:receiver"
               />
               {domainResolverResult != null ? (
                 <Typography
@@ -966,7 +967,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               onSuccess={() => {
                 this.onUpdateStep(SEND_FORM_STEP.RECEIVER);
               }}
-              receiverHandler={receiverField.value}
+              // Сommented until better times
+              // receiverHandler={receiverField.value}
+              domainResolverResult={this.state.domainResolverResult}
             />
           </>
         );

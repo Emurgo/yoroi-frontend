@@ -129,7 +129,6 @@ export default class CardanoStakingPage extends Component<AllProps, State> {
                 isTestnet={selectedWallet.isTestnet}
               />
               {this._displayPoolInfo()}
-              <br />
             </div>
           )}
           {!selectedWallet.isTestnet && (

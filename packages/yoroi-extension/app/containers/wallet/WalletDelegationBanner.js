@@ -11,7 +11,7 @@ import { observer } from 'mobx-react';
 import { emptyDashboardMessages } from '../../components/wallet/staking/dashboard/StakingDashboard';
 import { toSvg } from 'jdenticon';
 
-import { SocialMediaStakePool, HelperTooltip } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
+import { HelperTooltip } from '../../components/wallet/staking/dashboard-revamp/StakePool/StakePool';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
@@ -140,12 +140,6 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
               {intl.formatMessage(messages.firstRewardDetails)}
             </Typography>
           </Box>
-          <Box>
-            <Typography component="div" variant="body1" fontWeight={500} color="ds.text_gray_medium">
-              {intl.formatMessage(messages.socialMedia)}
-            </Typography>
-            <SocialMediaStakePool color="ds.text_gray_medium" socialLinks={socialLinks} websiteUrl={websiteUrl} />
-          </Box>
         </Box>
         <Box sx={{ marginTop: '24px', display: 'flex', flexDirection: 'row', gap: '24px' }}>
           <Link
@@ -170,6 +164,7 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
             label={intl.formatMessage(globalMessages.delegateLabel)}
             disabled={isWalletWithNoFunds}
             isTestnet={isTestnet}
+            socialMediaInfo={{ socialLinks, websiteUrl: socialLinks?.web ?? websiteUrl }}
           />
         </Box>
       </Box>

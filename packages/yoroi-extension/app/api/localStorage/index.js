@@ -39,6 +39,8 @@ const storageKeys = {
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
+  MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
+  CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -61,6 +63,7 @@ const storageKeys = {
   WALLETS_NAVIGATION: networkForLocalStorage + '-WALLETS-NAVIGATION',
   SELECTED_WALLET: 'SELECTED_WALLET',
   PUSH_NOTIFICATION_METADATA: 'PUSH_NOTIFICATION_METADATA',
+  AIRDROP_CLAIM_RESULTS: 'AIRDROP_CLAIM_RESULTS',
 };
 
 export type SetCustomUserThemeRequest = {|
@@ -78,6 +81,14 @@ export type PushNotificationMetadata = {|
   isEnabled?: boolean,
   fcmToken?: string,
 |};
+
+type WalletClaimResult = {|
+  publicDeriverId: number,
+  destAddr: string,
+  claimId: string,
+  amount: number,
+|};
+
 /**
  * This api layer provides access to the electron local storage
  * for user settings that are not synced with any coin backend.
@@ -156,12 +167,22 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== Midnight Modal ========== //
-  getMidnightModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  // ========== CARDANO_CARD Modal ========== //
+  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
-  setMidnightModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED, closed);
+  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
-  unsetMidnightModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_MODAL_CLOSED);
+  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+
+  // ========== Midnight Banner Announcement ========== //
+  getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+
+  setMidnightBannerAnnouncementClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
+
+  unsetMidnightBannerAnnouncementClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
 
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
@@ -505,6 +526,18 @@ export default class LocalStorageApi {
 
   savePushNotificationMetadata: PushNotificationMetadata => Promise<void> = async metadata => {
     await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
+  };
+
+  getAirdropClaimResults: () => Promise<Array<WalletClaimResult>> = async () => {
+    const raw = await getLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS);
+    if (!raw) {
+      return [];
+    }
+    return JSON.parse(raw);
+  };
+
+  saveAirdropClaimResults: (Array<WalletClaimResult>) => Promise<void> = async results => {
+    await setLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS, JSON.stringify(results));
   };
 
   async reset(): Promise<void> {

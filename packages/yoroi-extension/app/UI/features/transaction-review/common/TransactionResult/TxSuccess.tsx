@@ -2,18 +2,21 @@ import { Button, Stack, Typography } from '@mui/material';
 import { useNavigateTo } from '../hooks/useNavigateTo';
 import { SuccessIlustration } from './SuccessIlustration';
 import { useModal } from '../../../../components/modals/ModalContext';
+import { useStrings } from '../hooks/useStrings';
 
 export const TxSuccess = () => {
   const navigate = useNavigateTo();
   const { closeModal } = useModal();
+  const strings = useStrings();
+
   return (
     <Stack width="100%" alignItems="center">
       <SuccessIlustration />
       <Typography variant="h5" fontWeight="500" mt="42px">
-        Transaction signed
+        {strings.successTitle}
       </Typography>
       <Typography variant="body1" mt="8px" color="ds.text_gray_low" textAlign="center" mb="24px">
-        It may take a few minutes to display it in the list of wallet transactions.{' '}
+        {strings.successDescription}
       </Typography>
       <Button
         //  @ts-ignore
@@ -25,7 +28,7 @@ export const TxSuccess = () => {
         }}
         id="txSuccess-close-button"
       >
-        Close
+        {strings.successClose}
       </Button>
     </Stack>
   );

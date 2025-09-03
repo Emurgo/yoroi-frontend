@@ -1,5 +1,6 @@
 // @flow
 
+import type { ConfigType } from '../../../../../../../config/config-types';
 import { CoinTypes } from '../../../../../../config/numbersConfig';
 import { PRIMARY_ASSET_CONSTANTS } from '../primitives/enums';
 import type { CardanoHaskellBaseConfig, CardanoHaskellConfig, NetworkRow, TokenInsert } from '../primitives/tables';
@@ -11,15 +12,18 @@ export const CardanoForks = Object.freeze({
   Haskell: 0,
 });
 
+// populated by ConfigWebpackPlugin
+declare var CONFIG: ConfigType;
+
 export const networks = Object.freeze({
   CardanoMainnet: ({
     NetworkId: 0,
     NetworkName: 'Cardano Mainnet',
     NetworkFeatureName: 'mainnet',
     Backend: {
-      BackendService: 'https://api.yoroiwallet.com',
+      BackendService: CONFIG.yoroiBackend.mainnet,
       TokenInfoService: 'https://cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://zero.yoroiwallet.com',
+      BackendServiceZero: CONFIG.yoroiBackend.zeroMainnet,
     },
     BaseConfig: ([
       Object.freeze({
@@ -56,9 +60,9 @@ export const networks = Object.freeze({
     NetworkName: 'Cardano Preprod Testnet',
     NetworkFeatureName: 'preprod',
     Backend: {
-      BackendService: 'https://preprod-backend.yoroiwallet.com',
+      BackendService: CONFIG.yoroiBackend.preprod,
       TokenInfoService: 'https://stage-cdn.yoroiwallet.com',
-      BackendServiceZero: 'https://yoroi-backend-zero-preprod-prod.emurgornd.com',
+      BackendServiceZero: CONFIG.yoroiBackend.zeroPreprod,
     },
     BaseConfig: ([
       Object.freeze({

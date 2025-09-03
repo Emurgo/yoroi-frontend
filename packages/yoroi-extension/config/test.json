@@ -19,7 +19,7 @@
     "pubKeyMaster": "ab9e4f1c4d996a0e9cdda8546bf5ee1dd8397fd7ab287c331ff171c7e4e0e9e2"
   },
   "bring": {
-    "baseUrl": "https://sandbox-api.bringweb3.io/v1/extension/check/portal",
+    "baseUrl": "https://api.bringweb3.io/v1/extension/",
     "identifier": "G1TjqDrfxS8jhRYz15Sg2fMGsvZpdFF8IWgKe0g8",
     "apiEndpoint": "sandbox"
   },
@@ -39,5 +39,11 @@
   "notifications": {
     "defaultDuration": 4,
     "vapidPublicKey": "BKj3BumTPTjepBiiXXYVZu-W8WbofAon4GG2YMhK-QKeVtd5UQ-zB8HMckW0nw4P2PfEIcPQ-ktxefSvTyzpE9M"
+  },
+  "yoroiBackend": {
+    "mainnet": "https://api.yoroiwallet.com",
+    "preprod": "https://preprod-backend.yoroiwallet.com",
+    "zeroMainnet": "https://zero.yoroiwallet.com",
+    "zeroPreprod": "https://yoroi-backend-zero-preprod-prod.emurgornd.com"
   }
 }

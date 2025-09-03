@@ -29,6 +29,7 @@ import { DappConnector } from './DappConnector';
 import { Delete } from './Delete';
 import { Device } from './Device';
 import { Drag } from './Drag';
+import { ErrorTriangle } from './ErrorTriangle';
 import { ExclamationCircle } from './ExclamationCircle';
 import { Expand } from './Expand';
 import { GridDefault } from './GridDefault';
@@ -93,6 +94,8 @@ import { Wallets } from './Wallets';
 import { Refresh } from './Refresh';
 import { Swap } from './Swap';
 import { AdaToken } from './AdaToken';
+import { Bell } from './Bell';
+import { Notification } from './Notification';
 
 export const Icon = {
   Assets,
@@ -124,6 +127,7 @@ export const Icon = {
   Delete,
   Device,
   Drag,
+  ErrorTriangle,
   ExclamationCircle,
   Expand,
   Explore,
@@ -188,6 +192,8 @@ export const Icon = {
   Wallet,
   Wallets,
   Swap,
+  Bell,
+  Notification,
 };
 
 export enum Icons {
@@ -220,6 +226,7 @@ export enum Icons {
   Delete = 'Delete',
   Device = 'Device',
   Drag = 'Drag',
+  ErrorTriangle = 'ErrorTriangle',
   ExclamationCircle = 'ExclamationCircle',
   Expand = 'Expand',
   Explore = 'Explore',

@@ -1,18 +1,15 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { Box, styled } from '@mui/system';
-import { Stack, Typography, useTheme } from '@mui/material';
+import { Box, Divider, Stack, styled, Typography, useTheme } from '@mui/material';
 import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
 import { UndelegateButton } from './UndelegateButton';
-import { truncateAddress } from '../../../../utils/formatters';
-import { poolIdHexToBech32 } from '../../../../api/ada/lib/cardanoCrypto/utils';
+import { getDefaultAssetByWallet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 type Props = {|
   delegatedPool: PoolData,
@@ -26,9 +23,11 @@ type Intl = {|
 |};
 
 function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateToSpecificPool, stores }: Props & Intl): Node {
-  const { id, name, ticker, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
+  const { id, name, poolSize, share, avatar, roa, socialLinks, websiteUrl } = delegatedPool || {};
   const theme = useTheme();
   const avatarGenerated = getAvatarFromPoolId(id);
+  const selectedWallet = stores.wallets.selected;
+  const defaultAsset = getDefaultAssetByWallet(selectedWallet);
 
   return (
     <Card
@@ -39,7 +38,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
         paddingBottom: '24px',
       }}
     >
-      <Stack direction="row" px={24} py={16} alignItems="center">
+      <Stack direction="row" pl={24} pr={8} py={10} alignItems="center">
         <Typography component="div" variant="h5" color={theme.palette.ds.text_gray_medium} fontWeight={500}>
           {intl.formatMessage(globalMessages.stakePoolDelegated)}
         </Typography>
@@ -53,15 +52,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           socialMediaInfo={{ socialLinks, websiteUrl }}
         />
       </Stack>
-      <Box
-        sx={{
-          borderBottom: '1px solid',
-          borderBottomColor: 'grayscale.200',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      />
+      <Divider sx={{ borderColor: 'ds.gray_200' }} />
       <Wrapper sx={{ paddingBottom: 0 }}>
         <AvatarWrapper>
           {avatar != null ? (
@@ -70,13 +61,6 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
             <AvatarImg src={avatarGenerated} alt="stake pool logo" />
           )}
         </AvatarWrapper>
-        <Box marginLeft="16px" sx={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-          <Typography component="div" color={theme.palette.ds.text_primary_medium} variant="body1" fontWeight="medium" mb="3px">
-            {ticker != null ? `[${ticker}]` : ''} {name ?? truncateAddress(poolIdHexToBech32(id))}
-          </Typography>
-          <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
-          <br />
-        </Box>
       </Wrapper>
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>
         {roa != null ? (
@@ -105,7 +89,7 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
               {intl.formatMessage(globalMessages.poolSize)}
             </Typography>
             <Typography as="span" fontWeight={500} color={theme.palette.ds.text_gray_medium} variant="h2">
-              {poolSize}
+              {poolSize} {defaultAsset.Metadata.ticker}
             </Typography>
           </Box>
         )}

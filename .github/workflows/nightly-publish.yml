@@ -45,15 +45,18 @@ jobs:
         working-directory: ./packages/yoroi-extension
         run: |
           CURRENT_VERSION=$(jq -r '.version' package.json)
-          PATCH_VERSION="${CURRENT_VERSION##*.}"
-          MAJOR_MINOR_VERSION="${CURRENT_VERSION%.*}"
-          REMINDER=$((PATCH_VERSION % 100))
-          if [ $REMINDER -eq 99 ]; then
-              NEW_PATCH_VERSION=$((PATCH_VERSION + 2))
+          DOTS=$(echo $CURRENT_VERSION | grep -o '\.' | grep -c '\.')
+          if [ $DOTS -eq 2 ]; then
+            NEW_VERSION="$CURRENT_VERSION.1"
+          elif [ $DOTS -eq 3 ]; then
+            NIGHTLY_VERSION="${CURRENT_VERSION##*.}"
+            NEW_NIGHTLY_VERSION=$((NIGHTLY_VERSION + 1))
+            PROD_VERSION="${CURRENT_VERSION%.*}"
+            NEW_VERSION="$PROD_VERSION.$NEW_NIGHTLY_VERSION"
           else
-              NEW_PATCH_VERSION=$((PATCH_VERSION + 1))
+            echo "ERR: unrecognised version format: $CURRENT_VERSION"
+            exit 1;
           fi
-          NEW_VERSION="$MAJOR_MINOR_VERSION.$NEW_PATCH_VERSION"
           jq --arg new_version "$NEW_VERSION" '.version = $new_version' package.json > new_package.json && mv new_package.json package.json
           echo "New version: $NEW_VERSION"
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
