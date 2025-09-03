@@ -1,6 +1,6 @@
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { atomicBreakdown } from '@yoroi/common';
+import { atomicBreakdown, isNumber } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -112,13 +112,17 @@ export const TokenPriceChangeChip = ({
     );
   }
 
-  const priceChangeProcent = formatPriceChange(
-    isPrimaryToken && timeInterval !== undefined ? (deltaPtTokenDataInterval ?? 0) : (changePercent ?? 0)
-  );
+  const priceChangePercent =
+    isPrimaryToken && timeInterval !== undefined ? (deltaPtTokenDataInterval ?? 0) : (changePercent ?? 0);
+
+  const priceChangePercentNumber = isNumber(priceChangePercent) ? priceChangePercent : Number(priceChangePercent);
+
+  const formattedPercent = formatPriceChange(Math.abs(priceChangePercentNumber));
+
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={deltaVariantPnl} withIcon>
-        <Typography fontSize="12px">{Math.abs(Number(priceChangeProcent))}</Typography>
+        <Typography fontSize="12px">{formattedPercent}</Typography>
       </PnlTag>
     </Box>
   );
