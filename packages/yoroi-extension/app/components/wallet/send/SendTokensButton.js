@@ -5,9 +5,10 @@ import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
 
-export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, stores }) => {
+export const SendTokensButton = ({ disabled, onSuccess, label, stores, domainResolverResult }) => {
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
-  const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
+  // Сommented until better times
+  // const { resolvedAddress, resolvedNameServer } = useDomainResolver(receiverHandler);
 
   const handleSubmit = async () => {
     const signTxRequest = stores.transactionBuilderStore.updateTentativeTx();
@@ -18,9 +19,9 @@ export const SendTokensButton = ({ disabled, onSuccess, label, receiverHandler, 
       operations: {
         kind: 'send',
       },
-      receiverCustomTitle: resolvedNameServer && {
-        to: <CopyableText value={receiverHandler}>{receiverHandler}</CopyableText>,
-        associatedAddress: resolvedAddress,
+      receiverCustomTitle: domainResolverResult && {
+        to: <CopyableText value={domainResolverResult.handle}>{domainResolverResult.handle}</CopyableText>,
+        associatedAddress: domainResolverResult.address,
       },
       unsignedTx: signTxRequest.unsignedTx,
     });
