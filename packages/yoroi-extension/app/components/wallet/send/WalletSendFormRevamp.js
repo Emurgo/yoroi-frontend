@@ -617,6 +617,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                componentId="wallet:send:enterAddressStep:receiver"
               />
               {domainResolverResult != null ? (
                 <Typography
