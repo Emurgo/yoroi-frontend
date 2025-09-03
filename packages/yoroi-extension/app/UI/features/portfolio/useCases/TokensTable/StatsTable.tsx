@@ -75,18 +75,19 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
   const assetFormatedList = useProcessedTokenData({ data: list, ptActivity, data24h, data30d, data7d });
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
+  const sortedData = getSortedData(assetFormatedList);
   return (
     <Table
       name="stat"
       headCells={headCells}
-      data={getSortedData(assetFormatedList)}
+      data={sortedData}
       order={order}
       orderBy={orderBy}
       handleRequestSort={handleRequestSort}
       isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {getSortedData(assetFormatedList).map((row: any, rowIndex: number) => (
+      {sortedData.map((row: any, rowIndex: number) => (
         <STableRow 
           key={row.id} 
           id={`portfolio:statTable:asset_${rowIndex}-assetRow-tableRow`}
