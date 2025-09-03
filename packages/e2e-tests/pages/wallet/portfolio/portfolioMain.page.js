@@ -329,6 +329,43 @@ export default class PortfolioMainPage extends WalletCommonBase {
   }
 
   /**
+   * Gets all asset names from the portfolio table
+   * @returns {Promise<string[]>}
+   */
+  async getAllAssetNames() {
+    this.logger.info(`PortfolioMainPage::getAllAssetNames is called`);
+    const assetNames = [];
+
+    // Determine the number of asset rows from the table body
+    const tableBodyElem = await this.findElement(this.portfolioTableBodyLocator);
+    const allRows = await tableBodyElem.findElements({ tagName: 'tr' });
+    const rowsCount = allRows.length;
+
+    for (let index = 0; index < rowsCount; index++) {
+      const assetNameLocator = {
+        locator: this.portfolioAssetNameCellPattern.locator.replace('INDEX', index.toString()),
+        method: this.portfolioAssetNameCellPattern.method,
+      };
+
+      try {
+        const nameCell = await this.findElement(assetNameLocator);
+        const text = await nameCell.getText();
+        if (text && text.trim()) {
+          const cleanText = text.trim().split('\n')[0];
+          if (cleanText && !assetNames.includes(cleanText)) {
+            assetNames.push(cleanText);
+          }
+        }
+      } catch (_ignored) {
+        // If a particular index is missing, continue to try remaining rows
+        continue;
+      }
+    }
+
+    return assetNames;
+  }
+
+  /**
    * Waits for navigation to details page
    * @returns {Promise<void>}
    */

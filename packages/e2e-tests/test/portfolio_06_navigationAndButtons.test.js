@@ -10,7 +10,7 @@ import PortfolioDetailPage from '../pages/wallet/portfolio/portfolioDetail.page.
 import BasePage from '../pages/basepage.js';
 import { pageTitle } from '../helpers/pageTitles.js';
 
-describe('Portfolio - navigation and button functionality', function () {
+describe('Portfolio Navigation and Buttons', function () {
   this.timeout(2 * oneMinute);
 
   let webdriver = null;
@@ -19,12 +19,10 @@ describe('Portfolio - navigation and button functionality', function () {
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
-    await prepareWallet(webdriver, logger, 'testWallet1', this);
-
-
+    await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Navigates to Portfolio page', async function () {
+  it('Navigate to Portfolio page', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
     await walletCommon.sleep(twoSeconds);
@@ -40,15 +38,15 @@ describe('Portfolio - navigation and button functionality', function () {
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
   });
 
-  it('Navigates to token details and returns to portfolio table', async function () {
+  it('Navigate to token details and return to portfolio table', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
 
-    // Ensure TADA is visible
-    await portfolioPage.searchForAsset('TADA');
+    // Ensure ADA is visible
+    await portfolioPage.searchForAsset('ADA');
     await portfolioPage.waitForSearchResults();
 
     // Open details
-    await portfolioPage.clickAssetByName('TADA');
+    await portfolioPage.clickAssetByName('ADA');
     await portfolioPage.waitForNavigationToDetails();
 
     // Verify details page
@@ -65,13 +63,13 @@ describe('Portfolio - navigation and button functionality', function () {
     expect(isPortfolioDisplayed, 'Portfolio table should be displayed after returning').to.be.true;
   });
 
-  it('Verifies Send and Receive buttons redirect correctly from token details', async function () {
+  it('Verify Send and Receive buttons redirect correctly from token details', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
 
     // Go to details
-    await portfolioPage.searchForAsset('TADA');
+    await portfolioPage.searchForAsset('ADA');
     await portfolioPage.waitForSearchResults();
-    await portfolioPage.clickAssetByName('TADA');
+    await portfolioPage.clickAssetByName('ADA');
     await portfolioPage.waitForNavigationToDetails();
 
     const portfolioDetailPage = new PortfolioDetailPage(webdriver, logger);
@@ -93,9 +91,9 @@ describe('Portfolio - navigation and button functionality', function () {
     await walletCommon.sleep(twoSeconds);
 
     // Open details again for Receive flow
-    await portfolioPage.searchForAsset('TADA');
+    await portfolioPage.searchForAsset('ADA');
     await portfolioPage.waitForSearchResults();
-    await portfolioPage.clickAssetByName('TADA');
+    await portfolioPage.clickAssetByName('ADA');
     await portfolioPage.waitForNavigationToDetails();
 
     // Receive

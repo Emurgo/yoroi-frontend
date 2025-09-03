@@ -9,7 +9,7 @@ import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import BasePage from '../pages/basepage.js';
 import { pageTitle } from '../helpers/pageTitles.js';
 
-describe('Portfolio - verify TADA token', function () {
+describe('Portfolio Token Verification', function () {
   this.timeout(2 * oneMinute);
 
   let webdriver = null;
@@ -18,10 +18,10 @@ describe('Portfolio - verify TADA token', function () {
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
-    await prepareWallet(webdriver, logger, 'testWallet1', this);
+    await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Navigates to Portfolio page', async function () {
+  it('Navigate to Portfolio page and verify token display', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
     await walletCommon.sleep(twoSeconds);
@@ -33,21 +33,14 @@ describe('Portfolio - verify TADA token', function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     const isDisplayed = await portfolioPage.isDisplayed();
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
-  });
 
-  it('Verifies TADA token is displayed in portfolio', async function () {
-    const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    
-    // Wait for data to load
-    await portfolioPage.waitForDataToLoad();
-    
-    // Verify TADA token is displayed
-    const isTadaDisplayed = await portfolioPage.isAssetDisplayed('TADA');
-    expect(isTadaDisplayed, 'TADA token is not displayed in portfolio').to.be.true;
-    
-    // Get the number of assets to verify we have data
+    // Verify ADA token is displayed in portfolio
+    const isAdaDisplayed = await portfolioPage.isAssetDisplayed('ADA');
+    expect(isAdaDisplayed, 'ADA token is not displayed in portfolio').to.be.true;
+
+    // Verify asset count
     const assetCount = await portfolioPage.countAssets();
-    expect(assetCount, 'No assets are displayed in portfolio').to.be.greaterThan(0);
+    expect(assetCount, 'Asset count should be greater than 0').to.be.greaterThan(0);
   });
 
   afterEach(function (done) {
