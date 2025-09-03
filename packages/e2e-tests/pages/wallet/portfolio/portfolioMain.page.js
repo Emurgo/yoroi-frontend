@@ -138,8 +138,15 @@ export default class PortfolioMainPage extends WalletCommonBase {
    * @returns {Promise<number>}
    */
   async countAssets() {
-    const elems = await this.findElements(this.portfolioAssetRowsLocator);
-    return elems.length;
+    this.logger.info(`PortfolioMainPage::countAssets is called`);
+    try {
+      const tableBodyElem = await this.findElement(this.portfolioTableBodyLocator);
+      const allRows = await tableBodyElem.findElements({ tagName: 'tr' });
+      return allRows.length;
+    } catch (error) {
+      this.logger.error(`PortfolioMainPage::countAssets - Error counting assets: ${error.message}`);
+      return 0;
+    }
   }
 
   /**
@@ -228,6 +235,47 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async getSearchInputValue() {
     this.logger.info(`PortfolioMainPage::getSearchInputValue is called`);
     return await this.getAttribute(this.portfolioSearchInputLocator, 'value');
+  }
+
+  /**
+   * Checks if token prices are displayed in the given fiat currency code
+   * @param {string} currencyCode e.g. 'EUR', 'USD'
+   * @returns {Promise<boolean>}
+   */
+  async arePricesInCurrency(currencyCode) {
+    this.logger.info(`PortfolioMainPage::arePricesInCurrency is called for ${currencyCode}`);
+    try {
+      const tableBodyElem = await this.findElement(this.portfolioTableBodyLocator);
+      const bodyText = await tableBodyElem.getText();
+      return bodyText.includes(` ${currencyCode}`);
+    } catch (_e) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns a map of columnName -> asset names order after sorting by that column
+   * @param {string[]} columns
+   * @returns {Promise<Record<string, string[]>>}
+   */
+  async getAssetNamesAfterSorting(columns) {
+    const result = {};
+    for (const column of columns) {
+      await this.sortByColumn(column);
+      await this.sleep(twoSeconds);
+      result[column] = await this.getAllAssetNames();
+    }
+    return result;
+  }
+
+  /**
+   * Compares two orders and returns true if they differ
+   * @param {string[]} initialOrder
+   * @param {string[]} sortedOrder
+   * @returns {boolean}
+   */
+  didOrderChange(initialOrder, sortedOrder) {
+    return JSON.stringify(initialOrder) !== JSON.stringify(sortedOrder);
   }
 
   /**
@@ -399,5 +447,72 @@ export default class PortfolioMainPage extends WalletCommonBase {
   async waitForNavigationToReceive() {
     this.logger.info(`PortfolioMainPage::waitForNavigationToReceive is called`);
     await this.sleep(twoSeconds);
+  }
+
+  /**
+   * Tests sorting by Name column and logs the results
+   * @param {string[]} initialAssetNames - The initial asset names before sorting
+   * @returns {Promise<{firstClickNames: string[], secondClickNames: string[], orderChanged: boolean}>}
+   */
+  async testNameColumnSorting(initialAssetNames) {
+    this.logger.info(`PortfolioMainPage::testNameColumnSorting is called`);
+    
+    // First click on Name header
+    await this.sortByColumn('Name');
+    await this.sleep(twoSeconds);
+    
+    // Verify assets are still displayed
+    const assetCount = await this.countAssets();
+    if (assetCount !== initialAssetNames.length) {
+      this.logger.error(`Asset count changed after first click: expected ${initialAssetNames.length}, got ${assetCount}`);
+    }
+    
+    // Get names after first click
+    const firstClickNames = await this.getAllAssetNames();
+    this.logger.info(`Asset names after first click on Name header: ${JSON.stringify(firstClickNames)}`);
+    
+    // Second click to test reverse sorting
+    await this.sortByColumn('Name');
+    await this.sleep(twoSeconds);
+    
+    // Get names after second click
+    const secondClickNames = await this.getAllAssetNames();
+    this.logger.info(`Asset names after second click on Name header: ${JSON.stringify(secondClickNames)}`);
+    
+    // Check if order changed
+    const firstOrderChanged = JSON.stringify(initialAssetNames) !== JSON.stringify(firstClickNames);
+    const secondOrderChanged = JSON.stringify(firstClickNames) !== JSON.stringify(secondClickNames);
+    const orderChanged = firstOrderChanged || secondOrderChanged;
+    
+    if (orderChanged) {
+      this.logger.info('Sorting is working - asset order changed after clicking Name header');
+    } else {
+      this.logger.info('Note: Asset order did not change after clicking Name header - this may be normal if assets are already sorted');
+    }
+    
+    return {
+      firstClickNames,
+      secondClickNames,
+      orderChanged
+    };
+  }
+
+  /**
+   * Verifies that the portfolio has exactly the expected number of assets
+   * @param {number} expectedCount - The expected number of assets
+   * @returns {Promise<boolean>} - True if count matches, false otherwise
+   */
+  async verifyAssetCount(expectedCount) {
+    this.logger.info(`PortfolioMainPage::verifyAssetCount is called with expected count: ${expectedCount}`);
+    const actualCount = await this.countAssets();
+    const matches = actualCount === expectedCount;
+    
+    if (matches) {
+      this.logger.info(`Asset count verification passed: ${actualCount} assets found`);
+    } else {
+      this.logger.error(`Asset count verification failed: expected ${expectedCount}, got ${actualCount}`);
+    }
+    
+    return matches;
   }
 }

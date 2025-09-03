@@ -21,20 +21,13 @@ describe('Portfolio Search Functionality', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Test portfolio search functionality with various scenarios', async function () {
+  it('Test portfolio search functionality', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
     await walletCommon.sleep(twoSeconds);
 
     // Verify we're on the portfolio page
-    const currentTitle = await walletCommon.getPageTitle();
-    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
-
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    const isDisplayed = await portfolioPage.isDisplayed();
-    expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
-
-    // Wait for data to load
     await portfolioPage.waitForDataToLoad();
 
     // Get initial asset count

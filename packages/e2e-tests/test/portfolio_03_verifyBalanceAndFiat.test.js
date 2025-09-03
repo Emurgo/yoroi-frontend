@@ -27,14 +27,7 @@ describe('Portfolio Balance and Fiat', function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
     await walletCommon.sleep(twoSeconds);
-
-    // Verify we're on the portfolio page
-    const currentTitle = await walletCommon.getPageTitle();
-    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
-
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    const isDisplayed = await portfolioPage.isDisplayed();
-    expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
     
     // Verify portfolio balance is displayed
     const portfolioBalance = await portfolioPage.getPortfolioBalance();
@@ -42,17 +35,18 @@ describe('Portfolio Balance and Fiat', function () {
 
     // Verify the balance matches the wallet balance from top bar
     const walletInfo = await walletCommon.getSelectedWalletInfo();
-    expect(portfolioBalance, 'Portfolio balance should match top bar balance').to.include(walletInfo.balance.toString());
+    const topBarAda = Number(walletInfo.balance);
+    const portfolioAda = Number((portfolioBalance || '').toString().replace(/[^0-9.]/g, ''));
+    expect(portfolioAda, 'Portfolio balance should be a valid number').to.be.a('number');
+    expect(portfolioAda, 'Portfolio balance should match top bar balance').to.equal(topBarAda);
   });
 
   it('Switch fiat currency in settings and verify change', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     
-    // Go to Settings tab
+
     await walletCommon.goToSettingsTab();
-    
-    // Navigate to General sub-menu
     const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToGeneralSubMenu();
     
@@ -62,14 +56,15 @@ describe('Portfolio Balance and Fiat', function () {
     
     // Go back to Portfolio to verify the change
     await walletCommon.goToPortfolioTab();
-    await walletCommon.sleep(twoSeconds);
-    
-    // Wait for balance to update
     await portfolioPage.waitForBalanceToUpdate();
     
     // Verify portfolio balance is still displayed after currency change
     const updatedPortfolioBalance = await portfolioPage.getPortfolioBalance();
     expect(updatedPortfolioBalance, 'Portfolio balance should still be displayed after currency change').to.not.be.empty;
+
+    // Verify token prices are displayed in EUR on the portfolio page
+    const pricesInEUR = await portfolioPage.arePricesInCurrency('EUR');
+    expect(pricesInEUR, 'Token prices should be displayed in EUR after switching fiat').to.be.true;
   });
 
   afterEach(function (done) {

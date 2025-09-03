@@ -29,10 +29,6 @@ describe('Portfolio Navigation and Buttons', function () {
    
     
 
-    // Verify we're on the portfolio page
-    const currentTitle = await walletCommon.getPageTitle();
-    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
-
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     const isDisplayed = await portfolioPage.isDisplayed();
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;

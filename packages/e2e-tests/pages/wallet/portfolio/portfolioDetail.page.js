@@ -3,7 +3,7 @@ import { pageTitle } from '../../../helpers/pageTitles.js';
 import { ElementLocator } from '../../locator.js';
 
 export default class PortfolioDetailPage extends WalletCommonBase {
-  // ADA Details Page Locators
+  // Portfolio Details Page Locators
 
   /** @type {ElementLocator} */
   portfolioTokenDetailsLocator = {
@@ -74,6 +74,21 @@ export default class PortfolioDetailPage extends WalletCommonBase {
     const tokenDetailsIsDisplayed = await this.customWaitIsPresented(this.portfolioTokenDetailsLocator);
     const headerSectionIsDisplayed = await this.customWaitIsPresented(this.portfolioTokenHeaderSectionLocator);
     return tokenDetailsIsDisplayed && headerSectionIsDisplayed;
+  }
+
+  /**
+   * Checks if the price chart is rendered inside the details container
+   * @returns {Promise<boolean>}
+   */
+  async isPriceChartDisplayed() {
+    this.logger.info(`PortfolioDetailPage::isPriceChartDisplayed is called`);
+    try {
+      const container = await this.findElement(this.portfolioTokenDetailsLocator);
+      const svgs = await container.findElements({ tagName: 'svg' });
+      return svgs.length > 0;
+    } catch (_e) {
+      return false;
+    }
   }
 
   /**

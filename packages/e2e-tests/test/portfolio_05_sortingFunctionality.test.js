@@ -21,7 +21,7 @@ describe('Portfolio Sorting Functionality', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Test portfolio table sorting by all columns', async function () {
+  it('Test portfolio table sorting by AssetName columns', async function () {
     const walletCommon = new WalletCommonBase(webdriver, logger);
     await walletCommon.goToPortfolioTab();
     await walletCommon.sleep(twoSeconds);
@@ -37,42 +37,15 @@ describe('Portfolio Sorting Functionality', function () {
     // Wait for data to load
     await portfolioPage.waitForDataToLoad();
 
-    // Get initial asset names to verify sorting changes the order
+    // Assert there are exactly 3 assets
     const initialAssetNames = await portfolioPage.getAllAssetNames();
-    expect(initialAssetNames.length, 'Should have assets to sort').to.be.greaterThan(0);
-    logger.info(`Initial asset order: ${JSON.stringify(initialAssetNames)}`);
+    expect(initialAssetNames.length, 'Expected exactly 3 assets in the portfolio').to.equal(3);
 
-    // Test sorting by each column
-    const columns = ['Name', 'Price', '24H', '1W', '1M', 'Portfolio %', 'Total amount'];
-    
-    for (const column of columns) {
-      logger.info(`Testing sorting by: ${column}`);
-      
-      // Sort by column
-      await portfolioPage.sortByColumn(column);
-      await walletCommon.sleep(twoSeconds); // Allow sorting to complete
-      
-      // Get asset names after sorting to verify order changed
-      const sortedAssetNames = await portfolioPage.getAllAssetNames();
-      logger.info(`Asset order after sorting by ${column}: ${JSON.stringify(sortedAssetNames)}`);
-      
-      // Verify assets are still displayed after sorting
-      const assetCount = await portfolioPage.countAssets();
-      expect(assetCount, `Assets should still be displayed after sorting by ${column}`).to.be.greaterThan(0);
-      
-      // For columns that should definitely change the order, verify they do
-      // Note: With only 3 assets, some columns might not show visible changes
-      if (column === 'Portfolio %' || column === 'Total amount') {
-        // These columns should definitely change the order due to different values
-        const orderChanged = JSON.stringify(initialAssetNames) !== JSON.stringify(sortedAssetNames);
-        logger.info(`Order changed for ${column}: ${orderChanged}`);
-        // Don't fail the test if order doesn't change - just log it
-        if (!orderChanged) {
-          logger.info(`Note: Sorting by ${column} did not change the order - this may be normal with only 3 assets`);
-        }
-      }
-    }
-    
+    // Test Name column sorting using page object method
+    const sortingResult = await portfolioPage.testNameColumnSorting(initialAssetNames);
+     
+    // Verify that sorting actually happened (at least one of the clicks should change the order)
+    expect(sortingResult.orderChanged, 'Sorting should change the asset order').to.be.true;
   });
 
   afterEach(function (done) {

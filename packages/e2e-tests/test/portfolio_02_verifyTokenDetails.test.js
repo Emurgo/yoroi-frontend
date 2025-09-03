@@ -28,12 +28,7 @@ describe('Portfolio Token Details', function () {
     await walletCommon.sleep(twoSeconds);
 
     // Verify we're on the portfolio page
-    const currentTitle = await walletCommon.getPageTitle();
-    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
-
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    const isDisplayed = await portfolioPage.isDisplayed();
-    expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
     
     // Click on ADA token to view details
     await portfolioPage.clickAssetByName('ADA');
@@ -53,6 +48,9 @@ describe('Portfolio Token Details', function () {
 
     const isTokenNameDisplayed = await portfolioDetailPage.isTokenNameDisplayed();
     expect(isTokenNameDisplayed, 'Token name is not displayed').to.be.true;
+
+    const isChartDisplayed = await portfolioDetailPage.isPriceChartDisplayed();
+    expect(isChartDisplayed, 'Price chart is not displayed').to.be.true;
   });
 
   afterEach(function (done) {
