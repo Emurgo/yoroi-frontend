@@ -1,7 +1,8 @@
 import { Button, styled } from '@mui/material';
 import { TransactionResult } from '../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../UI/features/transaction-review/module/ReviewTxProvider';
-import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
+// Сommented until better times
+// import { useDomainResolver } from '../../../UI/common/hooks/useDomainResolver';
 import CopyableText from '../../../UI/components/CopyableText';
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
 
