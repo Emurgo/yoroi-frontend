@@ -7,7 +7,6 @@ import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
 import { environment } from '../../../app/environment';
 import { bringInitBackground } from '@emurgo/bringweb3-chrome-extension-kit';
-import { sanitizeForLog } from '../../../app/coreUtils';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
 // $FlowIgnore
