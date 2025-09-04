@@ -13,7 +13,7 @@ import { QrCodeStep } from '../common/components/registrationSteps/QrCodeStep';
 import { TxExecutingStep } from '../common/components/registrationSteps/TxExecutingStep';
 import { useVoting, ProgressStep } from '../common/hooks/useVoting';
 
-const modalId = 'catalyst-registration';
+const modalId = 'catalystRegistration';
 
 export const CatalystRegistrationProcess = () => {
   const { openModal, closeModal } = useModal();
