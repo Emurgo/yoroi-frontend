@@ -69,7 +69,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       storage,
       network: Chain.Network.Mainnet,
       stakingKey: String(stakingKey),
-      address: walletAddresses[0],
+      address: walletAddresses[1],
       addressHex: String(stakingKey),
       primaryTokenInfo,
       isPrimaryToken,

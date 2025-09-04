@@ -12,7 +12,7 @@ export const EstimateSummary = () => {
   const { atoms }: any = useTheme();
   const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading } = useSwapRevamp();
   const { openModal } = useModal();
-
+  console.log('swapForm.estimate', swapForm.estimate);
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
   const tokenOutInfo = tokenInfos.get(swapForm.tokenOutInput.tokenId ?? undefinedToken);
 
