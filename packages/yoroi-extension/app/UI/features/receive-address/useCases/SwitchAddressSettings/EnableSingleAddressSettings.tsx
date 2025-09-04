@@ -2,14 +2,17 @@ import { Box, FormControlLabel } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RevampSwitch } from '../../../../../components/widgets/Switch';
 import { InfoTooltip } from '../../../../../components/widgets/InfoTooltip';
+import { useState } from 'react';
 
-type Props = {
-  isEnabled: boolean;
-  toggle: () => void;
-};
+export default function EnableSingleAddressSettings() {
+  const [isEnabled, setIsEnabled] = useState(true);
 
-export default function EnableSingleAddressSettings({ isEnabled, toggle }: Props) {
   const strings = useStrings();
+
+  const toggle = (value) => {
+    console.log("toggle", value);
+    setIsEnabled(!isEnabled);
+  };
 
   return (
     <Box>
