@@ -109,20 +109,12 @@ const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
 
   const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    if (routingPreferance === 'both') {
-      setRoutingPreferance(checked ? 'dexhunter' : 'muesliswap');
-    } else {
-      setRoutingPreferance(checked ? 'dexhunter' : 'muesliswap');
-    }
+    setRoutingPreferance(checked ? 'dexhunter' : 'muesliswap');
   };
 
   const handleMuesliswapToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    if (routingPreferance === 'both') {
-      setRoutingPreferance(checked ? 'muesliswap' : 'dexhunter');
-    } else {
-      setRoutingPreferance(checked ? 'muesliswap' : 'dexhunter');
-    }
+    setRoutingPreferance(checked ? 'muesliswap' : 'dexhunter');
   };
 
   const handleAutoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
