@@ -5,7 +5,7 @@ import { InfoTooltip } from '../../../../../components/widgets/InfoTooltip';
 import { useEffect, useState } from 'react';
 import LocalStorageApi from '../../../../../api/localStorage/index';
 
-export default function EnableSingleAddressSettings() {
+export default function EnableSingleAddressSettings({ selectedWalletId }: { selectedWalletId: number }) {
   const strings = useStrings();
   const [isEnabled, setIsEnabled] = useState(true);
   const localStorageApi = new LocalStorageApi();
@@ -13,18 +13,20 @@ export default function EnableSingleAddressSettings() {
   useEffect(() => {
     const fetchMode = async () => {
       const mode = await localStorageApi.getSingleAddressMode();
-      if (mode === 'true' || mode === undefined) {
+      const parsedAddressMode = JSON.parse(mode || '{}');
+      const isSingleAddressWallet = parsedAddressMode[selectedWalletId];
+      if (isSingleAddressWallet || isSingleAddressWallet === undefined) {
         setIsEnabled(true);
       } else {
         setIsEnabled(false);
       }
     };
     fetchMode();
-  }, [isEnabled]);
+  }, [isEnabled, selectedWalletId]);
 
   const toggle = async (event): Promise<void> => {
     setIsEnabled(event.target.checked);
-    await localStorageApi.setSingleAddressMode(String(event.target.checked));
+    await localStorageApi.setSingleAddressMode(JSON.stringify({ [selectedWalletId]: event.target.checked }));
   };
 
   return (

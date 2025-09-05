@@ -74,7 +74,7 @@ export default class WalletSettingsPage extends Component<StoresProps> {
           activeField={walletFieldBeingEdited}
           nameValidator={name => isValidWalletName(name)}
         />
-        {selectedWalletId != null ? <EnableSingleAddressSettings /> : null}
+        {selectedWalletId != null ? <EnableSingleAddressSettings selectedWalletId={selectedWalletId} /> : null}
         {selectedWalletId != null ? (
           <NotificationsSettings
             selectedWalletId={selectedWalletId}
