@@ -123,7 +123,18 @@ class ReceiveSubTab extends WalletTab {
       method: 'id',
     };
   };
-  // methods
+  /**
+   * Checks if the Receive sub-tab is displayed
+   * @returns {Promise<boolean>}
+   */
+  async isDisplayed() {
+    this.logger.info(`ReceiveSubTab::isDisplayed is called`);
+    try {
+      return await this.customWaitIsPresented(this.currentAddressToUseTextLocator);
+    } catch (_e) {
+      return false;
+    }
+  }
   /**
    * Generating a new address by clicking on the "Generate new address" button
    * @param {number} amount Amount of addresses to generate

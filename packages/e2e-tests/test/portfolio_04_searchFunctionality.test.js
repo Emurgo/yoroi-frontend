@@ -2,18 +2,18 @@ import { expect } from 'chai';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestLogger } from '../utils/utils.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
+import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
-import WalletCommonBase from '../pages/walletCommonBase.page.js';
+import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import BasePage from '../pages/basepage.js';
-import { pageTitle } from '../helpers/pageTitles.js';
 
 describe('Portfolio Search Functionality', function () {
   this.timeout(2 * oneMinute);
 
   let webdriver = null;
   let logger = null;
+  let initialAssetCount = 0;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
@@ -21,36 +21,39 @@ describe('Portfolio Search Functionality', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Test portfolio search functionality', async function () {
-    const walletCommon = new WalletCommonBase(webdriver, logger);
-    await walletCommon.goToPortfolioTab();
-    await walletCommon.sleep(twoSeconds);
+  it('Search existing token (ADA)', async function () {
+    const walletTab = new WalletTab(webdriver, logger);
+    await walletTab.goToPortfolioTab();
 
-    // Verify we're on the portfolio page
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    await portfolioPage.waitForDataToLoad();
 
-    // Get initial asset count
-    const initialAssetCount = await portfolioPage.countAssets();
-    expect(initialAssetCount, 'Initial asset count should be greater than 0').to.be.greaterThan(0);
+    initialAssetCount = await portfolioPage.countAssets();
+    expect(initialAssetCount, 'Initial asset count should be exactly 3').to.equal(3);
 
-    // Search for existing token (ADA)
     await portfolioPage.searchForAsset('ADA');
     await portfolioPage.waitForSearchResults();
 
-    // Verify search results show ADA
     const searchResultCount = await portfolioPage.countAssets();
-    expect(searchResultCount, 'Search results should show ADA token').to.be.greaterThan(0);
+    expect(searchResultCount, 'Search results should show exactly 1 ADA token').to.equal(1);
+  });
 
-    // Search for non-existing token
-    await portfolioPage.searchForAsset('NONEXISTENT_TOKEN');
+  it('Search non-existing token', async function () {
+    const portfolioPage = new PortfolioMainPage(webdriver, logger);
+
+    await portfolioPage.searchForAsset('NONEXISTENTTOKEN');
     await portfolioPage.waitForSearchResults();
 
-    // Verify no results message is displayed
-    const isNoResultsDisplayed = await portfolioPage.isNoResultsMessageDisplayed();
-    expect(isNoResultsDisplayed, 'No results message should be displayed').to.be.true;
+    const noResultCount = await portfolioPage.countAssets();
+    expect(noResultCount, 'No results expected for non-existing token').to.equal(0);
 
-    // Clear search and verify all assets are shown again
+    const noResultsMessageDisplayed = await portfolioPage.isNoResultsMessageDisplayed();
+    expect(noResultsMessageDisplayed, 'No results message should be displayed').to.be.true;
+  });
+
+  it('Clear search and verify full list', async function () {
+    const portfolioPage = new PortfolioMainPage(webdriver, logger);
+
+    // Clear and ensure we returned to the original number of assets
     await portfolioPage.clearSearch();
     await portfolioPage.waitForSearchResults();
 

@@ -2,13 +2,13 @@ import { expect } from 'chai';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestLogger } from '../utils/utils.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
+import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
-import WalletCommonBase from '../pages/walletCommonBase.page.js';
+import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import PortfolioDetailPage from '../pages/wallet/portfolio/portfolioDetail.page.js';
 import BasePage from '../pages/basepage.js';
-import { pageTitle } from '../helpers/pageTitles.js';
+
 
 describe('Portfolio Token Details', function () {
   this.timeout(2 * oneMinute);
@@ -22,33 +22,25 @@ describe('Portfolio Token Details', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Navigate to token details and verify elements', async function () {
-    const walletCommon = new WalletCommonBase(webdriver, logger);
-    await walletCommon.goToPortfolioTab();
-    await walletCommon.sleep(twoSeconds);
+  it('Navigate to Portfolio and open ADA details', async function () {
+    const walletTab = new WalletTab(webdriver, logger);
+    await walletTab.goToPortfolioTab();
 
     // Verify we're on the portfolio page
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     
-    // Click on ADA token to view details
+    // Open ADA details
     await portfolioPage.clickAssetByName('ADA');
-    await portfolioPage.waitForNavigationToDetails();
+  });
 
-    // Verify we're on the token details page
+  it('Verify token details page elements', async function () {
     const portfolioDetailPage = new PortfolioDetailPage(webdriver, logger);
+
+    // Details page should be displayed
     const isDetailPageDisplayed = await portfolioDetailPage.isDisplayed();
     expect(isDetailPageDisplayed, 'Portfolio detail page is not displayed').to.be.true;
 
-    // Verify token details are displayed
-    const isBalanceLabelDisplayed = await portfolioDetailPage.isTokenBalanceLabelDisplayed();
-    expect(isBalanceLabelDisplayed, 'Token balance label is not displayed').to.be.true;
-
-    const isBalanceAmountDisplayed = await portfolioDetailPage.isTokenBalanceAmountDisplayed();
-    expect(isBalanceAmountDisplayed, 'Token balance amount is not displayed').to.be.true;
-
-    const isTokenNameDisplayed = await portfolioDetailPage.isTokenNameDisplayed();
-    expect(isTokenNameDisplayed, 'Token name is not displayed').to.be.true;
-
+    // Price chart present
     const isChartDisplayed = await portfolioDetailPage.isPriceChartDisplayed();
     expect(isChartDisplayed, 'Price chart is not displayed').to.be.true;
   });

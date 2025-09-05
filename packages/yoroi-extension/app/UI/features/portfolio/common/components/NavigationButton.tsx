@@ -4,15 +4,17 @@ interface Props {
   label: string;
   onClick: () => void;
   variant: any;
+  componentId?: string;
   sx?: any;
   width?: string;
 }
 
-const NavigationButton = ({ label, onClick, variant, sx, width, ...props }: Props) => {
+const NavigationButton = ({ label, onClick, variant, componentId, sx, width, ...props }: Props) => {
   return (
     <Button
       onClick={onClick}
       variant={variant}
+      id={componentId}
       {...props}
       sx={(theme: any) => ({
         maxHeight: '40px',

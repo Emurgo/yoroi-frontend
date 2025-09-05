@@ -90,25 +90,23 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
       {sortedData.map((row: any, rowIndex: number) => (
         <STableRow 
           key={row.id} 
-          id={`portfolio:statTable:asset_${rowIndex}-assetRow-tableRow`}
+          id={`portfolio:statTable-assetRow_${rowIndex}-row`}
           onClick={() => navigateTo.portfolioDetail(row.id)}
         >
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:assetName-assetName-cell`}
+            id={`portfolio:statTable-asset_${rowIndex}-assetName-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenDisplay token={row} />
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:assetPrice-assetPrice-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:asset24hChange-asset24hChange-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenPriceChangeChip
@@ -119,7 +117,6 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:asset1wChange-asset1wChange-cell`}
             sx={{ padding: '16.8px 1rem', border: '1px solid red' }}
           >
             <TokenPriceChangeChip
@@ -131,7 +128,6 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:asset1mChange-asset1mChange-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenPriceChangeChip
@@ -143,14 +139,12 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:assetPortfolioPercentage-assetPortfolioPercentage-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenProcentage procentage={row.percentage} />
           </STableCell>
 
           <STableCell 
-            id={`portfolio:statTable:asset_${rowIndex}:assetTotalAmount-assetTotalAmount-cell`}
             sx={{ padding: '16.8px 1rem' }}
           >
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} stores={stores} />

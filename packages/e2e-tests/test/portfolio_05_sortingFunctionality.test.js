@@ -2,12 +2,11 @@ import { expect } from 'chai';
 import driversPoolsManager from '../utils/driversPool.js';
 import { getTestLogger } from '../utils/utils.js';
 import { customAfterEach } from '../utils/customHooks.js';
-import { oneMinute, twoSeconds } from '../helpers/timeConstants.js';
+import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
-import WalletCommonBase from '../pages/walletCommonBase.page.js';
-import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
+import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
+import PortfolioMainPage, { PortfolioColumns } from '../pages/wallet/portfolio/portfolioMain.page.js';
 import BasePage from '../pages/basepage.js';
-import { pageTitle } from '../helpers/pageTitles.js';
 
 describe('Portfolio Sorting Functionality', function () {
   this.timeout(2 * oneMinute);
@@ -21,31 +20,63 @@ describe('Portfolio Sorting Functionality', function () {
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
   });
 
-  it('Test portfolio table sorting by AssetName columns', async function () {
-    const walletCommon = new WalletCommonBase(webdriver, logger);
-    await walletCommon.goToPortfolioTab();
-    await walletCommon.sleep(twoSeconds);
-
-    // Verify we're on the portfolio page
-    const currentTitle = await walletCommon.getPageTitle();
-    expect(currentTitle).to.equal(pageTitle.portfolio, `Expected to be on ${pageTitle.portfolio} page`);
+  it('Open Portfolio page and confirm table is loaded', async function () {
+    const walletTab = new WalletTab(webdriver, logger);
+    await walletTab.goToPortfolioTab();
 
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
     const isDisplayed = await portfolioPage.isDisplayed();
     expect(isDisplayed, 'Portfolio page is not displayed').to.be.true;
 
-    // Wait for data to load
-    await portfolioPage.waitForDataToLoad();
+    const initialCount = await portfolioPage.countAssets();
+    expect(initialCount, 'Portfolio should list exactly 3 assets').to.equal(3);
+  });
 
-    // Assert there are exactly 3 assets
-    const initialAssetNames = await portfolioPage.getAllAssetNames();
-    expect(initialAssetNames.length, 'Expected exactly 3 assets in the portfolio').to.equal(3);
+  it('Verify sorting functionality for all columns', async function () {
+    const portfolioPage = new PortfolioMainPage(webdriver, logger);
 
-    // Test Name column sorting using page object method
-    const sortingResult = await portfolioPage.testNameColumnSorting(initialAssetNames);
-     
-    // Verify that sorting actually happened (at least one of the clicks should change the order)
-    expect(sortingResult.orderChanged, 'Sorting should change the asset order').to.be.true;
+    const initialNames = await portfolioPage.getAllAssetNames();
+    expect(initialNames.length, 'Initial asset count should be exactly 3').to.equal(3);
+
+    const columnsToCheck = [
+      PortfolioColumns.Name,
+      PortfolioColumns.Price,
+      PortfolioColumns['24H'],
+      PortfolioColumns['1W'],
+      PortfolioColumns['1M'],
+      PortfolioColumns['Portfolio %'],
+      PortfolioColumns['Total amount'],
+    ];
+
+    // Verify sorting for all columns
+    for (const column of columnsToCheck) {
+      const result = await portfolioPage.verifySortingForColumn(column);
+      
+      // Verify asset count remains 3
+      const afterClick = await portfolioPage.getAllAssetNames();
+      expect(afterClick.length, `Asset count should remain 3 after clicking ${column} header`).to.equal(3);
+      // Log results for debugging
+      logger.info(`${column} sorting result: asc=${result.ascSorted}, desc=${result.descSorted}, orderChanged=${result.orderChanged}`);
+      logger.info(`${column} icon states: initial=${result.iconState.initial}, afterFirst=${result.iconState.afterFirst}, afterSecond=${result.iconState.afterSecond}`);
+      
+      // Assert sorting behavior - check both icon state and actual data order
+      if (result.orderChanged) {
+        expect(result.ascSorted, `${column} should be sorted in ascending order after first click`).to.be.true;
+        expect(result.descSorted, `${column} should be sorted in descending order after second click`).to.be.true;
+        
+        // Verify icon states change appropriately
+        if (result.iconState.afterFirst !== 'none') {
+          expect(result.iconState.afterFirst, `${column} should show ascending icon after first click`).to.equal('asc');
+        }
+        if (result.iconState.afterSecond !== 'none') {
+          expect(result.iconState.afterSecond, `${column} should show descending icon after second click`).to.equal('desc');
+        }
+      } else {
+        logger.info(`${column} sorting did not change order - this may be expected for columns with identical values`);
+        // For columns that don't change order, we still verify the UI doesn't break
+        expect(afterClick.length, `${column} should maintain asset count after sorting attempts`).to.equal(3);
+      }
+    }
   });
 
   afterEach(function (done) {

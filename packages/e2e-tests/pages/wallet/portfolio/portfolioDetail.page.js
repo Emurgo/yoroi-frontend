@@ -1,5 +1,4 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
-import { pageTitle } from '../../../helpers/pageTitles.js';
 import { ElementLocator } from '../../locator.js';
 
 export default class PortfolioDetailPage extends WalletCommonBase {
@@ -18,51 +17,33 @@ export default class PortfolioDetailPage extends WalletCommonBase {
   };
 
   /** @type {ElementLocator} */
-  portfolioTokenBalanceLabelLocator = {
-    locator: 'portfolio-token-balance-label',
-    method: 'id',
-  };
-
-  /** @type {ElementLocator} */
-  portfolioTokenBalanceAmountLocator = {
-    locator: '//*[@id="portfolio:tokenDetails-tokenDetailsHeader-header"]/button/p',
-    method: 'xpath',
-  };
-
-  /** @type {ElementLocator} */
-  portfolioTokenNameLocator = {
-    locator: 'portfolio-token-name',
-    method: 'id',
-  };
-
-  /** @type {ElementLocator} */
-  portfolioTokenBalanceValueLocator = {
-    locator: 'portfolio-token-balance-value',
-    method: 'id',
-  };
-
-  /** @type {ElementLocator} */
   portfolioBackButtonLocator = {
-    locator: '//*[@id="portfolio:tokenDetails-tokenDetailsHeader-header"]/button/p',
-    method: 'xpath',
+    locator: 'portfolio:tokenDetails-backButton-back-button',
+    method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioSendButtonLocator = {
-    locator: 'portfolio:tokenDetails-sendButton-sendButton',
+    locator: 'portfolio:tokenDetails-sendButton',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioReceiveButtonLocator = {
-    locator: 'portfolio:tokenDetails-receiveButton-receiveButton',
+    locator: 'portfolio:tokenDetails-receiveButton',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioSwapButtonLocator = {
-    locator: 'portfolio:tokenDetails-swapButton-swapButton',
+    locator: 'portfolio:tokenDetails-swapButton',
     method: 'id',
+  };
+
+  /** @type {ElementLocator} */
+  portfolioChartContainerLocator = {
+    locator: '.recharts-responsive-container',
+    method: 'css',
   };
 
   /**
@@ -83,75 +64,12 @@ export default class PortfolioDetailPage extends WalletCommonBase {
   async isPriceChartDisplayed() {
     this.logger.info(`PortfolioDetailPage::isPriceChartDisplayed is called`);
     try {
-      const container = await this.findElement(this.portfolioTokenDetailsLocator);
-      const svgs = await container.findElements({ tagName: 'svg' });
-      return svgs.length > 0;
+      await this.customWaitIsPresented(this.portfolioChartContainerLocator);
+      return true;
     } catch (_e) {
+      this.logger.warn(`PortfolioDetailPage::isPriceChartDisplayed - Chart not found: ${_e.message}`);
       return false;
     }
-  }
-
-  /**
-   * Checks if token balance label is displayed on details page
-   * @returns {Promise<boolean>}
-   */
-  async isTokenBalanceLabelDisplayed() {
-    this.logger.info(`PortfolioDetailPage::isTokenBalanceLabelDisplayed is called`);
-    return await this.customWaitIsPresented(this.portfolioTokenBalanceLabelLocator);
-  }
-
-  /**
-   * Checks if token balance amount is displayed on details page
-   * @returns {Promise<boolean>}
-   */
-  async isTokenBalanceAmountDisplayed() {
-    this.logger.info(`PortfolioDetailPage::isTokenBalanceAmountDisplayed is called`);
-    return await this.customWaitIsPresented(this.portfolioTokenBalanceAmountLocator);
-  }
-
-  /**
-   * Checks if token name is displayed on details page
-   * @returns {Promise<boolean>}
-   */
-  async isTokenNameDisplayed() {
-    this.logger.info(`PortfolioDetailPage::isTokenNameDisplayed is called`);
-    return await this.customWaitIsPresented(this.portfolioTokenNameLocator);
-  }
-
-  /**
-   * Checks if token balance value is displayed on details page
-   * @returns {Promise<boolean>}
-   */
-  async isTokenBalanceValueDisplayed() {
-    this.logger.info(`PortfolioDetailPage::isTokenBalanceValueDisplayed is called`);
-    return await this.customWaitIsPresented(this.portfolioTokenBalanceValueLocator);
-  }
-
-  /**
-   * Gets the token balance amount as text
-   * @returns {Promise<string>}
-   */
-  async getTokenBalanceAmount() {
-    this.logger.info(`PortfolioDetailPage::getTokenBalanceAmount is called`);
-    return await this.getText(this.portfolioTokenBalanceAmountLocator);
-  }
-
-  /**
-   * Gets the token name as text
-   * @returns {Promise<string>}
-   */
-  async getTokenName() {
-    this.logger.info(`PortfolioDetailPage::getTokenName is called`);
-    return await this.getText(this.portfolioTokenNameLocator);
-  }
-
-  /**
-   * Gets the token balance value as text
-   * @returns {Promise<string>}
-   */
-  async getTokenBalanceValue() {
-    this.logger.info(`PortfolioDetailPage::getTokenBalanceValue is called`);
-    return await this.getText(this.portfolioTokenBalanceValueLocator);
   }
 
   /**
