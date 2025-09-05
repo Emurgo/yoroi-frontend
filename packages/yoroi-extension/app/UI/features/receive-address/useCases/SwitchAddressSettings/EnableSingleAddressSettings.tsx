@@ -2,16 +2,29 @@ import { Box, FormControlLabel } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RevampSwitch } from '../../../../../components/widgets/Switch';
 import { InfoTooltip } from '../../../../../components/widgets/InfoTooltip';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import LocalStorageApi from '../../../../../api/localStorage/index';
 
 export default function EnableSingleAddressSettings() {
-  const [isEnabled, setIsEnabled] = useState(true);
-
   const strings = useStrings();
+  const [isEnabled, setIsEnabled] = useState(true);
+  const localStorageApi = new LocalStorageApi();
 
-  const toggle = (value) => {
-    console.log("toggle", value);
-    setIsEnabled(!isEnabled);
+  useEffect(() => {
+    const fetchMode = async () => {
+      const mode = await localStorageApi.getSingleAddressMode();
+      if (mode === 'true' || mode === undefined) {
+        setIsEnabled(true);
+      } else {
+        setIsEnabled(false);
+      }
+    };
+    fetchMode();
+  }, [isEnabled]);
+
+  const toggle = async (event): Promise<void> => {
+    setIsEnabled(event.target.checked);
+    await localStorageApi.setSingleAddressMode(String(event.target.checked));
   };
 
   return (
