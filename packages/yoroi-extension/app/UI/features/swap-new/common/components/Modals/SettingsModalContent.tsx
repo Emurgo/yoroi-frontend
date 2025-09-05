@@ -16,7 +16,7 @@ export const SettingsModalContent = () => {
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(selectedSlippage));
   const inputRef = useRef<HTMLInputElement | null>(null);
   const strings = useStrings();
-  
+
   useEffect(() => {
     if (swapForm.slippageInput.value === 0) setSelectedSlippage(String(swapForm.slippageInput.value));
   }, [swapForm.slippageInput.value]);
