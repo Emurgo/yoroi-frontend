@@ -45,7 +45,6 @@ export default class PortfolioMainPage extends WalletCommonBase {
     method: 'id',
   };
 
-
   /**
    * Getting locator of an asset name cell by index
    * @param {number} index
@@ -105,7 +104,6 @@ export default class PortfolioMainPage extends WalletCommonBase {
     locator: 'portfolio:statTable-assetRow_0-row',
     method: 'id',
   };
-
 
   /**
    * Getting locator of an asset row by index
@@ -231,9 +229,9 @@ export default class PortfolioMainPage extends WalletCommonBase {
       const count = await this.countAssets();
       return count === 0;
     } catch (error) {
-        return false;
-      }
+      return false;
     }
+  }
 
   /**
    * Gets the current value of the search input
@@ -254,13 +252,13 @@ export default class PortfolioMainPage extends WalletCommonBase {
     try {
       const tableBodyElem = await this.findElement(this.portfolioTableBodyLocator);
       const bodyText = await tableBodyElem.getText();
-      
+
       // Check for EUR currency code or symbol
       return bodyText.includes('EUR') || bodyText.includes('€');
     } catch (_e) {
-        return false;
-      }
+      return false;
     }
+  }
 
   /**
    * Returns a map of columnName -> asset names order after sorting by that column
@@ -380,16 +378,16 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   async clickAssetByName(assetName) {
     this.logger.info(`PortfolioMainPage::clickAssetByName is called for asset: ${assetName}`);
-    
+
     try {
       // Get all asset names to find the correct index
       const assetNames = await this.getAllAssetNames();
       const assetIndex = assetNames.findIndex(name => name.includes(assetName));
-      
+
       if (assetIndex === -1) {
         throw new Error(`Asset "${assetName}" not found in portfolio`);
       }
-      
+
       // Use function-based locator
       await this.click(this.portfolioAssetRowLocator(assetIndex));
       this.logger.info(`Successfully clicked on asset "${assetName}" at index ${assetIndex}`);
@@ -425,7 +423,6 @@ export default class PortfolioMainPage extends WalletCommonBase {
     return assetNames;
   }
 
-
   /**
    * Waits for navigation back to portfolio page
    * @returns {Promise<void>}
@@ -442,42 +439,44 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   async testNameColumnSorting(initialAssetNames) {
     this.logger.info(`PortfolioMainPage::testNameColumnSorting is called`);
-    
+
     // First click on Name header
     await this.sortByColumn(PortfolioColumns.Name);
-    
+
     // Verify assets are still displayed
     const assetCount = await this.countAssets();
     if (assetCount !== initialAssetNames.length) {
       this.logger.error(`Asset count changed after first click: expected ${initialAssetNames.length}, got ${assetCount}`);
     }
-    
+
     // Get names after first click
     const firstClickNames = await this.getAllAssetNames();
     this.logger.info(`Asset names after first click on Name header: ${JSON.stringify(firstClickNames)}`);
-    
+
     // Second click to test reverse sorting
     await this.sortByColumn(PortfolioColumns.Name);
-    
+
     // Get names after second click
     const secondClickNames = await this.getAllAssetNames();
     this.logger.info(`Asset names after second click on Name header: ${JSON.stringify(secondClickNames)}`);
-    
+
     // Check if order changed
     const firstOrderChanged = JSON.stringify(initialAssetNames) !== JSON.stringify(firstClickNames);
     const secondOrderChanged = JSON.stringify(firstClickNames) !== JSON.stringify(secondClickNames);
     const orderChanged = firstOrderChanged || secondOrderChanged;
-    
+
     if (orderChanged) {
       this.logger.info('Sorting is working - asset order changed after clicking Name header');
     } else {
-      this.logger.info('Note: Asset order did not change after clicking Name header - this may be normal if assets are already sorted');
+      this.logger.info(
+        'Note: Asset order did not change after clicking Name header - this may be normal if assets are already sorted'
+      );
     }
-    
+
     return {
       firstClickNames,
       secondClickNames,
-      orderChanged
+      orderChanged,
     };
   }
 
@@ -587,28 +586,33 @@ export default class PortfolioMainPage extends WalletCommonBase {
         this.logger.warn(`PortfolioMainPage::getSortDirection - Unknown column name: ${columnName}`);
         return 'none';
     }
-    
+
     try {
       const headerElement = await this.findElement(headerLocator);
-      
+
       // Check CSS classes first (faster and more reliable)
       const className = await headerElement.getAttribute('class');
       this.logger.info(`Header class for ${columnName}: ${className}`);
-      
-      if (className && (className.includes('asc') || className.includes('ascending') || className.includes('MuiTableSortLabel-active'))) {
+
+      if (
+        className &&
+        (className.includes('asc') || className.includes('ascending') || className.includes('MuiTableSortLabel-active'))
+      ) {
         return 'asc';
       } else if (className && (className.includes('desc') || className.includes('descending'))) {
         return 'desc';
       }
-      
+
       // Fallback: look for sort icon elements (with timeout)
       try {
-        const sortIcons = await headerElement.findElements({ css: 'svg, .MuiTableSortLabel-icon, [class*="sort"], [class*="arrow"]' });
+        const sortIcons = await headerElement.findElements({
+          css: 'svg, .MuiTableSortLabel-icon, [class*="sort"], [class*="arrow"]',
+        });
         for (const icon of sortIcons) {
           const iconClass = await icon.getAttribute('class');
           const iconStyle = await icon.getAttribute('style');
           this.logger.info(`Icon class: ${iconClass}, style: ${iconStyle}`);
-          
+
           if (iconClass && (iconClass.includes('asc') || iconClass.includes('up'))) {
             return 'asc';
           } else if (iconClass && (iconClass.includes('desc') || iconClass.includes('down'))) {
@@ -618,7 +622,7 @@ export default class PortfolioMainPage extends WalletCommonBase {
       } catch (e) {
         this.logger.warn(`Error checking sort icons: ${e.message}`);
       }
-      
+
       return 'none';
     } catch (error) {
       this.logger.warn(`PortfolioMainPage::getSortDirection - Error getting sort direction: ${error.message}`);
@@ -633,32 +637,33 @@ export default class PortfolioMainPage extends WalletCommonBase {
    */
   async verifySortingForColumn(columnName) {
     this.logger.info(`PortfolioMainPage::verifySortingForColumn is called for ${columnName}`);
-    
+
     // Get initial state
-    const initialValues = columnName === PortfolioColumns.Name 
-      ? await this.getColumnTexts(columnName) 
-      : await this.getColumnNumbers(columnName);
+    const initialValues =
+      columnName === PortfolioColumns.Name ? await this.getColumnTexts(columnName) : await this.getColumnNumbers(columnName);
     const initialSortDirection = await this.getSortDirection(columnName);
     this.logger.info(`Initial state - Values: ${JSON.stringify(initialValues)}, Sort direction: ${initialSortDirection}`);
-    
+
     // First click
     await this.sortByColumn(columnName);
     await this.sleep(1000); // Wait for UI to update
     let valuesAfterFirst, sortDirectionFirst;
-    
+
     let isAscending;
     if (columnName === PortfolioColumns.Name) {
       valuesAfterFirst = await this.getColumnTexts(columnName);
       sortDirectionFirst = await this.getSortDirection(columnName);
       this.logger.info(`After first click - Names: ${JSON.stringify(valuesAfterFirst)}, Sort direction: ${sortDirectionFirst}`);
-      
+
       // Check if order changed and verify ascending
       const expectedAsc = [...valuesAfterFirst].sort((a, b) => a.localeCompare(b));
       isAscending = JSON.stringify(valuesAfterFirst) === JSON.stringify(expectedAsc);
       const orderChanged = JSON.stringify(initialValues) !== JSON.stringify(valuesAfterFirst);
-      
+
       if (orderChanged) {
-        this.logger.info(`Expected ascending: ${JSON.stringify(expectedAsc)}, Actual: ${JSON.stringify(valuesAfterFirst)}, Is ascending: ${isAscending}`);
+        this.logger.info(
+          `Expected ascending: ${JSON.stringify(expectedAsc)}, Actual: ${JSON.stringify(valuesAfterFirst)}, Is ascending: ${isAscending}`
+        );
       } else {
         this.logger.info('Order did not change after first click - skipping ascending verification');
       }
@@ -666,37 +671,41 @@ export default class PortfolioMainPage extends WalletCommonBase {
       valuesAfterFirst = await this.getColumnNumbers(columnName);
       sortDirectionFirst = await this.getSortDirection(columnName);
       this.logger.info(`After first click - Values: ${JSON.stringify(valuesAfterFirst)}, Sort direction: ${sortDirectionFirst}`);
-      
+
       const orderChanged = JSON.stringify(initialValues) !== JSON.stringify(valuesAfterFirst);
       isAscending = this.isSortedAsc(valuesAfterFirst);
-      
+
       if (orderChanged) {
         this.logger.info(`Is ascending: ${isAscending}`);
       } else {
         this.logger.info(`Order did not change for ${columnName} after first click - skipping ascending verification`);
       }
     }
-    
+
     // Second click
     await this.sortByColumn(columnName);
     await this.sleep(1000); // Wait for UI to update
     let valuesAfterSecond, sortDirectionSecond;
-    
+
     if (columnName === PortfolioColumns.Name) {
       valuesAfterSecond = await this.getColumnTexts(columnName);
       sortDirectionSecond = await this.getSortDirection(columnName);
-      this.logger.info(`After second click - Names: ${JSON.stringify(valuesAfterSecond)}, Sort direction: ${sortDirectionSecond}`);
-      
+      this.logger.info(
+        `After second click - Names: ${JSON.stringify(valuesAfterSecond)}, Sort direction: ${sortDirectionSecond}`
+      );
+
       const orderChangedSecond = JSON.stringify(valuesAfterFirst) !== JSON.stringify(valuesAfterSecond);
       const expectedDesc = [...valuesAfterSecond].sort((a, b) => b.localeCompare(a));
       const isDescending = JSON.stringify(valuesAfterSecond) === JSON.stringify(expectedDesc);
-      
+
       if (orderChangedSecond) {
-        this.logger.info(`Expected descending: ${JSON.stringify(expectedDesc)}, Actual: ${JSON.stringify(valuesAfterSecond)}, Is descending: ${isDescending}`);
+        this.logger.info(
+          `Expected descending: ${JSON.stringify(expectedDesc)}, Actual: ${JSON.stringify(valuesAfterSecond)}, Is descending: ${isDescending}`
+        );
       } else {
         this.logger.info('Order did not change after second click - skipping descending verification');
       }
-      
+
       return {
         ascSorted: isAscending,
         descSorted: isDescending,
@@ -704,23 +713,25 @@ export default class PortfolioMainPage extends WalletCommonBase {
         iconState: {
           initial: initialSortDirection,
           afterFirst: sortDirectionFirst,
-          afterSecond: sortDirectionSecond
-        }
+          afterSecond: sortDirectionSecond,
+        },
       };
     } else {
       valuesAfterSecond = await this.getColumnNumbers(columnName);
       sortDirectionSecond = await this.getSortDirection(columnName);
-      this.logger.info(`After second click - Values: ${JSON.stringify(valuesAfterSecond)}, Sort direction: ${sortDirectionSecond}`);
-      
+      this.logger.info(
+        `After second click - Values: ${JSON.stringify(valuesAfterSecond)}, Sort direction: ${sortDirectionSecond}`
+      );
+
       const orderChangedSecond = JSON.stringify(valuesAfterFirst) !== JSON.stringify(valuesAfterSecond);
       const isDescending = this.isSortedDesc(valuesAfterSecond);
-      
+
       if (orderChangedSecond) {
         this.logger.info(`Is descending: ${isDescending}`);
       } else {
         this.logger.info(`Order did not change for ${columnName} after second click - skipping descending verification`);
       }
-      
+
       return {
         ascSorted: this.isSortedAsc(valuesAfterFirst),
         descSorted: isDescending,
@@ -728,10 +739,9 @@ export default class PortfolioMainPage extends WalletCommonBase {
         iconState: {
           initial: initialSortDirection,
           afterFirst: sortDirectionFirst,
-          afterSecond: sortDirectionSecond
-        }
+          afterSecond: sortDirectionSecond,
+        },
       };
     }
   }
-
 }

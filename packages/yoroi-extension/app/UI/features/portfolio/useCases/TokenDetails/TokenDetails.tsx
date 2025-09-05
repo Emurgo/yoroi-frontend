@@ -19,7 +19,7 @@ const TokenInfo = styled(Stack)({
   width: '100%',
 });
 
-const componentId = "portfolio:tokenDetails";
+const componentId = 'portfolio:tokenDetails';
 
 interface Props {
   tokenInfo: TokenInfoType;
@@ -36,18 +36,46 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
   return (
     <Box sx={{ width: '100%' }} id={`${componentId}-tokenDetailsPage-container`}>
       <Header id={`${componentId}-tokenDetailsHeader-header`}>
-        <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} componentId={`${componentId}-backButton`} />
+        <BackButton
+          label={strings.backToPortfolio}
+          onAction={() => navigateTo.portfolio()}
+          componentId={`${componentId}-backButton`}
+        />
         <Stack direction="row" spacing={theme.spacing(16)} id={`${componentId}-tokenDetailsActions-actionsStack`}>
           {isTestnet ? null : (
-            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} componentId={`${componentId}-swapButton`} />
+            <NavigationButton
+              variant="primary"
+              onClick={() => navigateTo.swapPage(tokenInfo.info.id)}
+              label={strings.swap}
+              componentId={`${componentId}-swapButton`}
+            />
           )}
-          <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} componentId={`${componentId}-sendButton`} />
-          <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} componentId={`${componentId}-receiveButton`} />
+          <NavigationButton
+            variant="secondary"
+            onClick={() => navigateTo.sendPage()}
+            label={strings.send}
+            componentId={`${componentId}-sendButton`}
+          />
+          <NavigationButton
+            variant="secondary"
+            onClick={() => navigateTo.receivePage()}
+            label={strings.receive}
+            componentId={`${componentId}-receiveButton`}
+          />
         </Stack>
       </Header>
 
-      <Stack direction="column" spacing={theme.spacing(24)} sx={{ marginTop: theme.spacing(16) }} id={`${componentId}-tokenDetailsContent-contentStack`}>
-        <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(24)} id={`${componentId}-tokenDetailsInfo-infoStack`}>
+      <Stack
+        direction="column"
+        spacing={theme.spacing(24)}
+        sx={{ marginTop: theme.spacing(16) }}
+        id={`${componentId}-tokenDetailsContent-contentStack`}
+      >
+        <TokenInfo
+          direction={isPrimaryToken ? 'row' : 'column'}
+          spacing={theme.spacing(24)}
+          id={`${componentId}-tokenDetailsInfo-infoStack`}
+        >
           <Card id={`${componentId}-tokenDetailsCard-card`}>
             <HeaderSection tokenInfo={tokenInfo} stores={stores} />
             <Divider />

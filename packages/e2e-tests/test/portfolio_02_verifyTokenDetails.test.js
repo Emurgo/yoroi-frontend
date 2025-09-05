@@ -9,7 +9,6 @@ import PortfolioMainPage from '../pages/wallet/portfolio/portfolioMain.page.js';
 import PortfolioDetailPage from '../pages/wallet/portfolio/portfolioDetail.page.js';
 import BasePage from '../pages/basepage.js';
 
-
 describe('Portfolio Token Details', function () {
   this.timeout(2 * oneMinute);
 
@@ -28,7 +27,7 @@ describe('Portfolio Token Details', function () {
 
     // Verify we're on the portfolio page
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-    
+
     // Open ADA details
     await portfolioPage.clickAssetByName('ADA');
   });

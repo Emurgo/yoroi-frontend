@@ -34,7 +34,9 @@ describe('Portfolio Balance and Fiat', function () {
     expect(portfolioBalance, 'Portfolio balance should be displayed').to.not.be.empty;
 
     const topBarBalance = (await walletTab.getSelectedWalletInfo()).balance.toString();
-    expect(portfolioBalance.replace(/\s/g, ''), 'Portfolio balance should match top bar balance').to.equal(topBarBalance.replace(/\s/g, ''));
+    expect(portfolioBalance.replace(/\s/g, ''), 'Portfolio balance should match top bar balance').to.equal(
+      topBarBalance.replace(/\s/g, '')
+    );
   });
 
   it('Switch fiat currency to EUR in Settings', async function () {

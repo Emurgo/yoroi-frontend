@@ -51,19 +51,23 @@ describe('Portfolio Sorting Functionality', function () {
     // Verify sorting for all columns
     for (const column of columnsToCheck) {
       const result = await portfolioPage.verifySortingForColumn(column);
-      
+
       // Verify asset count remains 3
       const afterClick = await portfolioPage.getAllAssetNames();
       expect(afterClick.length, `Asset count should remain 3 after clicking ${column} header`).to.equal(3);
       // Log results for debugging
-      logger.info(`${column} sorting result: asc=${result.ascSorted}, desc=${result.descSorted}, orderChanged=${result.orderChanged}`);
-      logger.info(`${column} icon states: initial=${result.iconState.initial}, afterFirst=${result.iconState.afterFirst}, afterSecond=${result.iconState.afterSecond}`);
-      
+      logger.info(
+        `${column} sorting result: asc=${result.ascSorted}, desc=${result.descSorted}, orderChanged=${result.orderChanged}`
+      );
+      logger.info(
+        `${column} icon states: initial=${result.iconState.initial}, afterFirst=${result.iconState.afterFirst}, afterSecond=${result.iconState.afterSecond}`
+      );
+
       // Assert sorting behavior - check both icon state and actual data order
       if (result.orderChanged) {
         expect(result.ascSorted, `${column} should be sorted in ascending order after first click`).to.be.true;
         expect(result.descSorted, `${column} should be sorted in descending order after second click`).to.be.true;
-        
+
         // Verify icon states change appropriately
         if (result.iconState.afterFirst !== 'none') {
           expect(result.iconState.afterFirst, `${column} should show ascending icon after first click`).to.equal('asc');
