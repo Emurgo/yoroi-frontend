@@ -31,6 +31,7 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 
 const FRONTEND_FEE_ADDRESS_MAINNET =
   'addr1q9ry6jfdgm0lcrtfpgwrgxg7qfahv80jlghhrthy6w8hmyjuw9ngccy937pm7yw0jjnxasm7hzxjrf8rzkqcj26788lqws5fke';
@@ -237,70 +238,48 @@ export default class SwapStore extends Store<StoresMap> {
     parsedCbor: any,
     tokenInfos: Map<string, any>,
   |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, tokenInfos }) => {
-    const sellTokenId = swapState.tokenInInput.tokenId;
-    const buyTokenId = swapState.tokenOutInput.tokenId;
-    const sell = {
-      tokenId: sellTokenId,
-      quantity: String(Number(swapState.tokenInInput.value * 1000000)), // assumes ADA for now
-    };
-
-    const buy = {
-      tokenId: buyTokenId,
-      quantity: String(swapState.createTx.totalOutputWithoutSlippage * 10 ** (tokenInfos.get(buyTokenId)?.decimals ?? 0)),
-    };
-
-    const ptFees = {
-      deposit: String(swapState.createTx.deposits * 10 ** 6), // assume ADA for now
-      batcher: String(swapState.createTx.batcherFee * 10 ** 6), // assume ADA for now
-    };
-
-    const feFees = {
-      tokenId: sell.tokenId,
-      quantity: String(swapState.createTx.frontendFee * 1000000), // assumes ADA
-    };
-
-    const metadata = createMetadata([
-      {
-        label: '674',
-        data: {
-          msg: splitStringInto64CharArray(
-            JSON.stringify({
-              provider: swapState.createTx.splits[0].protocol,
-              sellTokenId: sell.tokenId,
-              sellQuantity: sell.quantity,
-              buyTokenId: buy.tokenId,
-              buyQuantity: buy.quantity,
-            })
-          ),
-        },
-      },
-    ]);
-    const entries: Array<TxOutput> = [];
-
-    entries.push({
-      address: parsedCbor.outputs[0].address,
-      amount: createSwapOrderAmount({ wallet, sell, ptFees }),
-      dataHash: parsedCbor.auxiliary_data_hash,
-    });
-
-    if (swapState.createTx.frontendFee > 0) {
-      entries.push({
-        address: FRONTEND_FEE_ADDRESS_MAINNET,
-        amount: createSwapFeFeeAmount({ wallet, feFees }),
-      });
-    }
-
     const protocolParameters = await getProtocolParameters(wallet);
-    console.log('createSimpleTx', {
-      entries,
-      metadata,
-      protocolParameters,
-    });
-    return await this.api.ada.createSimpleTx({
-      publicDeriver: wallet,
-      entries,
-      metadata,
-      protocolParameters,
+
+    const tx = RustModule.WalletV4.Transaction.from_hex(swapState.createTx.cbor);
+    const senderUtxos = [];
+    const inputs = tx.body().inputs();
+    for (let i = 0; i < inputs.len(); i++) {
+      const input = inputs.get(i);
+      let utxo;
+      for (const utxo of wallet.utxos) {
+        if (
+          utxo.output.Transaction.Hash === input.transaction_id().to_hex() &&
+            utxo.output.UtxoTransactionOutput.OutputIndex === input.index()
+        ) {
+          senderUtxos.push({
+            utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
+            tx_hash: utxo.output.Transaction.Hash,
+            tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+            receiver: utxo.address,
+            amount: '0', // not used
+            assets: [], // not used
+            addressing: utxo.addressing,
+          });
+          break;
+        }
+      }
+    }
+    return new HaskellShelleyTxSignRequest({
+      senderUtxos,
+      // $FlowIgnore: by type definition RustModule.WalletV4.TransactionBuilder is expected here but we can get away with what will actually be used
+      unsignedTx: {
+        build_tx() {
+          return tx;
+        }
+      },
+      changeAddr: [], // no used
+      metadata: tx.auxiliary_data(),
+      networkSettingSnapshot: {
+        ChainNetworkId: 0, // incorrect, but unused
+        KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+        PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
+        NetworkId: wallet.networkId,
+      },
     });
   };
 }
