@@ -1,6 +1,6 @@
 import type { WalletTypes, CatalystRegistrationContextType, CatalystState } from '../types';
 import { useCatalystRegistration } from '../../module/CatalystRegistrationContextProvider';
-import { ProgressStep } from '../../../../../stores/ada/VotingStore';
+import { ProgressStep } from '../constants';
 import { BigNumber } from 'bignumber.js';
 import environment from '../../../../../environment';
 
@@ -57,9 +57,12 @@ export const useVoting = (): VotingHookType => {
       if (stepState.currentStep === ProgressStep.REGISTER) {
         await createTransaction(value);
       } else if (stepState.currentStep === ProgressStep.TRANSACTION) {
+        if (selectedWallet.isHardware) {
+          await createTransaction(value);
+        }
         await signTransaction(value);
       }
-      dispatch({ type: 'NEXT_STEP' });
+      dispatch({ type: 'NEXT_STEP', selectedWallet: selectedWallet });
     } catch (error) {
       setError(error);
     }
