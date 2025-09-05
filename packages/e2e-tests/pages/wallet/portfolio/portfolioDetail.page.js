@@ -12,13 +12,13 @@ export default class PortfolioDetailPage extends WalletCommonBase {
 
   /** @type {ElementLocator} */
   portfolioTokenHeaderSectionLocator = {
-    locator: 'portfolio:tokenDetails-tokenDetailsHeader-header',
+    locator: 'portfolio:tokenDetails-header',
     method: 'id',
   };
 
   /** @type {ElementLocator} */
   portfolioBackButtonLocator = {
-    locator: 'portfolio:tokenDetails-backButton-back-button',
+    locator: 'portfolio:tokenDetails-back-button',
     method: 'id',
   };
 

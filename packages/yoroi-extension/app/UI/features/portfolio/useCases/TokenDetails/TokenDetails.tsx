@@ -35,11 +35,11 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
 
   return (
     <Box sx={{ width: '100%' }} id={`${componentId}-tokenDetailsPage-container`}>
-      <Header id={`${componentId}-tokenDetailsHeader-header`}>
+      <Header id={`${componentId}-header`}>
         <BackButton
           label={strings.backToPortfolio}
           onAction={() => navigateTo.portfolio()}
-          componentId={`${componentId}-backButton`}
+          componentId={`${componentId}-back-button`}
         />
         <Stack direction="row" spacing={theme.spacing(16)} id={`${componentId}-tokenDetailsActions-actionsStack`}>
           {isTestnet ? null : (

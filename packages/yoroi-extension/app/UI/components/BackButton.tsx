@@ -16,7 +16,7 @@ const SButton = styled(Button)(({ theme }: any) => ({
 
 export const BackButton = ({ label, onAction, componentId }: { label: string; onAction: () => void; componentId?: string }) => {
   return (
-    <SButton onClick={onAction} startIcon={<BackIcon />} id={componentId ? `${componentId}-back-button` : undefined}>
+    <SButton onClick={onAction} startIcon={<BackIcon />} id={componentId || undefined}>
       <Typography fontWeight="500" fontSize="14px">
         {label}
       </Typography>
