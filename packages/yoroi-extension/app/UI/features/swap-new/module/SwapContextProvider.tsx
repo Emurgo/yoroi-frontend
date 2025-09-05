@@ -75,7 +75,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       isPrimaryToken,
       partners,
     });
-  }, [stakingKey, primaryTokenInfo, partners, walletAddresses[0]]);
+  }, [stakingKey, primaryTokenInfo, partners]);
 
   const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
     swapManager,
@@ -578,8 +578,8 @@ const SwapContext = createContext<SwapContext>({
   action: () => null,
   createOrder: () => new Promise(res => res),
   cancel: () => new Promise(res => res),
-  managerSettings: { routingPreference: 'auto', slippage: 1 },
-  assignManagerSettings: () => ({ routingPreference: 'auto', slippage: 1 }),
+  managerSettings: { routingPreference: ['dexhunter'], slippage: 1 },
+  assignManagerSettings: () => ({ routingPreference: ['dexhunter'], slippage: 1 }),
   refetchOrders: () => null,
   ftAssetList: [],
   tokenInfoList: [],
