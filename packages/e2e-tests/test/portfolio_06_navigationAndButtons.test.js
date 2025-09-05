@@ -11,8 +11,6 @@ import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import BasePage from '../pages/basepage.js';
 
-// dynamic imports inside tests for sub-tabs
-
 describe('Portfolio Navigation and Buttons', function () {
   this.timeout(2 * oneMinute);
 
