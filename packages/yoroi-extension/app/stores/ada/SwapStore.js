@@ -232,12 +232,10 @@ export default class SwapStore extends Store<StoresMap> {
     );
   };
 
-  createRevampUnsignedSwapTx: ({|
-    wallet: WalletState,
-    swapState: any,
-    parsedCbor: any,
-    tokenInfos: Map<string, any>,
-  |}) => Promise<HaskellShelleyTxSignRequest> = async ({ wallet, swapState, parsedCbor, tokenInfos }) => {
+  createRevampUnsignedSwapTx: ({| wallet: WalletState, swapState: any |}) => Promise<HaskellShelleyTxSignRequest> = async ({
+    wallet,
+    swapState,
+  }) => {
     const protocolParameters = await getProtocolParameters(wallet);
 
     const tx = RustModule.WalletV4.Transaction.from_hex(swapState.createTx.cbor);
@@ -245,11 +243,10 @@ export default class SwapStore extends Store<StoresMap> {
     const inputs = tx.body().inputs();
     for (let i = 0; i < inputs.len(); i++) {
       const input = inputs.get(i);
-      let utxo;
       for (const utxo of wallet.utxos) {
         if (
           utxo.output.Transaction.Hash === input.transaction_id().to_hex() &&
-            utxo.output.UtxoTransactionOutput.OutputIndex === input.index()
+          utxo.output.UtxoTransactionOutput.OutputIndex === input.index()
         ) {
           senderUtxos.push({
             utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
@@ -270,7 +267,7 @@ export default class SwapStore extends Store<StoresMap> {
       unsignedTx: {
         build_tx() {
           return tx;
-        }
+        },
       },
       changeAddr: [], // no used
       metadata: tx.auxiliary_data(),
