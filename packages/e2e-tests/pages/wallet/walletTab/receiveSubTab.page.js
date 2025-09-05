@@ -123,6 +123,7 @@ class ReceiveSubTab extends WalletTab {
       method: 'id',
     };
   };
+  // methods
   /**
    * Checks if the Receive sub-tab is displayed
    * @returns {Promise<boolean>}
