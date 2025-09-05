@@ -24,7 +24,6 @@ export default class PushNotificationStore<
   @observable metadata: PushNotificationMetadata | null = null;
 
   setup(): void {
-    /*
     this.stores.loading.registerBlockingLoadingRequest(
       (async () => {
         const metadata = await localStorageApi.getPushNotificationMetadata();
@@ -32,12 +31,11 @@ export default class PushNotificationStore<
           this.metadata = metadata;
         });
         if (this.metadata?.isEnabled === undefined) {
-          this._enableNotifications();
+          //this._enableNotifications();
         }
       })(),
       'load push notification metadata'
     );
-    */
   }
 
   get duration(): number {
