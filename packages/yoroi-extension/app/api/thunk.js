@@ -269,7 +269,7 @@ export async function removeAllTransactions(request: RemoveAllTransactionsReques
 
 type PopAddressType = ({ publicDeriverId: number, ... }) => ReturnType<GetEntryFuncType<typeof PopAddress>>;
 export const popAddress: PopAddressType = async ({ publicDeriverId }) => {
-  await callBackground({ type: PopAddress.typeTag, request: { publicDeriverId } });
+  return await callBackground({ type: PopAddress.typeTag, request: { publicDeriverId } });
 };
 
 function deserializeTx(tx: any): ?WalletTransaction {

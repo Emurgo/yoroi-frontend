@@ -316,7 +316,7 @@ export const PopAddress: HandlerType<
     if (withDisplayCutoff == null) {
       throw new Error('unexpected missing asDisplayCutoff result');
     }
-    await withDisplayCutoff.popAddress();
+    return await withDisplayCutoff.popAddress();
   },
 });
 

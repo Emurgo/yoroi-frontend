@@ -64,8 +64,7 @@ export default class AddressesStore extends Store<StoresMap> {
     }
   };
   _baseCreateAddress: WalletState => Promise<?CreateAddressResponse> = async publicDeriver => {
-    const address = await this.createAddressRequest.execute(publicDeriver).promise;
-    return address;
+    return await this.createAddressRequest.execute(publicDeriver).promise;
   };
 
   @action resetErrors: void => void = () => {
