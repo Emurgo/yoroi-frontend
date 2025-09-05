@@ -26,9 +26,9 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
       <TableRow id="portfolio:statTable-assetsList-tableHeadRow">
         {headCells.map(({ label, align, id, isPadding, disabledSort }) => {
           return (
-            <TableCell 
-              key={id} 
-              align={align} 
+            <TableCell
+              key={id}
+              align={align}
               id={`portfolio:statTable:${id}Column-${id}Header-cell`}
               sx={{ padding: `11.8px ${theme.spacing(16)}` }}
             >
@@ -45,9 +45,9 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                   width: isPadding ? '100%' : 'fit-content',
                 }}
               >
-                <Typography 
-                  variant="body2" 
-                  color="ds.gray_600" 
+                <Typography
+                  variant="body2"
+                  color="ds.gray_600"
                   id={`portfolio:statTable:${id}Column-${id}HeaderText-text`}
                   sx={{ userSelect: 'none' }}
                 >

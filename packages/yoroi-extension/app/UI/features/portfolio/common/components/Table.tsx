@@ -33,10 +33,7 @@ const Table = ({
   const strings = useStrings();
 
   return data.length > 0 ? (
-    <MuiTable 
-      aria-label={`${name} table`}
-      id={`portfolio:${name}Table-assetsList-table`}
-    >
+    <MuiTable aria-label={`${name} table`} id={`portfolio:${name}Table-assetsList-table`}>
       <SortableTableHead headCells={headCells} order={order} orderBy={orderBy} onRequestSort={handleRequestSort} />
       <TableBody id={`portfolio:${name}Table-assetsList-tableBody`}>
         {isLoading ? Array.from({ length: 6 }).map((_, index) => cloneElement(TableRowSkeleton, { key: index })) : children}

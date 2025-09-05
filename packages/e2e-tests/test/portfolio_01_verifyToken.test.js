@@ -36,7 +36,6 @@ describe('Portfolio Token Verification', function () {
 
   it('Verify tokens are listed on portfolio', async function () {
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
-
     // Wait for table to load before counting
     await portfolioPage.waitForDataToLoad();
 

@@ -10,7 +10,6 @@ import PortfolioDetailPage from '../pages/wallet/portfolio/portfolioDetail.page.
 import SendSubTab from '../pages/wallet/walletTab/sendSubTab.page.js';
 import ReceiveSubTab from '../pages/wallet/walletTab/receiveSubTab.page.js';
 import BasePage from '../pages/basepage.js';
-import { pageTitle } from '../helpers/pageTitles.js';
 
 // dynamic imports inside tests for sub-tabs
 
@@ -52,7 +51,6 @@ describe('Portfolio Navigation and Buttons', function () {
   });
 
   it('Checking redirection to Send page from token details', async function () {
-    const walletTab = new WalletTab(webdriver, logger);
     const portfolioPage = new PortfolioMainPage(webdriver, logger);
 
     await portfolioPage.clickFirstAsset();

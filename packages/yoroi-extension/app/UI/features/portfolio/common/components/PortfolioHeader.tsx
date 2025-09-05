@@ -149,7 +149,13 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
           />
         </Stack>
 
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ marginTop: theme.spacing(8) }} id="portfolio:header-portfolioPriceInfo-priceRow">
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ marginTop: theme.spacing(8) }}
+          id="portfolio:header-portfolioPriceInfo-priceRow"
+        >
           {loading || isLoading ? (
             <Skeleton width="64px" height="13px" />
           ) : (
@@ -169,7 +175,11 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
         </Stack>
       </Stack>
 
-      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id="portfolio:header-portfolioSearch-searchInput" />
+      <SearchInput
+        onChange={e => setKeyword(e.target.value)}
+        placeholder={strings.search}
+        id="portfolio:header-portfolioSearch-searchInput"
+      />
     </Stack>
   );
 });

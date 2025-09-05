@@ -88,27 +88,20 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
       {sortedData.map((row: any, rowIndex: number) => (
-        <STableRow 
-          key={row.id} 
+        <STableRow
+          key={row.id}
           id={`portfolio:statTable-assetRow_${rowIndex}-row`}
           onClick={() => navigateTo.portfolioDetail(row.id)}
         >
-          <STableCell 
-            id={`portfolio:statTable-asset_${rowIndex}-assetName-cell`}
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell id={`portfolio:statTable-asset_${rowIndex}-assetName-cell`} sx={{ padding: '16.8px 1rem' }}>
             <TokenDisplay token={row} />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -116,9 +109,7 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem', border: '1px solid red' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem', border: '1px solid red' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data7d && data7d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -127,9 +118,7 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceChangeChip
               secondaryTokenActivity={data30d && data30d[row.info.id]}
               primaryTokenActivity={ptActivity}
@@ -138,15 +127,11 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
             />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenProcentage procentage={row.percentage} />
           </STableCell>
 
-          <STableCell 
-            sx={{ padding: '16.8px 1rem' }}
-          >
+          <STableCell sx={{ padding: '16.8px 1rem' }}>
             <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} stores={stores} />
           </STableCell>
         </STableRow>

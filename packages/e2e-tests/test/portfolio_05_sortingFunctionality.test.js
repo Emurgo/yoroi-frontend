@@ -55,13 +55,6 @@ describe('Portfolio Sorting Functionality', function () {
       // Verify asset count remains 3
       const afterClick = await portfolioPage.getAllAssetNames();
       expect(afterClick.length, `Asset count should remain 3 after clicking ${column} header`).to.equal(3);
-      // Log results for debugging
-      logger.info(
-        `${column} sorting result: asc=${result.ascSorted}, desc=${result.descSorted}, orderChanged=${result.orderChanged}`
-      );
-      logger.info(
-        `${column} icon states: initial=${result.iconState.initial}, afterFirst=${result.iconState.afterFirst}, afterSecond=${result.iconState.afterSecond}`
-      );
 
       // Assert sorting behavior - check both icon state and actual data order
       if (result.orderChanged) {
