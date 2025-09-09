@@ -7,6 +7,7 @@ import type { IFetcher } from '../../api/ada/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher } from '../../api/ada/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/ada/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
+import { getPlatform } from '../../../chrome/extension/background/utils';
 
 export default class AdaStateFetchStore<TStores: RequiredStores> extends BaseStateFetchStore<TStores, IFetcher> {
   @observable fetcher: IFetcher;
@@ -17,15 +18,8 @@ export default class AdaStateFetchStore<TStores: RequiredStores> extends BaseSta
       new RemoteFetcher(
         () => environment.getVersion(),
         () => this.stores.profile.currentLocale,
-        () => {
-          if (environment.isFirefox()) {
-            return 'firefox';
-          }
-          if (environment.isChrome()) {
-            return 'chrome';
-          }
-          return '-';
-        }
+        getPlatform,
+        () => this.stores.profile.getCurrentNetworkId()
       )
     );
   }

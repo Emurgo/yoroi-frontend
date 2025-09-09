@@ -10,18 +10,12 @@ import { BatchedFetcher as BatchedFetcherCommon } from '../../../app/api/common/
 
 async function createFetcher(fetcherType: Function, localStorageApi: LocalStorageApi): * {
   const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
+  const currentNetworkId = (await localStorageApi.loadCurrentNetworkId()) ?? 0; // Default to CardanoMainnet
   return new fetcherType(
     () => environment.getVersion(),
     () => locale,
-    () => {
-      if (environment.isFirefox()) {
-        return 'firefox';
-      }
-      if (environment.isChrome()) {
-        return 'chrome';
-      }
-      return '-';
-    }
+    getPlatform,
+    () => currentNetworkId
   );
 }
 
@@ -30,20 +24,25 @@ export async function getCardanoStateFetcher(localStorageApi: LocalStorageApi = 
 }
 
 export async function getCommonStateFetcher(): Promise<IFetcherCommon> {
-  const locale = (await new LocalStorageApi().getUserLocale()) ?? 'en-US';
+  const localStorageApi = new LocalStorageApi();
+  const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
+  const currentNetworkId = (await localStorageApi.loadCurrentNetworkId()) ?? 0; // Default to CardanoMainnet
   return new BatchedFetcherCommon(
     new RemoteFetcherCommon(
       () => environment.getVersion(),
       () => locale,
-      () => {
-        if (environment.isFirefox()) {
-          return 'firefox';
-        }
-        if (environment.isChrome()) {
-          return 'chrome';
-        }
-        return '-';
-      }
+      getPlatform,
+      () => currentNetworkId
     )
   );
+}
+
+export function getPlatform(): string {
+  if (environment.isFirefox()) {
+    return 'firefox';
+  }
+  if (environment.isChrome()) {
+    return 'chrome';
+  }
+  return '-';
 }
