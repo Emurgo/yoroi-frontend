@@ -10,8 +10,6 @@ declare var CONFIG: ConfigType;
 
 const localStorageApi = new LocalStorageApi();
 
-const FIREBASE_SERVICE_WORKER_SCOPE = 'firebase-cloud-messaging-push-scope';
-
 export default class PushNotificationStore<
   StoresMapType: {
     +loading: {
@@ -101,7 +99,13 @@ export default class PushNotificationStore<
     if (result === 'denied') {
       return false;
     }
-    const token = await getToken(messaging, { vapidKey: CONFIG.notifications.vapidPublicKey });
+    const token = await getToken(
+      messaging,
+      {
+        vapidKey: CONFIG.notifications.vapidPublicKey,
+        serviceWorkerRegistration: await this._getBackgroundServiceWorkerRegistration(),
+      }
+    );
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');
@@ -116,18 +120,17 @@ export default class PushNotificationStore<
   }
 
   async _disableNotifications(): Promise<boolean> {
-    const registrations = [...((await navigator.serviceWorker?.getRegistrations()) || [])];
+    const registration = await this._getBackgroundServiceWorkerRegistration();
 
-    const registration = registrations.find(reg => reg.scope.endsWith(FIREBASE_SERVICE_WORKER_SCOPE));
-
-    if (!registration) {
-      throw new Error('unexpectedly missing service worker registration');
-    }
     let subscription = await registration.pushManager.getSubscription();
     if (!subscription) {
       throw new Error('unexpected missing subscription');
     }
     return await subscription.unsubscribe();
+  }
+
+  async _getBackgroundServiceWorkerRegistration(): Promise<ServiceWorkerRegistration> {
+    return window.navigator.serviceWorker.getRegistration();
   }
 
   get fcmToken(): ?string {

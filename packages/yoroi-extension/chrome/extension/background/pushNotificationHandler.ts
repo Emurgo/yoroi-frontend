@@ -5,7 +5,6 @@ import { ROUTES } from '../../../app/routes-config';
 
 const localStorageApi = new LocalStorageApi();
 
-const broadcast = new BroadcastChannel('');
 let currentNotificationId;
 
 type Screen = 'wallet' | 'staking_center' | 'swap' | 'cashback' | 'governance';
@@ -83,43 +82,48 @@ self.addEventListener('notificationclose', (event: NotificationEvent<Notificatio
   call(appState.notifications.setRead, event.notification.data.fcmMessageId);
 });
 
-broadcast.onmessage = async (event: Event) => {
-  if (event.data.type === 'push-notification') {
-    const { eventData } = event.data;
-    const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
+self.addEventListener('push', event => {
+  if (event && event.data) {
+    const eventData = event.data.json();
+    event.waitUntil(
+      (async () => {
+        const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
 
-    let redirectionRoute: null | string = null;
+        let redirectionRoute: null | string = null;
 
-    const redirection =
-      eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
-    if (redirection) {
-      redirectionRoute = redirection.route;
-    }
+        const redirection =
+          eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
+        if (redirection) {
+          redirectionRoute = redirection.route;
+        }
 
-    const title = eventData.data['title-' + locale] ?? eventData.notification.title;
-    const body = eventData.data['body-' + locale] ?? eventData.notification.body;
-    if (typeof title !== 'string' || typeof body !== 'string') {
-      return;
-    }
+        const title = eventData.data['title-' + locale] ?? eventData.notification.title;
+        const body = eventData.data['body-' + locale] ?? eventData.notification.body;
+        if (typeof title !== 'string' || typeof body !== 'string') {
+          return;
+        }
 
-    // @ts-ignore
-    self.registration.showNotification(title, {
-      body,
-      actions: [],
-      data: {
-        fcmMessageId: eventData.fcmMessageId,
-        route: redirectionRoute,
-      },
-    });
+        // @ts-ignore
+        self.registration.showNotification(title, {
+          body,
+          actions: [],
+          data: {
+            fcmMessageId: eventData.fcmMessageId,
+            route: redirectionRoute,
+          },
+        });
 
-    call(appState.notifications.add, {
-      title: title,
-      body: body,
-      fcmMessageId: eventData.fcmMessageId,
-      read: false,
-      time: new Date().toISOString(),
-    });
+        call(appState.notifications.add, {
+          title: title,
+          body: body,
+          fcmMessageId: eventData.fcmMessageId,
+          read: false,
+          time: new Date().toISOString(),
+        });
 
-    currentNotificationId = eventData.fcmMessageId;
+        currentNotificationId = eventData.fcmMessageId;
+
+      })()
+    );
   }
-};
+});
