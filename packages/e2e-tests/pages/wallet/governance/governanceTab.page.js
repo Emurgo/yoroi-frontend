@@ -1,6 +1,6 @@
 import WalletCommonBase from '../../walletCommonBase.page';
 import { ElementLocator } from '../../locator.js';
-import { defaultWaitTimeout, fiveSeconds, halfSecond, quarterSecond } from '../../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 
 export default class GovernanceTab extends WalletCommonBase {
