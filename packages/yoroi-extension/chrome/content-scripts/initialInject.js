@@ -24,6 +24,8 @@
           }
         });
       }
+      // Clear the connectRequests array after processing to prevent issues with multiple calls
+      connectRequests = [];
     }
   });
 
