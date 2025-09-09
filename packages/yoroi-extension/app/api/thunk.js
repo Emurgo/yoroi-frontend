@@ -94,7 +94,7 @@ export function callBackground<R>(message: {| type: string, request?: Object |})
     const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
     window.chrome.runtime.sendMessage(serializedMessage, response => {
       // $FlowIgnore
-      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
+      //console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(
@@ -424,7 +424,7 @@ chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => 
     Logger.error('unrecognizable message type: ' + typeof message + ' (expected object); Original message: ' + serializedMessage);
     return;
   }
-  Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
+  //Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {

@@ -156,6 +156,46 @@ export const messages = Object.freeze(
       id: 'global.receive',
       defaultMessage: '!!!receive',
     },
+    forgotPassword: {
+      id: 'transaction.review.forgotPassword',
+      defaultMessage: '!!!Forgot your password?',
+    },
+    howToRestorePassword: {
+      id: 'transaction.review.howToRestorePassword',
+      defaultMessage: '!!!how to restore it.',
+    },
+    failTitle: {
+      id: 'transaction.fail.title',
+      defaultMessage: '!!!Transaction failed',
+    },
+    failCancelByUser: {
+      id: 'transaction.fail.cancelByUser',
+      defaultMessage: '!!!Transaction cancelled by user.',
+    },
+    failError: {
+      id: 'transaction.fail.error',
+      defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
+    },
+    failClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
+    failLedgerAppNotRunning: {
+      id: 'wallet.hw.ledger.app.not.running',
+      defaultMessage: '!!!The Cardano App is not running on your Ledger',
+    },
+    successTitle: {
+      id: 'transaction.success.title',
+      defaultMessage: '!!!Transaction signed',
+    },
+    successDescription: {
+      id: 'transaction.success.description',
+      defaultMessage: '!!!It may take a few minutes to display it in the list of wallet transactions.',
+    },
+    successClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
   })
 );
 
@@ -199,5 +239,15 @@ export const useStrings = () => {
     associatedAddress: intl.formatMessage(messages.associatedAddress),
     yourWallet: intl.formatMessage(messages.yourWallet),
     receiveLabel: intl.formatMessage(messages.receiveLabel),
+    forgotPassword: intl.formatMessage(messages.forgotPassword),
+    howToRestorePassword: intl.formatMessage(messages.howToRestorePassword),
+    failTitle: intl.formatMessage(messages.failTitle),
+    failCancelByUser: intl.formatMessage(messages.failCancelByUser),
+    failError: intl.formatMessage(messages.failError),
+    failClose: intl.formatMessage(messages.failClose),
+    failLedgerAppNotRunning: intl.formatMessage(messages.failLedgerAppNotRunning),
+    successTitle: intl.formatMessage(messages.successTitle),
+    successDescription: intl.formatMessage(messages.successDescription),
+    successClose: intl.formatMessage(messages.successClose),
   }).current;
 };

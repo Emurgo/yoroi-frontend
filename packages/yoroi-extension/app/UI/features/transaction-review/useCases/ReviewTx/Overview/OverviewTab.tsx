@@ -239,6 +239,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
   const undelegateFee = Quantities.diff(stakeKeyDeposit, totalPrimaryTokenSpent);
   const undelegateFormatedFee = new BigNumber(Quantities.diff(undelegateFee, stakingRewards))
     .shiftedBy(-primaryTokenInfo.decimals)
+    .decimalPlaces(primaryTokenInfo.decimals)
     .toString();
 
   return (

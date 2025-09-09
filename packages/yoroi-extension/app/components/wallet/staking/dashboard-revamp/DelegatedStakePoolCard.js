@@ -5,7 +5,6 @@ import { injectIntl } from 'react-intl';
 import { observer } from 'mobx-react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { SocialMediaStakePool } from './StakePool/StakePool';
 import type { PoolData } from '../../../../containers/wallet/staking/SeizaFetcher';
 import { getAvatarFromPoolId } from '../utils';
 import type { PoolTransition } from '../../../../stores/toplevel/DelegationStore';
@@ -68,8 +67,6 @@ function DelegatedStakePoolCard({ delegatedPool, intl, poolTransition, delegateT
           <Typography component="div" color={theme.palette.ds.text_primary_medium} variant="body1" fontWeight="medium" mb="3px">
             {ticker != null ? `[${ticker}]` : ''} {name && name !== '' ? name : truncateAddress(poolIdHexToBech32(id))}
           </Typography>
-          <SocialMediaStakePool color="grayscale.500" websiteUrl={websiteUrl} socialLinks={socialLinks} />
-          <br />
         </Box>
       </Wrapper>
       <Wrapper justifyContent="space-between" sx={{ paddingBottom: '25px' }}>

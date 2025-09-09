@@ -1,8 +1,11 @@
 // @flow
-import { Box, Typography } from '@mui/material';
+import { Box, Typography /*, IconButton, styled*/ } from '@mui/material';
 import { observer } from 'mobx-react';
-import type { Node } from 'react';
-import { Component } from 'react';
+import type { Node, ComponentType } from 'react';
+// $FlowIgnore
+//import { Icon } from '../../UI/components';
+// $FlowIgnore
+//import { useNotifications } from '../../UI/features/notifications/module/NotificationsProvider';
 
 type Props = {|
   +children?: ?Node,
@@ -15,74 +18,87 @@ type Props = {|
   +isErrorPage?: boolean,
 |};
 
-@observer
-class NavBarRevamp extends Component<Props> {
-  static defaultProps: {|
-    children: void,
-    walletDetails: void,
-    goToNotifications: void,
-    buyButton: void,
-    menu: void,
-    pageBanner: boolean,
-    isErrorPage: boolean,
-  |} = {
-    children: undefined,
-    goToNotifications: undefined,
-    walletDetails: undefined,
-    buyButton: undefined,
-    menu: undefined,
-    pageBanner: false,
-    isErrorPage: false,
-  };
+/*
+const StyledButton = styled(IconButton)(({ theme }: any) => ({
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+*/
 
-  render(): Node {
-    const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = this.props;
-    return (
-      <Box
-        sx={{
-          backgroundColor: 'ds.bg_color_max',
-          borderBottom: pageBanner || isErrorPage ? 'none' : '1px solid',
-          borderBottomColor: 'grayscale.200',
-        }}
-      >
-        <Box sx={{ position: 'relative', zIndex: 100, margin: 'auto' }}>
+function NavBarRevamp(props: Props) {
+  const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = props;
+  //const { setIsNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
+
+  return (
+    <Box
+      sx={{
+        backgroundColor: 'ds.bg_color_max',
+        borderBottom: pageBanner || isErrorPage ? 'none' : '1px solid',
+        borderBottomColor: 'grayscale.200',
+      }}
+    >
+      <Box sx={{ position: 'relative', zIndex: 100, margin: 'auto' }}>
+        <Box
+          as="header"
+          sx={{
+            color: 'ds.el_gray_medium',
+            display: 'flex',
+            alignItems: 'center',
+            height: 'inherit',
+          }}
+        >
           <Box
-            as="header"
             sx={{
-              color: 'ds.el_gray_medium',
               display: 'flex',
               alignItems: 'center',
-              height: 'inherit',
+              width: '100%',
+              justifyContent: 'space-between',
+              margin: '20px 24px',
+              marginBottom: menu != null ? '52px' : '',
             }}
           >
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                justifyContent: 'space-between',
-                margin: '20px 24px',
-                marginBottom: menu != null ? '52px' : '',
-              }}
-            >
-              <Box flex="0 0 auto">
-                <Typography component="div" color="ds.el_gray_medium">
-                  {title}
-                </Typography>
-              </Box>
-              <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                {children}
-                {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
-                {walletDetails != null && (
-                  <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>{walletDetails}</Box>
-                )}
-              </Box>
+            <Box flex="0 0 auto">
+              <Typography component="div" color="ds.el_gray_medium">
+                {title}
+              </Typography>
             </Box>
-            {menu != null && !isErrorPage ? <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box> : null}
+            <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              {children}
+              {/*
+              <StyledButton
+                onClick={() => {
+                  setIsNotificationCenterOpen(true);
+                }}
+              >
+                <Icon.Bell />
+                {hasUnreadNotifications && (
+                  <Box
+                    sx={{
+                      height: '6px',
+                      width: '6px',
+                      borderRadius: '50%',
+                      backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
+                      position: 'relative',
+                      right: '10px',
+                      top: '-8px',
+                    }}
+                  />
+                )}
+              </StyledButton>
+              */}
+              {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
+              {walletDetails != null && (
+                <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>{walletDetails}</Box>
+              )}
+            </Box>
           </Box>
+          {menu != null && !isErrorPage ? <Box sx={{ position: 'absolute', bottom: 0, left: 0 }}>{menu}</Box> : null}
         </Box>
       </Box>
-    );
-  }
+    </Box>
+  );
 }
-export default NavBarRevamp;
+export default (observer(NavBarRevamp): ComponentType<Props>);

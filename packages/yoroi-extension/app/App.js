@@ -174,6 +174,7 @@ class App extends Component<Props, State> {
         walletsStore={stores.wallets}
         appLoadedSlots={window.yoroi.appLoadedSlotPerNetwork}
         pushNotificationStore={stores.pushNotificationStore}
+        tokenInfoStore={stores.tokenInfoStore}
       >
         <NotificationsManager />
         <div style={{ height: '100%' }}>

@@ -7,9 +7,14 @@ import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
 import { environment } from '../../../app/environment';
 import { bringInitBackground } from '@emurgo/bringweb3-chrome-extension-kit';
-import { sanitizeForLog } from '../../../app/coreUtils';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
+// $FlowIgnore
+import './pushNotificationHandler';
+// $FlowIgnore
+import { makeAccessorServer } from '../../../api/objectModel';
+// $FlowIgnore
+import appState from '../../../api/appState';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -42,9 +47,9 @@ if (chrome.action) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   //fixme: verify sender.id === extension id
-  if (environment.isDev()) {
+  /*if (environment.isDev()) {
     console.debug(`get message ${JSON.stringify(sanitizeForLog(message))} from ${sender.tab.id}`);
-  }
+  }*/
   const handler = getHandler(message.type);
   if (handler) {
     const deserializedMessage = {
@@ -70,3 +75,25 @@ if (environment.isFirefox()) {
     }
   });
 }
+
+const { request } = makeAccessorServer(appState, async (serverEvent) => {
+  const tabs = await chrome.tabs.query({});
+  for (let tab of tabs) {
+    if (tab.url.startsWith(location.origin)) {
+      chrome.tabs.sendMessage(
+        tab.id,
+        {
+          type: 'yoroi-ng-server-event',
+          serverEvent
+        }
+      );
+    }
+  }
+})
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message.type === 'yoroi-ng-client-request') {
+    request(message.clientRequest).then(sendResponse).catch(console.error);
+  }
+  return true;
+});

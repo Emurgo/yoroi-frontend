@@ -5,6 +5,7 @@ import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { undefinedToken } from '../../common/constants';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
+import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
@@ -17,6 +18,7 @@ export const EstimateSummary = () => {
 
   const tokenInTicker = tokenInInfo?.ticker ?? tokenInInfo?.name ?? '-';
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
+  const isLimitOrder = swapForm.orderType === 'limit';
 
   if (isEstimateOrderLoading) {
     return (
@@ -38,10 +40,10 @@ export const EstimateSummary = () => {
 
   const openRouteModal = () => {
     openModal({
-      title: 'Select Route',
+      title: strings.selectRoute,
       content: (
         <Stack direction="column" width="100%">
-          <DexRouteTable data={swapForm.estimate?.splits ?? []} />
+          {isLimitOrder ? <LimitDexRouteTable /> : <DexRouteTable data={swapForm.estimate?.splits ?? []} />}
         </Stack>
       ),
       height: '327px',
