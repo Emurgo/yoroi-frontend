@@ -1,4 +1,6 @@
 // @flow
+// $FlowIgnore
+import './pushNotificationHandler';
 import debounce from 'lodash/debounce';
 import { handleInjectorMessage } from './handlers/content';
 import { getHandler } from './handlers/yoroi';
@@ -10,8 +12,6 @@ import { bringInitBackground } from '@emurgo/bringweb3-chrome-extension-kit';
 import { sanitizeForLog } from '../../../app/coreUtils';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
-// $FlowIgnore
-import './pushNotificationHandler';
 // $FlowIgnore
 import { makeAccessorServer } from '../../../api/objectModel';
 // $FlowIgnore
