@@ -7,7 +7,7 @@
     "allowUnusedLabels": false,
     /* Modules */
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "es2020",
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
 
