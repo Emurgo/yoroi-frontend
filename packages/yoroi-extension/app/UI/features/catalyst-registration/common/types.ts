@@ -5,7 +5,7 @@ import { BigNumber } from 'bignumber.js';
 
 export type StepAction =
   | { type: 'START_REGISTRATION' }
-  | { type: 'NEXT_STEP' }
+  | { type: 'NEXT_STEP'; selectedWallet?: any }
   | { type: 'PREVIOUS_STEP' }
   | { type: 'RESET' }
   | { type: 'SET_ERROR'; error: string | null }

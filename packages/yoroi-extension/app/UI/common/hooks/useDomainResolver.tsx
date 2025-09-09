@@ -68,8 +68,7 @@ export const useDomainResolver = (handle: string) => {
           return;
         }
 
-        const resolverApi = await getInitializedResolverApi();
-        const { getCardanoAddresses } = resolverApi;
+        const { getCardanoAddresses } = await getInitializedResolverApi();
 
         if (!getCardanoAddresses) throw new Error('Resolver API is not available');
 
