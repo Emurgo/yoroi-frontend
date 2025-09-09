@@ -394,7 +394,7 @@
   "settings.externalStorage.intro": "Pilih layanan penyimpanan eksternal untuk menghubungkan akun dan menyimpan catatan memo Anda.",
   "settings.externalStorage.provider": "Hubungkan ke {provider}",
   "settings.externalStorage.title": "Hubungkan akun",
-  "settings.general.aboutYoroi.commitLabel": "Lakukan:",
+  "settings.general.aboutYoroi.commitLabel": "Commit:",
   "settings.general.aboutYoroi.facebook": "Facebook Yoroi",
   "settings.general.aboutYoroi.git.branch": "Cabang:",
   "settings.general.aboutYoroi.github": "Github Yoroi",
