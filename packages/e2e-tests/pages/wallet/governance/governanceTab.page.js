@@ -82,10 +82,26 @@ export default class GovernanceTab extends WalletCommonBase {
   }
 
   async isLoaded() {
-    const yoroiSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.delegateToYoroiSkeletonLocator);
-    const drepSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.delegateToDrepSkeletonLocator);
-    const abstainSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.abstainSkeletonLocator);
-    const noConfidenceSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.noConfidenceSkeletonLocator);
+    const yoroiSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.delegateToYoroiSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const drepSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.delegateToDrepSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const abstainSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.abstainSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const noConfidenceSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.noConfidenceSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
     const allResults = await Promise.all([
       yoroiSkeletonDisplayedPromise,
       drepSkeletonDisplayedPromise,
