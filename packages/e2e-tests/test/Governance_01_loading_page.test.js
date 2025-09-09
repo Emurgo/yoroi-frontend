@@ -2,15 +2,15 @@ import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
-import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
 import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
+import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import GovernanceTab from '../pages/wallet/governance/governanceTab.page.js';
 
-describe('Cashback One wallet added', function () {
+describe('Governance page loading', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
@@ -24,8 +24,8 @@ describe('Cashback One wallet added', function () {
   });
 
   it('Open the Governance page', async function () {
-    const walletTab = new WalletTab(webdriver, logger);
-    await walletTab.goToGovernanceTab();
+    const transactionsPage = new TransactionsSubTab(webdriver, logger);
+    await transactionsPage.goToGovernanceTab();
     const governancePage = new GovernanceTab(webdriver, logger);
     const pageIsDiplayed = await governancePage.isDisplayed();
     expect(pageIsDiplayed, 'The Governance page is not displayed').to.be.true;
@@ -37,14 +37,12 @@ describe('Cashback One wallet added', function () {
     expect(contentIsLoaded, 'The Governance page content is not loaded').to.be.true;
   });
 
-  afterEach(function (done) {
+  afterEach(async function () {
     customAfterEach(this, webdriver, logger);
-    done();
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
     basePage.closeBrowser();
-    done();
   });
 });
