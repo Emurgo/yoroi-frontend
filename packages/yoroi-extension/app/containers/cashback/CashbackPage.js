@@ -34,6 +34,8 @@ import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 import type { BringConfigType, ConfigType } from '../../../config/config-types';
 import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
 
+declare var chrome;
+
 const messages = defineMessages({
   claim: {
     id: 'cashback.claim.dialog.title',
@@ -260,6 +262,8 @@ const CashbackPageContainer = observer((props: AllProps) => {
       const url = new URL(data.iframeUrl);
       url.searchParams.set('token', data.token);
       url.searchParams.set('theme', theme.name.split('-')[0]);
+      url.searchParams.set('extensionId', chrome.runtime.id);
+      url.searchParams.set('terms', 'false');
 
       setIframeSrc(url.href);
     } catch (error) {
