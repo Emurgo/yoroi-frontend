@@ -28,7 +28,13 @@ export default class PushNotificationStore<
         runInAction(() => {
           this.metadata = metadata;
         });
-        if (this.metadata?.isEnabled === undefined) {
+        if (
+          // first time after upgrading
+          this.metadata?.isEnabled === undefined ||
+            // By observation we need to re-run `getToken` after manually reloading the extension,
+            // and the returned token may change. So it is possible that we need to also do this after upgrading.
+            this.metadata?.isEnabled
+        ) {
           this._enableNotifications();
         }
       })(),
