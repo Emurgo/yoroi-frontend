@@ -1,6 +1,6 @@
-import WalletCommonBase from '../../walletCommonBase.page';
+import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
-import { defaultWaitTimeout, fiveSeconds, halfSecond, quarterSecond } from '../../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, quarterSecond } from '../../../helpers/timeConstants.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 
 export default class GovernanceTab extends WalletCommonBase {
@@ -63,11 +63,11 @@ export default class GovernanceTab extends WalletCommonBase {
 
   // methods
   async isDisplayed() {
-    const curPageTitle = await this.getPageTitle();
+    const titleIsCorrect = await this.titleIsCorrect(pageTitle.governance);
     const discriptionDisplayedPromise = this.customWaitIsPresented(this.pageDescriptionLocator, fiveSeconds, quarterSecond);
     const linkDisplayedPromise = this.customWaitIsPresented(this.learnMoreLinkLocator, fiveSeconds, quarterSecond);
     const [discriptionDisplayed, linkDisplayed] = await Promise.all([discriptionDisplayedPromise, linkDisplayedPromise]);
-    return curPageTitle === pageTitle.governance && discriptionDisplayed && linkDisplayed;
+    return titleIsCorrect && discriptionDisplayed && linkDisplayed;
   }
 
   async votingCardsAreDisplayed() {
@@ -82,10 +82,26 @@ export default class GovernanceTab extends WalletCommonBase {
   }
 
   async isLoaded() {
-    const yoroiSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.delegateToYoroiSkeletonLocator);
-    const drepSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.delegateToDrepSkeletonLocator);
-    const abstainSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.abstainSkeletonLocator);
-    const noConfidenceSkeletonDisplayedPromise = this.customWaitIsNotPresented(this.noConfidenceSkeletonLocator);
+    const yoroiSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.delegateToYoroiSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const drepSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.delegateToDrepSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const abstainSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.abstainSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
+    const noConfidenceSkeletonDisplayedPromise = this.customWaitIsNotPresented(
+      this.noConfidenceSkeletonLocator,
+      defaultWaitTimeout,
+      quarterSecond
+    );
     const allResults = await Promise.all([
       yoroiSkeletonDisplayedPromise,
       drepSkeletonDisplayedPromise,
