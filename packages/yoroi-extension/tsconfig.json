@@ -12,7 +12,7 @@
     "jsx": "react-jsx",
 
     /* Type Checking */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
