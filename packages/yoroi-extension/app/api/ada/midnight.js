@@ -137,7 +137,13 @@ export async function claimForAddress(
       // todo: handle insufficient firmware version
       throw new Error(`Trezor signing error: ${resp.payload.error} (code=${String(resp.payload.code)})`);
     }
-    const { signature, pubKey, headers: { protected: { address } } } = resp.payload;
+    const {
+      signature,
+      pubKey,
+      headers: {
+        protected: { address },
+      },
+    } = resp.payload;
     signResult = await encodeHardwareWalletSignResult(address, signature, payload, pubKey, false);
     publicKey = pubKey;
   } else {

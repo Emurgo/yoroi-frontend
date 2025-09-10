@@ -336,7 +336,13 @@ export default class ConnectorStore extends Store<StoresMap> {
           if (!signResult.success) {
             throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
           }
-          const { signature, pubKey, headers: { protected: { address } } } = signResult.payload;
+          const {
+            signature,
+            pubKey,
+            headers: {
+              protected: { address },
+            },
+          } = signResult.payload;
 
           userSignConfirm({
             tx: null,
