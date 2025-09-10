@@ -12,6 +12,7 @@ export default class StateFetchStore<
   StoresMapType: {
     +profile: {
       +currentLocale: string,
+      +getCurrentNetworkId: function,
       ...
     },
     ...

@@ -18,8 +18,7 @@ export default class AdaStateFetchStore<TStores: RequiredStores> extends BaseSta
       new RemoteFetcher(
         () => environment.getVersion(),
         () => this.stores.profile.currentLocale,
-        getPlatform,
-        () => this.stores.profile.getCurrentNetworkId()
+        getPlatform
       )
     );
   }
