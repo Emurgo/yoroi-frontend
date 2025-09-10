@@ -31,9 +31,9 @@ export default class PushNotificationStore<
         if (
           // first time after upgrading
           this.metadata?.isEnabled === undefined ||
-            // By observation we need to re-run `getToken` after manually reloading the extension,
-            // and the returned token may change. So it is possible that we need to also do this after upgrading.
-            this.metadata?.isEnabled
+          // By observation we need to re-run `getToken` after manually reloading the extension,
+          // and the returned token may change. So it is possible that we need to also do this after upgrading.
+          this.metadata?.isEnabled
         ) {
           this._enableNotifications();
         }
@@ -105,13 +105,10 @@ export default class PushNotificationStore<
     if (result === 'denied') {
       return false;
     }
-    const token = await getToken(
-      messaging,
-      {
-        vapidKey: CONFIG.notifications.vapidPublicKey,
-        serviceWorkerRegistration: await this._getBackgroundServiceWorkerRegistration(),
-      }
-    );
+    const token = await getToken(messaging, {
+      vapidKey: CONFIG.notifications.vapidPublicKey,
+      serviceWorkerRegistration: await this._getBackgroundServiceWorkerRegistration(),
+    });
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');

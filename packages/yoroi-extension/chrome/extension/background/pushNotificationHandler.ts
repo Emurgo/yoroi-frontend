@@ -20,13 +20,6 @@ interface EventData {
   fcmMessageId: string;
 }
 
-interface Event {
-  data: {
-    type: 'push-notification';
-    eventData: EventData;
-  };
-}
-
 const REDIRECTIONS: { id: Screen; route: string }[] = [
   {
     id: 'wallet',
@@ -82,48 +75,58 @@ self.addEventListener('notificationclose', (event: NotificationEvent<Notificatio
   call(appState.notifications.setRead, event.notification.data.fcmMessageId);
 });
 
-self.addEventListener('push', event => {
-  if (event && event.data) {
-    const eventData = event.data.json();
-    event.waitUntil(
-      (async () => {
-        const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
+async function pushHandler(eventData) {
+  const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
 
-        let redirectionRoute: null | string = null;
+  let redirectionRoute: null | string = null;
 
-        const redirection =
-          eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
-        if (redirection) {
-          redirectionRoute = redirection.route;
-        }
-
-        const title = eventData.data['title-' + locale] ?? eventData.notification.title;
-        const body = eventData.data['body-' + locale] ?? eventData.notification.body;
-        if (typeof title !== 'string' || typeof body !== 'string') {
-          return;
-        }
-
-        // @ts-ignore
-        self.registration.showNotification(title, {
-          body,
-          actions: [],
-          data: {
-            fcmMessageId: eventData.fcmMessageId,
-            route: redirectionRoute,
-          },
-        });
-
-        call(appState.notifications.add, {
-          title: title,
-          body: body,
-          fcmMessageId: eventData.fcmMessageId,
-          read: false,
-          time: new Date().toISOString(),
-        });
-
-        currentNotificationId = eventData.fcmMessageId;
-
-      })()
-    );
+  const redirection =
+    eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
+  if (redirection) {
+    redirectionRoute = redirection.route;
   }
-});
+
+  const title = eventData.data['title-' + locale] ?? eventData.notification.title;
+  const body = eventData.data['body-' + locale] ?? eventData.notification.body;
+  if (typeof title !== 'string' || typeof body !== 'string') {
+    return;
+  }
+  // @ts-ignore
+  self.registration.showNotification(title, {
+    body,
+    actions: [],
+    data: {
+      fcmMessageId: eventData.fcmMessageId,
+      route: redirectionRoute,
+    },
+  });
+
+  call(appState.notifications.add, {
+    title: title,
+    body: body,
+    fcmMessageId: eventData.fcmMessageId,
+    read: false,
+    time: new Date().toISOString(),
+  });
+
+  currentNotificationId = eventData.fcmMessageId;
+}
+
+declare var pushNotificationEventData: EventData | null;
+declare var pushNotificationEventHandler: (_: EventData) => void | Promise<void>;
+
+if (typeof pushNotificationEventData !== 'undefined') {
+  pushNotificationEventHandler = pushHandler;
+
+  if (pushNotificationEventData) {
+    pushHandler(pushNotificationEventData);
+    pushNotificationEventData = null;
+  }
+} else {
+  // dev mode
+  self.addEventListener('push', (event: any) => {
+    if (event && event.data) {
+      pushHandler(event.data.json());
+    }
+  });
+}
