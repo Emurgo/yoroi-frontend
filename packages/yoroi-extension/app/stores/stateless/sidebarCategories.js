@@ -89,18 +89,11 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
-    className: 'nfts',
-    route: ROUTES.NFTS.ROOT,
-    icon: nftsIcon,
-    label: globalMessages.sidebarNfts,
-    isVisible: existsSelectedWallet,
-  },
-  {
     className: 'nft-gallery',
     route: ROUTES.NFT_GALLERY.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: isDev,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'voting',
