@@ -327,7 +327,7 @@ export default class ConnectorStore extends Store<StoresMap> {
         try {
           const signResult = await wrapWithFrame(trezor =>
             trezor.cardanoSignMessage({
-              path: signingPath,
+              path: [...signingPath], // convert mobx array to native array
               payload,
               preferHexDisplay: false,
               derivationType: CardanoDerivationType.ICARUS_TREZOR,
