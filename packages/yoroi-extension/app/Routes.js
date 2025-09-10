@@ -360,7 +360,6 @@ const PortfolioSubpages = ({ stores }) => {
   );
 };
 
-
 const AssetsSubpages = ({ stores }) => (
   <AssetsWrapper stores={stores}>
     <Suspense fallback={null}>
