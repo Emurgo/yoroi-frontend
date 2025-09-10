@@ -292,7 +292,7 @@
   "global.language.spanish": "Spanyol",
   "global.language.turkish": "Turki",
   "global.language.vietnamese": "Vietnam",
-  "global.publicKey.explanation": "Public key bisa digunakan untuk melihat riwayat wallet, tetapi <strong>tidak</strong> bisa digunakan untuk pemindahan dana dengan cara apa pun (private key <strong>tidak</strong> disertakan)",
+  "global.publicKey.explanation": "Public key bisa digunakan untuk melihat riwayat wallet, tetapi tidak bisa digunakan untuk pemindahan dana dengan cara apa pun (private key tidak disertakan)",
   "global.receive": "Terima",
   "global.selectAsset.labael": "Pilih aset",
   "global.staleTxnWarningLine1": "Wallet Anda telah berubah sejak Anda membuat transaksi ini.",
