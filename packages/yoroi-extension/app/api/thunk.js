@@ -424,7 +424,7 @@ chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => 
     Logger.error('unrecognizable message type: ' + typeof message + ' (expected object); Original message: ' + serializedMessage);
     return;
   }
-  Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
+  //Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {
