@@ -27,11 +27,6 @@ class SettingsTab extends WalletCommonBase {
     locator: 'settings-supportSubTab-button',
     method: 'id',
   };
-  // Level of Complexity subtab
-  complexitySubmenuItemLocator = {
-    locator: 'settings-levelofcomplexitySubTab-button',
-    method: 'id',
-  };
   // Analytics subtab
   analyticsSubmenuItemLocator = {
     locator: 'settings-analyticsSubTab-button',
@@ -62,10 +57,6 @@ class SettingsTab extends WalletCommonBase {
   async goToSupportSubMenu() {
     this.logger.info(`SettingsTab::goToSupportSubMenu is called`);
     await this.scrollAndClick(this.supportSubmenuItemLocator);
-  }
-  async goToComplexitySubMenu() {
-    this.logger.info(`SettingsTab::goToComplexitySubMenu is called`);
-    await this.scrollAndClick(this.complexitySubmenuItemLocator);
   }
   async goToAnalyticsSubMenu() {
     this.logger.info(`SettingsTab::goToAnalyticsSubMenu is called`);

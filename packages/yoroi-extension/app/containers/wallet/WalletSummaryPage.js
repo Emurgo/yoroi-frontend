@@ -117,7 +117,6 @@ export default class WalletSummaryPage extends Component<StoresProps> {
             onCopyAddressTooltip={onCopyAddressTooltip}
             notification={notificationToolTip}
             addressToDisplayString={addr => addressToDisplayString(addr, getNetworkById(selected.networkId))}
-            complexityLevel={stores.profile.selectedComplexityLevel}
             id="wallet:transaction-transactionsList-box"
           />
         );

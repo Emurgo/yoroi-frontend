@@ -18,7 +18,6 @@ import type { Notification } from '../../../types/notification.types';
 import { genAddressLookup } from '../../../stores/stateless/addressStores';
 import type { TokenLookupKey } from '../../../api/common/lib/MultiToken';
 import type { TokenRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import TransactionRevamp from './TransactionRevamp';
 import { Box } from '@mui/system';
 
@@ -50,7 +49,6 @@ type Props = {|
   +notification: ?Notification,
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> | null,
-  +complexityLevel: ?ComplexityLevelType,
   id: string,
 |};
 
@@ -187,7 +185,6 @@ export default class WalletTransactionsListRevamp extends Component<Props> {
                   notification={notification}
                   onCopyAddressTooltip={onCopyAddressTooltip}
                   addressToDisplayString={this.props.addressToDisplayString}
-                  complexityLevel={this.props.complexityLevel}
                   id={baseIdPart + ':transactionsGroup_' + index}
                   txIndex={transactionIndex}
                 />
