@@ -125,7 +125,7 @@ export async function claimForAddress(
   } else if (wallet.type === 'trezor') {
     const resp = await wrapWithFrame(trezor =>
       trezor.cardanoSignMessage({
-        path: wallet.stakingAddressing.addressing.path,
+        path: [...wallet.stakingAddressing.addressing.path],
         payload,
         preferHexDisplay: false,
         derivationType: CardanoDerivationType.ICARUS_TREZOR,
