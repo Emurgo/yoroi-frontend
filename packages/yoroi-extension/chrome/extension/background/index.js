@@ -9,7 +9,6 @@ import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
 import { environment } from '../../../app/environment';
 import { bringInitBackground } from '@emurgo/bringweb3-chrome-extension-kit';
-import { sanitizeForLog } from '../../../app/coreUtils';
 import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
 // $FlowIgnore
@@ -48,9 +47,9 @@ if (chrome.action) {
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   //fixme: verify sender.id === extension id
-  if (environment.isDev()) {
+  /*if (environment.isDev()) {
     console.debug(`get message ${JSON.stringify(sanitizeForLog(message))} from ${sender.tab.id}`);
-  }
+  }*/
   const handler = getHandler(message.type);
   if (handler) {
     const deserializedMessage = {

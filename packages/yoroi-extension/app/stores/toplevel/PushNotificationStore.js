@@ -35,7 +35,7 @@ export default class PushNotificationStore<
           // and the returned token may change. So it is possible that we need to also do this after upgrading.
           this.metadata?.isEnabled
         ) {
-          this._enableNotifications();
+          //this._enableNotifications();
         }
       })(),
       'load push notification metadata'
