@@ -22,7 +22,7 @@ import { tokenManagers } from '../../portfolio/common/helpers/build-token-manage
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { useGetInputs } from '../common/helpers';
-import { ASSET_DIRECTION_IN } from '../common/constants';
+import { ASSET_DIRECTION_IN, undefinedToken } from '../common/constants';
 import { AssetDirectionType, MarketOrderType } from '../common/types';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
@@ -43,7 +43,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
-  const { partners, excludedTokens } = useSwapConfig();
+  const { partners, excludedTokens, tokenOutId } = useSwapConfig();
+  console.log('tokenOutId', tokenOutId);
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
@@ -113,6 +114,15 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
     }
   );
+
+  const { data: orders = [], refetch: refetchOrders } = useQuery({
+    queryKey: ['useSwapOrders', stakingKey, swapManager.settings.routingPreference],
+    queryFn: async () => {
+      const res = await swapManager.api.orders();
+      if (isRight(res)) return res.value.data;
+      return [];
+    },
+  });
 
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
@@ -236,7 +246,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const context: any = useMemo(
     () => ({
-      swapForm: { action, ...state },
+      swapForm: { action, orders, refetchOrders, ...state },
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
@@ -254,7 +264,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       swapManager,
       stores,
     }),
-    [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
+    [state.tokenInInput, state.tokenOutInput, action, tokenInfos, orders, refetchOrders]
   );
 
   if (!selectedWallet) return null;
@@ -489,8 +499,8 @@ const defaultState: SwapState = Object.freeze({
     value: '',
   },
   tokenOutInput: {
-    isTouched: false,
-    tokenId: undefined,
+    isTouched: true,
+    tokenId: 'fe7c786ab321f41c654ef6c1af7b3250a613c24e4213e0425a7ae456.55534441',
     disabled: false,
     error: null,
     value: '',
