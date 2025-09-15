@@ -26,6 +26,7 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
 import AbortDialog from '../features/airdrop/useCases/AbortDialog';
+import { useYoroiRemoteConfig } from '../common/hooks/useYoroiRemoteConfig.ts';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -90,12 +91,16 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const checkEndpoint = isMainnet ? CHECK_ENDPOINT_MAINNET : CHECK_ENDPOINT_PREPROD;
   const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
 
+  const isTrezor = wallet.type === 'trezor';
+
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
     ).address.Hash
   );
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
+
+  const { data: config } = useYoroiRemoteConfig();
 
   useEffect(() => {
     (async () => {
@@ -192,7 +197,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   let content;
 
-  if (!alloc) {
+  if (!alloc || (isTrezor && !config)) {
     content = <LoadingSpinner />;
   } else if (alloc.isZero()) {
     content = <Zero />;
@@ -209,6 +214,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     content = (
       <ClaimContent
         alloc={formattedAlloc}
+        isTrezor={isTrezor && !config.enableTrezorAirdrop}
         destAddrBech32={destAddrBech32}
         isClaimDialog={isClaimDialog}
         showClaimDialog={showClaimDialog}

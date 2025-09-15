@@ -1,9 +1,10 @@
-import { Box, Checkbox, FormControlLabel, Divider, Stack } from '@mui/material';
+import { Box, Typography, Checkbox, FormControlLabel, Divider, Stack } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useIntl, defineMessages } from 'react-intl';
 import { useState, useRef, useEffect } from 'react';
 import Terms from './Terms';
 import { ClaimInfo1 } from './ClaimInfo';
+import { Icons, IconWrapper } from '../../../components';
 
 const messages = defineMessages({
   agree: {
@@ -15,17 +16,26 @@ const messages = defineMessages({
     id: 'airdrop.claim',
     defaultMessage: '!!!claim allocation',
   },
+  trezorTitle: {
+    id: 'airdrop.trezorTitle',
+    defaultMessage: '!!!Trezor not supported',
+  },
+  trezorText: {
+    id: 'airdrop.trezorText',
+    defaultMessage: '!!!Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.',
+  },
 });
 
 interface Props {
   alloc: string;
+  isTrezor: boolean;
   destAddrBech32: string;
   isClaimDialog: boolean;
   showClaimDialog: () => void;
 }
 
 export default function ClaimContent(props: Readonly<Props>) {
-  const { alloc, destAddrBech32, isClaimDialog, showClaimDialog } = props;
+  const { alloc, isTrezor, destAddrBech32, isClaimDialog, showClaimDialog } = props;
   const [isTermsAgreed, setIsTermsAgreed] = useState<boolean>(false);
   const [hasOverflow, setHasOverflow] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -61,40 +71,75 @@ export default function ClaimContent(props: Readonly<Props>) {
             width: '612px',
           }}
         >
-          <ClaimInfo1 destAddrBech32={destAddrBech32} alloc={alloc} />
-          <Terms />
-          <FormControlLabel
-            label={intl.formatMessage(messages.agree)}
-            control={
-              <Checkbox
-                checked={isTermsAgreed}
-                onChange={() => {
-                  setIsTermsAgreed(!isTermsAgreed);
+          <ClaimInfo1 destAddrBech32={destAddrBech32} alloc={alloc} isTrezor={isTrezor} />
+          {!isTrezor ? (
+            <>
+              <Terms />
+              <FormControlLabel
+                label={intl.formatMessage(messages.agree)}
+                control={
+                  <Checkbox
+                    checked={isTermsAgreed}
+                    onChange={() => {
+                      setIsTermsAgreed(!isTermsAgreed);
+                    }}
+                    sx={{ marginRight: '8px' }}
+                  />
+                }
+                sx={{
+                  marginTop: '24px',
+                  color: 'ds.text_gray_medium',
                 }}
-                sx={{ marginRight: '8px' }}
               />
-            }
-            sx={{
-              marginTop: '24px',
-              color: 'ds.text_gray_medium',
-            }}
-          />
+            </>
+          ) : (
+            // if trezor
+            <Box
+              sx={{
+                borderRadius: '8px',
+                bgcolor: 'ds.sys_magenta_100',
+                padding: '24px',
+                marginTop: '24px',
+              }}
+            >
+              <Stack direction="row" gap="8px">
+                {/*  @ts-ignore */}
+                <Box as="span" sx={{ verticalAlign: 'middle' }}>
+                  <IconWrapper color="ds.sys_magenta_500" icon={Icons.ErrorTriangle} />
+                </Box>
+                {/*  @ts-ignore */}
+                <Typography
+                  sx={{ verticalAlign: 'middle' }}
+                  as="span"
+                  variant="body1"
+                  fontWeight={500}
+                  color="ds.sys_magenta_500"
+                >
+                  {intl.formatMessage(messages.trezorTitle)}
+                </Typography>
+              </Stack>
+              <Typography variant="body1" color="ds.text_gray_medium">
+                {intl.formatMessage(messages.trezorText)}
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
-
-      <Stack sx={{ height: '96px', display: 'flex' }}>
-        {hasOverflow && <Divider />}
-        <LoadingButton
-          //  @ts-ignore
-          variant="primary"
-          sx={{ margin: 'auto' }}
-          disabled={!isTermsAgreed}
-          loading={isClaimDialog}
-          onClick={showClaimDialog}
-        >
-          {intl.formatMessage(messages.claim)}
-        </LoadingButton>
-      </Stack>
+      {!isTrezor && (
+        <Stack sx={{ height: '96px', display: 'flex' }}>
+          {hasOverflow && <Divider />}
+          <LoadingButton
+            //  @ts-ignore
+            variant="primary"
+            sx={{ margin: 'auto' }}
+            disabled={!isTermsAgreed}
+            loading={isClaimDialog}
+            onClick={showClaimDialog}
+          >
+            {intl.formatMessage(messages.claim)}
+          </LoadingButton>
+        </Stack>
+      )}
     </>
   );
 }
