@@ -6,13 +6,14 @@ type Props = {
   children: ReactNode;
   value: string;
   copyButtonFollowText?: boolean;
+  pathTestId?: string;
 };
 
-const CopyableText: React.FC<Props> = ({ children, value, copyButtonFollowText = false }) => {
+const CopyableText: React.FC<Props> = ({ children, value, copyButtonFollowText = false, pathTestId = '' }) => {
   return (
     <Stack direction="row" {...(copyButtonFollowText ? {} : { justifyContent: 'space-between' })}>
-      <Box mr="4px">{children}</Box>
-      <CopyButton textToCopy={value} />
+      <Box mr="4px" id={`${pathTestId}-info-text`}>{children}</Box>
+      <CopyButton textToCopy={value} pathTestId={pathTestId} />
     </Stack>
   );
 };
