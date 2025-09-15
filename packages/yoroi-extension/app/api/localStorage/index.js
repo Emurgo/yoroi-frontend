@@ -46,6 +46,7 @@ const storageKeys = {
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
+  SINGLE_ADDRESS_MODE: '-SINGLE_ADDRESS_MODE',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -172,6 +173,12 @@ export default class LocalStorageApi {
   setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
   unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+
+  // ========== SINGLE_ADDRESS Mode ========== //
+
+  getSingleAddressMode: void => Promise<?string> = () => getLocalItem(storageKeys.SINGLE_ADDRESS_MODE);
+
+  setSingleAddressMode: string => Promise<void> = mode => setLocalItem(storageKeys.SINGLE_ADDRESS_MODE, mode);
 
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
