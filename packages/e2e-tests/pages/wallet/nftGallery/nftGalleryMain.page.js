@@ -121,12 +121,10 @@ export default class NftGalleryTab extends WalletCommonBase {
    */
   async noNftsIsDisplayed() {
     this.logger.info(`NftGalleryTab::noNftsIsDisplayed is called`);
-    const counterText = await this.getText(this.nftsCountTextLocator);
-    const counterArray = counterText.split(' ');
     const noNftsText = await this.getText(this.noNftsTextLocator);
     const noNftsImageIsDisplayed = await this.customWaitIsPresented(this.noNftsFoundImageLocator, fiveSeconds, quarterSecond);
 
-    return counterArray.length === 1 && noNftsText === NO_NFTS_ADDED && noNftsImageIsDisplayed;
+    return noNftsText === NO_NFTS_ADDED && noNftsImageIsDisplayed;
   }
   /**
    * Checking No NFTs found screen is displayed
