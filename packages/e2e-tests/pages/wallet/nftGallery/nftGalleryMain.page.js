@@ -109,6 +109,9 @@ export default class NftGalleryTab extends WalletCommonBase {
       counterTitleIsDisplayedPromise,
       searchIsDisplayedPromise,
     ]);
+    this.logger.info(
+      `NftGalleryTab::isDisplayed States: titleState -> ${titleState}, counterState -> ${counterState}, searchState -> ${searchState}`
+    );
 
     return titleState && counterState && searchState;
   }
