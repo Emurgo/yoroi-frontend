@@ -31,7 +31,7 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   nftImageZoomedLocator = {
-    locator: 'nftDetails:zoomed-image-component',
+    locator: 'nftDetails:zoomedImage-image-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -268,7 +268,7 @@ export default class NftDetails extends WalletCommonBase {
    */
   async zoomImage() {
     this.logger.info(`NftDetails::zoomImage is called`);
-    await this.click(this.nftImageBoxLocator);
+    await this.click(this.nftImageLocator);
   }
   /**
    * Getting the zoomed NFT image link
