@@ -91,6 +91,8 @@ export const SwapOrders = (props: Props) => {
   const completedOrders = orders.filter(order => order.status !== 'open');
   const openOrders = orders.filter(order => order.status === 'open');
 
+  console.log('ORDER', { openOrders, completedOrders });
+
   const columnContext = { completedOrders: showCompletedOrders };
   const columnKeys = orderColumns.map(c => resolveValueOrGetter(c.name, columnContext));
   const columnNames = orderColumns.map(c =>
@@ -192,9 +194,9 @@ const tokenName = (token?: Portfolio.Token.Info) => token?.ticker ?? token?.name
 const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, handleCancel }: OrderRowProps) => {
   const strings = useStrings();
   const intl = useIntl();
-  const { ftAssetList } = useSwapRevamp();
-  const tokenOut = ftAssetList[order.tokenOut]; // TODO: using real tokens
-  const tokenIn = ftAssetList[order.tokenIn]; // TODO: using real tokens
+  const { ftAssetList, tokenInfos } = useSwapRevamp();
+  const tokenOut = tokenInfos.get(order.tokenOut);
+  const tokenIn = tokenInfos.get(order.tokenIn);
 
   const amountOut = order.actualAmountOut === 0 ? order.expectedAmountOut : order.actualAmountOut;
   const priceCalc = amountOut === 0 ? 0 : order.amountIn / amountOut;
@@ -213,8 +215,8 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, handleCancel }: O
     <>
       <AssetPair
         sx={{ py: '20px' }}
-        tokenIn={ftAssetList[order.tokenIn]}
-        tokenOut={ftAssetList[order.tokenOut]}
+        tokenIn={tokenInfos.get(order.tokenIn)}
+        tokenOut={tokenInfos.get(order.tokenOut)}
         defaultTokenInfo={defaultTokenInfo}
       />
       <Box textAlign="right">{priceStr}</Box>

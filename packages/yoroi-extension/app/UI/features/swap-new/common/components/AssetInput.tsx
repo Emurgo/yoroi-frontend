@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
+import { Box, Skeleton, Stack, Typography, styled, useTheme } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
@@ -21,7 +21,7 @@ type AssetInputProps = {
 export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
-  const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
+  const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList, loadingTokenList } = useSwapRevamp();
   const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
   const value = tokenInput.value;
 
@@ -105,6 +105,14 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     const value = event.target.value;
     swapForm.action({ type: direction === ASSET_DIRECTION_IN ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
+
+  if (!loadingTokenList) {
+    return (
+      // <SkeletonWrapper atoms={atoms} directions={direction}>
+      <Skeleton width="506px" height="132px" sx={{ borderRadius: direction === ASSET_DIRECTION_OUT ? '-40px' : '0px' }} />
+      // </SkeletonWrapper>
+    );
+  }
 
   return (
     <Wrapper
@@ -222,6 +230,17 @@ const Wrapper = styled(Box, {
     borderWidth: 2,
   },
   marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
+}));
+
+const SkeletonWrapper = styled(Box, {
+  shouldForwardProp: prop => prop !== 'selected' && prop !== 'hasError' && prop !== 'atoms' && prop !== 'direction',
+})<{
+  atoms: any;
+  direction: AssetDirectionType;
+}>(({ direction }: any) => ({
+  borderRadius: 12,
+  height: '100%',
+  // marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
 }));
 
 const Label = styled(Typography)(({ theme }: any) => ({
