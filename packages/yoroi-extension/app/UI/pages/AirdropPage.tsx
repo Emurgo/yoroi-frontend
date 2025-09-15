@@ -11,7 +11,8 @@ import BigNumber from 'bignumber.js';
 import {
   getAllocatedAddresses,
   checkClaimForAddress,
-  claimForAddress,
+  signClaim,
+  makeClaim,
   getClaimMessage,
   scanForOriginalDestAddress,
 } from '../../api/ada/midnight';
@@ -170,13 +171,15 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const claim = async password => {
     const addr = forceNonNull(unclaimedAddrs[0]);
 
+    const claimParams = await signClaim(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+
     let claimResult;
     let allowAbortDelayTimeoutId = setTimeout(() => {
       setAllowAborting(true);
     }, ALLOW_ABORT_DELAY);
 
     try {
-      claimResult = await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+      claimResult = await makeClaim(claimEndpoint, claimParams);
     } finally {
       clearTimeout(allowAbortDelayTimeoutId);
       setAllowAborting(false);
