@@ -65,12 +65,12 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   overviewDescriptionTextLocator = {
-    locator: 'nftDetails:overview-description-text',
+    locator: 'nftDetails:overview:description-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
   overviewAuthorTextLocator = {
-    locator: 'nftDetails:overview-author-text',
+    locator: 'nftDetails:overview:author-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -95,7 +95,7 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   overviewExplorerLinkLocator = {
-    locator: 'nftDetails:overview-explorer-link',
+    locator: 'nftDetails:overview:explorerLink-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
