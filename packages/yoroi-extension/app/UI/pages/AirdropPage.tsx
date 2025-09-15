@@ -26,7 +26,7 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
 import AbortDialog from '../features/airdrop/useCases/AbortDialog';
-import { useYoroiRemoteConfig } from '../common/hooks/useYoroiRemoteConfig.ts';
+import { useYoroiRemoteConfig } from '../common/hooks/useYoroiRemoteConfig';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -214,7 +214,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     content = (
       <ClaimContent
         alloc={formattedAlloc}
-        isTrezor={isTrezor && !config.enableTrezorAirdrop}
+        isTrezor={isTrezor && !forceNonNull(config).enableTrezorAirdrop}
         destAddrBech32={destAddrBech32}
         isClaimDialog={isClaimDialog}
         showClaimDialog={showClaimDialog}
