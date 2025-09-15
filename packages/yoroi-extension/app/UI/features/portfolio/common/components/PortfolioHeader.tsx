@@ -79,7 +79,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
 
     return totalAmount;
-  }, [tokenActivity, config.decimals, ptPrice]);
+  }, [tokenActivity, config.decimals, ptPrice, accountPair, primaryTokenInfo, unitOfAccount]);
 
   const handleCurrencyChange = async () => {
     const pair = {
@@ -124,7 +124,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     };
 
     setFiatPair();
-  }, [totalTokenPrice, walletBalance, showADA, networkId]);
+  }, [totalTokenPrice, walletBalance, showADA, networkId, primaryTokenInfo, unitOfAccount, changeUnitOfAccountPair]);
 
   if (!accountPair) {
     return <LoadingSkeleton />;
