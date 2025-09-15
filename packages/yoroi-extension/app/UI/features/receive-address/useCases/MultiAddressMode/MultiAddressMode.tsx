@@ -1,6 +1,3 @@
-
 export const MultiAddressMode = () => {
-  return (
-    <div>MultiAddressMode</div>
-  )
-}
+  return <div>MultiAddressMode</div>;
+};

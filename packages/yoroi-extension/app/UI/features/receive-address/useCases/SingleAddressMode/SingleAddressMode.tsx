@@ -1,6 +1,3 @@
-
 export const SingleAddressMode = () => {
-  return (
-    <div>SingleAddressMode</div>
-  )
-}
+  return <div>SingleAddressMode</div>;
+};

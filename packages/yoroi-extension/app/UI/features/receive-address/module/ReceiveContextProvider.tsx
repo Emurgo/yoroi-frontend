@@ -19,7 +19,7 @@ export const ReceiveContextProvider = observer(({ children, stores }: ReceiveCon
 
   const selectedWallet = wallets.selected;
 
-  const initialState = { selectedWallet,  };
+  const initialState = { selectedWallet };
 
   const state = React.useMemo(
     () => ({
@@ -43,5 +43,4 @@ export const ReceiveContextProvider = observer(({ children, stores }: ReceiveCon
 });
 
 export const useReceive = () =>
-  React.useContext(ReceiveContext) ??
-  console.log('useReceive: needs to be wrapped in a Receive ContextProvider');
+  React.useContext(ReceiveContext) ?? console.log('useReceive: needs to be wrapped in a Receive ContextProvider');
