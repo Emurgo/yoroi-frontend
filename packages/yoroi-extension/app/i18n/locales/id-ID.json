@@ -436,7 +436,7 @@
   "settings.menu.general.link.label": "Umum",
   "settings.menu.levelOfComplexity.link.label": "Level Kompleksitas",
   "settings.menu.support.link.label": "Dukungan / Log",
-  "settings.menu.termsOfService.link.label": "Ketentuan Perjanjian Layanan",
+  "settings.menu.termsOfService.link.label": "Perjanjian Ketentuan Layanan",
   "settings.menu.termsOfUse.link.label": "Syarat penggunaaan",
   "settings.menu.wallet.link.label": "Wallet",
   "settings.noexternal.dialog.content": "Memo Anda disimpan secara lokal. Memo tersebut tidak akan otomatis disinkronkan dan akan hilang jika Anda menghapus Yoroi",
