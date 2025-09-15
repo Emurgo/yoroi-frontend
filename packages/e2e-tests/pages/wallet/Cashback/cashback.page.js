@@ -8,13 +8,13 @@ import { pageTitle } from '../../../helpers/pageTitles.js';
 class CashbackPage extends WalletCommonBase {
   // Main locators
   claimCashbackButton = {
-    locator: 'button._btn_xnrj2_111._claim_btn_xnrj2_126',
-    method: 'css',
+    locator: '//button[contains(@class, "_claim_btn")]',
+    method: 'xpath',
   };
 
   cashbackCardContainer = {
-    locator: 'div._card_1ix60_1',
-    method: 'css',
+    locator: '//div[starts-with(@class, "_card")]',
+    method: 'xpath',
   };
 
   // Iframe locator
@@ -108,11 +108,13 @@ class CashbackPage extends WalletCommonBase {
     try {
       await this.switchToCashbackIframe();
       const cards = await this.findElements(this.cashbackCardContainer);
-      await this.switchToDefaultContent();
+      this.logger.info(`CashbackPage::getCashbackCardCount Cards amounnt: ${cards.length}`);
       return cards.length;
     } catch (error) {
-      await this.switchToDefaultContent();
+      this.logger.error(`CashbackPage::getCashbackCardCount Error: ${error}`);
       return 0;
+    } finally {
+      await this.switchToDefaultContent();
     }
   }
 }
