@@ -19,7 +19,7 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: 'auto' }}>
+    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: '100%' }}>
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
