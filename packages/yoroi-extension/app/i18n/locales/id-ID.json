@@ -859,7 +859,6 @@
   "wallet.hw.ledger.error.deviceStatus": "Data tidak valid atau ukurannya terlalu besar untuk Ledger.",
   "wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific": "Penandatanganan pesan CIP-8 hanya didukung oleh aplikasi Cardano versi 7.1.0 atau lebih tinggi.",
   "wallet.hw.ledger.data.sign.unsupported.error": "Aplikasi Ledger Cardano tidak mendukung penandatanganan data saat ini",
-  "wallet.hw.trezor.data.sign.unsupported.error": "Trezor tidak mendukung penandatanganan data saat ini",
   "wallet.hw.tx.hash.error": "Hash transaksi tidak cocok antara perangkat dan Yoroi.",
   "wallet.hw.tx.unsupported.error": "Transaksi ini tidak dapat ditandatangani oleh hardware wallet.",
   "wallet.includeKey.explanationLine1": "Apakah Anda ingin menyertakan <strong>public</strong> key wallet Anda dalam eror log?",
