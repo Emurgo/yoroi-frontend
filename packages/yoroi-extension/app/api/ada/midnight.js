@@ -79,14 +79,21 @@ export function getClaimMessage(value: number, destAddrBech32: string): string {
   return 'STAR ' + String(value) + ' to ' + destAddrBech32 + ' ' + TC_HASH;
 }
 
-export async function claimForAddress(
-  claimEndpoint: string,
+type ClaimParams = {|
+  address: string,
+  amount: number,
+  cose_sign1: string,
+  dest_address: string,
+  public_key: string,
+|};
+
+export async function signClaim(
   wallet: WalletState,
   addrClaimData: AddressClaimData,
   destAddrBech32: string,
   password: string, // only for mnemonic wallet
   locale: string // only for Ledger
-): Promise<{| claimId: string |}> {
+): Promise<ClaimParams> {
   const payload = Buffer.from(getClaimMessage(addrClaimData.value, destAddrBech32), 'ascii').toString('hex');
   const network = getNetworkById(wallet.networkId);
   const config = network.BaseConfig[0];
@@ -149,13 +156,16 @@ export async function claimForAddress(
   } else {
     throw new Error('unsupported wallet type');
   }
-  const params = {
+  return {
     address: addressHexToBech32(wallet.stakingAddress),
     amount: addrClaimData.value,
     cose_sign1: signResult.signature,
     dest_address: destAddrBech32,
     public_key: publicKey,
   };
+}
+
+export async function makeClaim(claimEndpoint: string, params: ClaimParams): Promise<{| claimId: string |}> {
   const resp = await fetch(`${claimEndpoint}/claims/cardano`, {
     method: 'POST',
     body: JSON.stringify([params]),
