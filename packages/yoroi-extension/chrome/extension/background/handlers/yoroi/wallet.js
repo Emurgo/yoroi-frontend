@@ -317,6 +317,18 @@ export const PopAddress: HandlerType<
       throw new Error('unexpected missing asDisplayCutoff result');
     }
     await withDisplayCutoff.popAddress();
+    // Get fresh wallet state and emit update directly
+    const freshWalletState = (await getWalletsState(request.publicDeriverId))[0];
+    emitUpdateToSubscriptions({
+      type: 'wallet-state-update',
+      params: {
+        eventType: 'update',
+        publicDeriverId: request.publicDeriverId,
+        isRefreshing: false,
+        walletState: freshWalletState,
+        newTxs: [],
+      }
+    });
   },
 });
 
