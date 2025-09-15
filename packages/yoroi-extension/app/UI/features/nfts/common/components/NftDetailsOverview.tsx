@@ -29,20 +29,24 @@ export default function NftDetailsOverview({ nftInfo, networkUrl }: NftDetailsOv
 
   return (
     <Stack spacing={24}>
-      <LabelWithValue
-        label={strings.description}
-        value={nftInfo.description || '-'}
-        pathId={descriptionPathTestID}
-      />
+      <LabelWithValue label={strings.description} value={nftInfo.description || '-'} pathId={descriptionPathTestID} />
       <LabelWithValue label={strings.author} value={nftInfo.author || '-'} pathId={authorPathTestID} />
       <LabelWithValue
         label={strings.fingerprint}
-        value={<CopyableText value={nftInfo.id} pathTestId={fingerprintPathTestId}>{displayAddrTruncated(nftInfo.id, truncate)}</CopyableText>}
+        value={
+          <CopyableText value={nftInfo.id} pathTestId={fingerprintPathTestId}>
+            {displayAddrTruncated(nftInfo.id, truncate)}
+          </CopyableText>
+        }
         pathId={fingerprintPathTestId}
       />
       <LabelWithValue
         label={strings.policyId}
-        value={<CopyableText value={nftInfo.policyId} pathTestId={policyIdPathTestId}>{displayAddrTruncated(nftInfo.policyId, truncate)}</CopyableText>}
+        value={
+          <CopyableText value={nftInfo.policyId} pathTestId={policyIdPathTestId}>
+            {displayAddrTruncated(nftInfo.policyId, truncate)}
+          </CopyableText>
+        }
         pathId={policyIdPathTestId}
       />
 
