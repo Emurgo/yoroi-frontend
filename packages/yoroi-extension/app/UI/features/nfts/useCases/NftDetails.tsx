@@ -19,7 +19,7 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: '100%' }}>
+    <Box sx={{ overflow: 'hidden', height: '100%' }}>
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
@@ -28,6 +28,8 @@ const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => v
         height="100%"
         contentHeight="550px"
         nftPathId={nftPathId}
+        onClickHandler={onClick}
+        cursor={'zoom-in'}
       />
     </Box>
   );
@@ -132,13 +134,13 @@ export default function NftDetails() {
             overflow: 'auto',
             cursor: 'zoom-out',
           }}
-          onClick={onClose}
         >
           <NftImage
             imageUrl={currentNft?.image}
             name={currentNft?.name || '-'}
             imageSx={{ maxWidth: '100%', maxHeight: '100%' }}
             nftPathId={nftPathId + ':zoomedImage'}
+            onClickHandler={onClose}
           />
         </Box>
       </Modal>
