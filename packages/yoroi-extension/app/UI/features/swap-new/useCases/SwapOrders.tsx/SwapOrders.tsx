@@ -214,9 +214,6 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
   const priceStr = `1 ${tokenName(tokenIn)} = ${price} ${tokenName(tokenOut)}`;
 
   const amountOutStr = `${Number(amountOut.toFixed(tokenOut?.decimals ?? 0))} ${tokenName(tokenOut)}`;
-
-  // const lastTxHash = order.updateTxHash ?? order.txHash ?? '';
-  // const shortenedTxHash = `${truncateString({ value: lastTxHash, maxLength: 22 })}#${order.outputIndex ?? 0}`;
   const totalStr = `${order.amountIn} ${tokenName(tokenIn)}`;
 
   return (
