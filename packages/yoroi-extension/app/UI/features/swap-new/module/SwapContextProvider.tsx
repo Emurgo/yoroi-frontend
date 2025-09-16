@@ -44,7 +44,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
   const { partners, excludedTokens, tokenOutId } = useSwapConfig();
-  console.log('tokenOutId', tokenOutId);
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);

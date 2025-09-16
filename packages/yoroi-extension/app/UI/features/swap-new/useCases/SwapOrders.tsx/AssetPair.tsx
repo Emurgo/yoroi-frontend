@@ -6,10 +6,13 @@ import defaultTokenImage from '../../../../../assets/images/revamp/token-default
 import defaultTokenDarkImage from '../../../../../assets/images/revamp/asset-default-dark.inline.svg';
 import { urlResolveForIpfsAndCorsproxy } from '../../../../../coreUtils';
 import { Portfolio } from '@yoroi/types';
+import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';
+import { normalizeTokenId } from '../../common/helpers';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 
 type Props = {
-  tokenIn?: Portfolio.Token.Info;
-  tokenOut?: Portfolio.Token.Info;
+  tokenInID: Portfolio.Token.Id;
+  tokenOutID: Portfolio.Token.Id;
   sx?: SxProps<Theme>;
   defaultTokenInfo: Portfolio.Token.Info;
 };
@@ -51,23 +54,39 @@ export const tokenImg = (
   );
 };
 
-const AssetPair = ({ tokenIn, tokenOut, defaultTokenInfo, sx = {} }: Props): React.ReactNode => (
-  <Box display="flex" alignItems="center" gap="8px" sx={sx}>
-    <Box display="flex" alignItems="center" gap="8px">
-      {tokenOut ? tokenImg(tokenOut, defaultTokenInfo) : null}
-      <Box fontWeight={500} sx={{ color: 'ds.text_gray_medium' }}>
-        {tokenOut?.ticker ?? '-'}
+const AssetPair = ({ tokenInID, tokenOutID, defaultTokenInfo, sx = {} }: Props): React.ReactNode => {
+  const { tokenInfos } = useSwapRevamp();
+  const tokenIn = tokenInfos.get(tokenInID);
+  const tokenOut = tokenInfos.get(tokenOutID);
+
+  return (
+    <Box display="flex" alignItems="center" gap="8px" sx={sx}>
+      <Box display="flex" alignItems="center" gap="8px">
+        <TokenInfoIcon
+          info={{
+            id: normalizeTokenId(tokenOutID),
+          }}
+          size="md"
+        />
+        <Box fontWeight={500} sx={{ color: 'ds.text_gray_medium' }}>
+          {tokenOut?.ticker ?? defaultTokenInfo.ticker}
+        </Box>
+      </Box>
+
+      <Box>/</Box>
+
+      {/* TO token */}
+      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
+        <TokenInfoIcon
+          info={{
+            id: normalizeTokenId(tokenInID),
+          }}
+          size="md"
+        />
+        <Box fontWeight={500}>{tokenIn?.ticker ?? defaultTokenInfo.ticker}</Box>
       </Box>
     </Box>
-
-    <Box>/</Box>
-
-    {/* TO token */}
-    <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
-      {tokenIn ? tokenImg(tokenIn, defaultTokenInfo) : null}
-      <Box fontWeight={500}>{tokenIn?.ticker ?? '-'}</Box>
-    </Box>
-  </Box>
-);
+  );
+};
 
 export default AssetPair;

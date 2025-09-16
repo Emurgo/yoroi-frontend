@@ -106,12 +106,8 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     swapForm.action({ type: direction === ASSET_DIRECTION_IN ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
 
-  if (!loadingTokenList) {
-    return (
-      // <SkeletonWrapper atoms={atoms} directions={direction}>
-      <Skeleton width="506px" height="132px" sx={{ borderRadius: direction === ASSET_DIRECTION_OUT ? '-40px' : '0px' }} />
-      // </SkeletonWrapper>
-    );
+  if (loadingTokenList) {
+    return <SkeletonWrapper direction={direction} />;
   }
 
   return (
@@ -233,14 +229,15 @@ const Wrapper = styled(Box, {
 }));
 
 const SkeletonWrapper = styled(Box, {
-  shouldForwardProp: prop => prop !== 'selected' && prop !== 'hasError' && prop !== 'atoms' && prop !== 'direction',
+  shouldForwardProp: prop => prop !== 'direction',
 })<{
-  atoms: any;
   direction: AssetDirectionType;
-}>(({ direction }: any) => ({
+}>(({ direction, theme }: any) => ({
   borderRadius: 12,
-  height: '100%',
-  // marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
+  height: '132px',
+  width: '503px',
+  backgroundColor: theme.palette.ds.gray_100,
+  marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
 }));
 
 const Label = styled(Typography)(({ theme }: any) => ({

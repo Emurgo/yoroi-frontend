@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useStrings } from '../../../../../containers/swap/common/useStrings';
+import React, { useState } from 'react';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import Table from '../../../../../components/common/table/Table';
 import { fail, maybe } from '../../../../../coreUtils';
@@ -12,7 +11,8 @@ import { Portfolio, Swap } from '@yoroi/types';
 import AssetPair from './AssetPair';
 import { useIntl } from 'react-intl';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
-import { truncateString } from '@yoroi/common';
+import { useStrings } from '../../common/hooks/useStrings';
+import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
 
 type Column = {
   name: ColumnValueOrGetter;
@@ -70,11 +70,10 @@ export const SwapOrders = (props: Props) => {
       openOrdersOnly: true,
     },
     {
-      name: strings.dex,
+      name: strings.routeLabel,
       align: 'left',
       leftPadding: '32px',
       width: 'auto',
-      openOrdersOnly: true,
     },
     {
       name: ({ completedOrders }) => (completedOrders ? strings.timeExecuted : strings.timeCreated),
@@ -94,17 +93,28 @@ export const SwapOrders = (props: Props) => {
   console.log('ORDER', { openOrders, completedOrders });
 
   const columnContext = { completedOrders: showCompletedOrders };
-  const columnKeys = orderColumns.map(c => resolveValueOrGetter(c.name, columnContext));
-  const columnNames = orderColumns.map(c =>
-    showCompletedOrders && c.openOrdersOnly ? '' : resolveValueOrGetter(c.name, columnContext)
+  const visibleColumns = React.useMemo(
+    () => orderColumns.filter(c => !(showCompletedOrders && c.openOrdersOnly)),
+    [orderColumns, showCompletedOrders]
   );
-  const columnAlignment = orderColumns.map(c => resolveValueOrGetter(c.align ?? '', columnContext));
-  const columnLeftPaddings = orderColumns.map(c => resolveValueOrGetter(c.leftPadding ?? '', columnContext));
-  const gridTemplateColumns = orderColumns.map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext)).join(' ');
+
+  const columnNames = visibleColumns.map(c => resolveValueOrGetter(c.name, columnContext));
+  const columnKeys = visibleColumns.map((c, i) => (typeof c as any).id ?? `${resolveValueOrGetter(c.name, columnContext)}__${i}`);
+  const columnAlignment = visibleColumns.map(c => resolveValueOrGetter(c.align ?? '', columnContext));
+  const columnLeftPaddings = visibleColumns.map(c => resolveValueOrGetter(c.leftPadding ?? '', columnContext));
+  const gridTemplateColumns = visibleColumns.map(c => resolveValueOrGetter(c.width ?? 'auto', columnContext)).join(' ');
 
   const isDisplayOpenOrdersEmpty = !showCompletedOrders && openOrders?.length === 0;
   const isDisplayCompletedOrdersEmpty = showCompletedOrders && completedOrders?.length === 0;
-  const safeColumnNames = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty ? [] : columnNames;
+  const isEmptyView = isDisplayOpenOrdersEmpty || isDisplayCompletedOrdersEmpty;
+
+  const safeColumnNames = isEmptyView ? [] : columnNames;
+  const safeColumnKeys = isEmptyView ? [] : columnKeys;
+  const safeColumnAlignment = isEmptyView ? [] : columnAlignment;
+  const safeColumnLeftPaddings = isEmptyView ? [] : columnLeftPaddings;
+  const safeGridTemplateColumns = isEmptyView ? '' : gridTemplateColumns;
+
+  const columnRightPaddings = isEmptyView ? [] : new Array(visibleColumns.length).fill('0px');
 
   return (
     <>
@@ -126,13 +136,13 @@ export const SwapOrders = (props: Props) => {
           />
         </Box>
         <Table
-          columnKeys={columnKeys}
+          columnKeys={safeColumnKeys}
           columnNames={safeColumnNames}
-          columnAlignment={columnAlignment}
-          columnLeftPaddings={columnLeftPaddings}
-          gridTemplateColumns={gridTemplateColumns}
+          columnAlignment={safeColumnAlignment}
+          columnLeftPaddings={safeColumnLeftPaddings}
+          gridTemplateColumns={safeGridTemplateColumns}
           columnGap="0px"
-          columnRightPaddings={['0px', '0px', '0px', '0px', '0px', '0px', '0px']}
+          columnRightPaddings={columnRightPaddings}
         >
           {showCompletedOrders
             ? completedOrders.map(order => (
@@ -150,6 +160,7 @@ export const SwapOrders = (props: Props) => {
                   defaultTokenInfo={primaryTokenInfo}
                   selectedExplorer={selectedExplorer}
                   handleCancel={async () => console.log('handleCancel')}
+                  openOrdersOnly
                 />
               ))}
         </Table>
@@ -187,14 +198,14 @@ interface OrderRowProps {
   defaultTokenInfo: Portfolio.Token.Info;
   selectedExplorer: any;
   handleCancel?: () => Promise<void>;
+  openOrdersOnly?: boolean;
 }
 
-const tokenName = (token?: Portfolio.Token.Info) => token?.ticker ?? token?.name ?? token?.id ?? '-';
-
-const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, handleCancel }: OrderRowProps) => {
+const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = false, handleCancel }: OrderRowProps) => {
+  const tokenName = (token?: Portfolio.Token.Info) => token?.ticker ?? token?.name ?? token?.id ?? defaultTokenInfo.ticker;
   const strings = useStrings();
   const intl = useIntl();
-  const { ftAssetList, tokenInfos } = useSwapRevamp();
+  const { tokenInfos } = useSwapRevamp();
   const tokenOut = tokenInfos.get(order.tokenOut);
   const tokenIn = tokenInfos.get(order.tokenIn);
 
@@ -207,24 +218,20 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, handleCancel }: O
 
   const amountOutStr = `${Number(amountOut.toFixed(tokenOut?.decimals ?? 0))} ${tokenName(tokenOut)}`;
 
-  const lastTxHash = order.updateTxHash ?? order.txHash ?? '';
-  const shortenedTxHash = `${truncateString({ value: lastTxHash, maxLength: 22 })}#${order.outputIndex ?? 0}`;
+  // const lastTxHash = order.updateTxHash ?? order.txHash ?? '';
+  // const shortenedTxHash = `${truncateString({ value: lastTxHash, maxLength: 22 })}#${order.outputIndex ?? 0}`;
   const totalStr = `${order.amountIn} ${tokenName(tokenIn)}`;
 
   return (
     <>
-      <AssetPair
-        sx={{ py: '20px' }}
-        tokenIn={tokenInfos.get(order.tokenIn)}
-        tokenOut={tokenInfos.get(order.tokenOut)}
-        defaultTokenInfo={defaultTokenInfo}
-      />
+      <AssetPair sx={{ py: '20px' }} defaultTokenInfo={defaultTokenInfo} tokenInID={order.tokenIn} tokenOutID={order.tokenOut} />
       <Box textAlign="right">{priceStr}</Box>
       <Box textAlign="right">{amountOutStr}</Box>
-      <Box textAlign="right">{totalStr} </Box>
+      {openOrdersOnly && <Box textAlign="right">{totalStr} </Box>}
       <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
         {maybe(order.protocol, protocol => (
-          <SwapPoolLabel provider={protocol} />
+          // <SwapPoolLabel provider={protocol} />
+          <ProtocolAvatar protocol={protocol} />
         ))}
       </Box>
       {
