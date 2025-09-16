@@ -859,7 +859,6 @@
   "wallet.hw.ledger.error.deviceStatus": "Ledgerのデータが無効またはサイズオーバーです。",
   "wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific": "CIP-8メッセージの署名は、Cardanoアプリのバージョン7.1.0以上でのみサポートされています。",
   "wallet.hw.ledger.data.sign.unsupported.error": "Ledger Cardanoアプリは現時点ではデータ署名をサポートしていません",
-  "wallet.hw.trezor.data.sign.unsupported.error": "Trezorは現時点ではデータ署名にはサポートしていません",
   "wallet.hw.tx.hash.error": "ヨロイ拡張機能で計算された取引ハッシュと、デバイスで計算された取引ハッシュが一致しません。",
   "wallet.hw.tx.unsupported.error": "この取引をハードウェアウォレットで署名することはサポートされていません。",
   "wallet.includeKey.explanationLine1": "あなたのウォレットの<strong>公開鍵</strong>をエラーログに載せたいですか？",

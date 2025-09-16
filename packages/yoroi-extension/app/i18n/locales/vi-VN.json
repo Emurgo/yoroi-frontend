@@ -859,7 +859,6 @@
   "wallet.hw.ledger.error.deviceStatus": "Invalid or oversized data for Ledger.",
   "wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific": "CIP-8 message signing is only supported by Cardano app version 7.1.0 or above.",
   "wallet.hw.ledger.data.sign.unsupported.error": "The Ledger Cardano app does not support data signing at this memoment",
-  "wallet.hw.trezor.data.sign.unsupported.error": "Ví Trezor không hỗ trợ ký dữ liệu tại thời điểm này",
   "wallet.hw.tx.hash.error": "Giá trị hàm băm giao dịch được tính toán bởi tiện ích mở rộng Yoroi và từ thiết bị không khớp.",
   "wallet.hw.tx.unsupported.error": "Việc ký giao dịch này bằng ví phần cứng không được hỗ trợ.",
   "wallet.includeKey.explanationLine1": "Bạn có muốn bao gồm khóa <strong>công khai</strong> ví của mình trong nhật ký lỗi không?",

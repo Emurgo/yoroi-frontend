@@ -859,7 +859,6 @@
   "wallet.hw.ledger.error.deviceStatus": "Ledger 数据无效或超出范围。",
   "wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific": "CIP-8 消息签名仅支持 Cardano 应用程序 7.1.0 或以上版本。",
   "wallet.hw.ledger.data.sign.unsupported.error": "Ledger Cardano 应用目前暂不支持数据签名功能",
-  "wallet.hw.trezor.data.sign.unsupported.error": "Trezor 目前暂不支持数据签名",
   "wallet.hw.tx.hash.error": "Yoroi 扩展计算的交易哈希值与设备计算的交易哈希值不匹配。",
   "wallet.hw.tx.unsupported.error": "不支持使用硬件钱包签署此交易。",
   "wallet.includeKey.explanationLine1": "你希望在错误日志中附上您的钱包的<strong>公钥</strong>吗？",
