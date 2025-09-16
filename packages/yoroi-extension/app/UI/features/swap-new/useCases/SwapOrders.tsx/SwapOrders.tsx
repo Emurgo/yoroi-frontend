@@ -89,8 +89,6 @@ export const SwapOrders = (props: Props) => {
   const completedOrders = orders.filter(order => order.status !== 'open');
   const openOrders = orders.filter(order => order.status === 'open');
 
-  console.log('ORDER', { openOrders, completedOrders });
-
   const columnContext = { completedOrders: showCompletedOrders };
   const visibleColumns = React.useMemo(
     () => orderColumns.filter(c => !(showCompletedOrders && c.openOrdersOnly)),
