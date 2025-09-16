@@ -111,7 +111,7 @@ export const PortfolioContextProvider = ({
       explorer,
       isTestnet: selectedWallet.isTestnet,
     }),
-    [state, actions, ftAssetList]
+    [state, actions, ftAssetList, networkId, selectedWallet, settingFiatPairUnit]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;
