@@ -38,6 +38,10 @@ export default class WalletCommonBase extends BasePage {
     locator: 'sidebar.settings',
     method: 'id',
   };
+  governanceTabButtonLocator = {
+    locator: 'sidebar.governance',
+    method: 'id',
+  };
   navBarPageTitleLocator = {
     locator: 'topBar-pageTitle-text',
     method: 'id',
@@ -237,6 +241,10 @@ export default class WalletCommonBase extends BasePage {
     await this.scrollIntoView(this.settingTabButtonLocator);
     await this.click(this.settingTabButtonLocator);
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
+  }
+  async goToGovernanceTab() {
+    this.logger.info(`WalletCommonBase::goToGovernanceTab is called`);
+    await this.click(this.governanceTabButtonLocator);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);

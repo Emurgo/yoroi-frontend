@@ -1,22 +1,14 @@
-import { getSwapConfigApiMaker } from '@yoroi/swap';
-import { useQuery } from 'react-query';
+import { useYoroiRemoteConfig } from '../../../../common/hooks/useYoroiRemoteConfig';
 
 export const useSwapConfig = () => {
-  const getSwapConfig = getSwapConfigApiMaker();
-  const query = useQuery({
-    useErrorBoundary: false,
-    queryKey: ['useSwapConfig111'],
-    queryFn: () => getSwapConfig(),
-  });
+  const { data } = useYoroiRemoteConfig();
 
-  const swapConfig = query.data;
-  const partners = swapConfig?.partners;
-  const excludedTokens = swapConfig?.excludedTokens ?? [];
+  const tokenOutId = data?.swap?.initialPair?.tokenOut ?? null;
+  const excludedTokens = data?.swap?.excludedTokens ?? [];
+  const partners = data?.swap?.partners ?? {};
 
   return {
-    ...query,
-    swapConfig,
-    // tokenOutId,
+    tokenOutId,
     excludedTokens,
     partners,
   };

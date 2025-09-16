@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.12.2",
+  "version": "5.13.1",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:main": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev main --env mainnet",
@@ -169,7 +169,7 @@
     "@yoroi/portfolio": "1.0.3",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/staking": "^1.6.0",
-    "@yoroi/swap": "2.1.0",
+    "@yoroi/swap": "6.0.2",
     "@yoroi/types": "2.0.0",
     "assert": "2.1.0",
     "async-await-queue": "2.1.4",
@@ -227,7 +227,7 @@
     "semver": "7.6.0",
     "stream-browserify": "3.0.0",
     "tinycolor2": "1.4.2",
-    "trezor-connect-flow": "Emurgo/trezor-connect-flow#83295582a0ed21c596ab69e2bb8eb54a519a0286",
+    "trezor-connect-flow": "Emurgo/trezor-connect-flow#77286052a184810bcfbcc103fe7a06bc34ec7e42",
     "typescript": "^5.4.5",
     "ua-parser-js": "1.0.37",
     "url": "0.11.3",

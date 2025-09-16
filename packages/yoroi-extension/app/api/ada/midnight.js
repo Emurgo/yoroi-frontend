@@ -8,6 +8,8 @@ import { getNetworkById } from './lib/storage/database/prepackaged/networks';
 import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
+import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
+import { CardanoDerivationType } from 'trezor-connect-flow';
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 
@@ -77,15 +79,25 @@ export function getClaimMessage(value: number, destAddrBech32: string): string {
   return 'STAR ' + String(value) + ' to ' + destAddrBech32 + ' ' + TC_HASH;
 }
 
-export async function claimForAddress(
-  claimEndpoint: string,
+type ClaimParams = {|
+  address: string,
+  amount: number,
+  cose_sign1: string,
+  dest_address: string,
+  public_key: string,
+|};
+
+export async function signClaim(
   wallet: WalletState,
   addrClaimData: AddressClaimData,
   destAddrBech32: string,
   password: string, // only for mnemonic wallet
   locale: string // only for Ledger
-): Promise<{| claimId: string |}> {
+): Promise<ClaimParams> {
   const payload = Buffer.from(getClaimMessage(addrClaimData.value, destAddrBech32), 'ascii').toString('hex');
+  const network = getNetworkById(wallet.networkId);
+  const config = network.BaseConfig[0];
+
   let signResult;
   let publicKey;
   if (wallet.type === 'mnemonic') {
@@ -94,8 +106,6 @@ export async function claimForAddress(
     publicKey = signResult.pubKey;
   } else if (wallet.type === 'ledger') {
     const ledgerConnect = new LedgerConnect({ locale });
-    const network = getNetworkById(wallet.networkId);
-    const config = network.BaseConfig[0];
     const hashPayload = false;
     const { signatureHex, signingPublicKeyHex, addressFieldHex } = await ledgerConnect.signMessage({
       serial: null,
@@ -119,16 +129,43 @@ export async function claimForAddress(
     });
     signResult = await encodeHardwareWalletSignResult(addressFieldHex, signatureHex, payload, signingPublicKeyHex, false);
     publicKey = signingPublicKeyHex;
+  } else if (wallet.type === 'trezor') {
+    const resp = await wrapWithFrame(trezor =>
+      trezor.cardanoSignMessage({
+        path: [...wallet.stakingAddressing.addressing.path],
+        payload,
+        preferHexDisplay: false,
+        derivationType: CardanoDerivationType.ICARUS_TREZOR,
+        protocolMagic: config.ByronNetworkId,
+        networkId: Number(config.ChainNetworkId),
+      })
+    );
+    if (!resp.success) {
+      // todo: handle insufficient firmware version
+      throw new Error(`Trezor signing error: ${resp.payload.error} (code=${String(resp.payload.code)})`);
+    }
+    const {
+      signature,
+      pubKey,
+      headers: {
+        protected: { address },
+      },
+    } = resp.payload;
+    signResult = await encodeHardwareWalletSignResult(address, signature, payload, pubKey, false);
+    publicKey = pubKey;
   } else {
     throw new Error('unsupported wallet type');
   }
-  const params = {
+  return {
     address: addressHexToBech32(wallet.stakingAddress),
     amount: addrClaimData.value,
     cose_sign1: signResult.signature,
     dest_address: destAddrBech32,
     public_key: publicKey,
   };
+}
+
+export async function makeClaim(claimEndpoint: string, params: ClaimParams): Promise<{| claimId: string |}> {
   const resp = await fetch(`${claimEndpoint}/claims/cardano`, {
     method: 'POST',
     body: JSON.stringify([params]),
@@ -150,24 +187,34 @@ export async function claimForAddress(
   return { claimId: respBody[0].claim_id };
 }
 
-type ClaimInfo = {|
-  destAddr: string,
-  claimId: string,
-  amount: number,
-|};
+type ScanResult =
+  | {|
+      success: true,
+      destAddr: string,
+      claimId: string,
+      amount: number,
+    |}
+  | {|
+      success: false,
+      error: string,
+    |};
 export async function scanForOriginalDestAddress(
   claimEndpoint: string,
   unusedAddr: string,
   usedAddrs: Array<string>
-): Promise<ClaimInfo | null> {
+): Promise<ScanResult | null> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
-      return null;
+      return {
+        success: false,
+        error: 'failed to fetch the destination address due to network error',
+      };
     }
     const json = await resp.json();
     if (json.length === 1) {
       return {
+        success: true,
         destAddr: addr,
         claimId: json[0].claim_id,
         amount: json[0].amount,

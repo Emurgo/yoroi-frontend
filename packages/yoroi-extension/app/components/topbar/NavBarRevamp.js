@@ -1,11 +1,11 @@
 // @flow
-import { Box, Typography, IconButton, styled } from '@mui/material';
+import { Box, Typography /*, IconButton, styled*/ } from '@mui/material';
 import { observer } from 'mobx-react';
 import type { Node, ComponentType } from 'react';
 // $FlowIgnore
-import { Icon } from '../../UI/components';
+//import { Icon } from '../../UI/components';
 // $FlowIgnore
-import { useNotifications } from '../../UI/features/notifications/module/NotificationsProvider';
+//import { useNotifications } from '../../UI/features/notifications/module/NotificationsProvider';
 
 type Props = {|
   +children?: ?Node,
@@ -18,6 +18,7 @@ type Props = {|
   +isErrorPage?: boolean,
 |};
 
+/*
 const StyledButton = styled(IconButton)(({ theme }: any) => ({
   '& svg': {
     '& path': {
@@ -25,10 +26,11 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
     },
   },
 }));
+*/
 
 function NavBarRevamp(props: Props) {
   const { title, children, walletDetails, menu, buyButton, pageBanner, isErrorPage } = props;
-  const { setIsNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
+  //const { setIsNotificationCenterOpen, hasUnreadNotifications } = useNotifications();
 
   return (
     <Box
@@ -65,6 +67,7 @@ function NavBarRevamp(props: Props) {
             </Box>
             <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               {children}
+              {/*
               <StyledButton
                 onClick={() => {
                   setIsNotificationCenterOpen(true);
@@ -85,6 +88,7 @@ function NavBarRevamp(props: Props) {
                   />
                 )}
               </StyledButton>
+              */}
               {buyButton && <Box sx={{ marginLeft: '25px' }}>{buyButton}</Box>}
               {walletDetails != null && (
                 <Box sx={{ flex: '0 0 auto', marginLeft: '24px', minWidth: '280px' }}>{walletDetails}</Box>
