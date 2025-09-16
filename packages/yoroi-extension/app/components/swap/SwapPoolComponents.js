@@ -23,7 +23,6 @@ const poolIcons = {
 };
 
 export function SwapPoolIcon({ provider }) {
-  console.log('SwapPoolIcon', { provider, poolIcons, poolIconsooooooooooo: poolIcons[provider] });
   return (
     <Box
       sx={{
@@ -39,7 +38,6 @@ export function SwapPoolIcon({ provider }) {
 }
 
 export function SwapPoolLabel({ provider, isAutoPool = false }: {| +provider: any, +isAutoPool?: boolean |}): React$Node {
-  console.log('SwapPoolLabel', { provider, isAutoPool });
   const strings = useStrings();
   return (
     <Box display="flex" alignItems="center" gap="8px">
