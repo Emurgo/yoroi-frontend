@@ -43,7 +43,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
-  const { partners, excludedTokens } = useSwapConfig();
+  const { partners, excludedTokens, tokenOutId } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
@@ -84,6 +84,12 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     networkId: Chain.Network.Mainnet,
     excludedTokens: excludedTokens,
   });
+
+  useEffect(() => {
+    if (tokenOutId) {
+      action({ type: SwapAction.TokenOutIdChanged, value: tokenOutId });
+    }
+  }, [tokenOutId]);
 
   useEffect(() => {
     action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
@@ -499,7 +505,7 @@ const defaultState: SwapState = Object.freeze({
   },
   tokenOutInput: {
     isTouched: true,
-    tokenId: 'fe7c786ab321f41c654ef6c1af7b3250a613c24e4213e0425a7ae456.55534441',
+    tokenId: undefined,
     disabled: false,
     error: null,
     value: '',
