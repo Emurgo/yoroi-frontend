@@ -181,6 +181,7 @@ export const GovernanceStatusSelection = () => {
   // noinspection JSIncompatibleTypesComparison
   const statusDelegatingToYoroi = governanceStatus.status === 'delegate' && governanceStatus.drep === YOROI_DREP_ID;
   const statusDelegating = governanceStatus.status === 'delegate' && governanceStatus.drep !== YOROI_DREP_ID;
+  const componentPathId = 'governance';
   const optionsList = [
     {
       title: strings.delegateToYoroiDRep,
@@ -204,6 +205,7 @@ export const GovernanceStatusSelection = () => {
               target="_blank"
               rel="noopener"
               lineHeight="22px"
+              id={`${componentPathId}:delegateToYoroiDRep-votingRecord-link`}
             >
               {strings.yoroiVotingRecordLink}
             </Link>
@@ -250,7 +252,8 @@ export const GovernanceStatusSelection = () => {
     },
   ];
 
-  const skeletonsCards = new Array(optionsList.length).fill(null);
+  const skeletonsCards = optionsList.map(option => option.title);
+  const skeletonsBottomCards = bottomList.map(option => option.title);
 
   if (!isParticipatingInGovernance && walletAdaBalance !== null && walletAdaBalance === 0) {
     const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
@@ -290,10 +293,24 @@ export const GovernanceStatusSelection = () => {
 
   return (
     <Container>
-      <Typography variant="h3" fontWeight="500" mb={2} gutterBottom color="ds.text_gray_medium">
+      <Typography
+        variant="h3"
+        fontWeight="500"
+        mb={2}
+        gutterBottom
+        color="ds.text_gray_medium"
+        id={`${componentPathId}-title-text`}
+      >
         {pageTitle}
       </Typography>
-      <Typography variant="body1" mb="24px" gutterBottom color="ds.text_gray_low" whiteSpace="pre-line">
+      <Typography
+        variant="body1"
+        mb="24px"
+        gutterBottom
+        color="ds.text_gray_low"
+        whiteSpace="pre-line"
+        id={`${componentPathId}-status-text`}
+      >
         {isPendindDrepDelegationTx ? strings.statusPending : pageSubtitle}
       </Typography>
       <Stack direction="column" justifyContent="center" gap="16px">
@@ -318,7 +335,7 @@ export const GovernanceStatusSelection = () => {
                 />
               );
             })
-          : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} />)}
+          : skeletonsCards.map((title, index) => <VotingSkeletonCard key={index} title={title} />)}
       </Stack>
       <Stack direction="row" gap="16px" mt="16px">
         {governanceStatus.status !== null
@@ -338,12 +355,12 @@ export const GovernanceStatusSelection = () => {
                 />
               );
             })
-          : skeletonsCards.map((_, index) => <VotingSkeletonCard key={index} smallCard />)}
+          : skeletonsBottomCards.map((title, index) => <VotingSkeletonCard key={index} smallCard title={title} />)}
       </Stack>
 
       <Stack gap="17px" mt="42px">
         {error && <Alert severity="error"> {error}</Alert>}
-        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px">
+        <Link href={LEARN_MORE_LINK} target="_blank" rel="noopener" lineHeight="22px" id={`${componentPathId}-learnMore-link`}>
           {strings.learnMore}
         </Link>
       </Stack>
