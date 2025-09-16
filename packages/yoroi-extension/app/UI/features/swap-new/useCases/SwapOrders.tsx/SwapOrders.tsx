@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import Table from '../../../../../components/common/table/Table';
 import { fail, maybe } from '../../../../../coreUtils';
-import { SwapPoolLabel } from '../../../../../components/swap/SwapPoolComponents';
 import ExplorableHashContainer from '../../../../../containers/widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../../../utils/formatters';
 

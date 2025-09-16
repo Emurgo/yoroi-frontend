@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Skeleton, Stack, Typography, styled, useTheme } from '@mui/material';
+import { Box, Stack, Typography, styled, useTheme } from '@mui/material';
 import { Icons, IconWrapper } from '../../../../components';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { TokenInfoIcon } from '../../../portfolio/common/components/TokenInfoIcon';

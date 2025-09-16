@@ -22,7 +22,7 @@ import { tokenManagers } from '../../portfolio/common/helpers/build-token-manage
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { useGetInputs } from '../common/helpers';
-import { ASSET_DIRECTION_IN, undefinedToken } from '../common/constants';
+import { ASSET_DIRECTION_IN } from '../common/constants';
 import { AssetDirectionType, MarketOrderType } from '../common/types';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
@@ -43,7 +43,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
-  const { partners, excludedTokens, tokenOutId } = useSwapConfig();
+  const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
