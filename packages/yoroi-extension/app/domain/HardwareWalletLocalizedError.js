@@ -12,10 +12,6 @@ const errors: * = defineMessages({
     id: 'wallet.hw.tx.unsupported.error',
     defaultMessage: '!!!Signing this transaction with hardware wallet is not supported.',
   },
-  trezorSignDataUnsupportedError: {
-    id: 'wallet.hw.trezor.data.sign.unsupported.error',
-    defaultMessage: '!!!Trezor does not support data signing at this memoment',
-  },
   unknownAddressError: {
     id: 'wallet.hw.data.sign.unkown.address',
     defaultMessage: '!!!The requested signing address is not found in this wallet',
@@ -25,7 +21,5 @@ const errors: * = defineMessages({
 export const transactionHashMismatchError: LocalizableError = new LocalizableError(errors.transactionHashMismatchError);
 
 export const unsupportedTransactionError: LocalizableError = new LocalizableError(errors.unsupportedTransactionError);
-
-export const trezorSignDataUnsupportedError: LocalizableError = new LocalizableError(errors.trezorSignDataUnsupportedError);
 
 export const unknownAddressError: LocalizableError = new LocalizableError(errors.unknownAddressError);

@@ -91,4 +91,5 @@ export type YoroiRemoteConfig = {
     verifiedTokens: string[];
     partners: Record<string, string>;
   };
+  enableTrezorAirdrop?: boolean;
 };

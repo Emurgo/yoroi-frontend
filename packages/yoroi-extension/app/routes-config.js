@@ -53,10 +53,6 @@ export const ROUTES = {
   CASHBACK: {
     ROOT: '/cashback',
   },
-  NFTS: {
-    ROOT: '/nfts',
-    DETAILS: '/nfts/:nftId',
-  },
   NFT_GALLERY: {
     ROOT: '/nft-gallery',
     DETAILS: '/nft-gallery/:nftId',
