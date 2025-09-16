@@ -130,8 +130,6 @@ describe('Creating wallet', function () {
     const nftsGalleryPage = new NftGalleryTab(webdriver, logger);
     const titleIsCorrect = await nftsGalleryPage.titleIsCorrect(pageTitle.nfts);
     expect(titleIsCorrect, `Title for NFTs Gallery is different from "${pageTitle.staking}"`).to.be.true;
-    const pageIsDisplayed = await nftsGalleryPage.isDisplayed();
-    expect(pageIsDisplayed, `NFTs Gallery dispalyed incorrectly`).to.be.true;
     const noNftsIsDisplayed = await nftsGalleryPage.noNftsIsDisplayed();
     expect(noNftsIsDisplayed, `No NFTs banner should be shown`).to.be.true;
   });

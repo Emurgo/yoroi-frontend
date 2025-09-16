@@ -21,24 +21,33 @@ export default function NftDetailsOverview({ nftInfo, networkUrl }: NftDetailsOv
   if (!nftInfo) return null;
 
   const truncate = below1250 ? 'short' : below1400 ? 'long' : 'none';
+  const descriptionPathTestID = `${nftOverviewPathId}:description`;
+  const authorPathTestID = `${nftOverviewPathId}:author`;
+  const fingerprintPathTestId = `${nftOverviewPathId}:fingerprint`;
+  const policyIdPathTestId = `${nftOverviewPathId}:policyId`;
+  const linkPathTestId = `${nftOverviewPathId}:explorerLink`;
 
   return (
     <Stack spacing={24}>
-      <LabelWithValue
-        label={strings.description}
-        value={nftInfo.description || '-'}
-        pathId={`${nftOverviewPathId}-description-text`}
-      />
-      <LabelWithValue label={strings.author} value={nftInfo.author || '-'} pathId={`${nftOverviewPathId}-author-text`} />
+      <LabelWithValue label={strings.description} value={nftInfo.description || '-'} pathId={descriptionPathTestID} />
+      <LabelWithValue label={strings.author} value={nftInfo.author || '-'} pathId={authorPathTestID} />
       <LabelWithValue
         label={strings.fingerprint}
-        value={<CopyableText value={nftInfo.id}>{displayAddrTruncated(nftInfo.id, truncate)}</CopyableText>}
-        pathId={`${nftOverviewPathId}-fingerprint-component`}
+        value={
+          <CopyableText value={nftInfo.id} pathTestId={fingerprintPathTestId}>
+            {displayAddrTruncated(nftInfo.id, truncate)}
+          </CopyableText>
+        }
+        pathId={fingerprintPathTestId}
       />
       <LabelWithValue
         label={strings.policyId}
-        value={<CopyableText value={nftInfo.policyId}>{displayAddrTruncated(nftInfo.policyId, truncate)}</CopyableText>}
-        pathId={`${nftOverviewPathId}-policyId-component`}
+        value={
+          <CopyableText value={nftInfo.policyId} pathTestId={policyIdPathTestId}>
+            {displayAddrTruncated(nftInfo.policyId, truncate)}
+          </CopyableText>
+        }
+        pathId={policyIdPathTestId}
       />
 
       {networkUrl && (
@@ -54,7 +63,7 @@ export default function NftDetailsOverview({ nftInfo, networkUrl }: NftDetailsOv
               {strings.cardanoScan}
             </Link>
           }
-          pathId={`${nftOverviewPathId}-explorer-link`}
+          pathId={linkPathTestId}
         />
       )}
     </Stack>
@@ -70,7 +79,7 @@ type LabelWithValueProps = {
 function LabelWithValue({ label, value, pathId }: LabelWithValueProps): React.ReactNode {
   return (
     <Box>
-      <Typography component="div" color="ds.el_gray_low">
+      <Typography component="div" color="ds.el_gray_low" id={`${pathId}-label-text`}>
         {label}
       </Typography>
       <Typography
@@ -79,7 +88,7 @@ function LabelWithValue({ label, value, pathId }: LabelWithValueProps): React.Re
         display="flex"
         alignItems="center"
         justifyContent="flex-start"
-        id={pathId}
+        id={`${pathId}-value-component`}
       >
         {value}
       </Typography>
