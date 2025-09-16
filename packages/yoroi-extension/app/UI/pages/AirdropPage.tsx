@@ -11,7 +11,8 @@ import BigNumber from 'bignumber.js';
 import {
   getAllocatedAddresses,
   checkClaimForAddress,
-  claimForAddress,
+  signClaim,
+  makeClaim,
   getClaimMessage,
   scanForOriginalDestAddress,
 } from '../../api/ada/midnight';
@@ -26,6 +27,7 @@ import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
 import AbortDialog from '../features/airdrop/useCases/AbortDialog';
+import { useYoroiRemoteConfig } from '../common/hooks/useYoroiRemoteConfig';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -99,6 +101,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   );
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
 
+  const { data: config } = useYoroiRemoteConfig();
+
   useEffect(() => {
     (async () => {
       const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
@@ -167,13 +171,15 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const claim = async password => {
     const addr = forceNonNull(unclaimedAddrs[0]);
 
+    const claimParams = await signClaim(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+
     let claimResult;
     let allowAbortDelayTimeoutId = setTimeout(() => {
       setAllowAborting(true);
     }, ALLOW_ABORT_DELAY);
 
     try {
-      claimResult = await claimForAddress(claimEndpoint, wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
+      claimResult = await makeClaim(claimEndpoint, claimParams);
     } finally {
       clearTimeout(allowAbortDelayTimeoutId);
       setAllowAborting(false);
@@ -194,7 +200,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   let content;
 
-  if (!alloc) {
+  if (!alloc || (isTrezor && !config)) {
     content = <LoadingSpinner />;
   } else if (alloc.isZero()) {
     content = <Zero />;
@@ -211,7 +217,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     content = (
       <ClaimContent
         alloc={formattedAlloc}
-        isTrezor={isTrezor}
+        isTrezor={isTrezor && !forceNonNull(config).enableTrezorAirdrop}
         destAddrBech32={destAddrBech32}
         isClaimDialog={isClaimDialog}
         showClaimDialog={showClaimDialog}

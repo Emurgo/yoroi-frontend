@@ -11,9 +11,13 @@ const StyledCard: any = styled(Stack)(({ theme, smallCard }: any) => ({
   padding: '16px',
   border: `2px solid ${theme.palette.ds?.primary_100}`,
 }));
-export const VotingSkeletonCard = ({ smallCard }: { smallCard?: boolean }) => {
+export const VotingSkeletonCard = ({ smallCard, title }: { smallCard?: boolean; title: string }) => {
+  const skeletonCardName = title
+    .split(' ')
+    .map((w, index) => (index === 0 ? w.charAt(0).toLowerCase() : w.charAt(0).toUpperCase()) + w.slice(1))
+    .join('');
   return (
-    <StyledCard smallCard={smallCard}>
+    <StyledCard smallCard={smallCard} id={`governance-${skeletonCardName}Skeleton-component`}>
       <Skeleton
         animation="wave"
         variant="rounded"
