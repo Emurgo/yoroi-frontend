@@ -14,6 +14,8 @@ interface NftImageProps {
   contentHeight?: string;
   nftPathId: string;
   imageSx?: SxProps;
+  onClickHandler?: () => void;
+  cursor?: string;
 }
 
 export default function NftImage({
@@ -24,6 +26,8 @@ export default function NftImage({
   width = 'auto',
   height = 'auto',
   imageSx = {},
+  onClickHandler,
+  cursor = 'default',
 }: NftImageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -61,12 +65,14 @@ export default function NftImage({
         height,
         objectFit: 'cover',
         display: 'inline-block',
+        cursor,
         ...imageSx,
       }}
       src={url}
       alt={name}
       loading="lazy"
       id={`${nftPathId}-image-component`}
+      onClick={onClickHandler ? () => onClickHandler() : undefined}
     />
   );
 }
