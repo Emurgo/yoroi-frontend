@@ -43,7 +43,6 @@ import { convertToLocalizableError as convertToLocalizableLedgerError } from '..
 import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
   transactionHashMismatchError,
-  trezorSignDataUnsupportedError,
   unknownAddressError,
   unsupportedTransactionError,
 } from '../../domain/HardwareWalletLocalizedError';
@@ -71,6 +70,7 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi, { findPath } from '../../api/ada';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { CardanoDerivationType } from 'trezor-connect-flow';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -179,9 +179,6 @@ export default class ConnectorStore extends Store<StoresMap> {
           if (response.sign.type === 'tx-reorg/cardano') {
             this.generateReorgTransaction();
             ampli.dappPopupAddCollateralPageViewed();
-          }
-          if (response.sign.type === 'data') {
-            this.checkHwWalletSignData();
           }
         }
       })
@@ -317,6 +314,56 @@ export default class ConnectorStore extends Store<StoresMap> {
           });
           throw error;
         }
+      } else if (wallet.type === 'trezor') {
+        const signingPath = findPath(wallet, signingMessage.sign.address);
+        if (signingPath == null) {
+          runInAction(() => {
+            this.hwWalletError = unknownAddressError;
+            this.isHwWalletErrorRecoverable = false;
+          });
+          return;
+        }
+
+        try {
+          const signResult = await wrapWithFrame(trezor =>
+            trezor.cardanoSignMessage({
+              path: [...signingPath], // convert mobx array to native array
+              payload,
+              preferHexDisplay: false,
+              derivationType: CardanoDerivationType.ICARUS_TREZOR,
+            })
+          );
+          if (!signResult.success) {
+            throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+          }
+          const {
+            signature,
+            pubKey,
+            headers: {
+              protected: { address },
+            },
+          } = signResult.payload;
+
+          userSignConfirm({
+            tx: null,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+            password: '',
+            signedMessageData: {
+              signatureHex: signature,
+              signingPublicKeyHex: pubKey,
+              addressFieldHex: address,
+            },
+          });
+        } catch (error) {
+          //todo: handle insufficient handware version
+          bringWindowToForeground();
+          runInAction(() => {
+            this.hwWalletError = new convertToLocalizableTrezorError(error);
+            this.isHwWalletErrorRecoverable = true;
+          });
+          throw error;
+        }
       } else {
         throw new Error('Not expected to reach here. Unexpectedly wallet type');
       }
@@ -369,9 +416,6 @@ export default class ConnectorStore extends Store<StoresMap> {
       }
       if (this.signingMessage?.sign.type === 'tx-reorg/cardano') {
         this.generateReorgTransaction();
-      }
-      if (this.signingMessage?.sign.type === 'data') {
-        this.checkHwWalletSignData();
       }
     } catch (err) {
       runInAction(() => {
@@ -1129,22 +1173,6 @@ export default class ConnectorStore extends Store<StoresMap> {
     };
 
     return buildSignedLedgerTransaction(rawTxHex, ledgerSignResult.witnesses, publicKeyInfo).txHex;
-  }
-
-  /**
-   * <TODO:LEDGER/SIGN_DATA>
-   */
-  checkHwWalletSignData(): void {
-    const { connectedWallet } = this;
-    if (connectedWallet == null) {
-      return;
-    }
-    if (connectedWallet.type === 'trezor') {
-      runInAction(() => {
-        this.hwWalletError = trezorSignDataUnsupportedError;
-        this.isHwWalletErrorRecoverable = false;
-      });
-    }
   }
 
   // legacy, maybe remove
