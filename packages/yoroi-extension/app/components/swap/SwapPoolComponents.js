@@ -22,7 +22,7 @@ const poolIcons = {
   spectrum: <SpecImage />,
 };
 
-export function SwapPoolIcon({ provider }) {
+export function SwapPoolIcon({ provider }: {| +provider: string |}): React$Node {
   return (
     <Box
       sx={{
