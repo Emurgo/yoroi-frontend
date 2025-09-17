@@ -224,7 +224,6 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
       {openOrdersOnly && <Box textAlign="right">{totalStr} </Box>}
       <Box display="flex" pl="32px" justifyContent="flex-start" alignItems="center" gap="8px">
         {maybe(order.protocol, protocol => (
-          // <SwapPoolLabel provider={protocol} />
           <ProtocolAvatar protocol={protocol} />
         ))}
       </Box>
