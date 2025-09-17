@@ -207,11 +207,9 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
             if (parts.length > 2) {
               clean = parts[0] + '.' + parts[1];
             }
-
             if (parts[1] && parts[1].length > 1) {
               clean = parts[0] + '.' + parts[1].slice(0, 1);
             }
-
             setSelectedSlippage(clean);
           }}
           style={{
