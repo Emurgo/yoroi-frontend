@@ -197,9 +197,14 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
         <input
           ref={inputRef}
           type="text"
+          inputMode="decimal"
           placeholder="0"
           value={selectedSlippage}
-          onChange={e => setSelectedSlippage(e.target.value)}
+          onChange={e => {
+            const raw = e.target.value;
+            const clean = raw.replace(/[^0-9.]/g, '');
+            setSelectedSlippage(clean);
+          }}
           style={{
             border: 'none',
             outline: 'none',

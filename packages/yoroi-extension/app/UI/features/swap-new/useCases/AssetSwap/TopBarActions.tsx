@@ -1,4 +1,4 @@
-import { Stack, useTheme } from '@mui/material';
+import { Box, Stack, useTheme } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
@@ -45,7 +45,9 @@ export const TopBarActions = () => {
 
       <Stack direction="row" alignItems="center" {...atoms.gap_sm}>
         <IconWrapper icon={Icons.Refresh} asButton />
-        <IconWrapper icon={Icons.Settings} asButton onClick={openSettingsModal} />
+        <Box onClick={openSettingsModal}>
+          <IconWrapper icon={Icons.Settings} asButton />
+        </Box>
       </Stack>
     </Stack>
   );
