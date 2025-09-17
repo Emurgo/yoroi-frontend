@@ -1,11 +1,9 @@
-
-
 export type IconProps = React.SVGProps<SVGSVGElement> & {
   size?: number | string;
   title?: string;
 };
 
-export const MinSwap = ({size = 36}: IconProps) => (
+export const MinSwap = ({ size = 36 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 164 164" fill="none">
     <path
       fill="#89AAFF"
@@ -26,4 +24,4 @@ export const MinSwap = ({size = 36}: IconProps) => (
       d="M69.787 116.159l10.856 7.481c.775.591 1.938.591 2.52 0l10.856-7.481c1.356-.985.581-2.757-1.358-2.757H70.95c-1.55 0-2.52 1.772-1.163 2.757"
     />
   </svg>
-)
+);

@@ -1,11 +1,9 @@
-
-
 export type IconProps = React.SVGProps<SVGSVGElement> & {
   size?: number | string;
   title?: string;
 };
 
-export const SpectrumSwap = ({size = 36}: IconProps) => (
+export const SpectrumSwap = ({ size = 36 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 44 41" fill="none">
     <g clipPath="url(#clip0_8294_205086)">
       <path
@@ -823,10 +821,7 @@ export const SpectrumSwap = ({size = 36}: IconProps) => (
         fill="#F4FEFA"
       />
 
-      <path
-        d="M6.90154 27.6545C6.5837 28.039 6.26706 28.039 5.94922 27.6545H6.90154Z"
-        fill="#F9FDF6"
-      />
+      <path d="M6.90154 27.6545C6.5837 28.039 6.26706 28.039 5.94922 27.6545H6.90154Z" fill="#F9FDF6" />
 
       <path
         d="M34.2705 10.9972C34.6407 10.9448 34.799 11.1031 34.7466 11.4734C34.6681 11.5436 34.5883 11.5436 34.5086 11.4734C34.4693 11.4734 34.4288 11.4734 34.3895 11.4734C34.2157 11.3484 34.2872 11.1615 34.2705 10.9972Z"
@@ -1253,10 +1248,7 @@ export const SpectrumSwap = ({size = 36}: IconProps) => (
         fill="#FCFAE6"
       />
 
-      <path
-        d="M15.4697 35.0315H15.9459C15.7876 35.4481 15.6281 35.1172 15.4697 35.0315Z"
-        fill="#F4F9F3"
-      />
+      <path d="M15.4697 35.0315H15.9459C15.7876 35.4481 15.6281 35.1172 15.4697 35.0315Z" fill="#F4F9F3" />
 
       <path
         d="M25.2266 4.80946C25.1873 4.80946 25.148 4.80946 25.1088 4.80946C25.1457 4.57138 25.0111 4.30354 25.2266 4.09521C25.3278 4.19283 25.3635 4.31544 25.3671 4.45234C25.3635 4.58804 25.3385 4.71542 25.2266 4.80827V4.80946Z"
@@ -9791,13 +9783,8 @@ export const SpectrumSwap = ({size = 36}: IconProps) => (
 
     <defs>
       <clipPath id="clip0_8294_205086">
-        <rect
-          width="43.8402"
-          height="40"
-          fill="white"
-          transform="translate(0 0.97998)"
-        />
+        <rect width="43.8402" height="40" fill="white" transform="translate(0 0.97998)" />
       </clipPath>
     </defs>
   </svg>
-)
+);

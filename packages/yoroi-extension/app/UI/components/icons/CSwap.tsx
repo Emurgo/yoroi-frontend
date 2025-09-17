@@ -3,8 +3,7 @@ export type IconProps = React.SVGProps<SVGSVGElement> & {
   title?: string;
 };
 
-
-export const Cswap = ({size = 28}: IconProps) => (
+export const Cswap = ({ size = 28 }: IconProps) => (
   <svg width={size} height={Number(size) * 1.14285714} viewBox="0 0 28 32" fill="none">
     <path d="M14 32l14-8V8l-14 8v16z" fill="url(#paint0_linear_5140_22880)" />
 
@@ -63,4 +62,4 @@ export const Cswap = ({size = 28}: IconProps) => (
       </linearGradient>
     </defs>
   </svg>
-)
+);
