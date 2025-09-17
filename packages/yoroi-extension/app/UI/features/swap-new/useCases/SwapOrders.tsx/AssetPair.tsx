@@ -20,6 +20,18 @@ const AssetPair = ({ tokenInID, tokenOutID, defaultTokenInfo, sx = {} }: Props):
 
   return (
     <Box display="flex" alignItems="center" gap="8px" sx={sx}>
+      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
+        <TokenInfoIcon
+          info={{
+            id: normalizeTokenId(tokenInID),
+          }}
+          size="md"
+        />
+        <Box fontWeight={500}>{tokenIn?.ticker ?? defaultTokenInfo.ticker}</Box>
+      </Box>
+      <Box>/</Box>
+
+      {/* TO token */}
       <Box display="flex" alignItems="center" gap="8px">
         <TokenInfoIcon
           info={{
@@ -30,19 +42,6 @@ const AssetPair = ({ tokenInID, tokenOutID, defaultTokenInfo, sx = {} }: Props):
         <Box fontWeight={500} sx={{ color: 'ds.text_gray_medium' }}>
           {tokenOut?.ticker ?? defaultTokenInfo.ticker}
         </Box>
-      </Box>
-
-      <Box>/</Box>
-
-      {/* TO token */}
-      <Box display="flex" alignItems="center" gap="8px" sx={{ color: 'ds.text_gray_medium' }}>
-        <TokenInfoIcon
-          info={{
-            id: normalizeTokenId(tokenInID),
-          }}
-          size="md"
-        />
-        <Box fontWeight={500}>{tokenIn?.ticker ?? defaultTokenInfo.ticker}</Box>
       </Box>
     </Box>
   );
