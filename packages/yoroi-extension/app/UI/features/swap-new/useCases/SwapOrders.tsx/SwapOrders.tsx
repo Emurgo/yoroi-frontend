@@ -85,8 +85,7 @@ export const SwapOrders = (props: Props) => {
       width: 'auto',
     },
   ];
-
-  const completedOrders = orders.filter(order => order.status !== 'open');
+  const completedOrders = orders.filter(order => order.status === 'matched' && order.status !== 'canceled');
   const openOrders = orders.filter(order => order.status === 'open');
 
   const columnContext = { completedOrders: showCompletedOrders };
@@ -233,8 +232,8 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
         </Box>
       }
       <Box display="flex" justifyContent="space-between" alignItems="center" gap="12px">
-        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.txHash} primary>
-          <Typography variant="body1">{truncateAddressShort(order.txHash)}</Typography>
+        <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.updateTxHash} primary>
+          <Typography variant="body1">{truncateAddressShort(order.updateTxHash)}</Typography>
         </ExplorableHashContainer>
         {maybe(handleCancel, f => (
           <Box>
