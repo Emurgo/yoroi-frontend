@@ -201,8 +201,17 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
           placeholder="0"
           value={selectedSlippage}
           onChange={e => {
-            const raw = e.target.value;
-            const clean = raw.replace(/[^0-9.]/g, '');
+            let raw = e.target.value;
+            let clean = raw.replace(/[^0-9.]/g, '');
+            const parts = clean.split('.');
+            if (parts.length > 2) {
+              clean = parts[0] + '.' + parts[1];
+            }
+
+            if (parts[1] && parts[1].length > 1) {
+              clean = parts[0] + '.' + parts[1].slice(0, 1);
+            }
+
             setSelectedSlippage(clean);
           }}
           style={{
