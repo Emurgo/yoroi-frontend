@@ -8,8 +8,8 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import BasePage from '../pages/basepage.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
-import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import { testWalletNFTsAllNfts } from '../helpers/nftsInfo.js';
+import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
 
 describe('Counting shown NFTs', function () {
   this.timeout(2 * oneMinute);
@@ -26,7 +26,7 @@ describe('Counting shown NFTs', function () {
   });
 
   it('Open NFTs Gallery', async function () {
-    const walletCommonPage = new WalletCommonBase(webdriver, logger);
+    const walletCommonPage = new WalletTab(webdriver, logger);
     await walletCommonPage.goToNftsTab();
     const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const nftsPageIsDisplayed = await nftsMainPage.isDisplayed();

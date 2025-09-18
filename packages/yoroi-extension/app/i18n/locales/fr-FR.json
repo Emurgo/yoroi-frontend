@@ -859,7 +859,6 @@
   "wallet.hw.ledger.error.deviceStatus": "Données invalides ou trop volumineuses pour Ledger.",
   "wallet.hw.ledger.error.deviceVersionNoDataSigningSpecific": "La signature de message CIP-8 est uniquement supporté à partir de la version 7.1.0 de l'application Cardano.",
   "wallet.hw.ledger.data.sign.unsupported.error": "L'application Cardano pour Ledger ne supporte pas la signature de données pour le moment",
-  "wallet.hw.trezor.data.sign.unsupported.error": "Trezor ne supporte la signature de données pour le moment",
   "wallet.hw.tx.hash.error": "Le hash de transaction calculé par l'extension Yoroi et votre appareil ne correspondent pas.",
   "wallet.hw.tx.unsupported.error": "La signature de cette transaction par hardware wallet n'est pas supportée.",
   "wallet.includeKey.explanationLine1": "Voulez-vous inclure la clé <strong>publique</strong> de votre wallet dans les journaux d'erreurs ?",

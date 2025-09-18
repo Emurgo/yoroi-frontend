@@ -31,7 +31,7 @@ export default class PushNotificationStore<
           this.metadata = metadata;
         });
         if (this.metadata?.isEnabled === undefined) {
-          this._enableNotifications();
+          //this._enableNotifications();
         }
       })(),
       'load push notification metadata'

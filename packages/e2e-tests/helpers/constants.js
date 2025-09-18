@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { isMacOS, getRandomItem } from '../utils/utils.js';
+import { getRandomItem } from '../utils/utils.js';
 import * as fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
