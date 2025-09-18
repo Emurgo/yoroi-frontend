@@ -10,7 +10,7 @@ import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRoute
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading } = useSwapRevamp();
+  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading, isLimitOptionsLoading } = useSwapRevamp();
   const { openModal } = useModal();
 
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
@@ -19,7 +19,7 @@ export const EstimateSummary = () => {
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
 
-  if (isEstimateOrderLoading) {
+  if (isEstimateOrderLoading || isLimitOptionsLoading) {
     return (
       <Stack gap={12}>
         {Array.from({ length: 4 }).map((_, index) => (

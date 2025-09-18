@@ -95,7 +95,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
   }, [swapManager.settings.slippage]);
 
-  const { data: limitOptions } = useQuery(
+  const { data: limitOptions, isLoading: isLimitOptionsLoading } = useQuery(
     [
       'useSwapLimitOptions',
       'mainet',
@@ -131,18 +131,10 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
-    if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
-      action({ type: 'ProtocolChanged', value });
-    } else {
-      const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
-      if (state.selectedProtocol.isTouched === true && current === undefined) {
-        action({ type: 'ProtocolChanged', value });
-      }
-    }
+    action({ type: 'ProtocolChanged', value });
 
     const wantedPrice = limitOptions?.wantedPrice;
-    if (wantedPrice !== undefined && wantedPrice > 0 && state.selectedProtocol.value === limitOptions?.defaultProtocol)
-      action({ type: 'WantedPriceInputChanged', value: String(wantedPrice) });
+    action({ type: 'WantedPriceInputChanged', value: String(wantedPrice) });
   }, [
     limitOptions?.defaultProtocol,
     limitOptions?.options,
@@ -176,15 +168,18 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     )
       return;
     setIsEstimateOrderLoading(true);
+
     swapManager.api
       .estimate({
         slippage: state.slippageInput.value,
         tokenIn: state.tokenInInput.tokenId,
         tokenOut: state.tokenOutInput.tokenId,
-        ...(state.lastInputTouched === ASSET_DIRECTION_IN
+        ...(state.lastInputTouched === 'in'
           ? {
               amountIn: Number(state.tokenInInput.value),
-              ...(state.orderType === 'limit' && { wantedPrice: Number(state.wantedPrice) }),
+              ...(state.orderType === 'limit' && {
+                wantedPrice: Number(state.wantedPrice),
+              }),
             }
           : {
               amountOut: Number(state.tokenOutInput.value),
@@ -264,6 +259,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       explorer,
       createOrder: create,
       isCreateOrderLoading,
+      isLimitOptionsLoading,
       isEstimateOrderLoading,
       limitOptions,
       swapManager,
@@ -578,6 +574,7 @@ export type SwapContext = SwapState & {
   loadingTokenList: boolean;
   isCreateOrderLoading: boolean;
   isEstimateOrderLoading: boolean;
+  isLimitOptionsLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
   swapManager: any;
 };
@@ -604,6 +601,7 @@ const SwapContext = createContext<SwapContext>({
   loadingTokenList: false,
   isCreateOrderLoading: false,
   isEstimateOrderLoading: false,
+  isLimitOptionsLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
   swapManager: {},
 });

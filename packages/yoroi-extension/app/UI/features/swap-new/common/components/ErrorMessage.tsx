@@ -2,10 +2,10 @@ import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { Stack, Typography } from '@mui/material';
 
 export const ErrorMessage = () => {
-  const { swapForm } = useSwapRevamp();
+  const { swapForm, isLimitOptionsLoading } = useSwapRevamp();
   const message = swapForm.tokenOutInput.error;
 
-  if (!message) {
+  if (!message || isLimitOptionsLoading) {
     return null;
   }
   return (
