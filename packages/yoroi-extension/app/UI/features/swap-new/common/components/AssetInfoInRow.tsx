@@ -8,6 +8,7 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import TokenInfoModal from './Modals/TokenInfoModal';
 import { AssetDirectionType } from '../types';
 import { ASSET_DIRECTION_IN } from '../constants';
+import { SelectAssetTo } from './Modals/SelectAssetTo';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -59,6 +60,14 @@ export const AssetInfoInRow = React.memo(
         content: <TokenInfoModal token={token} />,
         height: '624px',
         width: '612px',
+        handleBack: () => {
+          openModal({
+            title: `SWAP TO`,
+            content: <SelectAssetTo />,
+            height: '624px',
+            width: '612px',
+          });
+        },
       });
     };
 

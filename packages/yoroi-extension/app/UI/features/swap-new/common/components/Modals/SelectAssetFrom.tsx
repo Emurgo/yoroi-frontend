@@ -108,7 +108,7 @@ export const SelectAssetFrom = () => {
               primaryTokenInfo={primaryTokenInfo}
               token={{
                 decimals: asset.info.numberOfDecimals,
-                name: asset.info.ticker ?? asset.info.name,
+                name: asset.info.name ?? asset.info.ticker,
                 id: asset.info.id,
                 formatedAmount: asset.formatedAmount,
                 quantity: asset.quantity,
