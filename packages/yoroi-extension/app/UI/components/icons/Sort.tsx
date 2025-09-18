@@ -6,7 +6,7 @@ interface Props {
   orderBy: string | null;
   style: any;
   onClick: () => void;
-  pathId?: string,
+  pathId?: string;
   props?: React.SVGProps<SVGSVGElement>;
 }
 
