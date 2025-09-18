@@ -27,28 +27,52 @@ export default class Portfolio extends WalletCommonBase {
   balancePricePerformanceTextLocator = {
     locator: 'portfolio:header:performance-price-text',
     method: 'id',
-  }
+  };
   /** @type {ElementLocator} */
   switchBalanceBtnLocator = {
     locator: 'portfolio:header-switchCurrencies-button',
     method: 'id',
   };
   /** @type {ElementLocator} */
-  serchInputLocator = {
+  searchInputLocator = {
     locator: 'portfolio:header-search-input',
-    method: 'id'
-  }
-  // tokensTable
-  // nameColumnHeader
-  // priceColumnHeader
-  // dayColumnHeader
-  // weekColumnHeader
-  // monthColumnHeader
-  // percentageColumnHeader
-  // totalColumnHeader
+    method: 'id',
+  };
+  /**
+   * Getting a column locator
+   * @param {string} columnIdentificator
+   * @returns {ElementLocator}
+   */
+  getColumnBtnLocator = columnIdentificator => {
+    return {
+      locator: `portfolio:table:header-${columnIdentificator}Column-button`,
+      method: 'id',
+    };
+  };
+  getDescColumnIconLocator = columnIdentificator => {
+    return {
+      locator: `portfolio:table:header:${columnIdentificator}Column-descIcon-component`,
+      method: 'id',
+    };
+  };
+  getAscColumnIconLocator = columnIdentificator => {
+    return {
+      locator: `portfolio:table:header:${columnIdentificator}Column-ascIcon-component`,
+      method: 'id',
+    };
+  };
   // getTokenLocatorByIndex
   // getTokenLocatorByName
-
+  /** @type {ElementLocator} */
+  noResultImageBoxLocator = {
+    locator: 'portfolio-noResultsImage-box',
+    method: 'id',
+  };
+  /** @type {ElementLocator} */
+  noResultsTextLocator = {
+    locator: 'portfolio-noResults-text',
+    method: 'id',
+  };
   // methods
   // isDisplayed
   // search
