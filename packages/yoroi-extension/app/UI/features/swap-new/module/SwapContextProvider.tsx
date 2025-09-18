@@ -174,7 +174,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         slippage: state.slippageInput.value,
         tokenIn: state.tokenInInput.tokenId,
         tokenOut: state.tokenOutInput.tokenId,
-        ...(state.lastInputTouched === 'in'
+        ...(state.lastInputTouched === ASSET_DIRECTION_IN
           ? {
               amountIn: Number(state.tokenInInput.value),
               ...(state.orderType === 'limit' && {
