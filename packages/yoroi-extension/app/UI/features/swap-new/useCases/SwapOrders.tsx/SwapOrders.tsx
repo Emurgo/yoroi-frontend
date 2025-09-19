@@ -5,13 +5,16 @@ import { fail, maybe } from '../../../../../coreUtils';
 import ExplorableHashContainer from '../../../../../containers/widgets/ExplorableHashContainer';
 import { truncateAddressShort } from '../../../../../utils/formatters';
 
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Portfolio, Swap } from '@yoroi/types';
 import AssetPair from './AssetPair';
 import { useIntl } from 'react-intl';
 import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { useStrings } from '../../common/hooks/useStrings';
 import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
+import { LoadingButton } from '@mui/lab';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
+import { TransactionResult } from '../../../transaction-review/common/types';
 
 type Column = {
   name: ColumnValueOrGetter;
@@ -155,36 +158,11 @@ export const SwapOrders = (props: Props) => {
                   order={order}
                   defaultTokenInfo={primaryTokenInfo}
                   selectedExplorer={selectedExplorer}
-                  handleCancel={async () => console.log('handleCancel')}
                   openOrdersOnly
                 />
               ))}
         </Table>
       </Box>
-      {/* {cancellationState && (
-          <CancelSwapOrderDialog
-            order={cancellationState.order}
-            reorgTxData={cancellationState.collateralReorgTx?.txData}
-            isSubmitting={Boolean(cancellationState.isSubmitting)}
-            transactionParams={maybe(cancellationState.tx, tx => ({
-              formattedFee: tx.formattedFee,
-              returnValues: tx.formattedReturn,
-            }))}
-            onReorgConfirm={handleReorgConfirm}
-            onCancelOrder={handleCancelConfirm}
-            onDialogClose={() => setCancellationState(null)}
-            defaultTokenInfo={defaultTokenInfo}
-            getTokenInfo={genLookupOrFail(tokenInfoStore.tokenInfo)}
-            selectedExplorer={selectedExplorer}
-            submissionError={null}
-            walletType={wallet.type}
-            hwWalletError={null}
-          />
-        )} */}
-      {/* {!showCompletedOrders && openOrdersLoading && <LoadingOpenOrders columnLeftPaddings={columnLeftPaddings} />}
-        {showCompletedOrders && completedOrdersLoading && <LoadingCompletedOrders columnLeftPaddings={columnLeftPaddings} />}
-        {!openOrdersLoading && isDisplayOpenOrdersEmpty && <NoOpenOrders />}
-        {!completedOrdersLoading && isDisplayCompletedOrdersEmpty && <NoCompleteOrders />} */}
     </>
   );
 };
@@ -193,13 +171,11 @@ interface OrderRowProps {
   order: Swap.Order;
   defaultTokenInfo: Portfolio.Token.Info;
   selectedExplorer: any;
-  handleCancel?: () => Promise<void>;
   openOrdersOnly?: boolean;
 }
 
-const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = false, handleCancel }: OrderRowProps) => {
+const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = false }: OrderRowProps) => {
   const tokenName = (token?: Portfolio.Token.Info) => token?.ticker ?? token?.name ?? token?.id ?? defaultTokenInfo.ticker;
-  const strings = useStrings();
   const intl = useIntl();
   const { tokenInfos } = useSwapRevamp();
   const tokenOut = tokenInfos.get(order.tokenOut);
@@ -211,7 +187,6 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
   const price = roundedPrice !== '0' ? roundedPrice : priceCalc.toFixed(6);
 
   const priceStr = `1 ${tokenName(tokenIn)} = ${price} ${tokenName(tokenOut)}`;
-
   const amountOutStr = `${Number(amountOut.toFixed(tokenOut?.decimals ?? 0))} ${tokenName(tokenOut)}`;
   const totalStr = `${order.amountIn} ${tokenName(tokenIn)}`;
 
@@ -235,12 +210,64 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
         <ExplorableHashContainer selectedExplorer={selectedExplorer} linkType="transaction" hash={order.updateTxHash} primary>
           <Typography variant="body1">{truncateAddressShort(order.updateTxHash)}</Typography>
         </ExplorableHashContainer>
-        {maybe(handleCancel, f => (
-          <Box>
-            <Button onClick={f}>{strings.cancel}</Button>
-          </Box>
-        ))}
+        {openOrdersOnly && <OrderCancelation order={order} />}
       </Box>
     </>
+  );
+};
+
+const OrderCancelation = ({ order }: { order: Swap.Order }) => {
+  const [loading, setIsLoading] = useState(false);
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
+  const strings = useStrings();
+  const { swapManager, stores } = useSwapRevamp();
+  const wallet = stores.wallets.selectedOrFail;
+  const handleCancel = async order => {
+    setIsLoading(true);
+    const response = await swapManager.api.cancel({ order });
+    setIsLoading(false);
+    if (response.value.data.cbor !== undefined) {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: passswordInput => {
+          handleSubmitTransaction(passswordInput, response.value.data.cbor);
+        },
+        cborTx: response.value.data.cbor,
+      });
+    }
+  };
+
+  const handleSubmitTransaction = async (passswordInput, cancelTxCbor) => {
+    try {
+      startLoadingTxReview();
+      try {
+        const { signedTxHex: signedCancelTx } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+          wallet,
+          transactionHex: cancelTxCbor,
+          password: passswordInput,
+        });
+        const signedTransactionHexes: any = signedCancelTx != null ? [signedCancelTx, signedCancelTx] : [signedCancelTx];
+        await stores.substores.ada.swapStore.executeTransactionHexes({
+          wallet,
+          signedTransactionHexes,
+        });
+        showTxResultModal(TransactionResult.SUCCESS);
+      } catch (error) {
+        console.warn('Failed to submit transaction', error);
+        showTxResultModal(TransactionResult.FAIL);
+      } finally {
+        closeTxReviewModal();
+      }
+    } catch (error) {
+      console.warn('Failed to sign transaction', error);
+      showTxResultModal(TransactionResult.FAIL);
+    }
+  };
+  return (
+    <Box>
+      <LoadingButton loading={loading} onClick={() => handleCancel(order)}>
+        {strings.cancel}
+      </LoadingButton>
+    </Box>
   );
 };
