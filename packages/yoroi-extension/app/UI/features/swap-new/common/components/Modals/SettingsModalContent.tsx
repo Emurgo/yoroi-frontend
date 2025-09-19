@@ -210,6 +210,8 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
             if (parts[1] && parts[1].length > 1) {
               clean = parts[0] + '.' + parts[1].slice(0, 1);
             }
+            if (clean !== '' && Number(clean) > 75) return;
+
             setSelectedSlippage(clean);
           }}
           style={{
