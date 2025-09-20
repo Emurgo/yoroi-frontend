@@ -137,8 +137,10 @@ export const TokenPriceChangeChip = ({
 export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stores, pathId }) => {
   const theme = useTheme();
   const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
-  const mainFiatFullPathId = `${pathId}-totalMainFiat-text`;
-  const secondFiatFullPathId = `${pathId}-totalSecondFiat-text`;
+  const mainFiatFullPathId = `${pathId}-totalMain-text`;
+  const secondFiatFullPathId = `${pathId}-totalSecond-text`;
+  const mainCurrencyValueFullPathId = `${pathId}-totalMainCurrencyValue-text`;
+  const mainCurrencyFiatFullPathId = `${pathId}-totalMainCurrencyFiat-text`;
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
@@ -195,11 +197,13 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
   return (
     <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
       <Stack direction="column">
-        <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }} id={mainFiatFullPathId}>
+        <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
-            <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+            <Typography mr="4px" id={mainCurrencyValueFullPathId}>
+              {isPrimary ? walletBalance?.ada : token.formatedAmount}
+            </Typography>
           </HiddenAmount>
-          <Typography>{token.info.name}</Typography>
+          <Typography id={mainCurrencyFiatFullPathId}>{token.info.name}</Typography>
         </Typography>
         {token.info.name === accountPair?.from.name ? (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
