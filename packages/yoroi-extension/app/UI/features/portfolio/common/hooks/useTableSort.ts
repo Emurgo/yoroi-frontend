@@ -25,7 +25,7 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
   };
 
   const compareValues = (a: any, b: any, sortType: TableSortType, sortOrder: 'asc' | 'desc', sortKey: string): number => {
-    const isInvalid = (val: any) => isNaN(Number(val)) || Number(val) === 0;
+    const isInvalid = (val: any) => isNaN(Number(val));
 
     if (['price', 'portfolio', 'totalAmount', '24h', '1W', '1M'].includes(sortKey)) {
       const aInvalid = isInvalid(a[sortKey]);
