@@ -30,6 +30,7 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
   const strings = useStrings();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const { isTestnet } = usePortfolio();
+  const pathId = 'portfolio:tokenDetails'
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -37,10 +38,10 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
         <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
         <Stack direction="row" spacing={theme.spacing(16)}>
           {isTestnet ? null : (
-            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} />
+            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} pathId={pathId} />
           )}
-          <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} />
-          <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} />
+          <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} pathId={pathId} />
+          <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} pathId={pathId} />
         </Stack>
       </Header>
 
