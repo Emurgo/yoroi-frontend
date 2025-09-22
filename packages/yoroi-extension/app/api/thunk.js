@@ -89,6 +89,15 @@ declare var chrome;
 
 // UI -> background queries:
 
+const OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER = 'OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER';
+
+type LongMessageReceiverInfo = {|
+  chunks: Array<string>,
+  resolve: Object => void,
+  receivedChunkCount: number,
+|};
+const longMessageReceiverMap = new Map<string, LongMessageReceiverInfo>();
+
 export function callBackground<R>(message: {| type: string, request?: Object |}): Promise<R> {
   return new Promise((resolve, reject) => {
     const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
@@ -102,7 +111,21 @@ export function callBackground<R>(message: {| type: string, request?: Object |})
         );
         return;
       }
-      resolve(response);
+      if (response?.type === OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER) {
+        const receiverInfo = longMessageReceiverMap.get(response.messageId);
+        if (receiverInfo) {
+          receiverInfo.resolve = resolve;
+          // theoretically there is the possibility that all chunks have been received but it's unlikely to happen
+        } else {
+          longMessageReceiverMap.set(response.messageId, {
+            resolve,
+            chunks: [],
+            receivedChunkCount: 0,
+          });
+        }
+      } else {
+        resolve(response);
+      }
     });
   });
 }
@@ -393,9 +416,29 @@ const callbacks = Object.freeze({
 });
 const APP_ORIGIN = window.location.origin || null;
 const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
+const LONG_RESPONSE_MESSAGE_TYPE = 'long-response';
 chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
   if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
     Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + ')');
+    return;
+  }
+  if (rawMessage.type === LONG_RESPONSE_MESSAGE_TYPE) {
+    let receiverInfo = longMessageReceiverMap.get(rawMessage.id);
+    if (!receiverInfo) {
+      receiverInfo = {
+        resolve: () => {},
+        chunks: [],
+        receivedChunkCount: 0,
+      }
+    }
+    receiverInfo.chunks[rawMessage.chunkIndex] = rawMessage.chunk;
+    receiverInfo.receivedChunkCount += 1;
+    if (receiverInfo.receivedChunkCount === rawMessage.chunkCount) {
+      const message = receiverInfo.chunks.join('');
+      const messageObj = JSON.parse(message);
+      receiverInfo.resolve(messageObj);
+      longMessageReceiverMap.delete(rawMessage.id);
+    }
     return;
   }
   if (rawMessage.type !== EXPECTED_MESSAGE_TYPE) {
