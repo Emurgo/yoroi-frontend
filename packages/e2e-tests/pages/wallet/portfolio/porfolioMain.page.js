@@ -227,9 +227,9 @@ export default class PortfolioTab extends WalletCommonBase {
   }
 
   /**
-   * Getting token info from the row
-   * @param {number} rowIndex 
-   * @returns 
+   * Getting token info from the table
+   * @param {number} rowIndex
+   * @returns
    */
   async getTokenInfoByIndex(rowIndex) {
     // Possible place for improvement
@@ -279,5 +279,68 @@ export default class PortfolioTab extends WalletCommonBase {
       secondTotalValue,
       secondTotalFiat,
     };
+  }
+
+  /**
+   * Collect values from the pointed column
+   * @param {string} columnName - The column name
+   * @returns {Promise<Array>} The array of values
+   */
+  async getColumnValues(columnName) {
+    this.logger.info(`PortfolioTab::getColumnValues is called. Column name: "${columnName}"`);
+
+    const columnValues = [];
+    const tokenCount = await this.countTokens();
+
+    for (let rowIndex = 0; rowIndex < tokenCount; rowIndex++) {
+      try {
+        let value = null;
+
+        switch (columnName) {
+          case Columns.Name:
+            value = await this.getText(this.getTokenNameLocator(rowIndex));
+            break;
+
+          case Columns.Price:
+            const priceText = await this.getText(this.getTokenPriceLocator(rowIndex));
+            value = priceText === '-' ? null : strNumberToNumber(priceText.split(' ')[0]);
+            break;
+
+          case Columns.Day:
+            value = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
+            break;
+
+          case Columns.Week:
+            value = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
+            break;
+
+          case Columns.Month:
+            value = await this._getChangeValue(this.getTokenMonthChangesLocator(rowIndex));
+            break;
+
+          case Columns.Percentage:
+            const percentageText = await this.getText(this.getTokenPercentageLocator(rowIndex));
+            value = strNumberToNumber(percentageText);
+            break;
+
+          case Columns.Total:
+            const totalText = await this.getText(this.getTokenTotalMainCurrencyValueLocator(rowIndex));
+            value = strNumberToNumber(totalText);
+            break;
+
+          default:
+            this.logger.warn(`PortfolioTab::getColumnValues: Unknown column name: "${columnName}"`);
+            return [];
+        }
+
+        columnValues.push(value);
+      } catch (error) {
+        this.logger.error(`PortfolioTab::getColumnValues: Error getting value for row ${rowIndex}: ${error.message}`);
+        columnValues.push(null);
+      }
+    }
+
+    this.logger.info(`PortfolioTab::getColumnValues: Collected ${columnValues.length} values`);
+    return columnValues;
   }
 }
