@@ -49,7 +49,11 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
   } = usePortfolioTokenActivity();
 
   const getClosePrice = (): number | null => {
+    if(tokenInfo?.info?.id){
     if (data24h && data24h[tokenInfo.info.id] && data24h && data24h[tokenInfo.info.id].length > 1) {
+    ...
+    }
+ }
       const priceData = data24h[tokenInfo.info.id][1].price;
       if (priceData) {
         return priceData.close;
