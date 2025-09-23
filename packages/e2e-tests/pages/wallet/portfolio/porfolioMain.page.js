@@ -1,8 +1,8 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
-import { Colors } from '../../../helpers/constants.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
+import { getChangeValue } from '../../../helpers/portfolioHelper.js';
 import { quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 
 export default class PortfolioTab extends WalletCommonBase {
@@ -212,20 +212,6 @@ export default class PortfolioTab extends WalletCommonBase {
     await this.click(columnHeaderLocator);
   }
 
-  async _defineSign(priceChangeLocator) {
-    const color = await this.getCssValue(priceChangeLocator, 'color');
-    return color === Colors.portfolioNegative ? '-' : '';
-  }
-
-  async _getChangeValue(priceLocator) {
-    const priceChangeText = await this.getText(priceLocator);
-    if (priceChangeText === '-') {
-      return null;
-    }
-    const priceChangeSign = await this._defineSign(priceLocator);
-    return strNumberToNumber(`${priceChangeSign}${priceChangeText}`);
-  }
-
   /**
    * Getting token info from the table
    * @param {number} rowIndex
@@ -240,9 +226,9 @@ export default class PortfolioTab extends WalletCommonBase {
     const [priceValue, priceFiat] = priceText.split(' ');
     const price = priceText === '-' ? null : strNumberToNumber(priceValue);
 
-    const priceChangeDay = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
-    const priceChangeWeek = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
-    const priceChangeMonth = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
+    const priceChangeDay = await getChangeValue(this, this.getTokenDayChangesLocator(rowIndex));
+    const priceChangeWeek = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
+    const priceChangeMonth = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
 
     const percentageText = await this.getText(this.getTokenPercentageLocator(rowIndex));
     const percentage = strNumberToNumber(percentageText);
@@ -307,15 +293,15 @@ export default class PortfolioTab extends WalletCommonBase {
             break;
 
           case Columns.Day:
-            value = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
+            value = await getChangeValue(this, this.getTokenDayChangesLocator(rowIndex));
             break;
 
           case Columns.Week:
-            value = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
+            value = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
             break;
 
           case Columns.Month:
-            value = await this._getChangeValue(this.getTokenMonthChangesLocator(rowIndex));
+            value = await getChangeValue(this, this.getTokenMonthChangesLocator(rowIndex));
             break;
 
           case Columns.Percentage:
