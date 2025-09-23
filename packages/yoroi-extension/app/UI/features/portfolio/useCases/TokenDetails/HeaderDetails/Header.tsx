@@ -49,7 +49,7 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
   } = usePortfolioTokenActivity();
 
   const getClosePrice = (): number | null => {
-    if (data24h && data24h[tokenInfo.info.id] && data24h && data24h[tokenInfo.info.id].length > 1) {
+    if (tokenInfo?.info?.id && data24h && data24h[tokenInfo.info.id] && data24h && data24h[tokenInfo.info.id].length > 1) {
       const priceData = data24h[tokenInfo.info.id][1].price;
       if (priceData) {
         return priceData.close;
@@ -61,11 +61,12 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
   const totaPriceCalc = React.useMemo(() => {
     if (!isPrimaryToken && !isEmpty(data24h)) {
       const tokenPrice = getClosePrice();
-      if (tokenPrice === null && !isPrimaryToken) {
+      if (tokenPrice === null || !tokenInfo?.quantity || !tokenInfo?.info?.numberOfDecimals) {
         return '-';
       }
+
       const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
-      const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
+      const tokenDecimals = tokenInfo.info.numberOfDecimals;
 
       return atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
         .bn.times(tokenPrice ?? 1)
