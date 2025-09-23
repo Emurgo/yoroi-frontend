@@ -17,13 +17,15 @@ import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
 interface Props {
   tokenInfo: TokenInfoType;
   stores: any;
+  pathId?: string;
 }
 
-const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode => {
+const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
+  const parentPathId = pathId || '';
 
   // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
   const { wallets, delegation } = stores;
@@ -77,7 +79,12 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
 
       <Stack direction="column" spacing={theme.spacing(4)}>
         <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
-          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
+          <Typography
+            variant="h2"
+            fontWeight="500"
+            color="ds.text_gray_medium"
+            id={`${parentPathId}:tokenBalance:main-value-text`}
+          >
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
           <Typography
@@ -87,12 +94,13 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
             sx={{
               paddingTop: `${theme.spacing(18)}`,
             }}
+            id={`${parentPathId}:tokenBalance:main-fiat-text`}
           >
             {tokenInfo.info.name}
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600">
+        <Typography color="ds.gray_600" id={`${parentPathId}:tokenBalance-second-text`}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
           <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>

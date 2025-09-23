@@ -52,10 +52,12 @@ const StyledButton = styled(Button)(({ theme, disabled, variant }: { theme: any;
 
 interface Props {
   tokenInfo: TokenInfoType;
+  pathId?: string;
 }
 
-export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
+export const TokenChartInterval = ({ tokenInfo, pathId }: Props): React.ReactNode => {
   const isPrimaryToken: boolean = tokenInfo.id === '-';
+  const marketPathId = `${pathId || ''}:marketPrice`;
 
   const chartHeight = isPrimaryToken ? 153 : 257;
   const theme: any = useTheme();
@@ -86,6 +88,7 @@ export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
         detailInfo={detailInfo}
         isLoading={isFetching || !data || chartData === undefined}
         tokenInfo={tokenInfo}
+        pathId={marketPathId}
       />
     );
   }
@@ -102,9 +105,10 @@ export const TokenChartInterval = ({ tokenInfo }: Props): React.ReactNode => {
         isLoading={isFetching || !data || chartData === undefined}
         tokenInfo={tokenInfo}
         isDragging={isDragging}
+        pathId={marketPathId}
       />
 
-      <Box sx={{ userSelect: 'none', width: '100%' }}>
+      <Box sx={{ userSelect: 'none', width: '100%' }} id={`${marketPathId}-graph-box`}>
         {isFetching ? (
           <GraphSkeleton />
         ) : (

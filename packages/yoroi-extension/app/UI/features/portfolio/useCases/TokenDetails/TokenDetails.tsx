@@ -30,27 +30,37 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
   const strings = useStrings();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const { isTestnet } = usePortfolio();
-  const pathId = 'portfolio:tokenDetails'
+  const pathId = 'portfolio:tokenDetails';
 
   return (
     <Box sx={{ width: '100%' }}>
       <Header>
-        <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} />
+        <BackButton label={strings.backToPortfolio} onAction={() => navigateTo.portfolio()} pathId={pathId} />
         <Stack direction="row" spacing={theme.spacing(16)}>
           {isTestnet ? null : (
-            <NavigationButton variant="primary" onClick={() => navigateTo.swapPage(tokenInfo.info.id)} label={strings.swap} pathId={pathId} />
+            <NavigationButton
+              variant="primary"
+              onClick={() => navigateTo.swapPage(tokenInfo.info.id)}
+              label={strings.swap}
+              pathId={pathId}
+            />
           )}
           <NavigationButton variant="secondary" onClick={() => navigateTo.sendPage()} label={strings.send} pathId={pathId} />
-          <NavigationButton variant="secondary" onClick={() => navigateTo.receivePage()} label={strings.receive} pathId={pathId} />
+          <NavigationButton
+            variant="secondary"
+            onClick={() => navigateTo.receivePage()}
+            label={strings.receive}
+            pathId={pathId}
+          />
         </Stack>
       </Header>
 
       <Stack direction="column" spacing={theme.spacing(24)} sx={{ marginTop: theme.spacing(16) }}>
         <TokenInfo direction={isPrimaryToken ? 'row' : 'column'} spacing={theme.spacing(24)}>
           <Card>
-            <HeaderSection tokenInfo={tokenInfo} stores={stores} />
+            <HeaderSection tokenInfo={tokenInfo} stores={stores} pathId={pathId} />
             <Divider />
-            <TokenChartInterval tokenInfo={tokenInfo} />
+            <TokenChartInterval tokenInfo={tokenInfo} pathId={pathId} />
           </Card>
 
           <OverviewPerformance tokenInfo={tokenInfo} />
