@@ -417,6 +417,15 @@ const callbacks = Object.freeze({
 const APP_ORIGIN = window.location.origin || null;
 const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
 const LONG_RESPONSE_MESSAGE_TYPE = 'long-response';
+/*
+  Two types of messages are received here:
+  1. Oversized response message of RPC call to background initiated by callBackground().
+  These are sent by chrome/extension/background/handlers/yoroi/index.js
+  2. State updates initiated from the background, via emitUpdateToSubscriptions() in
+  chrome/extension/background/subscriptionManager.js. They might also be chunked.
+*/
+const longNotificationMap = new Map<string, {| chunks: Array<string>, receivedChunkCount: number |}>();
+
 chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
   if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
     Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + ')');
@@ -429,7 +438,7 @@ chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => 
         resolve: () => {},
         chunks: [],
         receivedChunkCount: 0,
-      }
+      };
     }
     receiverInfo.chunks[rawMessage.chunkIndex] = rawMessage.chunk;
     receiverInfo.receivedChunkCount += 1;
@@ -445,7 +454,29 @@ chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => 
     Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + ')');
     return;
   }
-  const serializedMessage = rawMessage.data;
+  let serializedMessage;
+  if (
+    rawMessage.id &&
+    rawMessage.chunk &&
+    typeof rawMessage.chunkIndex === 'number' &&
+    typeof rawMessage.chunkCount === 'number'
+  ) {
+    let longNotificationEntry = longNotificationMap.get(rawMessage.id);
+    if (!longNotificationEntry) {
+      longNotificationEntry = { chunks: [], receivedChunkCount: 0 };
+      longNotificationMap.set(rawMessage.id, longNotificationEntry);
+    }
+    longNotificationEntry.chunks[rawMessage.chunkIndex] = rawMessage.chunk;
+    longNotificationEntry.receivedChunkCount += 1;
+    if (longNotificationEntry.receivedChunkCount === rawMessage.chunkCount) {
+      serializedMessage = longNotificationEntry.chunks.join('');
+      longNotificationMap.delete(rawMessage.id);
+    } else {
+      return;
+    }
+  } else {
+    serializedMessage = rawMessage.data;
+  }
   const messageType = typeof serializedMessage;
   if (messageType !== 'string') {
     Logger.error(
