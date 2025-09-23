@@ -30,8 +30,16 @@ export default class WalletCommonBase extends BasePage {
     locator: 'connector.appNameShort',
     method: 'id',
   };
+  cashbackTabButtonLocator = {
+    locator: 'sidebar.cashback',
+    method: 'id',
+  };
   settingTabButtonLocator = {
     locator: 'sidebar.settings',
+    method: 'id',
+  };
+  governanceTabButtonLocator = {
+    locator: 'sidebar.governance',
     method: 'id',
   };
   navBarPageTitleLocator = {
@@ -223,11 +231,20 @@ export default class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::goToConnectorTab is called`);
     await this.click(this.connectorTabButtonLocator);
   }
+  async goToCashbackTab() {
+    this.logger.info(`WalletCommonBase::goToCashbackTab is called`);
+    await this.click(this.cashbackTabButtonLocator);
+  }
   async goToSettingsTab() {
     this.logger.info(`WalletCommonBase::goToSettingsTab is called`);
     await this.setImplicitTimeout(oneSecond, this.goToSettingsTab.name);
+    await this.scrollIntoView(this.settingTabButtonLocator);
     await this.click(this.settingTabButtonLocator);
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
+  }
+  async goToGovernanceTab() {
+    this.logger.info(`WalletCommonBase::goToGovernanceTab is called`);
+    await this.click(this.governanceTabButtonLocator);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);

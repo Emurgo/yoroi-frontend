@@ -84,6 +84,12 @@ export const GovernanceVoteingCard = ({
 }: Props) => {
   const [hover, onHover] = React.useState(false);
   if (isVisible === false) return <></>;
+  const commonId = 'governance';
+  const buttonName = title
+    .split(' ')
+    .map((w, index) => (index === 0 ? w.charAt(0).toLowerCase() : w.charAt(0).toUpperCase()) + w.slice(1))
+    .join('');
+  const btnComponentId = `${commonId}-${buttonName}-button`;
   return (
     <div onMouseOver={() => onHover(true)} onMouseLeave={() => onHover(false)}>
       <StyledCard
@@ -92,6 +98,7 @@ export const GovernanceVoteingCard = ({
         selected={selected}
         blocked={blocked}
         smallCard={smallCard}
+        id={btnComponentId}
       >
         {loading && (
           <SpinnerBox>
@@ -100,7 +107,7 @@ export const GovernanceVoteingCard = ({
         )}
         <Stack direction="column" px="16px">
           <IconContainer>{icon}</IconContainer>
-          <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px">
+          <Typography variant="h3" fontSize="18px" fontWeight="500" mt="8px" id={`${commonId}:${buttonName}-title-text`}>
             {hover && titleHover ? titleHover : title}
           </Typography>
           <Description
@@ -108,12 +115,18 @@ export const GovernanceVoteingCard = ({
             color="ds.gray_800"
             whiteSpace="pre-line"
             style={{ wordWrap: 'break-word', maxWidth: '580px' }}
+            id={`${commonId}:${buttonName}-description-text`}
           >
             {descriptionHover && hover ? descriptionHover : description}
           </Description>
         </Stack>
         {extraInfo && (
-          <Typography variant="body2" fontWeight="500" color="ds.text_gray_medium">
+          <Typography
+            variant="body2"
+            fontWeight="500"
+            color="ds.text_gray_medium"
+            id={`${commonId}:${buttonName}-extraInfo-text`}
+          >
             {extraInfo}
           </Typography>
         )}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useStrings } from '../common/hooks/useStrings';
 import { IllustrationCard } from '../../../components/cards';
@@ -14,12 +14,32 @@ import { handleExternalLinkClick } from '../../../../utils/routing';
 import RegistrationDisclaimer from '../common/components/RegistrationDisclaimer';
 import { useVoting } from '../common/hooks/useVoting';
 import { CatalystRegistrationProcess } from './CatalystRegistrationProcess';
+import LocalStorageApi from '../../../../api/localStorage/index';
 
 const CatalystRegistration = () => {
+  const localStorageApi = new LocalStorageApi();
   const [showDisclaimer, setShowDisclaimer] = useState(true);
   const strings = useStrings();
   const { walletType } = useVoting();
   const isHardwareWallet = walletType === 'trezor' || walletType === 'ledger';
+
+  useEffect(() => {
+    const loadCatalystDisclaimerState = async () => {
+      const stateInStorage = await localStorageApi.getCatalystDisclaimerState();
+      if (stateInStorage && stateInStorage === true) {
+        setShowDisclaimer(false);
+      } else {
+        setShowDisclaimer(true);
+      }
+    };
+
+    loadCatalystDisclaimerState();
+  }, []);
+
+  const closeCatalystDisclaimer = async () => {
+    await localStorageApi.setCatalystDisclaimerState(false);
+    setShowDisclaimer(false);
+  };
 
   return (
     <Box
@@ -39,7 +59,7 @@ const CatalystRegistration = () => {
           {strings.subtitle}
         </Typography>
       </Box>
-      {showDisclaimer && <RegistrationDisclaimer onClose={() => setShowDisclaimer(false)} />}
+      {showDisclaimer && <RegistrationDisclaimer onClose={closeCatalystDisclaimer} />}
       <Stack direction="row" width="100%" gap="24px" mt="8px">
         <IllustrationCard
           illustration={<DownloadApp />}

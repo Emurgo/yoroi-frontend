@@ -12,7 +12,6 @@ import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../com
 import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
-import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
@@ -20,7 +19,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
-  const { createOrder, swapForm, tokenInfos, isCreateOrderLoading, stores } = useSwapRevamp();
+  const { createOrder, swapForm, isCreateOrderLoading, stores } = useSwapRevamp();
   const { openModal } = useModal();
   const strings = useStrings();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
@@ -37,13 +36,10 @@ export const AssetSwap = () => {
 
   // @ts-ignore
   const handleSubmitTransaction = async password => {
-    const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
     // @ts-ignore
     const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
       wallet,
       swapState: swapForm,
-      tokenInfos,
-      parsedCbor,
     });
 
     try {

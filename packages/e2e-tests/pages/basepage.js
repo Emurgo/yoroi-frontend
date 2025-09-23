@@ -188,6 +188,22 @@ class BasePage {
     this.logger.info(`BasePage::getCssValueElement Result: ${result}`);
     return result;
   }
+
+  /**
+   * Utility method for logging and error handling.
+   */
+  async withLogging(action, fn) {
+    this.logger.info(`${this.constructor.name}::${action} called`);
+    try {
+      const result = await fn();
+      this.logger.info(`${this.constructor.name}::${action} succeeded`);
+      return result;
+    } catch (error) {
+      this.logger.error(`${this.constructor.name}::${action} failed: ${error.message}`);
+      throw error;
+    }
+  }
+
   async getAttribute(locator, property) {
     this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
     return await this.driver.findElement(getByLocator(locator)).getAttribute(property);
@@ -261,6 +277,7 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
+    await this.click(locator);
     await this.sleep(250);
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
     await this.sleep(500);

@@ -31,7 +31,7 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   nftImageZoomedLocator = {
-    locator: 'nftDetails:zoomed-image-component',
+    locator: 'nftDetails:zoomedImage-image-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -65,12 +65,12 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   overviewDescriptionTextLocator = {
-    locator: 'nftDetails:overview-description-text',
+    locator: 'nftDetails:overview:description-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
   overviewAuthorTextLocator = {
-    locator: 'nftDetails:overview-author-text',
+    locator: 'nftDetails:overview:author-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -95,7 +95,7 @@ export default class NftDetails extends WalletCommonBase {
   };
   /**@type {ElementLocator} */
   overviewExplorerLinkLocator = {
-    locator: 'nftDetails:overview-explorer-link',
+    locator: 'nftDetails:overview:explorerLink-value-component',
     method: 'id',
   };
   /**@type {ElementLocator} */
@@ -268,7 +268,7 @@ export default class NftDetails extends WalletCommonBase {
    */
   async zoomImage() {
     this.logger.info(`NftDetails::zoomImage is called`);
-    await this.click(this.nftImageBoxLocator);
+    await this.click(this.nftImageLocator);
   }
   /**
    * Getting the zoomed NFT image link
