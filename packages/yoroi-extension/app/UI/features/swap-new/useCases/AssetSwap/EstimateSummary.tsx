@@ -56,7 +56,7 @@ export const EstimateSummary = () => {
         label={strings.routeLabel}
         tooltip={strings.routePath}
         value={
-          <Typography>
+          <Typography sx={{ cursor: 'pointer' }}>
             <Link onClick={openRouteModal}>{protocol}</Link>
           </Typography>
         }

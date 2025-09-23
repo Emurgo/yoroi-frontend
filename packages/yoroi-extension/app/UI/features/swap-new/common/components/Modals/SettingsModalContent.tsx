@@ -31,7 +31,7 @@ export const SettingsModalContent = () => {
   };
 
   const applyChanges = async () => {
-    await swapForm.action({ type: SwapAction.ProtocolChanged, value: routingPreferance });
+    await swapForm.action({ type: SwapAction.ProtocolSelected, value: routingPreferance });
     await swapForm.action({ type: SwapAction.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),

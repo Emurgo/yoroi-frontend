@@ -27,6 +27,10 @@ export const TopBarActions = () => {
     });
   };
 
+  const onRefresh = () => {
+    swapForm.action({ type: 'Refresh' });
+  };
+
   return (
     <Stack direction="row" justifyContent="space-between" width="100%" {...atoms.pr_sm}>
       <Tabs
@@ -44,7 +48,9 @@ export const TopBarActions = () => {
       />
 
       <Stack direction="row" alignItems="center" {...atoms.gap_sm}>
-        <IconWrapper icon={Icons.Refresh} asButton />
+        <Box onClick={onRefresh}>
+          <IconWrapper icon={Icons.Refresh} asButton />
+        </Box>
         <Box onClick={openSettingsModal}>
           <IconWrapper icon={Icons.Settings} asButton />
         </Box>

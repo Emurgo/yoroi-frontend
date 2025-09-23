@@ -129,19 +129,27 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     },
   });
 
-  useEffect(() => {
-    const value = limitOptions?.defaultProtocol;
-    action({ type: 'ProtocolChanged', value });
+useEffect(() => {
+  const value = limitOptions?.defaultProtocol;
+  if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
 
-    const wantedPrice = limitOptions?.wantedPrice;
-    action({ type: 'WantedPriceInputChanged', value: String(wantedPrice) });
-  }, [
-    limitOptions?.defaultProtocol,
-    limitOptions?.options,
-    limitOptions?.wantedPrice,
-    state.selectedProtocol.isTouched,
-    state.selectedProtocol.value,
-  ]);
+    action({ type: 'ProtocolChanged', value });
+  } else {
+    const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
+    if (current === undefined) {
+      action({ type: 'ProtocolChanged', value });
+    }
+  }
+
+  const wantedPrice = limitOptions?.wantedPrice;
+  action({ type: 'WantedPriceInputChanged', value: String(wantedPrice) });
+}, [
+  limitOptions?.defaultProtocol,
+  limitOptions?.options,
+  limitOptions?.wantedPrice,
+  state.selectedProtocol.isTouched,
+  state.selectedProtocol.value,
+]);
 
   useEffect(() => {
     const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
