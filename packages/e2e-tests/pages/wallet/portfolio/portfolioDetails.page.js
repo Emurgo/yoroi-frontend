@@ -2,7 +2,7 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { fiveSeconds, oneSecond, quarterSecond } from '../../../helpers/timeConstants.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
-import { getChangeValue } from '../../../helpers/portfolioHelper.js';
+import { Colors } from '../../../helpers/constants.js';
 
 export default class PortfolioTokenDetails extends WalletCommonBase {
   // locators
@@ -164,9 +164,24 @@ export default class PortfolioTokenDetails extends WalletCommonBase {
 
     return { value, fiat };
   }
+  async _defineSign(priceChangeLocator) {
+    const color = await this.getCssValue(priceChangeLocator, 'color');
+    return color === Colors.portfolioNegative ? '-' : '';
+  }
+  async _getChangeValue(priceLocator) {
+    let priceChangeText = await this.getText(priceLocator);
+    if (priceChangeText.endsWith('%')) {
+      priceChangeText = priceChangeText.slice(0, priceChangeText.length - 1);
+    }
+    if (priceChangeText === '-') {
+      return null;
+    }
+    const priceChangeSign = await this._defineSign(priceLocator);
+    return strNumberToNumber(`${priceChangeSign}${priceChangeText}`);
+  }
   async getPriceChange() {
     this.logger.info(`PortfolioTokenDetails::getMarketPrice is called`);
-    const percentage = await getChangeValue(this, this.pricePercentageChangeLocator);
+    const percentage = await this._getChangeValue(this.pricePercentageChangeLocator);
     const priceChangeRaw = await this.getText(this.priceValueChangeLocator);
     const [priceChangeText, fiat] = priceChangeRaw.split(/\s/g);
     let value = null;

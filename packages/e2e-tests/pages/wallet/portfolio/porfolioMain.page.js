@@ -2,8 +2,8 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
-import { getChangeValue } from '../../../helpers/portfolioHelper.js';
-import { quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { fiveSeconds, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { Colors } from '../../../helpers/constants.js';
 
 export default class PortfolioTab extends WalletCommonBase {
   // locators
@@ -85,67 +85,92 @@ export default class PortfolioTab extends WalletCommonBase {
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenRowLocator = rowIndex => `portfolio:table-token_${rowIndex}-rowComponent`;
+  getTokenRowLocator = rowIndex => {
+    return {
+      locator: `portfolio:table-token_${rowIndex}-rowComponent`,
+      method: 'id',
+    };
+  };
   /**
    * Getting token name by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenNameLocator = rowIndex => `portfolio:table:token_${rowIndex}-name-text`;
+  getTokenNameLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-name-text`, method: 'id' };
+  };
   /**
    * Getting token price by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenPriceLocator = rowIndex => `portfolio:table:token_${rowIndex}-price-text`;
+  getTokenPriceLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-price-text`, method: 'id' };
+  };
   /**
    * Getting token day price change by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenDayChangesLocator = rowIndex => `portfolio:table:token_${rowIndex}-24h_priceChanges-text`;
+  getTokenDayChangesLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-24h_priceChanges-text`, method: 'id' };
+  };
   /**
    * Getting token week price change by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenWeekChangesLocator = rowIndex => `portfolio:table:token_${rowIndex}-1W_priceChanges-text`;
+  getTokenWeekChangesLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-1W_priceChanges-text`, method: 'id' };
+  };
   /**
    * Getting token month price change by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenMonthChangesLocator = rowIndex => `portfolio:table:token_${rowIndex}-1M_priceChanges-text`;
+  getTokenMonthChangesLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-1M_priceChanges-text`, method: 'id' };
+  };
   /**
    * Getting token percentage in wallet by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenPercentageLocator = rowIndex => `portfolio:table:token_${rowIndex}-percentage-text`;
+  getTokenPercentageLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-percentage-text`, method: 'id' };
+  };
   /**
    * Getting token total in main value and fiat in wallet by its row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenTotalMainLocator = rowIndex => `portfolio:table:token_${rowIndex}-totalMain-text`;
+  getTokenTotalMainLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-totalMain-text`, method: 'id' };
+  };
   /**
    * Getting the token value in the total column by row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenTotalMainCurrencyValueLocator = rowIndex => `portfolio:table:token_${rowIndex}-totalMainCurrencyValue-text`;
+  getTokenTotalMainCurrencyValueLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-totalMainCurrencyValue-text`, method: 'id' };
+  };
   /**
    * Getting the token fiat in the total column by row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenTotalMainCurrencyFiatLocator = rowIndex => `portfolio:table:token_${rowIndex}-totalMainCurrencyFiat-text`;
+  getTokenTotalMainCurrencyFiatLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-totalMainCurrencyFiat-text`, method: 'id' };
+  };
   /**
    * Getting the token secondary value in the column total by row index
    * @param {number} rowIndex
    * @returns {ElementLocator}
    */
-  getTokenTotalSecondLocator = rowIndex => `portfolio:table:token_${rowIndex}-totalSecond-text`;
+  getTokenTotalSecondLocator = rowIndex => {
+    return { locator: `portfolio:table:token_${rowIndex}-totalSecond-text`, method: 'id' };
+  };
   /** @type {ElementLocator} */
   noResultImageBoxLocator = {
     locator: 'portfolio-noResultsImage-box',
@@ -211,6 +236,18 @@ export default class PortfolioTab extends WalletCommonBase {
     const columnHeaderLocator = this.getColumnHeaderBtnLocator(columnName);
     await this.click(columnHeaderLocator);
   }
+  async _defineSign(priceChangeLocator) {
+    const color = await this.getCssValue(priceChangeLocator, 'color');
+    return color === Colors.portfolioNegative ? '-' : '';
+  }
+  async _getChangeValue(priceLocator) {
+    const priceChangeText = await this.getText(priceLocator);
+    if (priceChangeText === '-') {
+      return null;
+    }
+    const priceChangeSign = await this._defineSign(priceLocator);
+    return strNumberToNumber(`${priceChangeSign}${priceChangeText}`);
+  }
 
   /**
    * Getting token info from the table
@@ -226,9 +263,9 @@ export default class PortfolioTab extends WalletCommonBase {
     const [priceValue, priceFiat] = priceText.split(' ');
     const price = priceText === '-' ? null : strNumberToNumber(priceValue);
 
-    const priceChangeDay = await getChangeValue(this, this.getTokenDayChangesLocator(rowIndex));
-    const priceChangeWeek = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
-    const priceChangeMonth = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
+    const priceChangeDay = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
+    const priceChangeWeek = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
+    const priceChangeMonth = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
 
     const percentageText = await this.getText(this.getTokenPercentageLocator(rowIndex));
     const percentage = strNumberToNumber(percentageText);
@@ -293,15 +330,15 @@ export default class PortfolioTab extends WalletCommonBase {
             break;
 
           case Columns.Day:
-            value = await getChangeValue(this, this.getTokenDayChangesLocator(rowIndex));
+            value = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
             break;
 
           case Columns.Week:
-            value = await getChangeValue(this, this.getTokenWeekChangesLocator(rowIndex));
+            value = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
             break;
 
           case Columns.Month:
-            value = await getChangeValue(this, this.getTokenMonthChangesLocator(rowIndex));
+            value = await this._getChangeValue(this.getTokenMonthChangesLocator(rowIndex));
             break;
 
           case Columns.Percentage:
