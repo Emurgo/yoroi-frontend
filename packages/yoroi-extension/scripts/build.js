@@ -1,7 +1,15 @@
 // @flow
 
 const tasks = require('./tasks');
-const { exec, argv, shouldInjectConnector, isNightly, isE2E, buildAndCopyInjector } = require('./utils');
+const {
+  exec,
+  argv,
+  shouldInjectConnector,
+  isNightly,
+  isE2E,
+  buildAndCopyInjector,
+  embedPushNotificationHandler,
+} = require('./utils');
 
 // override NODE_ENV for ConfigWebpackPlugin
 process.env.NODE_CONFIG_ENV = argv.env;
@@ -25,6 +33,8 @@ function buildProd(env: string) {
   if (shouldInjectConnector) {
     buildAndCopyInjector('build/js', isNightly ? 'nightly' : 'prod');
   }
+
+  embedPushNotificationHandler();
 }
 
 buildProd(argv.env);
