@@ -27,7 +27,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const parentPathId = pathId || '';
 
-  // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
+  // TODO refactor and remove this calculation from here in the future - this should come from the main selected wallet context
   const { wallets, delegation } = stores;
   const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
   const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
@@ -38,7 +38,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
   // End of total Ada balance calculation
 
   const tokenTotalAmount = isPrimaryToken ? Number(primaryBalance) : tokenInfo.formatedAmount;
-  if (tokenInfo.quantity === null) {
+  if (!tokenInfo || tokenInfo.quantity === null) {
     return <></>;
   }
 
@@ -50,21 +50,30 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
     tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
+  const getClosePrice = (): number | null => {
+    if (tokenInfo?.info?.id && data24h && data24h[tokenInfo.info.id] && data24h && data24h[tokenInfo.info.id].length > 1) {
+      const priceData = data24h[tokenInfo.info.id][1].price;
+      if (priceData) {
+        return priceData.close;
+      }
+    }
+    return null;
+  };
+
   const totaPriceCalc = React.useMemo(() => {
     if (!isPrimaryToken && !isEmpty(data24h)) {
-      const tokenPrice = data24h && data24h[tokenInfo.info.id][1]?.price?.close;
-      const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
-      const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
-
-      if (tokenPrice === undefined && !isPrimaryToken) {
+      const tokenPrice = getClosePrice();
+      if (tokenPrice === null || !tokenInfo?.quantity || !tokenInfo?.info?.numberOfDecimals) {
         return '-';
       }
 
-      const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
+      const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
+      const tokenDecimals = tokenInfo.info.numberOfDecimals;
+
+      return atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
         .bn.times(tokenPrice ?? 1)
         .times(String(ptPrice))
         .toFormat(tokenDecimals);
-      return totaPrice;
     }
     return 0;
   }, [data24h, ptPrice]);
@@ -96,7 +105,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
             }}
             id={`${parentPathId}:tokenBalance:main-fiat-text`}
           >
-            {tokenInfo.info.name}
+            {tokenInfo?.info?.name}
           </Typography>
         </Stack>
 

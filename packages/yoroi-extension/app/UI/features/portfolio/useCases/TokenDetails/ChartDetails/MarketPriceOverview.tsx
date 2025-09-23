@@ -33,12 +33,20 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
     tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
-  const deltaPriceChange = !isPrimaryToken && !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price?.change;
+  const getPriceData = () => {
+    if (data24h && tokenInfo?.info?.id && data24h[tokenInfo.info.id] && data24h[tokenInfo.info.id].length > 1) {
+      return data24h[tokenInfo.info.id][1].price;
+    }
+  };
 
-  const priceChangeProcent = isPrimaryToken ? detailInfo?.changePercent || changePercent : !isEmpty(data24h) && deltaPriceChange;
+  const priceData = getPriceData();
+
+  const deltaPriceChange = !isPrimaryToken && !isEmpty(data24h) && priceData && priceData.change;
+
+  const priceChangePercent = isPrimaryToken ? detailInfo?.changePercent || changePercent : !isEmpty(data24h) && deltaPriceChange;
   const priceChangeValue = isPrimaryToken
     ? detailInfo?.changeValue || changeValue
-    : !isEmpty(data24h) && data24h[tokenInfo?.info?.id][1].price?.close - data24h[tokenInfo?.info?.id][1].price?.open;
+    : !isEmpty(data24h) && priceData && priceData.close - priceData.open;
   return (
     <Stack
       direction="row"
@@ -67,7 +75,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" gap="4px">
-              <PriceChangeChip value={Number(priceChangeProcent)} pathId={pathId} />
+              <PriceChangeChip value={Number(priceChangePercent)} pathId={pathId} />
               <PriceValueChip
                 value={Number(priceChangeValue)}
                 unitOfAccount={unitOfAccount || DEFAULT_FIAT_PAIR}
