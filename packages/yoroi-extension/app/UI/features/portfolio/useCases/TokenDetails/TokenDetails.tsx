@@ -28,8 +28,12 @@ const TokenDetails = observer(({ tokenInfo, stores }: Props): React.ReactNode =>
   const theme: any = useTheme();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const isPrimaryToken: boolean = tokenInfo.id === '-';
+  const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const { isTestnet } = usePortfolio();
+
+  if (!tokenInfo) {
+    return null;
+  }
 
   return (
     <Box sx={{ width: '100%' }}>

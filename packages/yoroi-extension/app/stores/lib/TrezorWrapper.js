@@ -33,6 +33,7 @@ export function getTrezorManifest(): Manifest {
       // In future if other non chrome like browser is supported them we can consider updating
       return manifest.appURL.CHROME;
     })(),
+    appName: manifest.appName,
   };
 
   return trezorManifest;

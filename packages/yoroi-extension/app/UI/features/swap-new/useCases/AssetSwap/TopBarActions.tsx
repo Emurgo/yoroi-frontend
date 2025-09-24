@@ -3,7 +3,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { SettingsModalContent } from '../../common/components/SettingsModalContent';
+import { SettingsModalContent } from '../../common/components/Modals/SettingsModalContent';
 import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
 import { LIMIT_ORDER, MARKET_ORDER } from '../../common/constants';
 

@@ -277,6 +277,7 @@ class BasePage {
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
+    await this.click(locator);
     await this.sleep(250);
     await input.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
     await this.sleep(500);

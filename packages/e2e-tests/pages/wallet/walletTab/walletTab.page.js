@@ -1,6 +1,5 @@
 import WalletCommonBase from '../../walletCommonBase.page.js';
 import { isFirefox } from '../../../utils/utils.js';
-import { pageTitle } from '../../../helpers/pageTitles.js';
 
 class WalletTab extends WalletCommonBase {
   //locators

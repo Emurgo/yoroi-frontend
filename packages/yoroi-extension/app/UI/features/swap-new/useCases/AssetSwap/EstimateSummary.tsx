@@ -15,7 +15,6 @@ export const EstimateSummary = () => {
 
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
   const tokenOutInfo = tokenInfos.get(swapForm.tokenOutInput.tokenId ?? undefinedToken);
-
   const tokenInTicker = tokenInInfo?.ticker ?? tokenInInfo?.name ?? '-';
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
