@@ -20,12 +20,11 @@ interface Props {
   pathId?: string;
 }
 
-const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.ReactNode => {
+const HeaderSection = observer(({ tokenInfo, stores, pathId='' }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
-  const parentPathId = pathId || '';
 
   // TODO refactor and remove this calculation from here in the future - this should come from the main selected wallet context
   const { wallets, delegation } = stores;
@@ -92,7 +91,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
             variant="h2"
             fontWeight="500"
             color="ds.text_gray_medium"
-            id={`${parentPathId}:tokenBalance:main-value-text`}
+            id={`${pathId}:tokenBalance:main-value-text`}
           >
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
@@ -103,13 +102,13 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId }: Props): React.Rea
             sx={{
               paddingTop: `${theme.spacing(18)}`,
             }}
-            id={`${parentPathId}:tokenBalance:main-fiat-text`}
+            id={`${pathId}:tokenBalance:main-fiat-text`}
           >
             {tokenInfo?.info?.name}
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600" id={`${parentPathId}:tokenBalance-second-text`}>
+        <Typography color="ds.gray_600" id={`${pathId}:tokenBalance-second-text`}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
           <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>
