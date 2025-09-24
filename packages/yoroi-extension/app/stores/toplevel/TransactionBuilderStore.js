@@ -110,7 +110,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
       // Should be rounded to be 1 ADA
       minAmount = String(1_000_000);
     } else {
-      minAmount = this.calculateMinAda(this.plannedTxInfoMap.map(({ token }) => ({ token })));
+      minAmount = this.calculateMinAda(this.plannedTxInfoMap);
     }
 
     return new MultiToken(
@@ -204,7 +204,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
      * When sending multi-asset, if the user entered ada less than MIN-ADA
      * it should be OVERWRITTEN.
      */
-    const minAmount = this.calculateMinAda(plannedTxInfoMap.map(({ token }) => ({ token })));
+    const minAmount = this.calculateMinAda(plannedTxInfoMap);
     const token = plannedTxInfoMap.find(({ token: t }) => t.IsDefault);
 
     if (!token) {
@@ -253,7 +253,7 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
     return true;
   }
 
-  calculateMinAda: (tokens: Array<{| token: $ReadOnly<TokenRow> |}>) => string = tokens => {
+  calculateMinAda: PlannedTxInfoMap => string = tokens => {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this.calculateMinAda)} requires wallet to be selected`);
     const network = getNetworkById(publicDeriver.networkId);
@@ -269,10 +269,10 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
           networkId: defaultToken.NetworkId,
           amount: fakeAmount,
         },
-        ...filteredTokens.map(({ token }) => ({
-          identifier: token.Identifier,
-          networkId: token.NetworkId,
-          amount: fakeAmount,
+        ...filteredTokens.map(token => ({
+          identifier: token.token.Identifier,
+          networkId: token.token.NetworkId,
+          amount: token.amount ? new BigNumber(token.amount) : fakeAmount,
         })),
       ],
       getDefaultEntryToken(defaultToken)
