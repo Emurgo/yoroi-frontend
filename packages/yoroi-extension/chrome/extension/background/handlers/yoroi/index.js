@@ -90,6 +90,8 @@ const handlerMap = Object.freeze({
   [GetProtocolParameters.typeTag]: GetProtocolParameters.handle,
 });
 
+const LONG_RESPONSE_MESSAGE_TYPE = 'long-response';
+
 type Handler = (
   request: Object,
   sender: Object,
@@ -118,7 +120,7 @@ export function getHandler(typeTag: string): ?Handler {
         } else {
           const messageId = String(incrementalId++);
           sendResponse({ type: OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER, messageId });
-          sendLongMessage(sender.tab.id, serializedResult, 'long-response', messageId, MAX_MESSAGE_LENGTH);
+          sendLongMessage(sender.tab.id, serializedResult, LONG_RESPONSE_MESSAGE_TYPE, messageId, MAX_MESSAGE_LENGTH);
         }
       } catch (error) {
         sendResponse({ error: error.message });
