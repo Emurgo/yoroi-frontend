@@ -20,16 +20,7 @@ export default class SupportSettingsPage extends Component<StoresProps> {
   };
 
   handleDownloadLogs: () => void = () => {
-    // TODO Removed some code here checking if it was an advanced user. Not sure about the possible solution
-    // as we are removing Advanced user type
-    const publicKey = this.getPublicKey();
-    if (publicKey == null) {
-      // if no public key to export, just download the logs right away
-      return downloadLogs();
-    }
-    // TODO: don't show if not in "Advanced"
-    // has public key -> prompt if they want to include it in the logs
-    this.props.stores.uiDialogs.open({ dialog: IncludePublicKeyDialog });
+    return downloadLogs();
   };
 
   getDialog: void => Node = () => {
