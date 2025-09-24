@@ -80,7 +80,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
       if (!touched) {
         return 'Select token';
       }
-      return tokenInputInfo?.ticker ?? tokenInputInfo?.name;
+      return tokenInput.tokenId === '.' ? primaryTokenInfo.name : (tokenInputInfo?.ticker ?? tokenInputInfo?.name);
     }
     return undefined;
   }, [direction, tokenInputInfo]);
@@ -90,7 +90,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
       return tokenInput.tokenId ?? tokenInputInfo?.id;
     }
     if (direction === ASSET_DIRECTION_OUT) {
-      return tokenInputInfo?.id;
+      return tokenInput.tokenId === '.' ? primaryTokenInfo.id : tokenInputInfo?.id;
     }
     return undefined;
   }, [direction, tokenInputInfo, tokenInput]);

@@ -21,7 +21,6 @@ import SwapPageContainer from './containers/swap/SwapPageContainer';
 import SwapProvider from './containers/swap/SwapProvider';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
-import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
@@ -136,12 +135,6 @@ const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
 const CashbackPagePromise = () => import('./containers/cashback/CashbackPage');
 const CashbackPage = React.lazy(CashbackPagePromise);
 
-const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
-const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
-
-const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
-const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
-
 // SWAP
 const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
 const SwapPage = React.lazy(SwapPagePromise);
@@ -174,8 +167,6 @@ export const LazyLoadPromises: Array<() => any> = [
   BlockchainSettingsPagePromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
-  NFTsPageRevampPromise,
-  NFTDetailPageRevampPromise,
   ConnectedWebsitesPagePromise,
   SwapPagePromise,
   SwapOrdersPagePromise,
@@ -200,10 +191,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<AssetsSubpages stores={stores} />}>
             <Route path={ROUTES.ASSETS.ROOT} element={<TokensPageRevamp stores={stores} />} />
             <Route path={ROUTES.ASSETS.DETAILS} element={<TokensDetailPageRevamp stores={stores} />} />
-          </Route>
-          <Route element={<NFTsSubPages stores={stores} />}>
-            <Route path={ROUTES.NFTS.ROOT} element={<NFTsPageRevamp stores={stores} />} />
-            <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
             <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
@@ -362,14 +349,6 @@ const PortfolioSubpages = ({ stores }) => {
     </CurrencyProvider>
   );
 };
-
-const NFTsSubPages = ({ stores }) => (
-  <NFTsWrapper stores={stores}>
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-  </NFTsWrapper>
-);
 
 const AssetsSubpages = ({ stores }) => (
   <AssetsWrapper stores={stores}>

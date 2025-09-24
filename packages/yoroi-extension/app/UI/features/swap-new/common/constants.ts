@@ -11,3 +11,10 @@ export const MARKET_ORDER = 'market';
 export const LIMIT_ORDER = 'limit';
 
 export const undefinedToken: Portfolio.Token.Id = '.unknown';
+
+export const DEX_ROUTING = {
+  AUTO: 'auto',
+  DEXHUNTER: 'dexhunter',
+  MUESLISWAP: 'muesliswap',
+  BOTH: 'both',
+} as const;

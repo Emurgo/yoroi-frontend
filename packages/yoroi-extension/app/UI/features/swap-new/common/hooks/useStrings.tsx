@@ -117,6 +117,10 @@ export const messages = Object.freeze(
       id: 'swap.allAssets',
       defaultMessage: '!!! All Assets',
     },
+    applyLabel: {
+      id: 'global.labels.apply',
+      defaultMessage: '!!! Apply',
+    },
   })
 );
 
@@ -142,6 +146,7 @@ export const useStrings = () => {
     slippageTolerance: intl.formatMessage(messages.slippageTolerance),
     slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
+    applyLabel: intl.formatMessage(messages.applyLabel),
     routingPreferance: intl.formatMessage(messages.routingPreferance),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
