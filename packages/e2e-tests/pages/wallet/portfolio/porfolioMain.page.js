@@ -2,7 +2,7 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
-import { fiveSeconds, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { fiveSeconds, halfMinute, halfSecond, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 import { Colors } from '../../../helpers/constants.js';
 
 export default class PortfolioTab extends WalletCommonBase {
@@ -19,8 +19,8 @@ export default class PortfolioTab extends WalletCommonBase {
   };
   /** @type {ElementLocator} */
   secondCurrencyTextLocator = {
-    locator: '$portfolio:header-secondCurrency-text',
-    id: 'id',
+    locator: 'portfolio:header-secondCurrency-text',
+    method: 'id',
   };
   /** @type {ElementLocator} */
   balancePercentagePerformanceTextLocator = {
@@ -199,6 +199,10 @@ export default class PortfolioTab extends WalletCommonBase {
 
     return titleState && searchState && mainFiatState;
   }
+  async waitIsLoaded() {
+    this.logger.info(`PortfolioTab::waitIsLoaded is called`);
+    return await this.customWaitIsPresented(this.getTokenRowLocator(0), halfMinute, halfSecond);
+  }
   /**
    * Searching for a token
    * @param {string} searchValue
@@ -365,5 +369,27 @@ export default class PortfolioTab extends WalletCommonBase {
 
     this.logger.info(`PortfolioTab::getColumnValues: Collected ${columnValues.length} values`);
     return columnValues;
+  }
+
+  async getPortfolioBalance() {
+    const [mainValueText, mainBalanceFiat, secondBalance] = await Promise.all([
+      this.getText(this.mainCurrencyValueTextLocator),
+      this.getText(this.mainCurrencyFiatTextLocator),
+      this.getText(this.secondCurrencyTextLocator),
+    ]);
+    const mainValue = strNumberToNumber(mainValueText);
+    const [secondValueText, secondFiat] = secondBalance.split(/\s/g);
+    const secondValue = strNumberToNumber(secondValueText);
+
+    return {
+      main: {
+        value: mainValue,
+        fiat: mainBalanceFiat,
+      },
+      secondary: {
+        value: secondValue,
+        fiat: secondFiat,
+      },
+    };
   }
 }
