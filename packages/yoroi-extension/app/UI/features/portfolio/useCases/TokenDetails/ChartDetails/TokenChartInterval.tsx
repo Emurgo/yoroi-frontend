@@ -55,7 +55,7 @@ interface Props {
   pathId?: string;
 }
 
-export const TokenChartInterval = ({ tokenInfo, pathId='' }: Props): React.ReactNode => {
+export const TokenChartInterval = ({ tokenInfo, pathId = '' }: Props): React.ReactNode => {
   const isPrimaryToken: boolean = tokenInfo.id === '-';
   const marketPathId = `${pathId}:marketPrice`;
 

@@ -14,7 +14,7 @@ const SButton = styled(Button)(({ theme }: any) => ({
   },
 }));
 
-export const BackButton = ({ label, onAction, pathId=''}: { label: string; onAction: () => void; pathId?: string }) => {
+export const BackButton = ({ label, onAction, pathId = '' }: { label: string; onAction: () => void; pathId?: string }) => {
   return (
     <SButton onClick={onAction} startIcon={<BackIcon />} id={`${pathId}-back-button`}>
       <Typography fontWeight="500" fontSize="14px">

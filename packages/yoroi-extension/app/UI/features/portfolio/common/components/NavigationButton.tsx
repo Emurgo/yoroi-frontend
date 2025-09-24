@@ -9,7 +9,7 @@ interface Props {
   pathId?: string;
 }
 
-const NavigationButton = ({ label, onClick, variant, sx, width, pathId='', ...props }: Props) => {
+const NavigationButton = ({ label, onClick, variant, sx, width, pathId = '', ...props }: Props) => {
   const cleanLabelName = label
     .split(' ')
     .map((word, index) => (index === 0 ? word.toLowerCase() : word[0]?.toUpperCase() + word.slice(1)))

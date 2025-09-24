@@ -20,7 +20,7 @@ interface Props {
   pathId?: string;
 }
 
-const HeaderSection = observer(({ tokenInfo, stores, pathId='' }: Props): React.ReactNode => {
+const HeaderSection = observer(({ tokenInfo, stores, pathId = '' }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
@@ -87,12 +87,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId='' }: Props): React.
 
       <Stack direction="column" spacing={theme.spacing(4)}>
         <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
-          <Typography
-            variant="h2"
-            fontWeight="500"
-            color="ds.text_gray_medium"
-            id={`${pathId}:tokenBalance:main-value-text`}
-          >
+          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium" id={`${pathId}:tokenBalance:main-value-text`}>
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
           <Typography
