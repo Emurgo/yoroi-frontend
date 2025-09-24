@@ -107,6 +107,7 @@ async function pushHandler(eventData) {
     fcmMessageId: eventData.fcmMessageId,
     read: false,
     time: new Date().toISOString(),
+    redirection: redirectionRoute,
   });
 
   currentNotificationId = eventData.fcmMessageId;
