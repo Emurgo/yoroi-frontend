@@ -112,8 +112,8 @@ export default class PortfolioTokenDetails extends WalletCommonBase {
     this.logger.info(`PortfolioTokenDetails::isDisplayed is called`);
     const states = await Promise.all([
       this.customWaitIsPresented(this.backBtnLocator, fiveSeconds, quarterSecond),
+      this.customWaitIsPresented(this.receiveBtnLocator, fiveSeconds, quarterSecond),
       this.customWaitIsPresented(this.mainBalanceValueLocator, fiveSeconds, quarterSecond),
-      this.customWaitIsPresented(this.graphLocator, fiveSeconds, quarterSecond),
       this.customWaitIsPresented(this.tokenNameLocator, fiveSeconds, quarterSecond),
     ]);
 
