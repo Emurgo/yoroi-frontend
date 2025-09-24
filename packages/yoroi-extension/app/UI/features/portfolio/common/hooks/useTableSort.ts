@@ -16,9 +16,10 @@ interface Props {
 
 const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) => {
   const defaultSortDirections: Record<string, 'asc' | 'desc'> = {
+    name: 'desc',
     price: 'desc',
     totalAmount: 'desc',
-    portfolio: 'asc',
+    portfolioPercents: 'desc',
     '24h': 'desc',
     '1W': 'desc',
     '1M': 'desc',
