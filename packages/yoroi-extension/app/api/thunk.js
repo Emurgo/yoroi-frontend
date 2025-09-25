@@ -65,6 +65,7 @@ import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
 import { sanitizeForLog } from '../coreUtils';
+import { OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER } from '../../chrome/extension/background/constants';
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -88,8 +89,6 @@ type GetEntryFuncType<HandlerT> = $PropertyType<HandlerT, 'handle'>;
 declare var chrome;
 
 // UI -> background queries:
-
-const OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER = 'OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER';
 
 type LongMessageReceiverInfo = {|
   chunks: Array<string>,
