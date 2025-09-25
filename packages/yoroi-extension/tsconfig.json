@@ -7,12 +7,12 @@
     "allowUnusedLabels": false,
     /* Modules */
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "es2020",
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
 
     /* Type Checking */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,

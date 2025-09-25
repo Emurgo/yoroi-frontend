@@ -1,0 +1,9 @@
+let pushNotificationEventData = null;
+let pushNotificationEventHandler = (eventData) => {
+  pushNotificationEventData = eventData;
+}
+self.addEventListener('push', event => {
+  if (event && event.data) {
+    pushNotificationEventHandler(event.data.json());
+  }
+});
