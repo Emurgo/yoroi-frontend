@@ -12,31 +12,28 @@ import type {
 import type { IFetcher } from './IFetcher.types';
 import { Logger, stringifyError } from '../../../../utils/logging';
 import { ServerStatusError, CurrentCoinPriceError, HistoricalCoinPriceError } from '../../errors';
-import { networks } from '../../../ada/lib/storage/database/prepackaged/networks';
+import { getNetworkById } from '../../../ada/lib/storage/database/prepackaged/networks';
 
 import type { ConfigType } from '../../../../../config/config-types';
 
-import { environment } from '../../../../environment';
 import { makeTimeoutAbortSignal, fetchAndEnsureSuccess } from '../../../utils';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-const priceBackendUrl = (() => {
-  let endpoint;
-  if (environment.isNightly()) {
-    endpoint = networks.CardanoPreprodTestnet.Backend.BackendService;
-  } else {
-    endpoint = networks.CardanoMainnet.Backend.BackendService;
-  }
+
+function getPriceBackendUrl(networkId: number): string {
+  const network = getNetworkById(networkId);
+  const endpoint = network.Backend.BackendService;
   if (endpoint == null) {
     throw new Error();
   }
   return endpoint;
-})();
+}
 
-function getEndpoint(): string {
+function getEndpoint(networkId: number): string {
   // TODO: some currency-independent endpoint
-  const endpoint = networks.CardanoMainnet.Backend.BackendService;
+  const network = getNetworkById(networkId);
+  const endpoint = network.Backend.BackendService;
   if (endpoint == null) {
     throw new Error();
   }
@@ -51,15 +48,23 @@ export class RemoteFetcher implements IFetcher {
   getLastLaunchVersion: () => string;
   getCurrentLocale: () => string;
   getPlatform: () => string;
+  getCurrentNetworkId: () => number;
 
-  constructor(getLastLaunchVersion: () => string, getCurrentLocale: () => string, getPlatform: () => string) {
+  constructor(
+    getLastLaunchVersion: () => string,
+    getCurrentLocale: () => string,
+    getPlatform: () => string,
+    getCurrentNetworkId: () => number
+  ) {
     this.getLastLaunchVersion = getLastLaunchVersion;
     this.getCurrentLocale = getCurrentLocale;
     this.getPlatform = getPlatform;
+    this.getCurrentNetworkId = getCurrentNetworkId;
   }
 
-  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = param =>
-    fetchAndEnsureSuccess(`${param.backend || getEndpoint()}/api/status`, {
+  checkServerStatus: ServerStatusRequest => Promise<ServerStatusResponse> = param => {
+    const backendUrl = param.backend || getEndpoint(this.getCurrentNetworkId());
+    return fetchAndEnsureSuccess(`${backendUrl}/api/status`, {
       method: 'GET',
       signal: makeTimeoutAbortSignal(CONFIG.app.walletRefreshInterval),
       headers: {
@@ -72,9 +77,11 @@ export class RemoteFetcher implements IFetcher {
         Logger.error(`${nameof(RemoteFetcher)}::${nameof(this.checkServerStatus)} error: ` + stringifyError(error));
         throw new ServerStatusError();
       });
+  };
 
-  getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = body =>
-    fetchAndEnsureSuccess(`${priceBackendUrl}/api/price/${body.from}/current`, {
+  getCurrentCoinPrice: CurrentCoinPriceRequest => Promise<CurrentCoinPriceResponse> = body => {
+    const backendUrl = getPriceBackendUrl(this.getCurrentNetworkId());
+    return fetchAndEnsureSuccess(`${backendUrl}/api/price/${body.from}/current`, {
       method: 'GET',
       signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
       headers: {
@@ -87,9 +94,11 @@ export class RemoteFetcher implements IFetcher {
         Logger.error('RemoteFetcher::getCurrentCoinPrice error: ' + stringifyError(error));
         throw new CurrentCoinPriceError();
       });
+  };
 
-  getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = body =>
-    fetchAndEnsureSuccess(`${priceBackendUrl}/api/price/${body.from}/${body.timestamps.join(',')}`, {
+  getHistoricalCoinPrice: HistoricalCoinPriceRequest => Promise<HistoricalCoinPriceResponse> = body => {
+    const backendUrl = getPriceBackendUrl(this.getCurrentNetworkId());
+    return fetchAndEnsureSuccess(`${backendUrl}/api/price/${body.from}/${body.timestamps.join(',')}`, {
       method: 'GET',
       signal: makeTimeoutAbortSignal(2 * CONFIG.app.walletRefreshInterval),
       headers: {
@@ -102,4 +111,5 @@ export class RemoteFetcher implements IFetcher {
         Logger.error('RemoteFetcher::getHistoricalCoinPrice error: ' + stringifyError(error));
         throw new HistoricalCoinPriceError();
       });
+  };
 }
