@@ -365,10 +365,14 @@ export default class LocalStorageApi {
 
   getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = async () => {
     const unitOfAccount = await getLocalItem(storageKeys.UNIT_OF_ACCOUNT);
-    if (unitOfAccount == null || unitOfAccount.currency === null) {
+    if (unitOfAccount == null) {
       return DEFAULT_CURRENCY_PAIR;
     }
-    return JSON.parse(unitOfAccount);
+    const unitOfAccountObject = JSON.parse(unitOfAccount);
+    if (unitOfAccountObject.currency === null) {
+      return DEFAULT_CURRENCY_PAIR;
+    }
+    return unitOfAccountObject;
   };
 
   setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
