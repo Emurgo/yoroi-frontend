@@ -104,13 +104,6 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
         svg: c.svg,
       };
     });
-    currencies.unshift({
-      value: 'ADA',
-      label: 'ADA - Cardano',
-      name: 'Cardano',
-      native: true,
-      svg: AdaCurrency,
-    });
 
     const unitOfAccountValue = profileStore.unitOfAccount.enabled ? profileStore.unitOfAccount.currency : 'ADA';
 
