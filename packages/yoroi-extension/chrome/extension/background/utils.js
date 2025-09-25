@@ -8,6 +8,8 @@ import type { IFetcher as IFetcherCommon } from '../../../app/api/common/lib/sta
 import { RemoteFetcher as RemoteFetcherCommon } from '../../../app/api/common/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher as BatchedFetcherCommon } from '../../../app/api/common/lib/state-fetch/batchedFetcher';
 
+declare var chrome;
+
 async function createFetcher(fetcherType: Function, localStorageApi: LocalStorageApi): * {
   const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
   const currentNetworkId = (await localStorageApi.loadCurrentNetworkId()) ?? 0; // Default to CardanoMainnet
@@ -45,4 +47,12 @@ export function getPlatform(): string {
     return 'chrome';
   }
   return '-';
+}
+
+export function sendLongMessage(toTabId: number, message: string, messageType: string, messageId: string, maxChunkSize: number) {
+  const chunkCount = Math.ceil(message.length / maxChunkSize);
+  for (let i = 0; i < chunkCount; i++) {
+    const nextChunk = message.slice(i * maxChunkSize, (i + 1) * maxChunkSize);
+    chrome.tabs.sendMessage(toTabId, { type: messageType, id: messageId, chunk: nextChunk, chunkIndex: i, chunkCount });
+  }
 }

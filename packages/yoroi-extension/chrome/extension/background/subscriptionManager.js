@@ -1,5 +1,7 @@
 // @flow
 // This module tracks the list of open tabs (current only 1) and their active wallets.
+import { MAX_MESSAGE_LENGTH } from './constants';
+import { sendLongMessage } from './utils';
 
 type SubscriptionEntry = {|
   tabId: number,
@@ -66,8 +68,15 @@ export function registerCallback(callback: (Callback) => void) {
 /*::
 declare var chrome;
 */
+const STATE_UPDATE_MESSAGE_TYPE = 'yoroi-emit-update';
+let messageId = 0;
 export function emitUpdateToSubscriptions(data: Object): void {
   for (const { tabId } of getSubscriptions()) {
-    chrome.tabs.sendMessage(tabId, { type: 'yoroi-emit-update', data: JSON.stringify(data) });
+    const message = JSON.stringify(data);
+    if (message.length <= MAX_MESSAGE_LENGTH) {
+      chrome.tabs.sendMessage(tabId, { type: STATE_UPDATE_MESSAGE_TYPE, data: message });
+    } else {
+      sendLongMessage(tabId, message, STATE_UPDATE_MESSAGE_TYPE, String(messageId++), MAX_MESSAGE_LENGTH);
+    }
   }
 }
