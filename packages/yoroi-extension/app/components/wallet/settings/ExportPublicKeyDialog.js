@@ -75,7 +75,7 @@ export default class ExportPublicKeyDialog extends Component<Props> {
               <FormattedMessage {...messages.publicKeyExplanationLine1} values={{ strong }} />
             </Typography>
             <Typography variant="body1" mb="16px" color="ds.text_gray_medium">
-              <FormattedMessage {...globalMessages.publicKeyExplanation} />
+              <FormattedMessage {...globalMessages.publicKeyExplanation} values={{ strong }} />
             </Typography>
             <Typography variant="body1" color="ds.text_gray_medium">
               {intl.formatMessage(globalMessages.whyUse)}

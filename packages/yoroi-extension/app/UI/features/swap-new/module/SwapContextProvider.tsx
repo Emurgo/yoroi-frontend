@@ -69,13 +69,13 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       storage,
       network: Chain.Network.Mainnet,
       stakingKey: String(stakingKey),
-      address: walletAddresses[0],
+      address: walletAddresses[1],
       addressHex: String(stakingKey),
       primaryTokenInfo,
       isPrimaryToken,
       partners,
     });
-  }, [stakingKey, primaryTokenInfo, partners, walletAddresses[0]]);
+  }, [stakingKey, primaryTokenInfo, partners]);
 
   const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
     swapManager,
@@ -251,6 +251,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       isCreateOrderLoading,
       isEstimateOrderLoading,
       limitOptions,
+      swapManager,
       stores,
     }),
     [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
@@ -563,6 +564,7 @@ export type SwapContext = SwapState & {
   isCreateOrderLoading: boolean;
   isEstimateOrderLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
+  swapManager: any;
 };
 
 const SwapContext = createContext<SwapContext>({
@@ -588,6 +590,7 @@ const SwapContext = createContext<SwapContext>({
   isCreateOrderLoading: false,
   isEstimateOrderLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
+  swapManager: {},
 });
 
 const parseNumber = (text: string) =>

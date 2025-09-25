@@ -1,8 +1,8 @@
 export const getNetworkUrl = (networkId: number): any => {
   return isTestnet(networkId)
     ? {
-        cardanoScan: 'https://testnet.cardanoscan.io/token',
-        cexplorer: 'https://testnet.cexplorer.io/asset',
+        cardanoScan: 'https://preprod.cardanoscan.io/token',
+        cexplorer: 'https://preprod.cexplorer.io/asset',
       }
     : { cardanoScan: 'https://cardanoscan.io/token', cexplorer: 'https://cexplorer.io/asset' };
 };
