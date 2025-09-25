@@ -6,7 +6,6 @@ import { DEFAULT_CURRENCY_PAIR } from '../../types/unitOfAccountType';
 
 import { getLocalItem, isEmptyStorage, removeLocalItem, setLocalItem } from './primitives';
 import { TabIdKeys } from '../../utils/tabManager';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types';
 import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
@@ -19,7 +18,6 @@ const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
-  COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
   TESTNET_MODAL_DISPLAYED: 'TESTNET_MODAL_DISPLAYED',
@@ -114,18 +112,6 @@ export default class LocalStorageApi {
   setUriSchemeAcceptance: void => Promise<void> = () => setLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE, JSON.stringify(true));
 
   unsetUriSchemeAcceptance: void => Promise<void> = () => removeLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE);
-
-  // ========== Level Complexity ========== //
-  getComplexityLevel: void => Promise<?ComplexityLevelType> = () =>
-    getLocalItem(storageKeys.COMPLEXITY_LEVEL).then(level => {
-      if (level == null) return null;
-      return JSON.parse(level);
-    });
-
-  setComplexityLevel: ComplexityLevelType => Promise<void> = (level: ComplexityLevelType) =>
-    setLocalItem(storageKeys.COMPLEXITY_LEVEL, JSON.stringify(level));
-
-  unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL);
 
   // ========== User Theme Mode========== //
 
@@ -546,7 +532,6 @@ export default class LocalStorageApi {
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
-    await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
     await this.unsetUnitOfAccount();
