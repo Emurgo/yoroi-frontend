@@ -8,7 +8,6 @@ import ThemeSettingsBlock from '../../../components/settings/categories/general-
 import AboutYoroiSettingsBlock from '../../../components/settings/categories/general-setting/AboutYoroiSettingsBlock';
 import UnitOfAccountSettings from '../../../components/settings/categories/general-setting/UnitOfAccountSettings';
 import BringCashbackSettings from '../../../components/settings/categories/general-setting/BringCashbackSettings';
-import { ReactComponent as AdaCurrency } from '../../../assets/images/currencies/ADA.inline.svg';
 import { unitOfAccountDisabledValue } from '../../../types/unitOfAccountType';
 import { Box, Typography } from '@mui/material';
 import { settingsMenuMessages } from '../../../components/settings/menu/SettingsMenu';
