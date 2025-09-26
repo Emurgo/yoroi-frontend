@@ -2,7 +2,7 @@ import { Box, Button, Stack, Typography, styled, useTheme } from '@mui/material'
 import React, { useState, useRef, useEffect } from 'react';
 import { useStrings } from '../../hooks/useStrings';
 import { Switch } from '../../../../../components/Switch/Switch';
-import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
 import { DEX_ROUTING } from '../../constants';
 
@@ -11,8 +11,7 @@ const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
-
-  const [routingPreferance, setRoutingPreferance] = useState<any>(swapForm.selectedProtocol.value || DEX_ROUTING.AUTO);
+  const [routingPreference, setRoutingPreference] = useState<any>(swapManager.settings.routingPreference);
   const [selectedSlippage, setSelectedSlippage] = useState(swapForm.slippageInput.value || 1);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(selectedSlippage)));
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -31,11 +30,11 @@ export const SettingsModalContent = () => {
   };
 
   const applyChanges = async () => {
-    await swapForm.action({ type: SwapAction.ProtocolSelected, value: routingPreferance });
-    await swapForm.action({ type: SwapAction.SlippageInputChanged, value: Number(selectedSlippage) });
+    await swapForm.action({ type: SwapActionType.ProtocolSelected, value: routingPreference });
+    await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreferance: [routingPreferance],
+      routingPreference: [routingPreference],
     });
     closeModal();
   };
@@ -58,9 +57,9 @@ export const SettingsModalContent = () => {
           <SlippageInput selectedSlippage={selectedSlippage} setSelectedSlippage={setSelectedSlippage} inputRef={inputRef} />
         )}
         <Typography variant="body1" color="ds.text_gray_medium" my={16}>
-          {strings.routingPreferance}
+          {strings.routingPreference}
         </Typography>
-        <RoutingPreferance setRoutingPreferance={setRoutingPreferance} routingPreferance={routingPreferance} />
+        <RoutingPreference setRoutingPreference={setRoutingPreference} routingPreference={routingPreference} />
       </Box>
       {/* @ts-ignore */}
       <SButton fullWidth variant="primary" onClick={applyChanges}>
@@ -101,32 +100,32 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
     </Box>
   );
 };
-const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
+const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
   const strings = useStrings();
 
-  const autoSelected = routingPreferance === DEX_ROUTING.AUTO;
+  const autoSelected = routingPreference === DEX_ROUTING.AUTO;
   const dexHunter =
-    routingPreferance === DEX_ROUTING.AUTO ||
-    routingPreferance === DEX_ROUTING.DEXHUNTER ||
-    routingPreferance === DEX_ROUTING.BOTH;
+    routingPreference === DEX_ROUTING.AUTO ||
+    routingPreference === DEX_ROUTING.DEXHUNTER ||
+    routingPreference === DEX_ROUTING.BOTH;
   const muesliswap =
-    routingPreferance === DEX_ROUTING.AUTO ||
-    routingPreferance === DEX_ROUTING.MUESLISWAP ||
-    routingPreferance === DEX_ROUTING.BOTH;
+    routingPreference === DEX_ROUTING.AUTO ||
+    routingPreference === DEX_ROUTING.MUESLISWAP ||
+    routingPreference === DEX_ROUTING.BOTH;
 
   const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);
+    setRoutingPreference(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);
   };
 
   const handleMuesliswapToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.MUESLISWAP : DEX_ROUTING.DEXHUNTER);
+    setRoutingPreference(checked ? DEX_ROUTING.MUESLISWAP : DEX_ROUTING.DEXHUNTER);
   };
 
   const handleAutoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.AUTO : DEX_ROUTING.BOTH);
+    setRoutingPreference(checked ? DEX_ROUTING.AUTO : DEX_ROUTING.BOTH);
   };
   return (
     <Stack gap={32}>

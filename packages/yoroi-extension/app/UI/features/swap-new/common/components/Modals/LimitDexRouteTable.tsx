@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Box } from '@mui/material';
-import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
 import { useStrings } from '../../hooks/useStrings';
 
@@ -46,7 +46,7 @@ export const LimitDexRouteTable = () => {
               <TableRow
                 key={index}
                 onClick={() => {
-                  swapForm.action({ type: SwapAction.ProtocolSelected, value: row.protocol });
+                  swapForm.action({ type: SwapActionType.ProtocolSelected, value: row.protocol });
                   closeModal();
                 }}
                 sx={{

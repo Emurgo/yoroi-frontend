@@ -578,7 +578,7 @@
   "swap.txSubmitted": "Transaksi dikirim",
   "swap.txFailed": "Transaksi gagal",
   "swap.txId": "ID transaksi",
-  "swap.routingPreferance": "Pilihan rute",
+  "swap.routingPreference": "Pilihan rute",
   "swap.checkTx": "Periksa transaksi ini daftar transaksi",
   "swap.txNotProcessed": "Transaksi Anda tidak diproses karena masalah teknis",
   "swap.goToTxs": "Ke transaksi",

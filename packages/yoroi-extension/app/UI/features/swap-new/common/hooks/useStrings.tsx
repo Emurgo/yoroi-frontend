@@ -80,8 +80,8 @@ export const messages = Object.freeze(
       id: 'swap.manual',
       defaultMessage: '!!!Slippage tolerance',
     },
-    routingPreferance: {
-      id: 'swap.routingPreferance',
+    routingPreference: {
+      id: 'swap.routingPreference',
       defaultMessage: '!!!Slippage tolerance',
     },
     autoLabel: {
@@ -187,7 +187,7 @@ export const useStrings = () => {
     slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
     applyLabel: intl.formatMessage(messages.applyLabel),
-    routingPreferance: intl.formatMessage(messages.routingPreferance),
+    routingPreference: intl.formatMessage(messages.routingPreference),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     swapLabel: intl.formatMessage(messages.swapLabel),

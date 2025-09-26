@@ -9,7 +9,7 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../common/constants';
-import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
@@ -33,7 +33,6 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
-
   // @ts-ignore
   const handleSubmitTransaction = async password => {
     // @ts-ignore
@@ -41,7 +40,7 @@ export const AssetSwap = () => {
       wallet,
       swapState: swapForm,
     });
-
+    console.log('unisgnedTxRequest', unisgnedTxRequest);
     try {
       await stores.transactionProcessingStore.adaSendAndRefresh({
         wallet,
@@ -53,7 +52,7 @@ export const AssetSwap = () => {
     } catch (e) {
       showTxResultModal(TransactionResult.FAIL);
     } finally {
-      swapForm.action({ type: SwapAction.ResetForm });
+      swapForm.action({ type: SwapActionType.ResetForm });
       closeTxReviewModal();
     }
   };
@@ -90,6 +89,7 @@ export const AssetSwap = () => {
         onClick={() => {
           createOrder();
         }}
+        disabled={!swapForm.canSwap}
         loading={isCreateOrderLoading}
       >
         {swapForm.orderType === MARKET_ORDER ? strings.swapLabel : strings.placeOrder}
@@ -104,3 +104,5 @@ const Content = styled(Stack)(({ theme }: any) => ({
   margin: '0 auto',
   height: '100%',
 }));
+
+

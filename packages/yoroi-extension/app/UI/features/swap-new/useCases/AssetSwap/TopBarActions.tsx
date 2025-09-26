@@ -4,7 +4,7 @@ import Tabs from '../../../../../components/common/tabs/Tabs';
 import { Icons, IconWrapper } from '../../../../components';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { SettingsModalContent } from '../../common/components/Modals/SettingsModalContent';
-import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
 import { LIMIT_ORDER, MARKET_ORDER } from '../../common/constants';
 
 export const TopBarActions = () => {
@@ -39,9 +39,9 @@ export const TopBarActions = () => {
           isActive: swapForm?.orderType === type,
           onClick: () => {
             if (type === LIMIT_ORDER) {
-              swapForm.action({ type: SwapAction.ChangeOrderType, value: LIMIT_ORDER });
+              swapForm.action({ type: SwapActionType.ChangeOrderType, value: LIMIT_ORDER });
             } else {
-              swapForm.action({ type: SwapAction.ChangeOrderType, value: MARKET_ORDER });
+              swapForm.action({ type: SwapActionType.ChangeOrderType, value: MARKET_ORDER });
             }
           },
         }))}

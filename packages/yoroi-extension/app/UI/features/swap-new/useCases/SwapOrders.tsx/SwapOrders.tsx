@@ -241,16 +241,12 @@ const OrderCancelation = ({ order }: { order: Swap.Order }) => {
     try {
       startLoadingTxReview();
       try {
-        const { signedTxHex: signedCancelTx } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
-          wallet,
-          transactionHex: cancelTxCbor,
-          password: passswordInput,
-        });
-        const signedTransactionHexes: any = signedCancelTx != null ? [signedCancelTx, signedCancelTx] : [signedCancelTx];
-        await stores.substores.ada.swapStore.executeTransactionHexes({
-          wallet,
-          signedTransactionHexes,
-        });
+       await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+         wallet,
+         transactionHex: cancelTxCbor,
+         password: passswordInput,
+       });
+
         showTxResultModal(TransactionResult.SUCCESS);
       } catch (error) {
         console.warn('Failed to submit transaction', error);
