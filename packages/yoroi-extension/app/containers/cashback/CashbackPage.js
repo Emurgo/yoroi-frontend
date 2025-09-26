@@ -34,6 +34,8 @@ import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 import type { BringConfigType, ConfigType } from '../../../config/config-types';
 import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
 
+declare var chrome;
+
 const messages = defineMessages({
   claim: {
     id: 'cashback.claim.dialog.title',
