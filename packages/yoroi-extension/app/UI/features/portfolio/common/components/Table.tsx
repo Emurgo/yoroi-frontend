@@ -42,8 +42,14 @@ const Table = ({
   ) : (
     <Stack width="full" justifyContent="center" alignItems="center" sx={{ flex: 1 }}>
       <Stack direction="column" alignItems="center" spacing={theme.spacing(24)}>
-        <Box component="img" src={noResultsPng}></Box>
-        <Typography variant="h4" fontWeight="500" color="ds.text_gray_medium" sx={{ lineHeight: '26px' }}>
+        <Box component="img" src={noResultsPng} id="portfolio-noResultsImage-box"></Box>
+        <Typography
+          variant="h4"
+          fontWeight="500"
+          color="ds.text_gray_medium"
+          sx={{ lineHeight: '26px' }}
+          id="portfolio-noResults-text"
+        >
           {strings.noResultsForThisSearch}
         </Typography>
       </Stack>
