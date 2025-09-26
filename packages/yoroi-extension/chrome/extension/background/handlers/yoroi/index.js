@@ -43,6 +43,8 @@ import {
 } from './connector';
 import { GetProtocolParameters } from './protocolParameters';
 import { subscribe } from '../../subscriptionManager';
+import { MAX_MESSAGE_LENGTH, OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER } from '../../constants';
+import { sendLongMessage } from '../../utils';
 
 const handlerMap = Object.freeze({
   [GetHistoricalCoinPrices.typeTag]: GetHistoricalCoinPrices.handle,
@@ -88,11 +90,15 @@ const handlerMap = Object.freeze({
   [GetProtocolParameters.typeTag]: GetProtocolParameters.handle,
 });
 
+const LONG_RESPONSE_MESSAGE_TYPE = 'long-response';
+
 type Handler = (
   request: Object,
   sender: Object,
   sendResponse: Function,
 ) => Promise<void>;
+
+let incrementalId = 0;
 
 export function getHandler(typeTag: string): ?Handler {
   if (typeTag === 'subscribe') {
@@ -104,11 +110,18 @@ export function getHandler(typeTag: string): ?Handler {
 
   const handler = handlerMap[typeTag];
   if (handler) {
-    return async (request, send, sendResponse) => {
+    return async (request, sender, sendResponse) => {
       try {
         const result = await handler(request.request);
         //console.debug(`BACKGROUND [${typeTag}] sending result: `, JSON.stringify(sanitizeForLog(result)));
-        sendResponse(result);
+        const serializedResult = JSON.stringify(result);
+        if (serializedResult.length <= MAX_MESSAGE_LENGTH) {
+          sendResponse(result);
+        } else {
+          const messageId = String(incrementalId++);
+          sendResponse({ type: OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER, messageId });
+          sendLongMessage(sender.tab.id, serializedResult, LONG_RESPONSE_MESSAGE_TYPE, messageId, MAX_MESSAGE_LENGTH);
+        }
       } catch (error) {
         sendResponse({ error: error.message });
       }

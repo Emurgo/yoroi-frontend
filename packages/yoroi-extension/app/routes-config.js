@@ -9,7 +9,6 @@ export const ROUTES = {
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
-    COMPLEXITY_LEVEL: '/profile/complexity-level',
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
@@ -33,7 +32,6 @@ export const ROUTES = {
     EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
     ANALYTICS: '/settings/analytics',
     PAPER_WALLET: '/settings/paper-wallet',
   },
