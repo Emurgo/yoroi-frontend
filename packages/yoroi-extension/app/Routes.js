@@ -123,12 +123,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
-const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
-const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
-
-const ComplexityLevelPagePromise = () => import('./containers/profile/ComplexityLevelPage');
-const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
-
 const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
 const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 
@@ -170,8 +164,6 @@ export const LazyLoadPromises: Array<() => any> = [
   WalletTransferPagePromise,
   ReceivePromise,
   VotingPageContentPromise,
-  ComplexityLevelSettingsPagePromise,
-  ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
@@ -192,7 +184,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.ROOT} element={<LoadingPage stores={stores} />} />
           <Route path={ROUTES.NIGHTLY_INFO} element={<NightlyPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} element={<LanguageSelectionPage stores={stores} />} />
-          <Route path={ROUTES.PROFILE.COMPLEXITY_LEVEL} element={<ComplexityLevelPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.TERMS_OF_USE} element={<TermsOfUsePage stores={stores} />} />
           <Route path={ROUTES.PROFILE.URI_PROMPT} element={<UriPromptPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.OPT_FOR_ANALYTICS} element={<OptForAnalyticsPage stores={stores} />} />
@@ -234,7 +225,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.SETTINGS.WALLET} element={<WalletSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.EXTERNAL_STORAGE} element={<ExternalStorageSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.SUPPORT} element={<SupportSettingsPage stores={stores} />} />
-            <Route path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY} element={<ComplexityLevelSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.ANALYTICS} element={<AnalyticsSettingsPage stores={stores} />} />
 
             <Route path={ROUTES.SETTINGS.ROOT} element={<Navigate to={ROUTES.SETTINGS.GENERAL} />} />
