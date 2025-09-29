@@ -11,7 +11,7 @@ export const HeaderPrice = observer(({ isLoading = false, isHiddenAmount }) => {
   }
 
   return (
-    <Typography color="ds.text_gray_low" mr="12px">
+    <Typography color="ds.text_gray_low" mr="12px" id={`$portfolio:header-secondCurrency-text`}>
       <HiddenAmount isHidden={isHiddenAmount}>{accountPair?.to.value}</HiddenAmount>
       <span>&nbsp;{accountPair?.to.name}</span>
     </Typography>

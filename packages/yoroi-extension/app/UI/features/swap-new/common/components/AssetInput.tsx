@@ -21,7 +21,7 @@ type AssetInputProps = {
 export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
   const { atoms }: any = useTheme();
-  const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList } = useSwapRevamp();
+  const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList, loadingTokenList } = useSwapRevamp();
   const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
   const value = tokenInput.value;
 
@@ -105,6 +105,10 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
     const value = event.target.value;
     swapForm.action({ type: direction === ASSET_DIRECTION_IN ? 'TokenInAmountChanged' : 'TokenOutAmountChanged', value });
   };
+
+  if (loadingTokenList) {
+    return <SkeletonWrapper direction={direction} />;
+  }
 
   return (
     <Wrapper
@@ -221,6 +225,18 @@ const Wrapper = styled(Box, {
     borderColor: !hasError && theme.palette.ds.el_gray_max,
     borderWidth: 2,
   },
+  marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
+}));
+
+const SkeletonWrapper = styled(Box, {
+  shouldForwardProp: prop => prop !== 'direction',
+})<{
+  direction: AssetDirectionType;
+}>(({ direction, theme }: any) => ({
+  borderRadius: 12,
+  height: '132px',
+  width: '503px',
+  backgroundColor: theme.palette.ds.gray_100,
   marginTop: direction === ASSET_DIRECTION_OUT ? '-10px' : '0px',
 }));
 

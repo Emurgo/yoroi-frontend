@@ -6,7 +6,6 @@ import type { Node } from 'react';
 import type { Notification } from '../../../types/notification.types';
 import type { StandardAddress } from '../../../types/AddressFilterTypes';
 import type { Addressing } from '../../../api/ada/lib/storage/models/PublicDeriver/interfaces';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { Component } from 'react';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
@@ -20,7 +19,6 @@ import {
   getCardanoSpendingKeyHash,
   normalizeToAddress,
 } from '../../../api/ada/lib/storage/bridge/utils';
-import { ComplexityLevels } from '../../../types/complexityLevelType';
 import classnames from 'classnames';
 import QrCodeWrapper from '../../widgets/QrCodeWrapper';
 import Dialog from '../../widgets/Dialog';
@@ -55,7 +53,6 @@ type Props = {|
   +onCopyAddressTooltip: string => void,
   +isHardware: boolean,
   +addressInfo: $ReadOnly<StandardAddress>,
-  +complexityLevel: ?ComplexityLevelType,
   +isAddressBook: boolean,
 |};
 
@@ -187,11 +184,6 @@ export default class VerifyAddressDialog extends Component<Props> {
 
   renderSpendingKey: void => Node = () => {
     const intl = this.context;
-
-    // this is useful for querying servers & debugging. Not so useful for the average user.
-    if (this.props.complexityLevel !== ComplexityLevels.Advanced) {
-      return null;
-    }
 
     const getSpendingKey = () => {
       if (isCardanoHaskellAddress(this.props.addressInfo.type)) {

@@ -10,7 +10,6 @@ import type { Notification } from '../../../types/notification.types';
 import type { TxDataOutput, TxDataInput } from '../../../api/common/types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import React, { Component } from 'react';
 import { observer } from 'mobx-react';
 import { IntlContext } from 'react-intl';
@@ -45,7 +44,6 @@ import { hiddenAmount } from '../../../utils/strings';
 import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } from '../../../stores/stateless/tokenHelpers';
 import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
-import { ComplexityLevels } from '../../../types/complexityLevelType';
 import { assuranceLevelTranslations, shelleyCertificateKinds, stateTranslations, messages } from './Transaction';
 
 type Props = {|
@@ -66,7 +64,6 @@ type Props = {|
   +notification: ?Notification,
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => $ReadOnly<TokenRow> | null,
-  +complexityLevel: ?ComplexityLevelType,
   id: string,
   txIndex: number,
 |};
@@ -995,17 +992,14 @@ export default class TransactionRevamp extends Component<Props, State> {
         try {
           jsonData = parseMetadata(data.metadata);
         } catch (_error) {
-          // try to parse schema using detailed conversion if advanced user
-          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-            try {
-              jsonData = parseMetadataDetailed(data.metadata);
-            } catch (_errDetailed) {
-              // discard error
-              // can not parse metadata as json
-              // show the metadata hex as is
-            }
+          // try to parse schema using detailed conversion
+          try {
+            jsonData = parseMetadataDetailed(data.metadata);
+          } catch (_errDetailed) {
+            // discard error
+            // can not parse metadata as json
+            // show the metadata hex as is
           }
-          // do nothing for simple user
         }
         if (jsonData !== null) {
           metadata = <CodeBlock code={jsonData} />;

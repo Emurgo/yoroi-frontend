@@ -86,6 +86,9 @@ export default class UnitOfAccountSettings extends Component<Props> {
 
     const optionRenderer = option => {
       const SvgElem = option.svg;
+      if (option.value === 'ADA') {
+        return null;
+      }
       return (
         <MenuItemStyled
           key={option.value}

@@ -10,7 +10,6 @@ import type { TxMemoTableRow } from '../../../api/ada/lib/storage/database/memos
 import type { Notification } from '../../../types/notification.types';
 import type { TokenLookupKey, TokenEntry } from '../../../api/common/lib/MultiToken';
 import type { UnitOfAccountSettingType } from '../../../types/unitOfAccountType';
-import type { ComplexityLevelType } from '../../../types/complexityLevelType';
 import { observer } from 'mobx-react';
 import { defineMessages, IntlContext } from 'react-intl';
 import moment from 'moment';
@@ -38,7 +37,6 @@ import { getTokenName, getTokenIdentifierIfExists, assetNameFromIdentifier } fro
 import { parseMetadata, parseMetadataDetailed } from '../../../api/ada/lib/storage/bridge/metadataUtils';
 import CodeBlock from '../../widgets/CodeBlock';
 import BigNumber from 'bignumber.js';
-import { ComplexityLevels } from '../../../types/complexityLevelType';
 
 export const messages: Object = defineMessages({
   type: {
@@ -241,7 +239,6 @@ type Props = {|
   +notification: ?Notification,
   +addressToDisplayString: string => string,
   +getTokenInfo: ($ReadOnly<Inexact<TokenLookupKey>>) => ?$ReadOnly<TokenRow>,
-  +complexityLevel: ?ComplexityLevelType,
 |};
 
 type State = {|
@@ -917,17 +914,14 @@ export default class Transaction extends Component<Props, State> {
         try {
           jsonData = parseMetadata(data.metadata);
         } catch (_error) {
-          // try to parse schema using detailed conversion if advanced user
-          if (this.props.complexityLevel === ComplexityLevels.Advanced) {
-            try {
-              jsonData = parseMetadataDetailed(data.metadata);
-            } catch (_errDetailed) {
-              // discard error
-              // can not parse metadata as json
-              // show the metadata hex as is
-            }
+          // try to parse schema using detailed conversion
+          try {
+            jsonData = parseMetadataDetailed(data.metadata);
+          } catch (_errDetailed) {
+            // discard error
+            // can not parse metadata as json
+            // show the metadata hex as is
           }
-          // do nothing for simple user
         }
         if (jsonData !== null) {
           metadata = <CodeBlock code={jsonData} />;

@@ -43,6 +43,8 @@ interface Props {
   stores: any;
 }
 
+const pathId = 'portfolio:header';
+
 const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
@@ -137,7 +139,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax" id={`${pathId}-mainCurrencyValue-text`}>
               <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
                 {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
               </HiddenAmount>
@@ -169,7 +171,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
         </Stack>
       </Stack>
 
-      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
+      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id={`${pathId}-search-input`} />
     </Stack>
   );
 });
@@ -190,10 +192,16 @@ const LoadingSkeleton = () => (
 
 const CurrencyDisplay = ({ from, handleCurrencyChange }) => (
   <Stack direction="row" alignItems="flex-end" gap="4px" ml="2px">
-    <Typography component="span" variant="body1" fontWeight="500" color="ds.text_gray_medium">
+    <Typography
+      component="span"
+      variant="body1"
+      fontWeight="500"
+      color="ds.text_gray_medium"
+      id={`${pathId}-mainCurrencyFiat-text`}
+    >
       {from}
     </Typography>
-    <IconWrapper onClick={handleCurrencyChange}>
+    <IconWrapper onClick={handleCurrencyChange} id={`${pathId}-switchCurrencies-button`}>
       <Switch />
     </IconWrapper>
   </Stack>
@@ -219,7 +227,7 @@ type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; cha
 export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography variant="caption" lineHeight="16px">
+      <Typography variant="caption" lineHeight="16px" id={`${pathId}:performance-percentage-text`}>
         {changePercent}
       </Typography>
     </PnlTag>
@@ -235,7 +243,7 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
 
   return (
     <PnlTag variant={variantPnl} withPercentSign={false}>
-      <Typography variant="caption" lineHeight="16px">{`${
+      <Typography variant="caption" lineHeight="16px" id={`${pathId}:performance-price-text`}>{`${
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>
     </PnlTag>

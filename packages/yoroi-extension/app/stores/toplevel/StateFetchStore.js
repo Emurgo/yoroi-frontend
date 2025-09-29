@@ -6,11 +6,13 @@ import type { IFetcher } from '../../api/common/lib/state-fetch/IFetcher.types';
 import { RemoteFetcher } from '../../api/common/lib/state-fetch/remoteFetcher';
 import { BatchedFetcher } from '../../api/common/lib/state-fetch/batchedFetcher';
 import environment from '../../environment';
+import { getPlatform } from '../../../chrome/extension/background/utils';
 
 export default class StateFetchStore<
   StoresMapType: {
     +profile: {
       +currentLocale: string,
+      +getCurrentNetworkId: function,
       ...
     },
     ...
@@ -24,15 +26,8 @@ export default class StateFetchStore<
       new RemoteFetcher(
         () => environment.getVersion(),
         () => this.stores.profile.currentLocale,
-        () => {
-          if (environment.isFirefox()) {
-            return 'firefox';
-          }
-          if (environment.isChrome()) {
-            return 'chrome';
-          }
-          return '-';
-        }
+        getPlatform,
+        () => this.stores.profile.getCurrentNetworkId()
       )
     );
   }
