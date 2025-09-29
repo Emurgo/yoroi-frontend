@@ -58,7 +58,7 @@ export const SettingsModalContent = () => {
           <SlippageInput selectedSlippage={selectedSlippage} setSelectedSlippage={setSelectedSlippage} inputRef={inputRef} />
         )}
         <Typography variant="body1" color="ds.text_gray_medium" my={16}>
-          {strings.routingPreferance}
+          {strings.routingPreference}
         </Typography>
         <RoutingPreference setRoutingPreference={setRoutingPreference} routingPreference={routingPreference} />
       </Box>
