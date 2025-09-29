@@ -104,5 +104,3 @@ const Content = styled(Stack)(({ theme }: any) => ({
   margin: '0 auto',
   height: '100%',
 }));
-
-
