@@ -114,7 +114,6 @@ const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
     routingPreference === DEX_ROUTING.MUESLISWAP ||
     routingPreference === DEX_ROUTING.BOTH;
 
-  console.log('OPTIONSSS', { autoSelected, dexHunter, muesliswap });
   const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setRoutingPreference(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);
