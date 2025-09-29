@@ -14,8 +14,8 @@ export default class WalletCommonBase extends BasePage {
     locator: 'sidebar.staking',
     method: 'id',
   };
-  assetsTabButtonLocator = {
-    locator: 'sidebar.assets',
+  portfolioTabButtonLocator = {
+    locator: 'sidebar.portfolio',
     method: 'id',
   };
   nftsTabButtonLocator = {
@@ -215,9 +215,9 @@ export default class WalletCommonBase extends BasePage {
     await this.click(this.stakingTabButtonLocator);
   }
   // TODO Portfolio should be here
-  async goToAssetsTab() {
-    this.logger.info(`WalletCommonBase::goToAssetsTab is called`);
-    await this.click(this.assetsTabButtonLocator);
+  async goToPortfolioTab() {
+    this.logger.info(`WalletCommonBase::goToPortfolioTab is called`);
+    await this.click(this.portfolioTabButtonLocator);
   }
   async goToNftsTab() {
     this.logger.info(`WalletCommonBase::goToNftsTab is called`);
