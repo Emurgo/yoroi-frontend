@@ -326,7 +326,6 @@ export default class WalletReceivePage extends Component<StoresProps> {
             isHardware={isHwWallet}
             verify={() => stores.substores.ada.hwVerifyAddress.verifyAddress(publicDeriver)}
             cancel={stores.substores.ada.hwVerifyAddress.closeAddressDetailDialog}
-            complexityLevel={profile.selectedComplexityLevel}
             isAddressBook={isAddressBook}
           />
         ) : null}

@@ -17,15 +17,16 @@ import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
 interface Props {
   tokenInfo: TokenInfoType;
   stores: any;
+  pathId?: string;
 }
 
-const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode => {
+const HeaderSection = observer(({ tokenInfo, stores, pathId = '' }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
   const isPrimaryToken: boolean = tokenInfo.id === '-';
 
-  // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
+  // TODO refactor and remove this calculation from here in the future - this should come from the main selected wallet context
   const { wallets, delegation } = stores;
   const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
   const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
@@ -36,7 +37,7 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
   // End of total Ada balance calculation
 
   const tokenTotalAmount = isPrimaryToken ? Number(primaryBalance) : tokenInfo.formatedAmount;
-  if (tokenInfo.quantity === null) {
+  if (!tokenInfo || tokenInfo.quantity === null) {
     return <></>;
   }
 
@@ -48,21 +49,30 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
     tokenActivity: { data24h },
   } = usePortfolioTokenActivity();
 
+  const getClosePrice = (): number | null => {
+    if (tokenInfo?.info?.id && data24h && data24h[tokenInfo.info.id] && data24h && data24h[tokenInfo.info.id].length > 1) {
+      const priceData = data24h[tokenInfo.info.id][1].price;
+      if (priceData) {
+        return priceData.close;
+      }
+    }
+    return null;
+  };
+
   const totaPriceCalc = React.useMemo(() => {
     if (!isPrimaryToken && !isEmpty(data24h)) {
-      const tokenPrice = data24h && data24h[tokenInfo.info.id][1]?.price?.close;
-      const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
-      const tokenDecimals = !isPrimaryToken && tokenInfo.info.numberOfDecimals;
-
-      if (tokenPrice === undefined && !isPrimaryToken) {
+      const tokenPrice = getClosePrice();
+      if (tokenPrice === null || !tokenInfo?.quantity || !tokenInfo?.info?.numberOfDecimals) {
         return '-';
       }
 
-      const totaPrice = atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
+      const tokenQuantityAsBigInt = bigNumberToBigInt(new BigNumber(tokenInfo.quantity));
+      const tokenDecimals = tokenInfo.info.numberOfDecimals;
+
+      return atomicBreakdown(tokenQuantityAsBigInt, tokenDecimals)
         .bn.times(tokenPrice ?? 1)
         .times(String(ptPrice))
         .toFormat(tokenDecimals);
-      return totaPrice;
     }
     return 0;
   }, [data24h, ptPrice]);
@@ -77,7 +87,7 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
 
       <Stack direction="column" spacing={theme.spacing(4)}>
         <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
-          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
+          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium" id={`${pathId}:tokenBalance:main-value-text`}>
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
           <Typography
@@ -87,12 +97,13 @@ const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode =
             sx={{
               paddingTop: `${theme.spacing(18)}`,
             }}
+            id={`${pathId}:tokenBalance:main-fiat-text`}
           >
-            {tokenInfo.info.name}
+            {tokenInfo?.info?.name}
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600">
+        <Typography color="ds.gray_600" id={`${pathId}:tokenBalance-second-text`}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
           <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>

@@ -10,6 +10,8 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
+const pathId = 'portfolio:tokenDetails:overview';
+
 const Overview = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
@@ -26,23 +28,23 @@ const Overview = ({ tokenInfo }: Props): React.ReactNode => {
             borderRadius: '16px',
           }}
           component="img"
-          src={tokenInfo.info.image || tokenPng}
+          src={tokenInfo?.info?.image || tokenPng}
           onError={e => {
             // @ts-ignore
             e.target.src = tokenPng;
           }}
         ></Box>
 
-        <Typography fontWeight="500" color="ds.gray_900">
-          {tokenInfo?.info.name}
+        <Typography fontWeight="500" color="ds.gray_900" id={`${pathId}-tokenName-text`}>
+          {tokenInfo?.info?.name}
         </Typography>
       </Stack>
 
-      <TokenOverviewSection label={strings.info} value={tokenInfo?.info.metadata?.description} />
+      <TokenOverviewSection label={strings.info} value={tokenInfo?.info?.metadata?.description} />
 
       <TokenOverviewSection
         label={strings.website}
-        value={isPrimary ? 'https://cardano.org/' : tokenInfo?.info.metadata?.website}
+        value={isPrimary ? 'https://cardano.org/' : tokenInfo?.info?.metadata?.website}
         isExternalLink
       />
 
@@ -50,15 +52,15 @@ const Overview = ({ tokenInfo }: Props): React.ReactNode => {
         <></>
       ) : (
         <>
-          <TokenOverviewSection label={strings.policyId} value={tokenInfo?.info.policyId} withCopy />
+          <TokenOverviewSection label={strings.policyId} value={tokenInfo?.info?.policyId} withCopy />
 
-          <TokenOverviewSection label={strings.fingerprint} value={tokenInfo?.info.fingerprint} withCopy />
+          <TokenOverviewSection label={strings.fingerprint} value={tokenInfo?.info?.fingerprint} withCopy />
         </>
       )}
 
       <TokenOverviewSection
         label={strings.detailsOn}
-        value={`${tokenInfo.info.fingerprint}`}
+        value={`${tokenInfo?.info?.fingerprint}`}
         isNetworkUrl={true}
         isPrimary={isPrimary}
       />
@@ -91,6 +93,10 @@ const TokenOverviewSection = ({
 
   const { explorer } = usePortfolio();
   const theme: any = useTheme();
+  const cleanLabelName = label
+    .split(' ')
+    .map((word, index) => (index === 0 ? word.toLowerCase() : word[0]?.toUpperCase() + word.slice(1)))
+    .join('');
 
   return (
     <Stack direction="row" alignItems="flex-end" gap="8px">
@@ -111,19 +117,28 @@ const TokenOverviewSection = ({
               }
               rel="noopener noreferrer"
               sx={{ textDecoration: 'none' }}
+              id={`${pathId}-${cleanLabelName}-link`}
             >
               {explorer.tokenInfo.name}
             </LinkMui>
           </Stack>
         ) : isExternalLink ? (
-          <LinkMui href={value} target="_blank" rel="noopener noreferrer" style={{ width: 'fit-content' }}>
+          <LinkMui
+            href={value}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ width: 'fit-content' }}
+            id={`${pathId}-${cleanLabelName}-link`}
+          >
             {value || '-'}
           </LinkMui>
         ) : (
-          <Typography color="ds.gray_600">{value || '-'}</Typography>
+          <Typography color="ds.gray_600" id={`${pathId}-${cleanLabelName}-text`}>
+            {value || '-'}
+          </Typography>
         )}
       </Stack>
-      {withCopy && <CopyButton textToCopy={value} />}
+      {withCopy && <CopyButton textToCopy={value} pathTestId={`${pathId}:${cleanLabelName}`} />}
     </Stack>
   );
 };

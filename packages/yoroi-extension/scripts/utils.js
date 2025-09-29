@@ -40,4 +40,22 @@ const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
   }
 };
 
-module.exports = { exec, argv, shouldInjectConnector, isNightly, isE2E, buildAndCopyInjector };
+const embedPushNotificationHandler = () => {
+  const embedded = fs.readFileSync(`${__dirname}/../chrome/extension/background/pushNotificationHandler.embedded`);
+  const fileName = `${__dirname}/../build/js/background-service-worker.js`;
+  const original = fs.readFileSync(fileName);
+  const fd = fs.openSync(fileName, 'w');
+  fs.writeSync(fd, embedded);
+  fs.writeSync(fd, original);
+  fs.closeSync(fd);
+};
+
+module.exports = {
+  exec,
+  argv,
+  shouldInjectConnector,
+  isNightly,
+  isE2E,
+  buildAndCopyInjector,
+  embedPushNotificationHandler,
+};
