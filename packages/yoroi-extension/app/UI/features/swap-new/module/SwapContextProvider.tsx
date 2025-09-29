@@ -201,13 +201,11 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         protocol: state.selectedProtocol.value,
       })
       .then(response => {
-        console.log('response from estimate: ', response);
         if (reqId !== estimateReqIdRef.current) return;
 
         if (isLeft(response)) {
           action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
-          console.log('response.value.data', response.value.data);
           action({ type: SwapActionType.EstimateResponse, value: response.value.data });
         }
       })
@@ -252,16 +250,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
     const inputs = await getInputs(amountsIn);
 
-    console.log('Created Order', {
-      tokenIn: state.tokenInInput.tokenId,
-      tokenOut: state.tokenOutInput.tokenId,
-      amountIn: Number(state.tokenInInput.value),
-      ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
-      blockedProtocols: [],
-      protocol: state.selectedProtocol.value,
-      inputs: inputs,
-    });
-
     swapManager.api
       .create({
         tokenIn: state.tokenInInput.tokenId,
@@ -273,7 +261,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         inputs: inputs,
       })
       .then(response => {
-        console.log('response from create order: ', response);
         setIsCreateOrderLoading(false);
         if (isLeft(response)) {
           action({ type: SwapActionType.CreateError, value: response.error });
