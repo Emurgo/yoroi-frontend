@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
-import CashbackPage from '../pages/wallet/cashback/cashback.page.js';
-import CashbackTermsModal from '../pages/wallet/cashback/modals/disclaimerModal.page.js';
+import CashbackPage from '../pages/wallet/Cashback/cashback.page.js';
+import CashbackTermsModal from '../pages/wallet/Cashback/modals/disclaimerModal.page.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { customAfterEach } from '../utils/customHooks.js';
 import { getTestLogger } from '../utils/utils.js';
@@ -9,7 +9,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import { createWallet, prepareWallet } from '../helpers/restoreWalletHelper.js';
 import GeneralSubTab from '../pages/wallet/settingsTab/generalSubTab.page.js';
 import WalletTab from '../pages/wallet/walletTab/walletTab.page.js';
-import WrongWalletModal from '../pages/wallet/cashback/modals/wrongWalletModal.page.js';
+import WrongWalletModal from '../pages/wallet/Cashback/modals/wrongWalletModal.page.js';
 import { testWallet1Mainnet } from '../utils/testWallets.js';
 
 describe('Cashback Two Wallets Added', function () {

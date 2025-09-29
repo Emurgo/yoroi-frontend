@@ -1,11 +1,6 @@
 import React from 'react';
 
-export type IconProps = React.SVGProps<SVGSVGElement> & {
-  size?: number | string;
-  title?: string;
-};
-
-export const Swap = (props: IconProps) => {
+export const Swap = (props: React.SVGProps<SVGSVGElement>) => {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

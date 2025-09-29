@@ -121,46 +121,6 @@ export const messages = Object.freeze(
       id: 'global.labels.apply',
       defaultMessage: '!!! Apply',
     },
-    ordersPair: {
-      id: 'swap.ordersPair',
-      defaultMessage: '!!!Pair (From / To)',
-    },
-    assetPrice: {
-      id: 'swap.assetPrice',
-      defaultMessage: '!!!Asset price',
-    },
-    assetAmount: {
-      id: 'swap.assetAmount',
-      defaultMessage: '!!!Asset amount',
-    },
-    total: {
-      id: 'swap.total',
-      defaultMessage: '!!!Total',
-    },
-    timeExecuted: {
-      id: 'swap.timeExecuted',
-      defaultMessage: '!!!Time executed',
-    },
-    timeCreated: {
-      id: 'swap.timeCreated',
-      defaultMessage: '!!!Time created',
-    },
-    txId: {
-      id: 'swap.txId',
-      defaultMessage: '!!!Transaction ID',
-    },
-    ordersCompletedLabel: {
-      id: 'swap.ordersCompletedLabel',
-      defaultMessage: '!!!Completed orders',
-    },
-    openOrdersLabel: {
-      id: 'swap.openOrdersLabel',
-      defaultMessage: '!!!Open orders',
-    },
-    cancel: {
-      id: 'global.labels.cancel',
-      defaultMessage: '!!!Cancel',
-    },
   })
 );
 
@@ -195,16 +155,6 @@ export const useStrings = () => {
     selectRoute: intl.formatMessage(messages.selectRoute),
     buyAt: intl.formatMessage(messages.buyAt),
     allAssets: intl.formatMessage(messages.allAssets),
-    ordersPair: intl.formatMessage(messages.ordersPair),
-    assetPrice: intl.formatMessage(messages.assetPrice),
-    assetAmount: intl.formatMessage(messages.assetAmount),
-    timeExecuted: intl.formatMessage(messages.timeExecuted),
-    timeCreated: intl.formatMessage(messages.timeCreated),
-    total: intl.formatMessage(messages.total),
-    txId: intl.formatMessage(messages.txId),
-    ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
-    openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
-    cancel: intl.formatMessage(messages.cancel),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

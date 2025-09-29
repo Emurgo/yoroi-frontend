@@ -6,16 +6,9 @@ interface Props {
   variant: any;
   sx?: any;
   width?: string;
-  pathId?: string;
 }
 
-const NavigationButton = ({ label, onClick, variant, sx, width, pathId = '', ...props }: Props) => {
-  const cleanLabelName = label
-    .split(' ')
-    .map((word, index) => (index === 0 ? word.toLowerCase() : word[0]?.toUpperCase() + word.slice(1)))
-    .join('');
-
-  const fullPathId = `${pathId}-${cleanLabelName}-button`;
+const NavigationButton = ({ label, onClick, variant, sx, width, ...props }: Props) => {
   return (
     <Button
       onClick={onClick}
@@ -40,7 +33,6 @@ const NavigationButton = ({ label, onClick, variant, sx, width, pathId = '', ...
         },
         ...sx,
       })}
-      id={fullPathId}
     >
       {/* @ts-ignore */}
       <Typography variant="button2">{label}</Typography>

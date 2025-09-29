@@ -17,10 +17,9 @@ import { bigNumberToBigInt } from '../../TokensTable/TableColumnsChip';
 interface Props {
   tokenInfo: TokenInfoType;
   stores: any;
-  pathId?: string;
 }
 
-const HeaderSection = observer(({ tokenInfo, stores, pathId = '' }: Props): React.ReactNode => {
+const HeaderSection = observer(({ tokenInfo, stores }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
   const { unitOfAccount, accountPair, primaryTokenInfo } = usePortfolio();
@@ -87,7 +86,7 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId = '' }: Props): Reac
 
       <Stack direction="column" spacing={theme.spacing(4)}>
         <Stack direction="row" spacing={theme.spacing(2)} alignItems="flex-start">
-          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium" id={`${pathId}:tokenBalance:main-value-text`}>
+          <Typography variant="h2" fontWeight="500" color="ds.text_gray_medium">
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{tokenTotalAmount}</HiddenAmount>
           </Typography>
           <Typography
@@ -97,13 +96,12 @@ const HeaderSection = observer(({ tokenInfo, stores, pathId = '' }: Props): Reac
             sx={{
               paddingTop: `${theme.spacing(18)}`,
             }}
-            id={`${pathId}:tokenBalance:main-fiat-text`}
           >
             {tokenInfo?.info?.name}
           </Typography>
         </Stack>
 
-        <Typography color="ds.gray_600" id={`${pathId}:tokenBalance-second-text`}>
+        <Typography color="ds.gray_600">
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{isPrimaryToken ? ptValue : totaPriceCalc}</HiddenAmount>
           <span>&nbsp;{isPrimaryToken && unitOfAccount === primaryTokenInfo.name ? DEFAULT_FIAT_PAIR : unitOfAccount}</span>
         </Typography>

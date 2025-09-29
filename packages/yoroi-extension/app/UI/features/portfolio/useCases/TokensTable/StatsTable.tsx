@@ -76,7 +76,6 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
 
   const { getSortedData, handleRequestSort } = useTableSort({ order, orderBy, setSortState, headCells, data: assetFormatedList });
   const sortedData = getSortedData(assetFormatedList);
-  const tokenPathId = (rowIndex: number) => `portfolio:table:token_${rowIndex}`;
   return (
     <Table
       name="stat"
@@ -88,23 +87,14 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
       isLoading={isLoading && !showWelcomeBanner}
       TableRowSkeleton={<TableRowSkeleton theme={theme} />}
     >
-      {sortedData.map((row: any, rowIndex) => (
-        <STableRow
-          key={row.id}
-          onClick={() => navigateTo.portfolioDetail(row.id)}
-          id={`portfolio:table-token_${rowIndex}-rowComponent`}
-        >
+      {sortedData.map((row: any) => (
+        <STableRow key={row.id} onClick={() => navigateTo.portfolioDetail(row.id)}>
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenDisplay token={row} pathId={tokenPathId(rowIndex)} />
+            <TokenDisplay token={row} />
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPrice
-              ptActivity={ptActivity}
-              secondaryToken24Activity={data24h && data24h[row.info.id]}
-              token={row}
-              pathId={tokenPathId(rowIndex)}
-            />
+            <TokenPrice ptActivity={ptActivity} secondaryToken24Activity={data24h && data24h[row.info.id]} token={row} />
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
@@ -112,7 +102,6 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
               secondaryTokenActivity={data24h && data24h[row.info.id]}
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
-              pathId={tokenPathId(rowIndex)}
             />
           </STableCell>
 
@@ -122,7 +111,6 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.WEEK}
-              pathId={tokenPathId(rowIndex)}
             />
           </STableCell>
 
@@ -132,21 +120,15 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
               primaryTokenActivity={ptActivity}
               isPrimaryToken={isPrimaryToken(row)}
               timeInterval={TOKEN_CHART_INTERVAL.MONTH}
-              pathId={tokenPathId(rowIndex)}
             />
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenProcentage procentage={row.percentage} pathId={tokenPathId(rowIndex)} />
+            <TokenProcentage procentage={row.percentage} />
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenPriceTotal
-              token={row}
-              secondaryToken24Activity={data24h && data24h[row.info.id]}
-              stores={stores}
-              pathId={tokenPathId(rowIndex)}
-            />
+            <TokenPriceTotal token={row} secondaryToken24Activity={data24h && data24h[row.info.id]} stores={stores} />
           </STableCell>
         </STableRow>
       ))}

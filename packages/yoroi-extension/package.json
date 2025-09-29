@@ -170,7 +170,7 @@
     "@yoroi/resolver": "2.0.2",
     "@yoroi/staking": "^1.6.0",
     "@yoroi/swap": "6.0.2",
-    "@yoroi/types": "6.0.0",
+    "@yoroi/types": "2.0.0",
     "assert": "2.1.0",
     "async-await-queue": "2.1.4",
     "bech32": "2.0.0",

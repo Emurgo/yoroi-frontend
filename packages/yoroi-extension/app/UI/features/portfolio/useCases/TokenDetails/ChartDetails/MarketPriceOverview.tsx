@@ -16,10 +16,9 @@ interface Props {
   isLoading: boolean;
   tokenInfo: TokenInfoType;
   isDragging?: boolean;
-  pathId?: string;
 }
 
-export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging, pathId }: Props): React.ReactNode => {
+export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isDragging }: Props): React.ReactNode => {
   const isPrimaryToken: boolean = tokenInfo?.id === '-';
   const theme: any = useTheme();
   const strings = useStrings();
@@ -68,19 +67,14 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
             secondaryTokenActivity={data24h && data24h[tokenInfo?.info?.id]}
             detailInfo={detailInfo}
             isDragging={isDragging}
-            pathId={pathId}
           />
 
           {chartData === undefined ? (
             <Skeleton width="64px" height="13px" />
           ) : (
             <Stack direction="row" gap="4px">
-              <PriceChangeChip value={Number(priceChangePercent)} pathId={pathId} />
-              <PriceValueChip
-                value={Number(priceChangeValue)}
-                unitOfAccount={unitOfAccount || DEFAULT_FIAT_PAIR}
-                pathId={pathId}
-              />
+              <PriceChangeChip value={Number(priceChangePercent)} />
+              <PriceValueChip value={Number(priceChangeValue)} unitOfAccount={unitOfAccount || DEFAULT_FIAT_PAIR} />
             </Stack>
           )}
         </Stack>
@@ -89,7 +83,7 @@ export const TokenMarketPriceOverview = ({ chartData, detailInfo, tokenInfo, isD
   );
 };
 
-const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity, detailInfo, isDragging, pathId }) => {
+const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptActivity, detailInfo, isDragging }) => {
   const tokenPrice = isPrimaryToken ? ptActivity.close : secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
 
   const sPrice = secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
@@ -106,17 +100,15 @@ const TokenPrice = ({ isPrimaryToken, unitOfAccount, secondaryTokenActivity, ptA
 
   return (
     <Stack direction="row" alignItems="flex-start" textAlign="center" color="ds.text_gray_medium">
-      <Typography fontWeight="500" id={`${pathId}:price-value-text`}>
-        {formatPriceChange(isPrimaryToken ? ptPrice : ptUnitPrice, 4)}
-      </Typography>
-      <Typography variant="caption" mt="2px" id={`${pathId}:price-fiat-text`}>
+      <Typography fontWeight="500">{formatPriceChange(isPrimaryToken ? ptPrice : ptUnitPrice, 4)}</Typography>
+      <Typography variant="caption" mt="2px">
         &nbsp;{unitOfAccount}
       </Typography>
     </Stack>
   );
 };
 
-const PriceChangeChip = ({ value, pathId }: { value: number; pathId?: string }) => {
+const PriceChangeChip = ({ value }: { value: number }) => {
   const theme: any = useTheme();
   const valueToDisplay = value >= 0 ? formatNumber(value) : formatNumber(-1 * value);
 
@@ -132,22 +124,20 @@ const PriceChangeChip = ({ value, pathId }: { value: number; pathId?: string }) 
               <Icon.ChipArrowDown fill={theme.palette.ds.sys_magenta_700} />
             ) : null}
             {/* @ts-ignore */}
-            <Typography variant="caption1" id={`${pathId}-pricePercentageChange-text`}>
-              {valueToDisplay === 'NaN' ? '-' : valueToDisplay}%
-            </Typography>
+            <Typography variant="caption1">{valueToDisplay === 'NaN' ? '-' : valueToDisplay}%</Typography>
           </Stack>
         }
       />
     </>
   );
 };
-const PriceValueChip = ({ value, unitOfAccount, pathId }: { value: number; unitOfAccount: string; pathId?: string }) => {
+const PriceValueChip = ({ value, unitOfAccount }: { value: number; unitOfAccount: string }) => {
   return (
     <>
       <Chip
         type={value > 0 ? ChipTypes.ACTIVE : value < 0 ? ChipTypes.INACTIVE : ChipTypes.DISABLED}
         label={
-          <Typography variant="caption" id={`${pathId}-priceValueChange-text`}>
+          <Typography variant="caption">
             {value > 0 && '+'}
             {formatNumber(value) === 'NaN' ? '-' : formatNumber(value)} {unitOfAccount}
           </Typography>

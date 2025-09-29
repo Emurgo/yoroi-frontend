@@ -8,7 +8,7 @@ type Props = {
 const SwapOrdersPage = (props: Props) => {
   return (
     <SwapLayout {...props}>
-      <SwapOrders stores={props.stores} />
+      <SwapOrders />
     </SwapLayout>
   );
 };

@@ -96,13 +96,6 @@ import { Swap } from './Swap';
 import { AdaToken } from './AdaToken';
 import { Bell } from './Bell';
 import { Notification } from './Notification';
-import { MuesliSwap } from './MuesliSwap';
-import { MinSwap } from './MinSwap';
-import { SpectrumSwap } from './SpectrumSwap';
-import { WingRiders } from './WingRinders';
-import { VyfiSwap } from './VyfiSwap';
-import { SundaeSwap } from './SundaeSwap';
-import { Cswap } from './CSwap';
 
 export const Icon = {
   Assets,
@@ -201,13 +194,6 @@ export const Icon = {
   Swap,
   Bell,
   Notification,
-  MuesliSwap,
-  MinSwap,
-  SpectrumSwap,
-  WingRiders,
-  VyfiSwap,
-  SundaeSwap,
-  Cswap,
 };
 
 export enum Icons {
@@ -302,13 +288,6 @@ export enum Icons {
   Wallet = 'Wallet',
   Wallets = 'Wallets',
   Swap = 'Swap',
-  MuesliSwap = 'MuesliSwap',
-  MinSwap = 'MinSwap',
-  SpectrumSwap = 'SpectrumSwap',
-  WingRiders = 'WingRiders',
-  VyfiSwap = 'VyfiSwap',
-  SundaeSwap = 'SundaeSwap',
-  CSwap = 'CSwap',
 }
 
 interface IconWrapperProps {

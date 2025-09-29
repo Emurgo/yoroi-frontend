@@ -10,8 +10,6 @@ interface Props {
   tokenInfo: TokenInfoType;
 }
 
-const pathId = 'portfolio:tokenDetails:overview';
-
 const Overview = ({ tokenInfo }: Props): React.ReactNode => {
   const theme: any = useTheme();
   const strings = useStrings();
@@ -35,7 +33,7 @@ const Overview = ({ tokenInfo }: Props): React.ReactNode => {
           }}
         ></Box>
 
-        <Typography fontWeight="500" color="ds.gray_900" id={`${pathId}-tokenName-text`}>
+        <Typography fontWeight="500" color="ds.gray_900">
           {tokenInfo?.info?.name}
         </Typography>
       </Stack>
@@ -93,10 +91,6 @@ const TokenOverviewSection = ({
 
   const { explorer } = usePortfolio();
   const theme: any = useTheme();
-  const cleanLabelName = label
-    .split(' ')
-    .map((word, index) => (index === 0 ? word.toLowerCase() : word[0]?.toUpperCase() + word.slice(1)))
-    .join('');
 
   return (
     <Stack direction="row" alignItems="flex-end" gap="8px">
@@ -117,28 +111,19 @@ const TokenOverviewSection = ({
               }
               rel="noopener noreferrer"
               sx={{ textDecoration: 'none' }}
-              id={`${pathId}-${cleanLabelName}-link`}
             >
               {explorer.tokenInfo.name}
             </LinkMui>
           </Stack>
         ) : isExternalLink ? (
-          <LinkMui
-            href={value}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ width: 'fit-content' }}
-            id={`${pathId}-${cleanLabelName}-link`}
-          >
+          <LinkMui href={value} target="_blank" rel="noopener noreferrer" style={{ width: 'fit-content' }}>
             {value || '-'}
           </LinkMui>
         ) : (
-          <Typography color="ds.gray_600" id={`${pathId}-${cleanLabelName}-text`}>
-            {value || '-'}
-          </Typography>
+          <Typography color="ds.gray_600">{value || '-'}</Typography>
         )}
       </Stack>
-      {withCopy && <CopyButton textToCopy={value} pathTestId={`${pathId}:${cleanLabelName}`} />}
+      {withCopy && <CopyButton textToCopy={value} />}
     </Stack>
   );
 };

@@ -12,7 +12,6 @@ interface Props {
 
 const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props): React.ReactNode => {
   const theme = useTheme();
-  const componentPathID = 'portfolio:table:header';
 
   return (
     <TableHead
@@ -39,7 +38,6 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                   justifyContent: isPadding ? 'space-between' : 'flex-start',
                   width: isPadding ? '100%' : 'fit-content',
                 }}
-                id={`${componentPathID}-${id}Column-button`}
               >
                 <Typography variant="body2" color="ds.gray_600" sx={{ userSelect: 'none' }}>
                   {label}
@@ -51,7 +49,6 @@ const SortableTableHead = ({ headCells, order, orderBy, onRequestSort }: Props):
                     orderBy={orderBy}
                     style={{ cursor: 'pointer' }}
                     onClick={() => (isPadding ? onRequestSort(id) : null)}
-                    pathId={`${componentPathID}:${id}Column`}
                   />
                 )}
               </Stack>

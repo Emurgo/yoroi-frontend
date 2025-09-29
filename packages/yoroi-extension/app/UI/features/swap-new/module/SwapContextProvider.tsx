@@ -43,7 +43,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
-  const { partners, excludedTokens, tokenOutId } = useSwapConfig();
+  const { partners, excludedTokens } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
@@ -86,12 +86,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   });
 
   useEffect(() => {
-    if (tokenOutId) {
-      action({ type: SwapAction.TokenOutIdChanged, value: tokenOutId });
-    }
-  }, [tokenOutId]);
-
-  useEffect(() => {
     action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
   }, [swapManager.settings.slippage]);
 
@@ -119,15 +113,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
     }
   );
-
-  const { data: orders = [], refetch: refetchOrders } = useQuery({
-    queryKey: ['useSwapOrders', stakingKey, swapManager.settings.routingPreference],
-    queryFn: async () => {
-      const res = await swapManager.api.orders();
-      if (isRight(res)) return res.value.data;
-      return [];
-    },
-  });
 
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
@@ -251,7 +236,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const context: any = useMemo(
     () => ({
-      swapForm: { action, orders, refetchOrders, ...state },
+      swapForm: { action, ...state },
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
@@ -269,7 +254,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       swapManager,
       stores,
     }),
-    [state.tokenInInput, state.tokenOutInput, action, tokenInfos, orders, refetchOrders]
+    [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
   );
 
   if (!selectedWallet) return null;
@@ -504,7 +489,7 @@ const defaultState: SwapState = Object.freeze({
     value: '',
   },
   tokenOutInput: {
-    isTouched: true,
+    isTouched: false,
     tokenId: undefined,
     disabled: false,
     error: null,
