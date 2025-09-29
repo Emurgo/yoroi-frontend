@@ -20,7 +20,7 @@ describe('Changing fiat currencies', function () {
     await prepareWallet(webdriver, logger, 'testWallet1', this);
   });
 
-  const testData = ['BRL', 'ETH', 'BTC', 'KRW', 'CNY', 'EUR', 'JPY', 'USD', 'ADA'];
+  const testData = ['BRL', 'ETH', 'BTC', 'KRW', 'CNY', 'EUR', 'JPY', 'USD'];
 
   for (const testDatum of testData) {
     describe(`Changing fiat currency to ${testDatum}`, function () {

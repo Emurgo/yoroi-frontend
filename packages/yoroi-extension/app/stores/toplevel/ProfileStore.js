@@ -6,11 +6,9 @@ import Request from '../lib/LocalizedRequest';
 import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
-import { ComplexityLevels } from '../../types/complexityLevelType';
 import type { WalletsNavigation } from '../../api/localStorage';
 import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
-import { noop } from '../../coreUtils';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
   /**
@@ -60,17 +58,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
       },
     },
     ...(this._isFirefox ? [] : [this._analyticsStep]),
-    {
-      // <TODO:PENDING_REMOVAL>
-      isDone: () => this.isComplexityLevelSelected,
-      action: async () => {
-        const route = ROUTES.PROFILE.COMPLEXITY_LEVEL;
-        if (this.stores.routing.currentRoute === route) {
-          return;
-        }
-        noop(this.stores.profile.selectComplexityLevel(ComplexityLevels.Simple));
-      },
-    },
     {
       isDone: () => !environment.isNightly() || this.acceptedNightly,
       action: async () => {

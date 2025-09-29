@@ -10,7 +10,6 @@ import type { LanguageType } from '../../i18n/translations';
 import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
 import { ampli } from '../../../ampli/index';
 import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
@@ -96,18 +95,6 @@ export default class BaseProfileStore<
     this.api.localStorage.setLastAnnouncedFeatureVersion
   );
 
-  @observable getComplexityLevelRequest: Request<(void) => Promise<?ComplexityLevelType>> = new Request<
-    (void) => Promise<?ComplexityLevelType>,
-  >(this.api.localStorage.getComplexityLevel);
-
-  @observable setComplexityLevelRequest: Request<(ComplexityLevelType) => Promise<void>> = new Request<
-    (ComplexityLevelType) => Promise<void>,
-  >(this.api.localStorage.setComplexityLevel);
-
-  @observable unsetComplexityLevelRequest: Request<(void) => Promise<void>> = new Request<(void) => Promise<void>>(
-    this.api.localStorage.unsetComplexityLevel
-  );
-
   @observable getLastLaunchVersionRequest: Request<(void) => Promise<string>> = new Request<(void) => Promise<string>>(
     this.api.localStorage.getLastLaunchVersion
   );
@@ -147,7 +134,6 @@ export default class BaseProfileStore<
   setup(): void {
     super.setup();
     this.registerReactions([this._setBigNumberFormat, this._updateMomentJsLocaleAfterLocaleChange]);
-    this._getSelectComplexityLevel(); // eagerly cache
     noop(this.lastAnnouncedFeatureVersion);
     this.getBringSandboxRequest.execute();
     this.stores.loading.registerBlockingLoadingRequest(this._loadAcceptedTosVersion(), 'load-tos-version');
@@ -347,28 +333,6 @@ export default class BaseProfileStore<
       this._acceptedTosVersion.version = CURRENT_TOS_VERSION;
     });
     await this.api.localStorage.saveAcceptedTosVersion(CURRENT_TOS_VERSION);
-  };
-
-  // ========== Complexity Level Choice ========== //
-
-  @computed get selectedComplexityLevel(): ?ComplexityLevelType {
-    let { result } = this.getComplexityLevelRequest;
-    if (result == null) {
-      result = this.getComplexityLevelRequest.execute().result;
-    }
-    return result;
-  }
-
-  @computed get isComplexityLevelSelected(): boolean {
-    return !!this.getComplexityLevelRequest.result;
-  }
-
-  selectComplexityLevel: ComplexityLevelType => Promise<void> = async (level: ComplexityLevelType): Promise<void> => {
-    await this.setComplexityLevelRequest.execute(level);
-    await this.getComplexityLevelRequest.execute();
-  };
-  _getSelectComplexityLevel: void => void = () => {
-    this.getComplexityLevelRequest.execute();
   };
 
   // ========== Last Launch Version ========== //
