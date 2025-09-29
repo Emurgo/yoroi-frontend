@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
 import { useStrings } from '../../hooks/useStrings';
+import { ProtocolAvatar } from '../ProtocolAvatar/ProtocolAvatar';
 
 export const LimitDexRouteTable = () => {
   const strings = useStrings();
@@ -62,7 +63,7 @@ export const LimitDexRouteTable = () => {
               >
                 <TableCell>
                   <Box display="flex" alignItems="center" gap={1}>
-                    <Typography variant="body2">{row.protocol}</Typography>
+                    <ProtocolAvatar protocol={row.protocol} />
                   </Box>
                 </TableCell>
 

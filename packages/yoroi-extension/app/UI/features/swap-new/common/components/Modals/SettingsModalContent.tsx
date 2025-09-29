@@ -11,6 +11,7 @@ const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
+
   const [routingPreference, setRoutingPreference] = useState<any>(swapManager.settings.routingPreference);
   const [selectedSlippage, setSelectedSlippage] = useState(swapForm.slippageInput.value || 1);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(selectedSlippage)));
@@ -34,7 +35,7 @@ export const SettingsModalContent = () => {
     await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreference: [routingPreference],
+      routingPreference: routingPreference,
     });
     closeModal();
   };
@@ -57,7 +58,7 @@ export const SettingsModalContent = () => {
           <SlippageInput selectedSlippage={selectedSlippage} setSelectedSlippage={setSelectedSlippage} inputRef={inputRef} />
         )}
         <Typography variant="body1" color="ds.text_gray_medium" my={16}>
-          {strings.routingPreference}
+          {strings.routingPreferance}
         </Typography>
         <RoutingPreference setRoutingPreference={setRoutingPreference} routingPreference={routingPreference} />
       </Box>
@@ -113,6 +114,7 @@ const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
     routingPreference === DEX_ROUTING.MUESLISWAP ||
     routingPreference === DEX_ROUTING.BOTH;
 
+  console.log('OPTIONSSS', { autoSelected, dexHunter, muesliswap });
   const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
     setRoutingPreference(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);

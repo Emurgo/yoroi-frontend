@@ -187,7 +187,7 @@ export const useStrings = () => {
     slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
     applyLabel: intl.formatMessage(messages.applyLabel),
-    routingPreference: intl.formatMessage(messages.routingPreference),
+    routingPreferance: intl.formatMessage(messages.routingPreferance),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     swapLabel: intl.formatMessage(messages.swapLabel),

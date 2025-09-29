@@ -6,6 +6,7 @@ import { undefinedToken } from '../../common/constants';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
+import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
@@ -57,7 +58,9 @@ export const EstimateSummary = () => {
         tooltip={strings.routePath}
         value={
           <Typography sx={{ cursor: 'pointer' }}>
-            <Link onClick={openRouteModal}>{protocol}</Link>
+            <Link onClick={openRouteModal}>
+              <ProtocolAvatar protocol={protocol} preventOpenLink />
+            </Link>
           </Typography>
         }
       />
