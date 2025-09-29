@@ -82,7 +82,7 @@ export const messages = Object.freeze(
     },
     routingPreference: {
       id: 'swap.routingPreference',
-      defaultMessage: '!!!Slippage tolerance',
+      defaultMessage: '!!!Routing preference',
     },
     autoLabel: {
       id: 'swap.auto',
