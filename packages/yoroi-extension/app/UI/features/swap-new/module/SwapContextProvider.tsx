@@ -50,8 +50,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
 
-  // const allUtxosAddresses = selectedWallet?.utxos.map(utxo => utxo.address);
-
   const [state, action] = useReducer(swapReducer, defaultState);
 
   useEffect(() => {
