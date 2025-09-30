@@ -106,9 +106,7 @@ const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
 
   const autoSelected = routingPreference === DEX_ROUTING.AUTO;
   const dexHunter =
-    routingPreference === DEX_ROUTING.AUTO ||
-    routingPreference === DEX_ROUTING.DEXHUNTER ||
-    routingPreference === DEX_ROUTING.BOTH;
+[DEX_ROUTING.AUTO,DEX_ROUTING.DEXHUNTER,DEX_ROUTING.BOTH].includes(routingPreference);
   const muesliswap =
     routingPreference === DEX_ROUTING.AUTO ||
     routingPreference === DEX_ROUTING.MUESLISWAP ||
