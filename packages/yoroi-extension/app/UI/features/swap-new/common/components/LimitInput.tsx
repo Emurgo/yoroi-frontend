@@ -8,7 +8,7 @@ export const LimitInput = () => {
   const { swapForm, tokenInfos } = useSwapRevamp();
   const tokenInputInfo = tokenInfos.get(swapForm.tokenOutInput?.tokenId);
 
-  if (swapForm.estimate === undefined || swapForm.orderType === MARKET_ORDER) {
+  if (swapForm.orderType === MARKET_ORDER) {
     return null;
   }
 
