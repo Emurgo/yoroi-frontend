@@ -40,7 +40,7 @@ export const AssetSwap = () => {
       wallet,
       swapState: swapForm,
     });
-    console.log('unisgnedTxRequest', unisgnedTxRequest);
+
     try {
       await stores.transactionProcessingStore.adaSendAndRefresh({
         wallet,

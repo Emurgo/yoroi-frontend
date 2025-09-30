@@ -22,10 +22,6 @@ export const useSyncedTokenInfos = ({
     queryKey: ['syncedTokenInfos', networkId, primaryTokenInfo.id, ...excludedTokens],
 
     queryFn: async () => {
-      // Hardcoded muesliswap because dexhunter is broken at the moment
-      await swapManager.assignSettings({
-        routingPreference: 'muesliswap',
-      });
       const res = await swapManager.api.tokens();
       if (!isRight(res)) return { tokenIds: [], tokenInfosArray: [] };
 
