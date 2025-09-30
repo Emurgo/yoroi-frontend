@@ -133,11 +133,11 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
     if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
-      action({ type: 'ProtocolChanged', value });
+      action({ type: SwapActionType.ProtocolChanged, value });
     } else {
       const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
       if (current === undefined) {
-        action({ type: 'ProtocolChanged', value });
+        action({ type: SwapActionType.ProtocolChanged, value });
       }
     }
 
