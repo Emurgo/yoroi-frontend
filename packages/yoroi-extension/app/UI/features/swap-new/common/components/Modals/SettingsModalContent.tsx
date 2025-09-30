@@ -35,7 +35,7 @@ export const SettingsModalContent = () => {
     await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreference: routingPreference,
+      routingPreference,
     });
     closeModal();
   };
