@@ -22,7 +22,7 @@ import { tokenManagers } from '../../portfolio/common/helpers/build-token-manage
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
 import { useGetInputs } from '../common/helpers';
-import { ASSET_DIRECTION_IN } from '../common/constants';
+import { ASSET_DIRECTION_IN, USDA_TOKEN_ID } from '../common/constants';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -48,10 +48,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
-
-  // const allUtxosAddresses = selectedWallet?.utxos.map(utxo => utxo.address);
-
+  const { getInputs } = useGetInputs(selectedWallet?.utxos ?? []);
   const [state, action] = useReducer(swapReducer, defaultState);
 
   useEffect(() => {
@@ -239,15 +236,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const create = useCallback(async () => {
     if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
-
     setIsCreateOrderLoading(true);
-
-    const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
-    const quantityIn =
-      Number(state.tokenInInput.value) *
-      10 ** (state.tokenInInput.tokenId === '.' ? primaryTokenInfo.decimals : tokenInInfo?.decimals);
-    const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
-    const inputs = await getInputs(amountsIn);
+    const inputs = await getInputs();
 
     swapManager.api
       .create({
@@ -601,7 +591,7 @@ const defaultState: SwapState = Object.freeze({
   },
   tokenOutInput: {
     isTouched: true,
-    tokenId: undefined,
+    tokenId: USDA_TOKEN_ID,
     disabled: false,
     error: null,
     value: '',
