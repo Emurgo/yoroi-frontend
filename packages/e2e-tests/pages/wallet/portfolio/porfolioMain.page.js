@@ -214,6 +214,10 @@ export default class PortfolioTab extends WalletCommonBase {
     await this.click(this.searchInputLocator);
     await this.input(this.searchInputLocator, searchValue);
   }
+  async cleanSearch() {
+    this.logger.info(`PortfolioTab::cleanSearch is called`);
+    await this.clearInputAll(this.searchInputLocator);
+  }
   /**
    * Getting amount of token in the tokens table
    * @returns {number} Amount of tokens in the table
