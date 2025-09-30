@@ -86,3 +86,30 @@ export const useGetInputs = (walletUtxos: any[]) => {
 
   return { getInputs };
 };
+
+export function sanitizeSlippageInput(
+  raw: string,
+  { max = 75, maxDecimals = 1 }: { max?: number; maxDecimals?: number } = {}
+): string | null {
+  let clean = (raw ?? '').replace(/[^0-9.]/g, '');
+
+  // keep only the first dot
+  let parts = clean.split('.');
+  if (parts.length > 2) {
+    clean = `${parts[0]}.${parts[1]}`;
+    parts = clean.split('.'); // re-split after modifying
+  }
+
+  // limit decimals
+  const decimals = parts[1] ?? '';
+  if (decimals.length > maxDecimals) {
+    clean = `${parts[0]}.${decimals.slice(0, maxDecimals)}`;
+  }
+
+  // enforce max (ignore change if over)
+  if (clean !== '' && !Number.isNaN(Number(clean)) && Number(clean) > max) {
+    return null;
+  }
+
+  return clean;
+}
