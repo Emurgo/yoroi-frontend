@@ -63,6 +63,10 @@ export const messages = Object.freeze(
       id: 'swap.slippage',
       defaultMessage: '!!!Slippage',
     },
+    swapToLabel: {
+      id: 'swap.swapToLabel',
+      defaultMessage: '!!!Swap to',
+    },
     slippageInfo: {
       id: 'swap.slippageInfo',
       defaultMessage:
@@ -205,6 +209,7 @@ export const useStrings = () => {
     ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
     cancel: intl.formatMessage(messages.cancel),
+    swapToLabel: intl.formatMessage(messages.swapToLabel),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

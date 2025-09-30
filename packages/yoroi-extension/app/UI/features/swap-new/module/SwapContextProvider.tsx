@@ -48,7 +48,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
-  const { getInputs } = useGetInputs(selectedWallet?.utxos ?? []);
+  const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
   const [state, action] = useReducer(swapReducer, defaultState);
 
   useEffect(() => {
@@ -132,11 +132,11 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
     if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
-      action({ type: 'ProtocolChanged', value });
+      action({ type: SwapActionType.ProtocolChanged, value });
     } else {
       const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
       if (current === undefined) {
-        action({ type: 'ProtocolChanged', value });
+        action({ type: SwapActionType.ProtocolChanged, value });
       }
     }
 

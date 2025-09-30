@@ -5,6 +5,7 @@ import { Switch } from '../../../../../components/Switch/Switch';
 import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
 import { DEX_ROUTING } from '../../constants';
+import { sanitizeSlippageInput } from '../../helpers';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -39,7 +40,6 @@ export const SettingsModalContent = () => {
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
       routingPreference: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
-    });
     closeModal();
   };
 
@@ -108,10 +108,7 @@ const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
   const strings = useStrings();
 
   const autoSelected = routingPreference === DEX_ROUTING.AUTO;
-  const dexHunter =
-    routingPreference === DEX_ROUTING.AUTO ||
-    routingPreference === DEX_ROUTING.DEXHUNTER ||
-    routingPreference === DEX_ROUTING.BOTH;
+  const dexHunter = [DEX_ROUTING.AUTO, DEX_ROUTING.DEXHUNTER, DEX_ROUTING.BOTH].includes(routingPreference);
   const muesliswap =
     routingPreference === DEX_ROUTING.AUTO ||
     routingPreference === DEX_ROUTING.MUESLISWAP ||
@@ -204,18 +201,9 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
           placeholder="0"
           value={selectedSlippage}
           onChange={e => {
-            let raw = e.target.value;
-            let clean = raw.replace(/[^0-9.]/g, '');
-            const parts = clean.split('.');
-            if (parts.length > 2) {
-              clean = parts[0] + '.' + parts[1];
-            }
-            if (parts[1] && parts[1].length > 1) {
-              clean = parts[0] + '.' + parts[1].slice(0, 1);
-            }
-            if (clean !== '' && Number(clean) > 75) return;
-
-            setSelectedSlippage(clean);
+            const next = sanitizeSlippageInput(e.target.value, { max: 75, maxDecimals: 1 });
+            if (next === null) return;
+            setSelectedSlippage(next);
           }}
           style={{
             border: 'none',
