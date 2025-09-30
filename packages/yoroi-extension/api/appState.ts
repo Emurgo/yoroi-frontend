@@ -7,6 +7,7 @@ interface NotificationData {
   title: string;
   body: string;
   time: string;
+  redirection?: string | null;
 }
 interface Notification extends NotificationData {
   id: number;
