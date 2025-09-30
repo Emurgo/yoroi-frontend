@@ -49,7 +49,14 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const {
+    unitOfAccount,
+    changeUnitOfAccountPair,
+    accountPair,
+    primaryTokenInfo,
+    selectedWallet: contextSelectedWallet,
+    networkId: contextNetworkId,
+  } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
   const localStorageApi = new LocalStorageApi();
   const {
@@ -57,15 +64,16 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     config,
   } = useCurrencyPairing();
 
-  // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
-  const { wallets, delegation } = stores;
-  const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
-  const networkId = selectedWallet.networkId;
+  // ✅ Use context data instead of store data for automatic re-rendering
+  const { delegation } = stores;
+  const selectedWallet = contextSelectedWallet;
+  const networkId = contextNetworkId;
   const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
-  const balance = selectedWallet.balance;
+
+  const balance = selectedWallet?.balance;
   const totalBalanceAmount = getTotalAmount(balance, rewards);
   const defaultEntry = totalBalanceAmount?.getDefaultEntry();
-  const primaryBalance = defaultEntry.amount.shiftedBy(-primaryTokenInfo.decimals);
+  const primaryBalance = defaultEntry?.amount.shiftedBy(-primaryTokenInfo?.decimals || 0);
   // End of total Ada balance calculation
 
   const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);

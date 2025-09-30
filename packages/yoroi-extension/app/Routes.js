@@ -1,7 +1,7 @@
 // @flow
 
 import type { Node } from 'react';
-import React, { Suspense } from 'react';
+import React, { Suspense, useMemo } from 'react';
 import { Navigate, Route, Routes, Outlet } from 'react-router';
 import ConnectedWebsitesPage, { ConnectedWebsitesPagePromise } from './containers/dapp-connector/ConnectedWebsitesContainer';
 import Transfer, { WalletTransferPagePromise } from './containers/transfer/Transfer';
