@@ -40,6 +40,7 @@ export const SettingsModalContent = () => {
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
       routingPreference: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
+    });
     closeModal();
   };
 
