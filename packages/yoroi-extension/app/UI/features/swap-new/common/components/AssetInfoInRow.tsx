@@ -8,6 +8,8 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import TokenInfoModal from './Modals/TokenInfoModal';
 import { AssetDirectionType } from '../types';
 import { ASSET_DIRECTION_IN } from '../constants';
+import { SelectAssetTo } from './Modals/SelectAssetTo';
+import { useStrings } from '../hooks/useStrings';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -34,6 +36,7 @@ export const AssetInfoInRow = React.memo(
     direction,
   }: AssetInfoInRowProps) => {
     const { atoms }: any = useTheme();
+    const strings = useStrings();
     const isPrimary = token.id === '-' || token.id === '';
     const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
     const decimals = isPrimary ? primaryTokenInfo.decimals : token.decimals;
@@ -59,6 +62,14 @@ export const AssetInfoInRow = React.memo(
         content: <TokenInfoModal token={token} />,
         height: '624px',
         width: '612px',
+        handleBack: () => {
+          openModal({
+            title: strings.swapToLabel,
+            content: <SelectAssetTo />,
+            height: '624px',
+            width: '612px',
+          });
+        },
       });
     };
 
