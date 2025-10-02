@@ -5,6 +5,7 @@ import { strNumberToNumber } from '../../../utils/utils.js';
 import { fiveSeconds, halfMinute, halfSecond, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 import { Colors } from '../../../helpers/constants.js';
 import { Columns } from '../../../helpers/portfolioHelper.js';
+import { PORTFOLIO_NO_RESULTS } from '../../../helpers/messages.js';
 
 export default class PortfolioTab extends WalletCommonBase {
   // locators
@@ -204,6 +205,19 @@ export default class PortfolioTab extends WalletCommonBase {
     this.logger.info(`PortfolioTab::waitIsLoaded is called`);
     return await this.customWaitIsPresented(this.getTokenRowLocator(0), halfMinute, halfSecond);
   }
+  async noResultsFound() {
+    this.logger.info(`PortfolioTab::noResultFound is called`);
+    const [imageIsDisplayed, textIsDisplayed] = await Promise.all([
+      this.customWaitIsPresented(this.noResultImageBoxLocator),
+      this.customWaitIsPresented(this.noResultsTextLocator),
+    ]);
+    if (textIsDisplayed) {
+      const displayedText = await this.getText(this.noResultsTextLocator);
+      return imageIsDisplayed && displayedText === PORTFOLIO_NO_RESULTS;
+    } else {
+      return false;
+    }
+  }
   /**
    * Searching for a token
    * @param {string} searchValue
@@ -213,6 +227,10 @@ export default class PortfolioTab extends WalletCommonBase {
     this.logger.info(`PortfolioTab::search is called. Search value: "${searchValue}"`);
     await this.click(this.searchInputLocator);
     await this.input(this.searchInputLocator, searchValue);
+  }
+  async cleanSearch() {
+    this.logger.info(`PortfolioTab::cleanSearch is called`);
+    await this.clearInputAll(this.searchInputLocator);
   }
   /**
    * Getting amount of token in the tokens table
