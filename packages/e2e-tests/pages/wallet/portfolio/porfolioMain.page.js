@@ -250,6 +250,15 @@ export default class PortfolioTab extends WalletCommonBase {
     const tokenRowLocator = this.getTokenRowLocator(rowIndex);
     await this.click(tokenRowLocator);
   }
+  async selectTokenByName(tokenName) {
+    this.logger.info(`PortfolioTab::selectTokenByName is called. Row index: "${tokenName}"`);
+    const allNames = await this.getColumnValues(Columns.Name);
+    const tokenIndex = allNames.indexOf(tokenName);
+    if (tokenIndex == -1) {
+      throw new Error(`There is no a token with the name ${tokenName}`);
+    }
+    await this.selectTokenByIndex(tokenIndex);
+  }
   /**
    * Sorting a selected column
    * @param {string} columnName

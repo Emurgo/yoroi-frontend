@@ -138,6 +138,13 @@ describe('Handle handles', function () {
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
       });
 
+      it('Check endpoint availability', async function () {
+        const resolverAvailable = await resolverEndpointIsAvailable(handlesEndpoints[testNegativeDatum.provider]);
+        if (!resolverAvailable) {
+          this.skip();
+        }
+      });
+
       it(`Enter the value, ${testNegativeDatum.provider}`, async function () {
         const sendStep1Page = new SendSubTab(webdriver, logger);
         await sendStep1Page.enterReceiver(testNegativeDatum.userHandle);
