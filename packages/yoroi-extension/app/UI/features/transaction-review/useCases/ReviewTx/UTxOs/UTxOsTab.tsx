@@ -17,8 +17,10 @@ interface Asset {
 // TODO Define the type for an individual input
 interface InputData {
   address: string;
-  tx_hash: string;
-  tx_index: number;
+  tx_hash?: string;
+  tx_index?: number;
+  txHash?: string;
+  txIndex?: number;
   assets: Asset[];
 }
 
@@ -38,7 +40,7 @@ interface OutputProps {
 
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
-
+  console.log('tx in UTxOsTab', tx);
   return (
     <Stack direction="column" sx={{ padding: '24px 0 24px 24px', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
@@ -62,7 +64,7 @@ export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
         content={
           <Stack gap="8px">
             {inputs.map(input => (
-              <Input key={`${input.address}-${input.tx_hash}-${input.tx_index}`} input={input} />
+              <Input key={`${input.address}-${input.txHash || input.tx_hash}-${input.tx_index}`} input={input} />
             ))}
           </Stack>
         }
@@ -101,7 +103,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
     if (!input.assets.length) return null;
     return input.assets.map(asset => (
       <TokenItem
-        key={asset?.tokenInfo.id || asset.Token.TokenId}
+        key={asset?.tokenInfo?.id || asset.Token.TokenId}
         tokenInfo={asset?.tokenInfo || asset.Token?.Metadata}
         quantity={asset?.quantity || Number(asset?.TokenList.Amount)}
         isPrimary={asset.Token?.Metadata.ticker === 'ADA'}
@@ -132,7 +134,7 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
 
         <Stack display="flex" flexDirection="row" gap="8px">
           <Typography variant="body1" fontWeight={500}>
-            {`#${input.txIndex || input.tx_index}`}
+            {`#${input?.txIndex ?? input?.tx_index}`}
           </Typography>
           <CopyButton textToCopy={input.txHash || input.tx_hash} />
         </Stack>
