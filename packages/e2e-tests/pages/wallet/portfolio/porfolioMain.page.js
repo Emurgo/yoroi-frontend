@@ -234,7 +234,7 @@ export default class PortfolioTab extends WalletCommonBase {
   }
   /**
    * Getting amount of token in the tokens table
-   * @returns {number} Amount of tokens in the table
+   * @returns {Promise<number>} Amount of tokens in the table
    */
   async countTokens() {
     this.logger.info(`PortfolioTab::countTokens is called.`);
