@@ -569,7 +569,7 @@
   "swap.txSubmitted": "取引は送信されました",
   "swap.txFailed": "取引が失敗しました",
   "swap.txId": "トランザクションID",
-  "swap.routingPreferance": "ルーティング設定",
+  "swap.routingPreference": "Routing preference",
   "swap.checkTx": "ウォレットの取引履歴でこの取引を確認してください",
   "swap.txNotProcessed": "技術的な問題が原因で取引が正しく処理されていません",
   "swap.goToTxs": "取引へ移動",
