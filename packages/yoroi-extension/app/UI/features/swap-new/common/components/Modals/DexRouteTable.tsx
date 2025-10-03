@@ -1,4 +1,5 @@
 import { Typography, Stack } from '@mui/material';
+import { ProtocolAvatar } from '../ProtocolAvatar/ProtocolAvatar';
 
 type DexRoute = {
   id: string;
@@ -23,8 +24,7 @@ export const DexRouteTable = ({ data }: Props) => {
         return (
           <Stack key={row.id} width="100%" flexDirection="row" justifyContent="space-between">
             <Stack>
-              {/* <span>{row.logo}</span> */}
-              <Typography variant="body2">{row.protocol}</Typography>
+              <ProtocolAvatar protocol={row.protocol as any} />
             </Stack>
             <Stack>
               <Typography variant="body2">{((100 * (row.expectedOutputWithoutSlippage ?? 0)) / total).toFixed(2)} %</Typography>

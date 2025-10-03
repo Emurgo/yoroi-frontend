@@ -2,8 +2,10 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
-import { fiveSeconds, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { fiveSeconds, halfMinute, halfSecond, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 import { Colors } from '../../../helpers/constants.js';
+import { Columns } from '../../../helpers/portfolioHelper.js';
+import { PORTFOLIO_NO_RESULTS } from '../../../helpers/messages.js';
 
 export default class PortfolioTab extends WalletCommonBase {
   // locators
@@ -19,8 +21,8 @@ export default class PortfolioTab extends WalletCommonBase {
   };
   /** @type {ElementLocator} */
   secondCurrencyTextLocator = {
-    locator: '$portfolio:header-secondCurrency-text',
-    id: 'id',
+    locator: 'portfolio:header-secondCurrency-text',
+    method: 'id',
   };
   /** @type {ElementLocator} */
   balancePercentagePerformanceTextLocator = {
@@ -199,6 +201,23 @@ export default class PortfolioTab extends WalletCommonBase {
 
     return titleState && searchState && mainFiatState;
   }
+  async waitIsLoaded() {
+    this.logger.info(`PortfolioTab::waitIsLoaded is called`);
+    return await this.customWaitIsPresented(this.getTokenRowLocator(0), halfMinute, halfSecond);
+  }
+  async noResultsFound() {
+    this.logger.info(`PortfolioTab::noResultFound is called`);
+    const [imageIsDisplayed, textIsDisplayed] = await Promise.all([
+      this.customWaitIsPresented(this.noResultImageBoxLocator),
+      this.customWaitIsPresented(this.noResultsTextLocator),
+    ]);
+    if (textIsDisplayed) {
+      const displayedText = await this.getText(this.noResultsTextLocator);
+      return imageIsDisplayed && displayedText === PORTFOLIO_NO_RESULTS;
+    } else {
+      return false;
+    }
+  }
   /**
    * Searching for a token
    * @param {string} searchValue
@@ -209,9 +228,13 @@ export default class PortfolioTab extends WalletCommonBase {
     await this.click(this.searchInputLocator);
     await this.input(this.searchInputLocator, searchValue);
   }
+  async cleanSearch() {
+    this.logger.info(`PortfolioTab::cleanSearch is called`);
+    await this.clearInputAll(this.searchInputLocator);
+  }
   /**
    * Getting amount of token in the tokens table
-   * @returns {number} Amount of tokens in the table
+   * @returns {Promise<number>} Amount of tokens in the table
    */
   async countTokens() {
     this.logger.info(`PortfolioTab::countTokens is called.`);
@@ -226,6 +249,15 @@ export default class PortfolioTab extends WalletCommonBase {
     this.logger.info(`PortfolioTab::selectTokenByIndex is called. Row index: "${rowIndex}"`);
     const tokenRowLocator = this.getTokenRowLocator(rowIndex);
     await this.click(tokenRowLocator);
+  }
+  async selectTokenByName(tokenName) {
+    this.logger.info(`PortfolioTab::selectTokenByName is called. Row index: "${tokenName}"`);
+    const allNames = await this.getColumnValues(Columns.Name);
+    const tokenIndex = allNames.indexOf(tokenName);
+    if (tokenIndex == -1) {
+      throw new Error(`There is no a token with the name ${tokenName}`);
+    }
+    await this.selectTokenByIndex(tokenIndex);
   }
   /**
    * Sorting a selected column
@@ -248,6 +280,9 @@ export default class PortfolioTab extends WalletCommonBase {
     const priceChangeSign = await this._defineSign(priceLocator);
     return strNumberToNumber(`${priceChangeSign}${priceChangeText}`);
   }
+  _getNumberOrNull(numberInStr) {
+    return numberInStr === '-' ? null : strNumberToNumber(numberInStr);
+  }
 
   /**
    * Getting token info from the table
@@ -261,7 +296,7 @@ export default class PortfolioTab extends WalletCommonBase {
 
     const priceText = await this.getText(this.getTokenPriceLocator(rowIndex));
     const [priceValue, priceFiat] = priceText.split(' ');
-    const price = priceText === '-' ? null : strNumberToNumber(priceValue);
+    const price = this._getNumberOrNull(priceValue);
 
     const priceChangeDay = await this._getChangeValue(this.getTokenDayChangesLocator(rowIndex));
     const priceChangeWeek = await this._getChangeValue(this.getTokenWeekChangesLocator(rowIndex));
@@ -326,7 +361,11 @@ export default class PortfolioTab extends WalletCommonBase {
 
           case Columns.Price:
             const priceText = await this.getText(this.getTokenPriceLocator(rowIndex));
-            value = priceText === '-' ? null : strNumberToNumber(priceText.split(' ')[0]);
+            const [priceValueText, priceFiat] = priceText.split(/\s/g);
+            value = {
+              value: this._getNumberOrNull(priceValueText),
+              fiat: priceFiat,
+            };
             break;
 
           case Columns.Day:
@@ -347,8 +386,24 @@ export default class PortfolioTab extends WalletCommonBase {
             break;
 
           case Columns.Total:
-            const totalText = await this.getText(this.getTokenTotalMainCurrencyValueLocator(rowIndex));
-            value = strNumberToNumber(totalText);
+            const [tokenAmountText, tokenName, secondBalance] = await Promise.all([
+              this.getText(this.getTokenTotalMainCurrencyValueLocator(rowIndex)),
+              this.getText(this.getTokenTotalMainCurrencyFiatLocator(rowIndex)),
+              this.getText(this.getTokenTotalSecondLocator(rowIndex)),
+            ]);
+            const tokenAmount = this._getNumberOrNull(tokenAmountText);
+            const [currencyBalanceText, currencyFiat] = secondBalance.split(/\s/g);
+            const currencyBalance = this._getNumberOrNull(currencyBalanceText);
+            value = {
+              token: {
+                balance: tokenAmount,
+                name: tokenName,
+              },
+              currency: {
+                balance: currencyBalance,
+                fiat: currencyFiat,
+              },
+            };
             break;
 
           default:
@@ -365,5 +420,33 @@ export default class PortfolioTab extends WalletCommonBase {
 
     this.logger.info(`PortfolioTab::getColumnValues: Collected ${columnValues.length} values`);
     return columnValues;
+  }
+
+  async getPortfolioBalance() {
+    this.logger.info(`PortfolioTab::getPortfolioBalance is called`);
+    const [mainValueText, mainBalanceFiat, secondBalance] = await Promise.all([
+      this.getText(this.mainCurrencyValueTextLocator),
+      this.getText(this.mainCurrencyFiatTextLocator),
+      this.getText(this.secondCurrencyTextLocator),
+    ]);
+    const mainValue = strNumberToNumber(mainValueText);
+    const [secondValueText, secondFiat] = secondBalance.split(/\s/g);
+    const secondValue = strNumberToNumber(secondValueText);
+
+    return {
+      main: {
+        value: mainValue,
+        fiat: mainBalanceFiat,
+      },
+      secondary: {
+        value: secondValue,
+        fiat: secondFiat,
+      },
+    };
+  }
+
+  async switchCurrencies() {
+    this.logger.info(`PortfolioTab::switchCurrencies is called`);
+    await this.click(this.switchBalanceBtnLocator);
   }
 }

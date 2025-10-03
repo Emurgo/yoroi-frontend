@@ -214,8 +214,11 @@ export default class PortfolioTokenDetails extends WalletCommonBase {
       fingerprint = await this.getText(this.tokenFingerprintTextLocator);
     }
     const cardanoscanLink = await this.getAttribute(this.tokenDetailsLinkLocator, 'href');
+    const tokenInfo = { name, description, websiteLink, policyId, fingerprint, cardanoscanLink };
 
-    return { name, description, websiteLink, policyId, fingerprint, cardanoscanLink };
+    this.logger.info(`PortfolioTokenDetails::getTokenInfo:tokenInfo\n${JSON.stringify(tokenInfo, null, 2)}`);
+
+    return tokenInfo;
   }
   async copyPolicyId() {
     this.logger.info(`PortfolioTokenDetails::copyPolicyId is called`);

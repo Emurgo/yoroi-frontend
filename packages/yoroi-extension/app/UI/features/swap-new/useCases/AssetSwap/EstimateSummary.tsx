@@ -6,11 +6,12 @@ import { undefinedToken } from '../../common/constants';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
+import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading } = useSwapRevamp();
+  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading, isLimitOptionsLoading } = useSwapRevamp();
   const { openModal } = useModal();
 
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
@@ -19,7 +20,7 @@ export const EstimateSummary = () => {
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
 
-  if (isEstimateOrderLoading) {
+  if (isEstimateOrderLoading || isLimitOptionsLoading) {
     return (
       <Stack gap={12}>
         {Array.from({ length: 4 }).map((_, index) => (
@@ -56,8 +57,10 @@ export const EstimateSummary = () => {
         label={strings.routeLabel}
         tooltip={strings.routePath}
         value={
-          <Typography>
-            <Link onClick={openRouteModal}>{protocol}</Link>
+          <Typography sx={{ cursor: 'pointer' }}>
+            <Link onClick={openRouteModal}>
+              <ProtocolAvatar protocol={protocol} preventOpenLink />
+            </Link>
           </Typography>
         }
       />

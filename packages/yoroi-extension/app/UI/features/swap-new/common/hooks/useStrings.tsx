@@ -63,6 +63,10 @@ export const messages = Object.freeze(
       id: 'swap.slippage',
       defaultMessage: '!!!Slippage',
     },
+    swapToLabel: {
+      id: 'swap.swapToLabel',
+      defaultMessage: '!!!Swap to',
+    },
     slippageInfo: {
       id: 'swap.slippageInfo',
       defaultMessage:
@@ -80,9 +84,9 @@ export const messages = Object.freeze(
       id: 'swap.manual',
       defaultMessage: '!!!Slippage tolerance',
     },
-    routingPreferance: {
-      id: 'swap.routingPreferance',
-      defaultMessage: '!!!Slippage tolerance',
+    routingPreference: {
+      id: 'swap.routingPreference',
+      defaultMessage: '!!!Routing preference',
     },
     autoLabel: {
       id: 'swap.auto',
@@ -187,7 +191,7 @@ export const useStrings = () => {
     slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
     applyLabel: intl.formatMessage(messages.applyLabel),
-    routingPreferance: intl.formatMessage(messages.routingPreferance),
+    routingPreference: intl.formatMessage(messages.routingPreference),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     swapLabel: intl.formatMessage(messages.swapLabel),
@@ -205,6 +209,7 @@ export const useStrings = () => {
     ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
     cancel: intl.formatMessage(messages.cancel),
+    swapToLabel: intl.formatMessage(messages.swapToLabel),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
