@@ -11,6 +11,8 @@ import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/co
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useMemo } from 'react';
+import { getTotalAmount } from '../../../../utils/createCurrentWalletInfo';
 
 export const TokenDisplay = ({ token, pathId }: { token: TokenInfoType; pathId: string }) => {
   const theme = useTheme();
@@ -136,11 +138,19 @@ export const TokenPriceChangeChip = ({
 
 export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stores, pathId }) => {
   const theme = useTheme();
-  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
+  const { accountPair, primaryTokenInfo, showWelcomeBanner, selectedWallet: contextSelectedWallet } = usePortfolio();
   const mainFiatFullPathId = `${pathId}-totalMain-text`;
   const secondFiatFullPathId = `${pathId}-totalSecond-text`;
   const mainCurrencyValueFullPathId = `${pathId}-totalMainCurrencyValue-text`;
   const mainCurrencyFiatFullPathId = `${pathId}-totalMainCurrencyFiat-text`;
+  const selectedWallet = contextSelectedWallet;
+
+  const { delegation } = stores;
+  const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
+  const balance = selectedWallet?.balance;
+  const totalBalanceAmount = getTotalAmount(balance, rewards);
+  const defaultEntry = totalBalanceAmount?.getDefaultEntry();
+  const primaryBalance = defaultEntry?.amount.shiftedBy(-primaryTokenInfo?.decimals || 0);
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
@@ -182,12 +192,15 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
 
   if (ptPrice === null) return `... ${currency}`;
 
-  const totalPrice =
-    ptPrice &&
-    atomicBreakdown(tokenQuantityAsBigInt, decimals)
-      .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
-      .toFormat(decimals);
+  const totalPrice = useMemo(() => {
+    return (
+      ptPrice &&
+      atomicBreakdown(tokenQuantityAsBigInt, decimals)
+        .bn.times(tokenPrice ?? 1)
+        .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
+        .toFormat(decimals)
+    );
+  }, [primaryBalance, selectedWallet?.balance]);
 
   const primaryAda = isPrimary && showingAda;
 
@@ -200,7 +213,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
         <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
             <Typography mr="4px" id={mainCurrencyValueFullPathId}>
-              {isPrimary ? walletBalance?.ada : token.formatedAmount}
+              {isPrimary ? Number(primaryBalance) : token.formatedAmount}
             </Typography>
           </HiddenAmount>
           <Typography id={mainCurrencyFiatFullPathId}>{token.info.name}</Typography>
