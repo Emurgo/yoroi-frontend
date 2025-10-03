@@ -40,7 +40,6 @@ interface OutputProps {
 
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
-  console.log('tx in UTxOsTab', tx);
   return (
     <Stack direction="column" sx={{ padding: '24px 0 24px 24px', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
