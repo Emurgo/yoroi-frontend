@@ -86,9 +86,19 @@ export default class WalletCommonBase extends BasePage {
       method: 'id',
     };
   };
+  generalWalletBtn = {
+    locator: '//div[starts-with(@id, "changeWalletDialog:walletsList-selectWallet_") and contains(@id, "-button")]',
+    method: 'xpath',
+  };
   getWalletNameLocator = index => {
     return {
       locator: `changeWalletDialog:walletsList:walletCard_${index}-walletName-text`,
+      method: 'id',
+    };
+  };
+  getWalletPlateLocator = index => {
+    return {
+      locator: `changeWalletDialog:walletsList:walletCard_${index}-walletPlate-text`,
       method: 'id',
     };
   };
@@ -259,19 +269,19 @@ export default class WalletCommonBase extends BasePage {
     await this.openChangeWalletModal();
     await this.click(this.changeWalletDialogAddNewWalletButtonLocator);
   }
-  async _findAndSelectWallet(walletName, totalWallets) {
+  async _findAndSelectWallet(walletPlate) {
     this.logger.info(`WalletCommonBase::_findAndSelectWallet is called`);
-    for (let index = 0; index < totalWallets; index++) {
-      const walletNameLocator = this.getWalletNameLocator(index);
-      const foundWalletName = await this.getText(walletNameLocator);
-      if (foundWalletName === walletName) {
-        const walletButtonLocator = this.getWalletButtonLocator(index);
-        await this.click(walletButtonLocator);
-        this.logger.info(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is found and selected`);
+    const allWalletBtns = await this.findElements(this.generalWalletBtn);
+    for (let index = 0; index < allWalletBtns.length; index++) {
+      const walletPlateLocator = this.getWalletPlateLocator(index);
+      const foundWalletPlate = await this.getText(walletPlateLocator);
+      if (foundWalletPlate === walletPlate) {
+        await allWalletBtns[index].click();
+        this.logger.info(`WalletCommonBase::_findAndSelectWallet with the plate "${walletPlate}" is found and selected`);
         return;
       }
     }
-    this.logger.warn(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is NOT found`);
+    this.logger.warn(`WalletCommonBase::_findAndSelectWallet with the plate "${walletPlate}" is NOT found`);
   }
   async switchToFirstWallet() {
     this.logger.info(`WalletCommonBase::switchToFirstWallet is called`);
@@ -280,16 +290,17 @@ export default class WalletCommonBase extends BasePage {
     await this.click(firstWalletLocator);
     await this.click(this.changeWalletDialogApplyWalletButtonLocator);
   }
-  async switchToWallet(walletObject, totalWallets) {
-    this.logger.info(`WalletCommonBase::switchToWallet is called`);
+  async switchToWallet(walletPlate) {
+    this.logger.info(`WalletCommonBase::switchToWallet is called. Wallet's plate to switch is ${walletPlate} `);
     await this.openChangeWalletModal();
-    await this._findAndSelectWallet(walletObject.name, totalWallets);
+    await this._findAndSelectWallet(walletPlate);
     await this.click(this.changeWalletDialogApplyWalletButtonLocator);
   }
   async getWalletInfoFromChangeWalletDialog(walletIndex) {
     this.logger.info(`WalletCommonBase::getWalletInfoFromChangeWalletDialog is called. Wallet index: ${walletIndex}`);
     const name = await this.getText(this.getWalletNameLocator(walletIndex));
     const balanceString = (await this.getText(this.getWalletBalanceLocator(walletIndex))).split(' ')[0];
+    const plate = await this.getText(this.getWalletPlateLocator(walletIndex));
     const tokensString = await this.getText(this.getWalletTokensAmountLocator(walletIndex));
     const nftsString = await this.getText(this.getWalletNFTsAmountLocator(walletIndex));
     const balance = parseFloat(balanceString);
@@ -298,6 +309,7 @@ export default class WalletCommonBase extends BasePage {
 
     return {
       name,
+      plate,
       balance,
       tokens,
       nfts,
