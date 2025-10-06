@@ -64,7 +64,6 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     config,
   } = useCurrencyPairing();
 
-  // ✅ Use context data instead of store data for automatic re-rendering
   const { delegation } = stores;
   const selectedWallet = contextSelectedWallet;
   const networkId = contextNetworkId;
