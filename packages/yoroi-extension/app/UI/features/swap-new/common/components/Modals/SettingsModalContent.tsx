@@ -31,7 +31,6 @@ export const SettingsModalContent = () => {
     }, 0);
   };
 
-  console.log('APPLY CHANGES', { routingPreference, selectedSlippage });
   const applyChanges = async () => {
     await swapForm.action({
       type: SwapActionType.ProtocolSelected,

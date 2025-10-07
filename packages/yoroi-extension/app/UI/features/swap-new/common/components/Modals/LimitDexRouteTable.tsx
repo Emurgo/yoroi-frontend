@@ -9,7 +9,7 @@ export const LimitDexRouteTable = () => {
   const { primaryTokenInfo, swapForm, limitOptions } = useSwapRevamp();
   const { closeModal } = useModal();
   const headers = [strings.routeLabel, strings.routeTvl, strings.dexFee];
-  console.log('limitOptions', limitOptions);
+
   return (
     <TableContainer sx={{ boxShadow: 'none', border: 'none', padding: '2px' }}>
       <Table
