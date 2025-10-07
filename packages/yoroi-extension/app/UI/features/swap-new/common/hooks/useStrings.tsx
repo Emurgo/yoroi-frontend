@@ -177,6 +177,10 @@ export const messages = Object.freeze(
       id: 'swap.startDoingSwaps',
       defaultMessage: '!!!Start doing the swap operations to see your open orders here',
     },
+    selectToken: {
+      id: 'swap.selectToken',
+      defaultMessage: '!!!Select token',
+    },
   })
 );
 
@@ -225,6 +229,7 @@ export const useStrings = () => {
     noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
     noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
     startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
+    selectToken: intl.formatMessage(messages.selectToken),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
