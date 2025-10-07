@@ -12,7 +12,7 @@ import PortfolioTab from '../pages/wallet/portfolio/porfolioMain.page.js';
 import { allTokens } from '../helpers/tokensInfo.js';
 import PortfolioTokenDetails from '../pages/wallet/portfolio/portfolioDetails.page.js';
 
-describe('Portfolio page displayed', function () {
+describe('Portfolio page displayed _smoke_', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
@@ -31,6 +31,8 @@ describe('Portfolio page displayed', function () {
     const portfolioMainPage = new PortfolioTab(webdriver, logger);
     const pageIsDisplayed = await portfolioMainPage.isDisplayed();
     expect(pageIsDisplayed, 'Portfolio page is not displayed').to.be.true;
+    const isLoaded = await portfolioMainPage.waitIsLoaded();
+    expect(isLoaded, 'Portfolio page is not loaded').to.be.true;
   });
 
   it('Count displayed tokens', async function () {

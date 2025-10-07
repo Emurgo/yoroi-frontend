@@ -14,6 +14,7 @@
   "scripts": {
     "test:clean:logs": "find . -type d -name \"testRunsData_*\" -exec rm -r {} +",
     "test:base:sequintel": "npm run test:clean:logs && mocha --require $npm_package_config_hooksPath $npm_package_config_testPathGeneral --reporter mochawesome",
+    "test:base:sequintel:tag": "npm run test:clean:logs && mocha --require $npm_package_config_hooksPath $npm_package_config_testPathGeneral --reporter mochawesome -g",
     "test:ledger:base:sequintel": "npm run test:clean:logs && mocha --require $npm_package_config_hooksPath $npm_package_config_testPathLedger --reporter mochawesome",
     "test:trezor:base:sequintel": "npm run test:clean:logs && mocha --require $npm_package_config_hooksPath $npm_package_config_testPathTrezor --reporter mochawesome",
     "test:dapp:base:sequintel": "npm run test:clean:logs && mocha --require $npm_package_config_hooksPath $npm_package_config_testPathDApp --reporter mochawesome",
@@ -31,6 +32,7 @@
     "test:chrome:ledger:one": "env TARGETBROWSER=chrome npm run test:ledger:base:one",
     "test:chrome:trezor:one": "env TARGETBROWSER=chrome npm run test:trezor:base:one",
     "test:chrome:dapp:one": "env TARGETBROWSER=chrome npm run test:dapp:base:one",
+    "test:chrome:smoke": "cross-env TARGETBROWSER=chrome HEADLESS=true npm run test:base:sequintel:tag \"_smoke_\"",
     "test:firefox": "cross-env TARGETBROWSER=firefox HEADLESS=true npm run test:base:sequintel",
     "test:firefox:hw": "env TARGETBROWSER=firefox npm run test:hw:base:sequintel",
     "test:firefox:dapp": "cross-env TARGETBROWSER=firefox ISDAPP=true npm run test:dapp:base:sequintel",
