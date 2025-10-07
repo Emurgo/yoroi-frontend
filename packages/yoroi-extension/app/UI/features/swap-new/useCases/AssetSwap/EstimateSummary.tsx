@@ -33,7 +33,6 @@ export const EstimateSummary = () => {
   if (swapForm.estimate === undefined) return null;
 
   const protocol = swapForm.estimate?.splits[0]?.protocol;
-
   const netPrice = swapForm.estimate.netPrice;
   const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
   const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
@@ -91,11 +90,13 @@ export const EstimateSummary = () => {
         tooltip={strings.guaranteedMin}
         value={`${swapForm.estimate?.totalOutput} ${tokenOutTicker}`}
       />
-      <DisplayInfoInRow
-        label={strings.slippageLabel}
-        tooltip={strings.slippageInfo}
-        value={`${swapForm.slippageInput.value} %`}
-      />
+      {!isLimitOrder && (
+        <DisplayInfoInRow
+          label={strings.slippageLabel}
+          tooltip={strings.slippageInfo}
+          value={`${swapForm.slippageInput.value} %`}
+        />
+      )}
     </Stack>
   );
 };

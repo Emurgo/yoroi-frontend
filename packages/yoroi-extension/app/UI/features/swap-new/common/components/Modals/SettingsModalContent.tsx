@@ -4,7 +4,7 @@ import { useStrings } from '../../hooks/useStrings';
 import { Switch } from '../../../../../components/Switch/Switch';
 import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
-import { DEX_ROUTING } from '../../constants';
+import { Aggregator, DEX_ROUTING, RoutingPref } from '../../constants';
 import { sanitizeSlippageInput } from '../../helpers';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
@@ -12,7 +12,7 @@ const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
-
+  console.log('swapManager.settings', swapManager.settings);
   const [routingPreference, setRoutingPreference] = useState<any>(swapManager.settings.routingPreference);
   const [selectedSlippage, setSelectedSlippage] = useState(swapForm.slippageInput.value || 1);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(selectedSlippage)));
@@ -31,15 +31,16 @@ export const SettingsModalContent = () => {
     }, 0);
   };
 
+  console.log('APPLY CHANGES', { routingPreference, selectedSlippage });
   const applyChanges = async () => {
     await swapForm.action({
       type: SwapActionType.ProtocolSelected,
-      value: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
+      value: routingPreference,
     });
     await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreference: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
+      routingPreference: routingPreference,
     });
     closeModal();
   };
@@ -105,53 +106,64 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
     </Box>
   );
 };
-const RoutingPreference = ({ setRoutingPreference, routingPreference }) => {
+
+const ALL: Aggregator[] = [DEX_ROUTING.DEXHUNTER, DEX_ROUTING.MUESLISWAP, DEX_ROUTING.MINSWAP];
+
+export const seedAllManual = (): Aggregator[] => [...ALL];
+
+export const toggleAggregator = (current: Aggregator[], target: Aggregator): Aggregator[] =>
+  current.includes(target) ? current.filter(x => x !== target) : [...current, target];
+
+type Props = {
+  routingPreference: RoutingPref;
+  setRoutingPreference: (val: RoutingPref) => void;
+};
+
+export const RoutingPreference: React.FC<Props> = ({ routingPreference, setRoutingPreference }) => {
   const strings = useStrings();
 
-  const autoSelected = routingPreference === DEX_ROUTING.AUTO;
-  const dexHunter = [DEX_ROUTING.AUTO, DEX_ROUTING.DEXHUNTER, DEX_ROUTING.BOTH].includes(routingPreference);
-  const muesliswap =
-    routingPreference === DEX_ROUTING.AUTO ||
-    routingPreference === DEX_ROUTING.MUESLISWAP ||
-    routingPreference === DEX_ROUTING.BOTH;
+  const isAuto = routingPreference === DEX_ROUTING.AUTO;
+  const list: Aggregator[] = Array.isArray(routingPreference) ? routingPreference : [];
 
-  const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreference(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);
+  const setAuto = (on: boolean) => {
+    setRoutingPreference(on ? DEX_ROUTING.AUTO : seedAllManual());
   };
 
-  const handleMuesliswapToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreference(checked ? DEX_ROUTING.MUESLISWAP : DEX_ROUTING.DEXHUNTER);
+  const onToggle = (dex: Aggregator) => {
+    const nextList = toggleAggregator(list, dex);
+    setRoutingPreference(nextList.length === 0 ? DEX_ROUTING.AUTO : nextList);
   };
 
-  const handleAutoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreference(checked ? DEX_ROUTING.AUTO : DEX_ROUTING.BOTH);
-  };
   return (
     <Stack gap={32}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
         <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
           {strings.autoLabel}
         </Typography>
-        <Switch checked={autoSelected} onChange={handleAutoChange} />
+        <Switch checked={isAuto} onChange={e => setAuto(e.target.checked)} />
       </Stack>
 
-      {!autoSelected && (
+      {!isAuto && (
         <>
           <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
             <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
               DexHunter
             </Typography>
-            <Switch checked={dexHunter} onChange={handleDexHunterToggle} />
+            <Switch checked={list.includes(DEX_ROUTING.DEXHUNTER)} onChange={() => onToggle(DEX_ROUTING.DEXHUNTER)} />
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
             <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
               MuesliSwap
             </Typography>
-            <Switch checked={muesliswap} onChange={handleMuesliswapToggle} />
+            <Switch checked={list.includes(DEX_ROUTING.MUESLISWAP)} onChange={() => onToggle(DEX_ROUTING.MUESLISWAP)} />
+          </Stack>
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
+            <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
+              Minswap
+            </Typography>
+            <Switch checked={list.includes(DEX_ROUTING.MINSWAP)} onChange={() => onToggle(DEX_ROUTING.MINSWAP)} />
           </Stack>
         </>
       )}

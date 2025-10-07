@@ -17,5 +17,8 @@ export const DEX_ROUTING = {
   AUTO: 'auto',
   DEXHUNTER: 'dexhunter',
   MUESLISWAP: 'muesliswap',
-  BOTH: 'both',
+  MINSWAP: 'minswap',
 } as const;
+
+export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MUESLISWAP | typeof DEX_ROUTING.MINSWAP;
+export type RoutingPref = typeof DEX_ROUTING.AUTO | Aggregator[];

@@ -84,13 +84,21 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     },
   });
 
-  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
+  const {
+    data: { tokenInfos = new Map(), tokenInfoList = [] } = {},
+    isLoading: loadingTokenList,
+    refetch: refetchTokenList,
+  } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
     primaryTokenInfo,
     networkId: Chain.Network.Mainnet,
     excludedTokens: excludedTokens,
   });
+
+  useEffect(() => {
+    refetchTokenList();
+  }, []);
 
   useEffect(() => {
     if (tokenOutId) {
@@ -198,7 +206,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       })
       .then(response => {
         if (reqId !== estimateReqIdRef.current) return;
-
         if (isLeft(response)) {
           action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
