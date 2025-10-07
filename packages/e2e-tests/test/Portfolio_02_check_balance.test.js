@@ -30,6 +30,8 @@ describe('Portfolio Check the displayed balance', function () {
     const portfolioMainPage = new PortfolioTab(webdriver, logger);
     const pageIsDisplayed = await portfolioMainPage.isDisplayed();
     expect(pageIsDisplayed, 'Portfolio page is not displayed').to.be.true;
+    const isLoaded = await portfolioMainPage.waitIsLoaded();
+    expect(isLoaded, 'Portfolio page is not loaded').to.be.true;
   });
 
   it('Check the displayed balance on main page', async function () {

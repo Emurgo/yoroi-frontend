@@ -12,13 +12,17 @@ export const Columns = Object.freeze({
   Day: '24h',
   Week: '1W',
   Month: '1M',
-  Percentage: 'portfolioPercents',
   Total: 'totalAmount',
+  Percentage: 'portfolioPercents',
 });
 export const RedirectionButtons = Object.freeze({
   Receive: 'receive',
   Send: 'send',
   Swap: 'swap',
+});
+export const SortingDirection = Object.freeze({
+  ASC: 'asc',
+  DESC: 'desc',
 });
 
 /**
@@ -45,5 +49,43 @@ export const callRedirection = async (buttonName, webdriver, logger) => {
       return await swapPage.isDisplayed();
     default:
       throw new Error(`Unknown button name "${buttonName}"`);
+  }
+};
+
+export const defineSortingDirection = values => {
+  let ascending = 0;
+  let descending = 0;
+
+  for (let i = 1; i < values.length; i++) {
+    if (values[i] == null || values[i - 1] == null) {
+      continue;
+    }
+    if (values[i] > values[i - 1]) {
+      ascending++;
+    } else if (values[i] < values[i - 1]) {
+      descending++;
+    }
+  }
+
+  if (ascending > descending) {
+    return SortingDirection.ASC;
+  } else if (descending > ascending) {
+    return SortingDirection.DESC;
+  } else {
+    throw new Error('Unknown sorting is applied');
+  }
+};
+
+export const getValuesForSorting = (columnName, values) => {
+  if (Columns[columnName] === Columns.Price) {
+    return values.map(columnValue => columnValue.value);
+  } else if (Columns[columnName] === Columns.Total) {
+    return values.map(columnValue =>
+      columnValue.token.name === 'ADA' && columnValue.currency.balance == null
+        ? columnValue.token.balance
+        : columnValue.currency.balance
+    );
+  } else {
+    return values;
   }
 };
