@@ -18,7 +18,7 @@ import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
 import WalletCommonBase from '../pages/walletCommonBase.page.js';
 import NftGalleryTab from '../pages/wallet/nftGallery/nftGalleryMain.page.js';
 
-describe('Creating wallet', function () {
+describe('Creating wallet _smoke_', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;
