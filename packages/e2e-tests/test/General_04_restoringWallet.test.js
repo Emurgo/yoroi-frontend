@@ -13,7 +13,7 @@ import { oneMinute } from '../helpers/timeConstants.js';
 import driversPoolsManager from '../utils/driversPool.js';
 import { preloadBrowserStorage } from '../helpers/restoreWalletHelper.js';
 
-describe('Restoring 15-wallet', function () {
+describe('Restoring 15-wallet _smoke_', function () {
   this.timeout(2 * oneMinute);
   let webdriver = null;
   let logger = null;

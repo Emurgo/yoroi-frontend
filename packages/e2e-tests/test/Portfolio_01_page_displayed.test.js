@@ -12,7 +12,7 @@ import PortfolioTab from '../pages/wallet/portfolio/porfolioMain.page.js';
 import { allTokens } from '../helpers/tokensInfo.js';
 import PortfolioTokenDetails from '../pages/wallet/portfolio/portfolioDetails.page.js';
 
-describe('Portfolio page displayed', function () {
+describe('Portfolio page displayed _smoke_', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
