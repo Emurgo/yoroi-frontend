@@ -569,7 +569,7 @@
   "swap.txSubmitted": "交易已提交",
   "swap.txFailed": "交易失败",
   "swap.txId": "交易 ID",
-  "swap.routingPreferance": "Routing preference",
+  "swap.routingPreference": "Routing preference",
   "swap.checkTx": "在钱包交易列表中查看此交易",
   "swap.txNotProcessed": "由于技术问题，您的交易没有被正确处理",
   "swap.goToTxs": "前往交易",

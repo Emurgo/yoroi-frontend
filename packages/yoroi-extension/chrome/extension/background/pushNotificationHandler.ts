@@ -31,7 +31,7 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
   },
   {
     id: 'swap',
-    route: ROUTES.SWAP_REVAMP,
+    route: ROUTES.SWAP.ROOT,
   },
   {
     id: 'cashback',
@@ -107,6 +107,7 @@ async function pushHandler(eventData) {
     fcmMessageId: eventData.fcmMessageId,
     read: false,
     time: new Date().toISOString(),
+    redirection: redirectionRoute,
   });
 
   currentNotificationId = eventData.fcmMessageId;
