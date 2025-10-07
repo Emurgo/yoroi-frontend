@@ -11,6 +11,7 @@ import BigNumber from 'bignumber.js';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../constants';
 import { AssetDirectionType } from '../types';
 import { normalizeTokenId } from '../helpers';
+import { truncateAddressShort } from '../../../../../utils/formatters';
 
 type AssetInputProps = {
   direction: AssetDirectionType;
@@ -79,7 +80,7 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
     return tokenInput.tokenId === '.' || tokenInput.tokenId === ''
       ? primaryTokenInfo.name
-      : (tokenInputInfo?.ticker ?? tokenInputInfo?.name);
+      : (tokenInputInfo?.name ?? (tokenInputInfo?.ticker || truncateAddressShort(tokenInput.tokenId)));
   }, [direction, tokenInputInfo, swapForm.tokenInInput.tokenId, swapForm.tokenOutInput.tokenId]);
 
   const AssetIdForIcon = React.useMemo(() => {

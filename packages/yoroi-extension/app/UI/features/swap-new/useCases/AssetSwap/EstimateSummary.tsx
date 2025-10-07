@@ -51,7 +51,7 @@ export const EstimateSummary = () => {
   };
 
   return (
-    <Stack direction="column" {...atoms.gap_md} width="100%" {...atoms.mt_lg}>
+    <Stack direction="column" {...atoms.gap_md} width="503px" {...atoms.mt_lg}>
       <DisplayInfoInRow
         label={strings.routeLabel}
         tooltip={strings.routePath}

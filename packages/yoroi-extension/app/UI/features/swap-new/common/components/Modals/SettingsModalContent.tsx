@@ -12,7 +12,7 @@ const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
-  console.log('swapManager.settings', swapManager.settings);
+  
   const [routingPreference, setRoutingPreference] = useState<any>(swapManager.settings.routingPreference);
   const [selectedSlippage, setSelectedSlippage] = useState(swapForm.slippageInput.value || 1);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(selectedSlippage)));
