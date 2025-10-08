@@ -14,7 +14,6 @@ import { networks } from '../../../../../app/api/ada/lib/storage/database/prepac
 declare var chrome;
 
 const handlers = Object.freeze({
-
   'pop-up-wallet-creation': async () => {
     chrome.tabs.create({ url: 'main_window.html#/wallets/add' });
     return { ok: undefined };
