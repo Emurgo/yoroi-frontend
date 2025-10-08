@@ -1,5 +1,5 @@
 import { Stack, Typography } from '@mui/material';
-import { ReactComponent as NoOpenOders } from '../../../../../assets/images/revamp/no-complete-orders.inline.svg';
+import { ReactComponent as NoOpenOders } from '../../../../../assets/images/revamp/no-open-orders.inline.svg';
 import { useStrings } from '../../common/hooks/useStrings';
 
 const NoOpenOrders = (): React.ReactNode => {
