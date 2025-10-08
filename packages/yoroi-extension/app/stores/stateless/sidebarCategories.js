@@ -78,7 +78,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     className: 'swap',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
-    label: { id: 'sidebar.swap2', defaultMessage: '!!!Swap2' },
+    label: globalMessages.sidebarSwap,
     isVisible: isDev,
   },
   {
