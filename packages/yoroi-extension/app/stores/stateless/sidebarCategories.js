@@ -75,7 +75,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: isOnMainnet,
   },
   {
-    className: 'swap',
+    className: 'swap2',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
