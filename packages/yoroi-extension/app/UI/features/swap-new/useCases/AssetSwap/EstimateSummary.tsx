@@ -36,6 +36,7 @@ export const EstimateSummary = () => {
   const netPrice = swapForm.estimate.netPrice;
   const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
   const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
+  const pickTokenTicker = (t?: string) => (t && t !== '-' ? t : primaryTokenInfo.ticker);
 
   const openRouteModal = () => {
     openModal({
@@ -66,7 +67,7 @@ export const EstimateSummary = () => {
       <DisplayInfoInRow
         label={strings.priceLabel}
         tooltip="Asset Price"
-        value={`1 ${tokenInTicker === '-' ? primaryTokenInfo.ticker : tokenInTicker} = ${price} ${tokenOutTicker}`}
+        value={`1 ${pickTokenTicker(tokenInTicker)} = ${price} ${pickTokenTicker(tokenOutTicker)}`}
       />
       <DisplayInfoInRow
         label="Fees"
