@@ -41,7 +41,7 @@ export const useFormattedTx = (data: TransactionBody): FormattedTx => {
 
 const formatInputs = (inputUtxos, allAssetList, networkId, primaryTokenInfo, walletAddresses): any => {
   return inputUtxos.map(utxo => {
-    const address = utxo?.receiver || utxo?.address;
+    const address = utxo?.receiver;
     const { resolvedAddress, paymentCredKind } = resolveAddress(address);
 
     const rewardAddress = address !== null && paymentCredKind === CredKind.Key ? deriveAddress(address, networkId) : null;

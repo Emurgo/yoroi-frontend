@@ -39,21 +39,15 @@ const getTokenName = (tokenInfo: any): string => {
 export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, tokenInfo, quantity }: TokenItemProps) => {
   const decimals = getDecimals(tokenInfo);
   const tokenName = getTokenName(tokenInfo);
+
   const value = new BigNumber(quantity).shiftedBy(-decimals).toString();
   if (isSent) {
     const primaryColor = isPrimary ? 'ds.white_static' : 'ds.text_primary_medium';
     const primaryBackground = isPrimary ? 'ds.primary_500' : 'ds.primary_100';
     return (
-      <Box
-        sx={{
-          padding: '4px 12px',
-          backgroundColor: primaryBackground,
-          borderRadius: '8px',
-          flexWrap: 'nowrap',
-        }}
-      >
+      <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
         <Typography variant="body1" color={primaryColor}>
-          {value} {tokenName || tokenInfo?.ticker}
+          {value} {tokenName}
         </Typography>
       </Box>
     );
@@ -64,7 +58,7 @@ export const TokenItem: React.FC<TokenItemProps> = ({ isSent = true, isPrimary, 
   return (
     <Box sx={{ padding: '4px 12px', backgroundColor: primaryBackground, borderRadius: '8px', flexWrap: 'nowrap' }}>
       <Typography variant="body1" color={primaryColor}>
-        {value} {tokenName || tokenInfo?.ticker}
+        {value} {tokenName}
       </Typography>
     </Box>
   );
