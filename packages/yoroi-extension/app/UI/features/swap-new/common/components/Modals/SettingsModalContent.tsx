@@ -32,14 +32,11 @@ export const SettingsModalContent = () => {
   };
 
   const applyChanges = async () => {
-    await swapForm.action({
-      type: SwapActionType.ProtocolSelected,
-      value: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
-    });
+    await swapForm.action({ type: SwapActionType.ProtocolSelected, value: routingPreference });
     await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreference: routingPreference === DEX_ROUTING.BOTH ? DEX_ROUTING.AUTO : routingPreference,
+      routingPreference,
     });
     closeModal();
   };
