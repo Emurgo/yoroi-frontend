@@ -119,11 +119,10 @@ export const useSyncedTokenInfos = ({
   const qc = useQueryClient();
   const sticky = getSticky(networkId);
 
-  // stable, canonical exclusion set
-  const excluded = React.useMemo(
-    () => Array.from(new Set(excludedTokens.map(t => (t ?? '').trim().toLowerCase()))).sort(),
-    [excludedTokens]
-  );
+  const excluded = React.useMemo(() => {
+    const unique = new Set(excludedTokens.map(t => (t ?? '').trim().toLowerCase()));
+    return Array.from(unique).sort((a, b) => a.localeCompare(b));
+  }, [excludedTokens]);
 
   const primaryId = React.useMemo(() => canonAssetId(primaryTokenInfo?.id), [primaryTokenInfo?.id]);
 
