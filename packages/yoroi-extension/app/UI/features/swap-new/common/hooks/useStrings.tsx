@@ -165,6 +165,22 @@ export const messages = Object.freeze(
       id: 'global.labels.cancel',
       defaultMessage: '!!!Cancel',
     },
+    noOrdersCompleted: {
+      id: 'swap.noOrdersCompleted',
+      defaultMessage: '!!!No orders completed yet',
+    },
+    noOrdersAvailable: {
+      id: 'swap.noOrdersAvailable',
+      defaultMessage: '!!!No orders available yet',
+    },
+    startDoingSwaps: {
+      id: 'swap.startDoingSwaps',
+      defaultMessage: '!!!Start doing the swap operations to see your open orders here',
+    },
+    selectToken: {
+      id: 'swap.selectToken',
+      defaultMessage: '!!!Select token',
+    },
   })
 );
 
@@ -210,6 +226,10 @@ export const useStrings = () => {
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
     cancel: intl.formatMessage(messages.cancel),
     swapToLabel: intl.formatMessage(messages.swapToLabel),
+    noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
+    noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
+    startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
+    selectToken: intl.formatMessage(messages.selectToken),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

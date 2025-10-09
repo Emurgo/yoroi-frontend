@@ -11,6 +11,8 @@ import BigNumber from 'bignumber.js';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT } from '../constants';
 import { AssetDirectionType } from '../types';
 import { normalizeTokenId } from '../helpers';
+import { truncateAddressShort } from '../../../../../utils/formatters';
+import { useStrings } from '../hooks/useStrings';
 
 type AssetInputProps = {
   direction: AssetDirectionType;
@@ -20,6 +22,7 @@ type AssetInputProps = {
 
 export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect }) => {
   const [focusState, setFocusState] = React.useState(false);
+  const strings = useStrings();
   const { atoms }: any = useTheme();
   const { primaryTokenInfo, swapForm, tokenInfos, ftAssetList, loadingTokenList } = useSwapRevamp();
   const tokenInput = swapForm[direction === ASSET_DIRECTION_IN ? 'tokenInInput' : 'tokenOutInput'];
@@ -74,12 +77,12 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
 
   const assetInputName = React.useMemo(() => {
     if (direction === ASSET_DIRECTION_OUT && !touched) {
-      return 'Select token';
+      return strings.selectToken;
     }
 
     return tokenInput.tokenId === '.' || tokenInput.tokenId === ''
       ? primaryTokenInfo.name
-      : (tokenInputInfo?.ticker ?? tokenInputInfo?.name);
+      : (tokenInputInfo?.name ?? (tokenInputInfo?.ticker || truncateAddressShort(tokenInput.tokenId)));
   }, [direction, tokenInputInfo, swapForm.tokenInInput.tokenId, swapForm.tokenOutInput.tokenId]);
 
   const AssetIdForIcon = React.useMemo(() => {

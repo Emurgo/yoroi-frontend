@@ -15,6 +15,8 @@ import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolA
 import { LoadingButton } from '@mui/lab';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../../../transaction-review/common/types';
+import NoCompleteOrders from './NoCompleteOrders';
+import NoOpenOrders from './NoOpenOrders';
 
 type Column = {
   name: ColumnValueOrGetter;
@@ -115,6 +117,16 @@ export const SwapOrders = (props: Props) => {
 
   const columnRightPaddings = isEmptyView ? [] : new Array(visibleColumns.length).fill('0px');
 
+  const renderEmptyOrders = () => {
+    if (showCompletedOrders && completedOrders.length === 0) {
+      return <NoCompleteOrders />;
+    }
+    if (!showCompletedOrders && openOrders.length === 0) {
+      return <NoOpenOrders />;
+    }
+    return null;
+  };
+
   return (
     <>
       <Box sx={{ mx: '24px' }}>
@@ -134,6 +146,7 @@ export const SwapOrders = (props: Props) => {
             ]}
           />
         </Box>
+        {renderEmptyOrders()}
         <Table
           columnKeys={safeColumnKeys}
           columnNames={safeColumnNames}
