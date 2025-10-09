@@ -32,8 +32,10 @@ const isHex = (s: string) => /^[0-9a-f]*$/i.test(s);
 const canon = (raw?: string | { id: string } | null): string | null => {
   const s = typeof raw === 'string' ? raw : raw?.id;
   if (!s) return null;
-  return s.trim().replace(/:+$/, '').toLowerCase();
-};
+  let t = s.trim();
+  while (t.endsWith(':')) t = t.slice(0, -1);
+  return t.toLowerCase();
+}
 
 /** Accepts policy(56 hex) or policy.asset(0..64 hex) or '.' for ADA */
 const canonAssetId = (raw?: string | { id: string } | null): string | null => {
