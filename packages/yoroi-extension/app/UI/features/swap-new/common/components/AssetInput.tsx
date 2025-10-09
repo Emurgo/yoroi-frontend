@@ -73,27 +73,18 @@ export const AssetInput: React.FC<AssetInputProps> = ({ direction, onAssetSelect
   }
 
   const assetInputName = React.useMemo(() => {
-    if (direction === ASSET_DIRECTION_IN) {
-      return tokenInputInfo?.ticker ? tokenInputInfo?.name : primaryTokenInfo.name;
+    if (direction === ASSET_DIRECTION_OUT && !touched) {
+      return 'Select token';
     }
-    if (direction === ASSET_DIRECTION_OUT) {
-      if (!touched) {
-        return 'Select token';
-      }
-      return tokenInput.tokenId === '.' ? primaryTokenInfo.name : (tokenInputInfo?.ticker ?? tokenInputInfo?.name);
-    }
-    return undefined;
-  }, [direction, tokenInputInfo]);
+
+    return tokenInput.tokenId === '.' || tokenInput.tokenId === ''
+      ? primaryTokenInfo.name
+      : (tokenInputInfo?.ticker ?? tokenInputInfo?.name);
+  }, [direction, tokenInputInfo, swapForm.tokenInInput.tokenId, swapForm.tokenOutInput.tokenId]);
 
   const AssetIdForIcon = React.useMemo(() => {
-    if (direction === ASSET_DIRECTION_IN) {
-      return tokenInput.tokenId ?? tokenInputInfo?.id;
-    }
-    if (direction === ASSET_DIRECTION_OUT) {
-      return tokenInput.tokenId === '.' ? primaryTokenInfo.id : tokenInputInfo?.id;
-    }
-    return undefined;
-  }, [direction, tokenInputInfo, tokenInput]);
+    return tokenInput.tokenId === '.' || tokenInput.tokenId === '' ? '.' : tokenInputInfo?.id;
+  }, [direction, tokenInputInfo, swapForm.tokenInInput.tokenId, swapForm.tokenOutInput.tokenId]);
 
   const focusInput = () => {
     if (inputRef?.current) {
@@ -220,6 +211,7 @@ const Wrapper = styled(Box, {
   }`,
   backgroundColor: direction === ASSET_DIRECTION_IN ? 'transparent' : theme.palette.ds.bg_color_contrast_min,
   height: '132px',
+  width: '506px',
 
   '&:hover': {
     borderColor: !hasError && theme.palette.ds.el_gray_max,

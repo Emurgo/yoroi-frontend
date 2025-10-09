@@ -241,10 +241,16 @@ const OrderCancelation = ({ order }: { order: Swap.Order }) => {
     try {
       startLoadingTxReview();
       try {
-        await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+        const { signedTxHex: signedCancelTx } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
           wallet,
           transactionHex: cancelTxCbor,
           password: passswordInput,
+        });
+
+        const signedTransactionHexes: any = [signedCancelTx];
+        await stores.substores.ada.swapStore.executeTransactionHexes({
+          wallet,
+          signedTransactionHexes,
         });
 
         showTxResultModal(TransactionResult.SUCCESS);
