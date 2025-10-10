@@ -231,8 +231,8 @@ jobs:
       - name: Update Trezor docker compose file
         working-directory: ./trezor-user-env/docker
         run: |
-          yq -i 'del(.services."trezor-user-env-unix".network_mode)' compose.yml
-          yq -i '.services."trezor-user-env-unix".ports = ["9001:9001", "9002:9002", "21326:21326", "127.0.0.1:21325:21326"]'
+          yq e 'del(.services."trezor-user-env-unix".network_mode)' -i compose.yml
+          yq e '.services."trezor-user-env-unix".ports = ["9001:9001", "9002:9002", "21326:21326", "127.0.0.1:21325:21326"]' -i compose.yml
 
       - name: Run the trezor user environment
         working-directory: ./trezor-user-env
