@@ -280,6 +280,21 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
+      - name: Show all ports
+        run: ss -tuln
+
+      - name: Port 9001
+        run: lsof -i :9001
+
+      - name: Port 9002
+        run: lsof -i :9002
+
+      - name: Port 21325
+        run: lsof -i :21325
+
+      - name: Port 21326
+        run: lsof -i :21326
+
       - name: Run tests
         working-directory: ./packages/e2e-tests
         env:
