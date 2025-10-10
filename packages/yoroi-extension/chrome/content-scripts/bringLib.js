@@ -42,24 +42,20 @@ export async function getFirstAddress(): Promise<string | typeof undefined> {
   return await callBackground('get-address');
 }
 
-export function getTheme(): Promise<'light' | 'dark'> {
-  return callBackground('get-theme-mode');
+export async function popUpWalletCreation(): Promise<void> {
+  await callBackground('pop-up-wallet-creation');
 }
 
-export function popUpWalletCreation(): void {
-  callBackground('pop-up-wallet-creation');
-}
-
-export function popUpCashbackWalletSelection(): void {
-  callBackground('pop-up-cashback-wallet-selection');
+export async function popUpCashbackWalletSelection(): Promise<void> {
+  await callBackground('pop-up-cashback-wallet-selection');
 }
 
 export async function promptCreationOrSelection(): Promise<void> {
   const address = await getFirstAddress();
   if (address === null) {
-    return await popUpWalletCreation();
+    await popUpWalletCreation();
   } else {
-    return await popUpCashbackWalletSelection();
+    await popUpCashbackWalletSelection();
   }
 }
 
