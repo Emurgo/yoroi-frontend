@@ -225,6 +225,8 @@ jobs:
     needs: [Build-Extension]
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Clone trezor-user-env
         run: git clone https://github.com/trezor/trezor-user-env.git
 
@@ -244,8 +246,6 @@ jobs:
         id: setup-chrome
         with:
           chrome-version: 'stable'
-
-      - uses: actions/checkout@v4
 
       - name: Read .nvmrc
         id: nvm
