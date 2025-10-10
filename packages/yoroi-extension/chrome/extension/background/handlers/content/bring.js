@@ -14,15 +14,6 @@ import { networks } from '../../../../../app/api/ada/lib/storage/database/prepac
 declare var chrome;
 
 const handlers = Object.freeze({
-  'get-theme-mode': async () => {
-    const localStorageApi = new LocalStorageApi();
-    let theme = await localStorageApi.getUserThemeMode();
-    if (theme !== 'light' && theme !== 'dark') {
-      theme = 'light';
-    }
-    return { ok: theme };
-  },
-
   'pop-up-wallet-creation': async () => {
     chrome.tabs.create({ url: 'main_window.html#/wallets/add' });
     return { ok: undefined };
