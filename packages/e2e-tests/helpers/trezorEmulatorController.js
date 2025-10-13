@@ -109,6 +109,7 @@ export class TrezorEmulatorController {
       type: 'emulator-start',
       version: '2-main',
       model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
+      "output_to_log_file": true,
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
