@@ -221,7 +221,7 @@ jobs:
       contains(github.event.review.body, '/check') ||
       contains(github.event.review.body, '/trezor')
       )
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: [Build-Extension]
 
     steps:

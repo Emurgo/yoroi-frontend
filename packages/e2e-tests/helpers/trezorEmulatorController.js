@@ -1,6 +1,6 @@
 import ws from 'ws';
 import { fiveSeconds, halfSecond } from './timeConstants.js';
-import { sleep } from '../utils/utils.js';
+import { isMacOS, sleep } from '../utils/utils.js';
 import { TrezorModels } from './trezorHelper.js';
 const { WebSocket } = ws;
 
@@ -207,7 +207,7 @@ export class TrezorEmulatorController {
   bridgeStart(bridgeVersion) {
     const requestJson = {
       type: 'bridge-start',
-      version: bridgeVersion || '2.0.33',
+      version: bridgeVersion || `2.0.33${isMacOS ? '-arm' : ''}`,
       output_to_logfile: true,
     };
 
