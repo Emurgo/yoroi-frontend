@@ -21,6 +21,8 @@ export class TrezorEmulatorController {
   isSafe3 = () => this.model === TrezorModels.Safe3;
   isSafe5 = () => this.model === TrezorModels.Safe5;
 
+  _getAddition = () => (isMacOS() ? '-arm' : '');
+
   _customPromise(json, functionName) {
     return new Promise((resolve, reject) => {
       this._send(json, functionName);
@@ -107,10 +109,8 @@ export class TrezorEmulatorController {
     this.model = trezorModel;
     const requestJson = {
       type: 'emulator-start',
-      version: '2-main',
+      version: `2-main${this._getAddition()}`,
       model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
-      output_to_logfile: true,
-      save_screenshots: true,
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
@@ -207,8 +207,7 @@ export class TrezorEmulatorController {
   bridgeStart(bridgeVersion) {
     const requestJson = {
       type: 'bridge-start',
-      version: bridgeVersion || `2.0.33${isMacOS ? '-arm' : ''}`,
-      output_to_logfile: true,
+      version: bridgeVersion || `2.0.33${this._getAddition()}`,
     };
 
     return this._customPromise(requestJson, 'bridgeStart');

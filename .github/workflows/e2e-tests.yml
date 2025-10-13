@@ -225,44 +225,14 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - name: Clone trezor-user-env
-        run: |
-          cd ..
-          git clone https://github.com/trezor/trezor-user-env.git
-
-      - name: Download firmware
-        working-directory: ../trezor-user-env/src/binaries/firmware/bin/
-        run: sudo ./download.sh
-
-      - name: Copy firmware for docker volume
-        working-directory: ../trezor-user-env
-        run: |
-          mkdir dockerVolumeFirmware
-          cp -rv ./src/binaries/firmware/bin/. dockerVolumeFirmware
-
-      - name: Download trezord-go
-        working-directory: ../trezor-user-env/src/binaries/trezord-go/bin/
-        run: sudo ./download.sh
-
-      - name: Copy trezord-go for docker volume
-        working-directory: ../trezor-user-env
-        run: |
-          mkdir dockerVolumeTrezorGo
-          cp -rv ./src/binaries/trezord-go/bin/. dockerVolumeTrezorGo
-
-      - name: Run the trezor user environment
-        working-directory: ../trezor-user-env
+      - name: Run the trezor user environment docker container
         run: |
           sudo docker run \
             -p 9001:9001 \
             -p 9002:9002 \
             -p 21326:21326 \
             -p 127.0.0.1:21325:21326 \
-            -v logs:/trezor-user-env/logs/ \
-            -v dockerVolumeFirmware:/trezor-user-env/src/binaries/firmware/bin/ \
-            -v dockerVolumeTrezorGo:/trezor-user-env/src/binaries/trezord-go/bin \
-            -d \
-            ghcr.io/trezor/trezor-user-env:latest
+            -d ghcr.io/trezor/trezor-user-env
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
