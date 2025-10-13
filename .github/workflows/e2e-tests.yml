@@ -225,43 +225,45 @@ jobs:
     needs: [Build-Extension]
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Clone trezor-user-env
-        run: git clone https://github.com/trezor/trezor-user-env.git
+        run: |
+          cd ..
+          git clone https://github.com/trezor/trezor-user-env.git
           
       - name: Download firmware
-        working-directory: ./trezor-user-env/src/binaries/firmware/bin/
+        working-directory: ../trezor-user-env/src/binaries/firmware/bin/
         run: sudo ./download.sh
 
       - name: Copy firmware for docker volume
-        working-directory: ./trezor-user-env
+        working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeFirmware
-          cp ./src/binaries/firmware/bin/* dockerVolumeFirmware
+          cp -r ./src/binaries/firmware/bin/* dockerVolumeFirmware
 
       - name: Download trezord-go
-        working-directory: ./trezor-user-env/src/binaries/trezord-go/bin/
+        working-directory: ../trezor-user-env/src/binaries/trezord-go/bin/
         run: sudo ./download.sh
 
       - name: Copy trezord-go for docker volume
-        working-directory: ./trezor-user-env
+        working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeTrezorGo
-          cp ./src/binaries/trezord-go/bin/* dockerVolumeTrezorGo
+          cp -r ./src/binaries/trezord-go/bin/* dockerVolumeTrezorGo
 
       - name: Create the logs folder in the root of the trezor-user-env
-        working-directory: ./trezor-user-env
+        working-directory: ../trezor-user-env
         run: mkdir logs
 
       - name: Run the trezor user environment
-        working-directory: ./trezor-user-env
-        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 127.0.0.1:21325:21326 -v logs:/trezor-user-env/logs/ -v dockerVolumeFirmware:/trezor-user-env/src/binaries/firmware/bin/ -v dockerVolumeTrezorGo:/trezor-user-env/src/binaries/trezord-go/bin -d ghcr.io/trezor/trezor-user-env:latest
+        working-directory: ../trezor-user-env
+        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 127.0.0.1:21325:21326 -v logs:/logs/ -v dockerVolumeFirmware:/src/binaries/firmware/bin/ -v dockerVolumeTrezorGo:/src/binaries/trezord-go/bin -d ghcr.io/trezor/trezor-user-env:latest
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
           chrome-version: 'stable'
+
+      - uses: actions/checkout@v4
 
       - name: Read .nvmrc
         id: nvm
@@ -296,6 +298,9 @@ jobs:
           name: builtApp
           path: ./packages/yoroi-extension
 
+      - name: Docker container info
+        run: sudo docker container ls
+
       - name: Run tests
         working-directory: ./packages/e2e-tests
         env:
@@ -306,7 +311,7 @@ jobs:
         if: ${{ failure() }}
         run: |
           mkdir ./packages/e2e-tests/testRunsData_chrome/trezor_logs
-          cp ./trezor-user-env/logs/* ./packages/e2e-tests/testRunsData_chrome/trezor_logs
+          cp -r ../trezor-user-env/logs/. ./packages/e2e-tests/testRunsData_chrome/trezor_logs
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
