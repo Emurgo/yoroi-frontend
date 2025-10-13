@@ -30,8 +30,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
-          cache: 'npm'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          cache: "npm"
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -86,7 +86,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: 'stable'
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -97,8 +97,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
-          cache: 'npm'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          cache: "npm"
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -157,7 +157,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: 'stable'
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -168,8 +168,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
-          cache: 'npm'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          cache: "npm"
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -229,7 +229,7 @@ jobs:
         run: |
           cd ..
           git clone https://github.com/trezor/trezor-user-env.git
-          
+
       - name: Download firmware
         working-directory: ../trezor-user-env/src/binaries/firmware/bin/
         run: sudo ./download.sh
@@ -238,7 +238,7 @@ jobs:
         working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeFirmware
-          cp -r ./src/binaries/firmware/bin/. dockerVolumeFirmware
+          cp -rv ./src/binaries/firmware/bin/. dockerVolumeFirmware
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env/src/binaries/trezord-go/bin/
@@ -248,20 +248,26 @@ jobs:
         working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeTrezorGo
-          cp -r ./src/binaries/trezord-go/bin/. dockerVolumeTrezorGo
-
-      - name: Create the logs folder in the root of the trezor-user-env
-        working-directory: ../trezor-user-env
-        run: mkdir logs
+          cp -rv ./src/binaries/trezord-go/bin/. dockerVolumeTrezorGo
 
       - name: Run the trezor user environment
         working-directory: ../trezor-user-env
-        run: sudo docker run -p 9001:9001 -p 9002:9002 -p 21326:21326 -p 127.0.0.1:21325:21326 -v logs:/logs/ -v dockerVolumeFirmware:/src/binaries/firmware/bin/ -v dockerVolumeTrezorGo:/src/binaries/trezord-go/bin -d ghcr.io/trezor/trezor-user-env:latest
+        run: |
+          sudo docker run \
+            -p 9001:9001 \
+            -p 9002:9002 \
+            -p 21326:21326 \
+            -p 127.0.0.1:21325:21326 \
+            -v logs:/trezor-user-env/logs/ \
+            -v dockerVolumeFirmware:/trezor-user-env/src/binaries/firmware/bin/ \
+            -v dockerVolumeTrezorGo:/trezor-user-env/src/binaries/trezord-go/bin \
+            -d \
+            ghcr.io/trezor/trezor-user-env:latest
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: 'stable'
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -272,8 +278,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
-          cache: 'npm'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          cache: "npm"
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -310,8 +316,8 @@ jobs:
       - name: Copy trezor logs
         if: ${{ failure() }}
         run: |
-          mkdir ./packages/e2e-tests/testRunsData_chrome/trezor_logs
-          cp -r ../trezor-user-env/logs/. ./packages/e2e-tests/testRunsData_chrome/trezor_logs
+          ls ../trezor-user-env/logs/ -al
+          cp -rv ../trezor-user-env/logs/. ./packages/e2e-tests/testRunsData_chrome/trezor_logs
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
@@ -338,7 +344,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: 'stable'
+          chrome-version: "stable"
 
       - uses: actions/checkout@v4
 
@@ -349,8 +355,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: '${{ steps.nvm.outputs.NVMRC }}'
-          cache: 'npm'
+          node-version: "${{ steps.nvm.outputs.NVMRC }}"
+          cache: "npm"
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
