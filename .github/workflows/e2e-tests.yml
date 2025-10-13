@@ -302,6 +302,11 @@ jobs:
           CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:trezor
 
+      - name: Copy trezor logs
+        run: |
+          mkdir ./packages/e2e-tests/testRunsData_chrome/trezor_logs
+          cp ./trezor-user-env/logs/* ./packages/e2e-tests/testRunsData_chrome/trezor_logs
+
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -310,7 +315,6 @@ jobs:
           path: |
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData_chrome
-            ./trezor-user-env/logs
 
   Ledger:
     if: github.event.review &&

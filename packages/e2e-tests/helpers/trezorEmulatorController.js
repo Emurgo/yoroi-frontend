@@ -8,7 +8,6 @@ class TrezorEmulatorControllerError extends Error {}
 
 export class TrezorEmulatorController {
   websocketUrl = 'ws://localhost:9001/';
-  id = 0;
 
   constructor(logger) {
     this.logger = logger;
@@ -82,14 +81,8 @@ export class TrezorEmulatorController {
   }
 
   _send(json, functionName) {
-    const tempId = this.id;
-    const requestToSend = JSON.stringify(
-      Object.assign(json, {
-        tempId,
-      })
-    );
+    const requestToSend = JSON.stringify(json)
     this.ws.send(requestToSend);
-    this.id++;
     this.logger.info(`${functionName}._send: Request sent: ${requestToSend}`);
   }
 
@@ -109,7 +102,7 @@ export class TrezorEmulatorController {
       type: 'emulator-start',
       version: '2-main',
       model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
-      "output_to_log_file": true,
+      output_to_log_file: true,
     };
 
     return this._customPromise(requestJson, 'emulatorStart');
