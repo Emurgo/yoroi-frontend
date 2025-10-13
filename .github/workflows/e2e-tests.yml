@@ -238,7 +238,7 @@ jobs:
         working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeFirmware
-          cp -r ./src/binaries/firmware/bin/* dockerVolumeFirmware
+          cp -r ./src/binaries/firmware/bin/. dockerVolumeFirmware
 
       - name: Download trezord-go
         working-directory: ../trezor-user-env/src/binaries/trezord-go/bin/
@@ -248,7 +248,7 @@ jobs:
         working-directory: ../trezor-user-env
         run: |
           mkdir dockerVolumeTrezorGo
-          cp -r ./src/binaries/trezord-go/bin/* dockerVolumeTrezorGo
+          cp -r ./src/binaries/trezord-go/bin/. dockerVolumeTrezorGo
 
       - name: Create the logs folder in the root of the trezor-user-env
         working-directory: ../trezor-user-env
