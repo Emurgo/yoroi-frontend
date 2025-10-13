@@ -30,8 +30,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "npm"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
 
       - name: Cache node modules
         uses: actions/cache@v4
@@ -86,7 +86,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: "stable"
+          chrome-version: 'stable'
 
       - uses: actions/checkout@v4
 
@@ -97,8 +97,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "npm"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -157,7 +157,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: "stable"
+          chrome-version: 'stable'
 
       - uses: actions/checkout@v4
 
@@ -168,8 +168,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "npm"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -221,11 +221,11 @@ jobs:
       contains(github.event.review.body, '/check') ||
       contains(github.event.review.body, '/trezor')
       )
-    runs-on: macos-latest
+    runs-on: ubuntu-22.04
     needs: [Build-Extension]
 
     steps:
-      - name: Run the trezor user environment docker container
+      - name: Run the trezor user environment
         run: |
           sudo docker run \
             -p 9001:9001 \
@@ -237,7 +237,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: "stable"
+          chrome-version: 'stable'
 
       - uses: actions/checkout@v4
 
@@ -248,8 +248,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "npm"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
@@ -283,12 +283,6 @@ jobs:
           CHROME_PATH: ${{ steps.setup-chrome.outputs.chrome-path }}
         run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:trezor
 
-      - name: Copy trezor logs
-        if: ${{ failure() }}
-        run: |
-          ls ../trezor-user-env/logs/ -al
-          cp -rv ../trezor-user-env/logs/. ./packages/e2e-tests/testRunsData_chrome/trezor_logs
-
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
@@ -314,7 +308,7 @@ jobs:
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
         with:
-          chrome-version: "stable"
+          chrome-version: 'stable'
 
       - uses: actions/checkout@v4
 
@@ -325,8 +319,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "${{ steps.nvm.outputs.NVMRC }}"
-          cache: "npm"
+          node-version: '${{ steps.nvm.outputs.NVMRC }}'
+          cache: 'npm'
 
       - name: Cache e2e-tests node modules
         uses: actions/cache@v4
