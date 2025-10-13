@@ -303,6 +303,7 @@ jobs:
         run: xvfb-run -a -e /dev/stdout -s "-screen 0 1600x900x24" npm run test:chrome:trezor
 
       - name: Copy trezor logs
+        if: ${{ failure() }}
         run: |
           mkdir ./packages/e2e-tests/testRunsData_chrome/trezor_logs
           cp ./trezor-user-env/logs/* ./packages/e2e-tests/testRunsData_chrome/trezor_logs

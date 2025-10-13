@@ -81,7 +81,7 @@ export class TrezorEmulatorController {
   }
 
   _send(json, functionName) {
-    const requestToSend = JSON.stringify(json)
+    const requestToSend = JSON.stringify(json);
     this.ws.send(requestToSend);
     this.logger.info(`${functionName}._send: Request sent: ${requestToSend}`);
   }
