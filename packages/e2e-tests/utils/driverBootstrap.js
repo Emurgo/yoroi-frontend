@@ -63,7 +63,8 @@ const getChromeBuilder = () => {
       'profile.default_content_setting_values.notifications': 1, // allow notification
     })
     .addArguments('disable-infobars')
-    .addArguments('--enable-clipboard');
+    .addArguments('--enable-clipboard')
+    .addArguments('--disable-web-security');
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
   }
