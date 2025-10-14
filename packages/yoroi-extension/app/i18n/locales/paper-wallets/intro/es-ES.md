@@ -1,7 +1,7 @@
-# Billetera de Papel
+# Paper Wallets
 
-Una **"Billetera de Papel"** es un documento especial, que contiene palabras mnemotécnicas secretas y un pequeño conjunto de direcciones. Cuando se crea una billetera de papel, la misma **no es almacenada por Yoroi**. El documento PDF generado constituye la única copia existente de dicha billetera.
+A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
 
-Se pueden recibir monedas en una billetera de papel, utilizando las direcciones pre-generadas. Asimismo, es posible restaurarla en cualquier momento para acceder a los fondos alojados en ella. Sin embargo, se debe descartar una billetera de papel luego de restaurar sus fondos, ya que dejará de ser una billetera "fría".
+You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
 
-La billetera de papel de Yoroi está protegida por una **contraseña personalizada por el usuario**, y contiene 21 palabras secretas. Incluso si alguien obtiene acceso a la billetera de papel, esta persona deberá también conocer la contraseña personalizada para obtener acceso a los fondos. **Por ello, si pierdes u olvidas tu contraseña, tus fondos se perderán irrevocablemente, y nadie podrá recuperarlos**.
+Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
