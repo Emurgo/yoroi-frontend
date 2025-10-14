@@ -1,7 +1,7 @@
-# ペーパーウォレット
+# Paper Wallets
 
-**ペーパーウォレット**は、秘密鍵となる言葉とアドレスが記載された特別な文書です。ペーパーウォレットを作成する場合、**ヨロイはこれを保存しません**。生成されたPDF文書のみがウォレットの控となります。
+A **"Paper Wallet"** is a special document, containing secret mnemonics words and a small set of addresses. When a paper wallet is created **it is NOT stored by Yoroi**. The generated PDF document is the only copy of this wallet in existence.
 
-事前に生成されたアドレスを使用して、ペーパーウォレットで通貨を受け取ることが可能です。また、ペーパーウォレットはいつでもヨロイに復元して、資金にアクセスすることができます。しかし、資金を復元したあとは「コールドウォレット」ではなくなるため、ペーパーウォレットを使用することはできません。
+You can use a paper wallet to receive coins using the pre-generated addresses. You can restore your paper wallet at any time into Yoroi to access the funds. However, you should stop using a paper wallet after you restore its funds as it will no longer be a "cold" wallet.
 
-ヨロイペーパーウォレットは**カスタムユーザーパスワード**で保護され、21の秘密鍵を含みます。ペーパーウォレットが第三者の手に渡った場合でも、パスワードがなければ資金にアクセスすることはできません。**しかし、ユーザーがパスワードを紛失または失念した場合は、資金は永遠に失われ、いかなる手段によっても復元することはできません。**ウォレットパスワードを誤って入力した場合、異なるウォレットが作成されます。これは妥当な否認権を認めるものです。
+Yoroi Paper Wallets are protected with a **custom user password** and contain 21 secret words. Even if someone gets access to this paper-wallet, they will also need to know your password to gain access to the funds. **But if you lose or forget your password, your funds will be lost forever and no one will be able to restore them**. Typing the wrong wallet password will give you a different wallet. This allows for plausible deniability.
