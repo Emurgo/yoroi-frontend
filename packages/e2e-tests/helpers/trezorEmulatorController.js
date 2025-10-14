@@ -1,6 +1,6 @@
 import ws from 'ws';
 import { fiveSeconds, halfSecond } from './timeConstants.js';
-import { sleep } from '../utils/utils.js';
+import { isMacOS, sleep } from '../utils/utils.js';
 import { TrezorModels } from './trezorHelper.js';
 const { WebSocket } = ws;
 
@@ -20,6 +20,8 @@ export class TrezorEmulatorController {
   isModelT = () => this.model === TrezorModels.ModelT;
   isSafe3 = () => this.model === TrezorModels.Safe3;
   isSafe5 = () => this.model === TrezorModels.Safe5;
+
+  _getAddition = () => (isMacOS() ? '-arm' : '');
 
   _customPromise(json, functionName) {
     return new Promise((resolve, reject) => {
@@ -85,7 +87,7 @@ export class TrezorEmulatorController {
     const tempId = this.id;
     const requestToSend = JSON.stringify(
       Object.assign(json, {
-        tempId,
+        id: tempId,
       })
     );
     this.ws.send(requestToSend);
@@ -107,7 +109,7 @@ export class TrezorEmulatorController {
     this.model = trezorModel;
     const requestJson = {
       type: 'emulator-start',
-      version: '2-main',
+      version: `2-main${this._getAddition()}`,
       model: trezorModel, // T2T1 - Trezor Model T, T3T1 - Trezor Safe 5, T3B1 - Trezor Safe 3
     };
 
@@ -205,7 +207,7 @@ export class TrezorEmulatorController {
   bridgeStart(bridgeVersion) {
     const requestJson = {
       type: 'bridge-start',
-      version: bridgeVersion || '2.0.33',
+      version: bridgeVersion || `2.0.33${this._getAddition()}`,
     };
 
     return this._customPromise(requestJson, 'bridgeStart');
