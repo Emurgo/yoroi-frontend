@@ -100,6 +100,7 @@ export default class AdaAddressesStore extends Store<StoresMap> {
       return Promise.resolve(null);
     }
     const res = await getCardanoAddresses({ resolve });
+    console.error(res);
     let resultForbidden: ?DomainResolverResponse = null;
     let resultUnexpected: ?DomainResolverResponse = null;
     for (const { nameServer, address, error } of res) {
@@ -123,7 +124,6 @@ export default class AdaAddressesStore extends Store<StoresMap> {
           resultForbidden = { nameServer: resolvedNameServer, error: 'forbidden', address: null };
         }
       } else {
-        console.error(error);
         if (resultUnexpected == null) {
           resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
         }
