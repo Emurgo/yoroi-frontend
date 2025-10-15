@@ -28,7 +28,7 @@
     "test:chrome:trezor": "cross-env TARGETBROWSER=chrome IS_TREZOR=true npm run test:trezor:base:sequintel",
     "test:chrome:dapp": "cross-env TARGETBROWSER=chrome ISDAPP=true npm run test:dapp:base:sequintel",
     "test:chrome:parallel": "env TARGETBROWSER=chrome npm run test:base:parallel",
-    "test:chrome:one": "env TARGETBROWSER=chrome npm run test:base:one",
+    "test:chrome:one": "cross-env TARGETBROWSER=chrome HEADLESS=true npm run test:base:one",
     "test:chrome:ledger:one": "env TARGETBROWSER=chrome npm run test:ledger:base:one",
     "test:chrome:trezor:one": "cross-env TARGETBROWSER=chrome IS_TREZOR=true npm run test:trezor:base:one",
     "test:chrome:dapp:one": "env TARGETBROWSER=chrome npm run test:dapp:base:one",
