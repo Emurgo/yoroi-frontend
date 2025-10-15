@@ -301,6 +301,8 @@ export const resolverEndpointIsAvailable = async endpoint => {
       });
     } else {
       reqResponse = await axios.get(endpoint);
+      console.log(reqResponse.status, reqResponse.code);
+      console.log(reqResponse.response.data);
     }
     return reqResponse.status == 200;
   } catch (error) {

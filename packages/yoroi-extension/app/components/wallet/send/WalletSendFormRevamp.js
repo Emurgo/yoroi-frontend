@@ -347,6 +347,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
         } else if (res.error === 'forbidden') {
           domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(messages.receiverFieldLabelForbiddenAccess)}`;
         } else {
+          console.error(error);
           domainResolverMessage = `${res.nameServer}: ${this.context.formatMessage(messages.receiverFieldLabelUnexpectedError)}`;
         }
       }

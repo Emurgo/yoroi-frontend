@@ -123,6 +123,7 @@ export default class AdaAddressesStore extends Store<StoresMap> {
           resultForbidden = { nameServer: resolvedNameServer, error: 'forbidden', address: null };
         }
       } else {
+        console.error(error);
         if (resultUnexpected == null) {
           resultUnexpected = { nameServer: resolvedNameServer, error: 'unexpected', address: null };
         }
