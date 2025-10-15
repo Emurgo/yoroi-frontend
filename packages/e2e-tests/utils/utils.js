@@ -305,6 +305,7 @@ export const resolverEndpointIsAvailable = async endpoint => {
     return reqResponse.status == 200;
   } catch (error) {
     console.error(error.status, error.code);
+    console.error(error.response.data);
     return false;
   }
 };
