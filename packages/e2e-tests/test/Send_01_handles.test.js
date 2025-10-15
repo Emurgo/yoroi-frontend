@@ -121,9 +121,6 @@ describe('Handle handles', function () {
   }
 
   for (const testNegativeDatum of testDataNegative) {
-    if (testNegativeDatum.provider === 'Unstoppable Domains' && isLocalRun()) {
-      continue;
-    }
     describe(`Negative case, ${testNegativeDatum.provider}`, function () {
       it(`Refresh page, ${testNegativeDatum.provider}`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
