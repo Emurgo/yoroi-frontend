@@ -9,13 +9,12 @@ export const ErrorMessage = () => {
   if (!code || isLimitOptionsLoading) {
     return null;
   }
-
   const message = useSwapErrorLabel()(code);
 
   return (
     <Stack sx={{ marginTop: '-8px' }}>
       <Typography variant="caption" color="ds.sys_magenta_500">
-        {message}
+        {message ?? code}
       </Typography>
     </Stack>
   );
