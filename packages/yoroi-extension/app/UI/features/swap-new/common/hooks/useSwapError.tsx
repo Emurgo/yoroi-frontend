@@ -6,8 +6,6 @@ export const useSwapErrorLabel = () => {
   const dict = React.useMemo<Record<string, string>>(
     () => ({
       token_in_must_be_different_from_token_out: S.buyAndSellToken,
-      // insufficient_balance: S.swap_error_insufficient_balance,
-      // route_not_found: S.swap_error_route_not_found,
     }),
     [S]
   );
