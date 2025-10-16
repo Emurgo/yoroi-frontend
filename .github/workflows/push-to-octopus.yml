@@ -1,0 +1,47 @@
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  push-to-octopus:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          token: ${{ secrets.GH_ACCESS_TOKEN }}
+
+      - name: Set package name 📦
+        run: echo "PACKAGE_NAME=$(echo yoroi-frontend-smoke-builds.${{ github.ref_name }}.zip)" >> $GITHUB_ENV
+
+      - name: Zip package 📦
+        run: zip -r ../$(echo $PACKAGE_NAME) . -x "*/.*"
+        
+      - name: Install Octopus CLI 🐙
+        uses: OctopusDeploy/install-octopus-cli-action@v3
+        with:
+          version: latest
+
+      - name: Push package to Octopus Deploy 🐙
+        uses: OctopusDeploy/push-package-action@v3
+        env: 
+          OCTOPUS_URL: https://emurgo.octopus.app
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+          OCTOPUS_SPACE: 'DevOps'
+        with:
+          packages: '${{ env.PACKAGE_NAME }}'
+
+      - name: Create release 
+        uses: OctopusDeploy/create-release-action@v3
+        env: 
+          OCTOPUS_URL: https://emurgo.octopus.app
+          OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+          OCTOPUS_SPACE: 'DevOps'
+        with:
+          project: yoroi-frontend-smoke-builds
+          channel: 'Dev'
+          packages: 'yoroi-frontend-smoke-builds:${{ github.ref_name }}'
+          release_number: '${{ github.ref_name }}'
