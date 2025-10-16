@@ -11,7 +11,7 @@ import {
   firefoxUuidMapping,
   TargetBrowser,
 } from '../helpers/constants.js';
-import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox, isHeadless } from './utils.js';
+import { getDownloadsDir, getTargetBrowser, isBrave, isChrome, isFirefox, isHeadless, isTrezorTests } from './utils.js';
 import { defaultWaitTimeout } from '../helpers/timeConstants.js';
 import * as chromeDriver from 'chromedriver';
 
@@ -66,6 +66,9 @@ const getChromeBuilder = () => {
     .addArguments('--enable-clipboard');
   if (isHeadless()) {
     chromeOpts.addArguments('--headless=new');
+  }
+  if (isTrezorTests()) {
+    chromeOpts.addArguments('--disable-web-security');
   }
   return new Builder()
     .forBrowser(TargetBrowser.Chrome)

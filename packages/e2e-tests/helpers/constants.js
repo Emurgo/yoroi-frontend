@@ -119,8 +119,9 @@ export const yoroiObject = Object.freeze({
 
 export const Colors = Object.freeze({
   errorRed: 'rgb(255, 19, 81)',
-  portfolioPositive: 'rgb(18, 112, 93)',
-  portfolioNegative: 'rgb(207, 5, 58)',
+  portfolioPositive: 'rgba(18, 112, 93, 1)',
+  portfolioNegative: 'rgba(207, 5, 58, 1)',
+  arrowSelected: 'rgb(0, 0, 0)',
 });
 
 export const balanceReplacer = '******';

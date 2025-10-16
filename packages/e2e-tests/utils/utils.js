@@ -49,6 +49,7 @@ export const isMacOS = () => getCurrentOS() === 'darwin';
 export const isHeadless = () => process.env.HEADLESS === 'true';
 export const isDapp = () => process.env.ISDAPP === 'true';
 export const isLocalRun = () => process.env.EXTENSION_LOCAL_RUN === 'true';
+export const isTrezorTests = () => process.env.IS_TREZOR === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');

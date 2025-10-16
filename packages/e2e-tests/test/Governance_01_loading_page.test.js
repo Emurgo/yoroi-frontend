@@ -10,7 +10,7 @@ import { prepareWallet } from '../helpers/restoreWalletHelper.js';
 import TransactionsSubTab from '../pages/wallet/walletTab/walletTransactions.page.js';
 import GovernanceTab from '../pages/wallet/governance/governanceTab.page.js';
 
-describe('Governance page loading', function () {
+describe('Governance page loading _smoke_', function () {
   this.timeout(2 * oneMinute);
   /** @type {WebDriver} */
   let webdriver = null;
