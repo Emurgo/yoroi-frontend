@@ -164,7 +164,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
     const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
 
-    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
+    const hasEnoughBalance = Number(tokenAmount?.quantity) >= Number(state.tokenInInput.value);
 
     if (!hasEnoughBalance) {
       action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });

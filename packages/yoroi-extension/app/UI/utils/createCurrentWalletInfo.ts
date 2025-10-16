@@ -90,18 +90,13 @@ const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
       }`;
 
       const shiftedAmount = token.entry.amount.shiftedBy(-numberOfDecimals);
-      const [beforeDecimal, afterDecimal = ''] = splitAmount(shiftedAmount, numberOfDecimals);
-
-      const before = String(beforeDecimal).replace(/,/g, '.');
-      const after = String(afterDecimal).replace(/,/g, '.');
-
-      const formatedAmount = after ? `${before}.${after}` : before;
+      const [beforeDecimal, afterDecimal] = splitAmount(shiftedAmount, numberOfDecimals);
 
       return {
         assetName: token.info.Metadata.assetName,
         quantity: asQuantity(token.entry.amount),
         id: tokenId,
-        formatedAmount: formatedAmount,
+        formatedAmount: [beforeDecimal, afterDecimal].join(''),
         shiftedAmount,
         info: {
           id: token.entry.identifier,
