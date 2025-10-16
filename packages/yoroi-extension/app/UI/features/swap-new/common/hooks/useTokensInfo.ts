@@ -35,7 +35,7 @@ const canon = (raw?: string | { id: string } | null): string | null => {
   let t = s.trim();
   while (t.endsWith(':')) t = t.slice(0, -1);
   return t.toLowerCase();
-}
+};
 
 const canonAssetId = (raw?: string | { id: string } | null): string | null => {
   const s = canon(raw);
