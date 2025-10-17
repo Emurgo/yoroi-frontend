@@ -210,7 +210,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         if (isLeft(response)) {
           action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
-          console.log('estimate response', response.value.data);
           action({ type: SwapActionType.EstimateResponse, value: response.value.data });
         }
       })
