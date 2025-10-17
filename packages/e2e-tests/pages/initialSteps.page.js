@@ -1,5 +1,4 @@
 import BasePage from './basepage.js';
-import { isChrome } from '../utils/utils.js';
 import { defaultWaitTimeout, halfSecond, oneSecond, quarterSecond, twoSeconds } from '../helpers/timeConstants.js';
 
 class InitialStepsPage extends BasePage {
@@ -128,9 +127,7 @@ class InitialStepsPage extends BasePage {
     await this.setImplicitTimeout(oneSecond, this.skipInitialSteps.name);
     await this.acceptToSAndPP();
     await this.skipAnalytics();
-    if (isChrome()) {
-      await this.skipCardanoPaymentUrls();
-    }
+    await this.skipCardanoPaymentUrls();
     await this.setImplicitTimeout(defaultWaitTimeout, this.skipInitialSteps.name);
   }
 }

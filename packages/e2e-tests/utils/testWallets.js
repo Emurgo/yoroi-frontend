@@ -1,6 +1,3 @@
-import { getTargetBrowser } from './utils.js';
-import { TargetBrowser } from '../helpers/constants.js';
-
 export const testWallet1 = Object.freeze({
   name: 'TestWallet1',
   plate: 'JPAX-4675',
@@ -50,11 +47,4 @@ export const testWalletNFTs = Object.freeze({
   balance: 3.24112,
 });
 
-export const getSpendableWallet = () => {
-  const browserName = getTargetBrowser();
-  if (browserName === TargetBrowser.Chrome) {
-    return testWallet3;
-  } else {
-    throw new Error(`There is no a separate wallet for the browser "${browserName}"`);
-  }
-};
+export const getSpendableWallet = () => testWallet3;
