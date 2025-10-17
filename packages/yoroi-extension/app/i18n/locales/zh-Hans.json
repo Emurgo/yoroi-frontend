@@ -478,7 +478,7 @@
   "notifications.settings.enablePushNotificationsDesc": "Allow push notifications",
   "notifications.settings.enablePushNotificationsTitle": "Push notifications",
   "settings.cashback.title": "现金返还奖励钱包",
-  "settings.cashback.note": "您的关联钱包是接收ADA现金返还奖励的指定钱包，并适用于所有合作伙伴网站。您可随时切换至其他钱包以确保现金返还奖励导向您首选的钱包，或选择“无”以拒绝此服务。",
+  "settings.cashback.note": "Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet.",
   "settings.cashback.label": "已连接的钱包",
   "sidebar.assets": "资产",
   "sidebar.faq": "常见问题",
