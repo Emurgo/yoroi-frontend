@@ -1,3 +1,4 @@
+import BigNumber from 'bignumber.js';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 export const normalizeTokenId = (id?: string | null) => (id === '' ? '.' : id);
 
@@ -147,3 +148,14 @@ export function sanitizeSlippageInput(
 
   return clean;
 }
+
+export const toBaseUnits = (val?: string | null, decimals = 0): bigint | null => {
+  const s = (val ?? '').trim();
+  if (s === '') return null; 
+  const bn = new BigNumber(s);
+  if (!bn.isFinite() || bn.isNegative()) return null;
+  const dp = bn.decimalPlaces();
+  if ((dp ?? 0) > decimals) return null; // too many fraction digits
+  // shift to base units and floor (no rounding up), then to bigint
+  return BigInt(bn.shiftedBy(decimals).integerValue(BigNumber.ROUND_DOWN).toFixed());
+};

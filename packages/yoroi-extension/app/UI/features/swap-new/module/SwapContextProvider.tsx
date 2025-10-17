@@ -21,8 +21,9 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { useGetInputs } from '../common/helpers';
+import { toBaseUnits, useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN, USDA_TOKEN_ID } from '../common/constants';
+import { useStrings } from '../common/hooks/useStrings';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -50,6 +51,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
   const [state, action] = useReducer(swapReducer, defaultState);
+  const strings = useStrings();
 
   useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -160,17 +162,16 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   ]);
 
   useEffect(() => {
-    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : (id ?? ''));
 
-    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+    const asset = ftAssetList.find(a => a.info.id === normalizeId(state.tokenInInput.tokenId));
+    const balance = asset ? BigInt(asset.quantity) : BigInt(0);
+    const decimals = asset?.info.numberOfDecimals ?? 0;
+    const needed = toBaseUnits(state.tokenInInput.value, decimals);
 
-    const hasEnoughBalance = Number(tokenAmount?.quantity) >= Number(state.tokenInInput.value);
+    const error = asset && needed !== null && balance < needed ? strings.notEnoughBalance : null;
 
-    if (!hasEnoughBalance) {
-      action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
-    } else {
-      action({ type: 'TokenInErrorChanged', value: null });
-    }
+    action({ type: 'TokenInErrorChanged', value: error });
   }, [ftAssetList, state.tokenInInput.tokenId, state.tokenInInput.value]);
 
   useEffect(() => {
@@ -209,6 +210,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         if (isLeft(response)) {
           action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
+          console.log('estimate response', response.value.data);
           action({ type: SwapActionType.EstimateResponse, value: response.value.data });
         }
       })
