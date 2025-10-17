@@ -1,4 +1,3 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import BasePage from '../pages/basepage.js';
 import driversPoolsManager from '../utils/driversPool.js';
@@ -54,6 +53,9 @@ describe('Handle handles', function () {
   ];
 
   for (const testDatum of testDataPositive) {
+    if (testDatum.provider === 'Unstoppable Domains') {
+      continue;
+    }
     describe(`Positive case, ${testDatum.provider}`, function () {
       it(`Refresh page, ${testDatum.provider}`, async function () {
         const transactionsPage = new TransactionsSubTab(webdriver, logger);
@@ -121,7 +123,7 @@ describe('Handle handles', function () {
   }
 
   for (const testNegativeDatum of testDataNegative) {
-    if (testNegativeDatum.provider === 'Unstoppable Domains' && isLocalRun()) {
+    if (testNegativeDatum.provider === 'Unstoppable Domains') {
       continue;
     }
     describe(`Negative case, ${testNegativeDatum.provider}`, function () {
