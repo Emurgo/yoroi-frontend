@@ -89,7 +89,7 @@ export const EstimateSummary = () => {
       <DisplayInfoInRow
         label={strings.minReceived}
         tooltip={strings.guaranteedMin}
-        value={`${swapForm.estimate?.totalOutput} ${tokenOutTicker}`}
+        value={`${swapForm.estimate?.totalOutput} ${pickTokenTicker(tokenOutTicker)}`}
       />
       {!isLimitOrder && (
         <DisplayInfoInRow
