@@ -478,7 +478,7 @@
   "notifications.settings.enablePushNotificationsDesc": "プッシュ通知を有効にします",
   "notifications.settings.enablePushNotificationsTitle": "プッシュ通知",
   "settings.cashback.title": "キャッシュバク報酬ウォレット",
-  "settings.cashback.note": "接続されたウォレットは、ADAキャッシュバック報酬を受け取るための指定ウォレットであり、すべての提携ウェブサイトに適用されます。キャッシュバックを希望するウォレットに確実に受け取るために、いつでも別のウォレットに切り替えることができます。または、「なし」を指定して、このサービスを拒否することもできます。",
+  "settings.cashback.note": "ADAキャッシュバック報酬を受け取るための指定されたウォレットは、すべてのパートナーウェブサイトに適用されます。 いつでも別のウォレットに切り替えて、キャッシュバックを希望のウォレットに転送することができます。",
   "settings.cashback.label": "ウォレットを接続",
   "sidebar.assets": "資産",
   "sidebar.faq": "Faq",

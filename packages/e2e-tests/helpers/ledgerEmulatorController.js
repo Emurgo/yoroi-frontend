@@ -19,7 +19,6 @@ export class LedgerEmulatorController {
     this.logger.info(`LedgerEmulator::constructor speculos endpoint: ${this.speculosEndpoint}`);
   }
 
-  isLedgerS = () => this.model === LedgerModels.NanoS;
   isLedgerSPlus = () => this.model === LedgerModels.NanoSPlus;
   isLedgerX = () => this.model === LedgerModels.NanoX;
 
@@ -47,11 +46,7 @@ export class LedgerEmulatorController {
   }
 
   async confirm() {
-    if (this.isLedgerS()) {
-      await this.clickRight();
-    } else {
-      await this.clickBoth();
-    }
+    await this.clickBoth();
   }
 
   /**
@@ -173,52 +168,8 @@ export class LedgerEmulatorController {
     return result;
   }
 
-  async fullConfAndContentNanoS() {
-    this.logger.info(`LedgerEmulator::fullConfirmAndGetContentNanoS is called`);
-    const result = [];
-    let content = await this.readScreen();
-    while (!Object.values(LedgerStates).includes(this._joinMsg(content))) {
-      let clickCounter = 0;
-      let screenFullText = content.screenText;
-      while (true) {
-        let prevText = (await this.readScreen()).screenText;
-        clickCounter++;
-        await this.clickRight();
-        const shiftedText = (await this.readScreen()).screenText;
-        if (prevText === shiftedText) {
-          if (clickCounter === 1) {
-            clickCounter = 0;
-            result.push(shiftedText);
-            await this.clickBoth();
-            content = await this.readScreen();
-          } else {
-            for (let index = clickCounter; index > 0; index--) {
-              await this.clickLeft();
-            }
-            clickCounter = 0;
-            result.push(screenFullText);
-            await this.clickBoth();
-            content = await this.readScreen();
-          }
-          break;
-        } else {
-          screenFullText = screenFullText + shiftedText[shiftedText.length - 1];
-          continue;
-        }
-      }
-      content = await this.readScreen();
-    }
-    await this.clickRight();
-
-    this.logger.info(`LedgerEmulator::fullConfirmAndGetContentNanoS result: ${JSON.stringify(result, null, 2)}`);
-    return result;
-  }
-
   async fullConfirmAndGetContent() {
     this.logger.info(`LedgerEmulator::fullConfirmAndGetContent is called`);
-    if (this.isLedgerS()) {
-      return this.fullConfAndContentNanoS();
-    }
     return this.fullConfAndContentNanoXAndSPlus();
   }
 }

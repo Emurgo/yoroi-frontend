@@ -2,7 +2,7 @@ import { until, Key, logging, WebElement, WebDriver } from 'selenium-webdriver';
 import path from 'path';
 import * as fs from 'node:fs';
 import { promisify } from 'util';
-import { createTestRunDataDir, getByLocator, getSnapshotObjectFromJSON, isFirefox, isChrome, isMacOS } from '../utils/utils.js';
+import { createTestRunDataDir, getByLocator, getSnapshotObjectFromJSON, isMacOS } from '../utils/utils.js';
 import { getExtensionUrl, getTransactionsURL } from '../utils/driverBootstrap.js';
 import {
   defaultRepeatPeriod,
@@ -325,15 +325,13 @@ class BasePage {
     const testRundDataDir = createTestRunDataDir(testSuiteName);
     const cleanName = logFileName.replace(/ /gi, '_');
     const logsPaths = path.resolve(testRundDataDir, `console_browser_${cleanName}.log`);
-    if (isChrome()) {
-      const logEntries = await this.driver.manage().logs().get(logging.Type.BROWSER, logging.Level.ALL);
-      const jsonLogsStrings = logEntries.map(l => {
-        const splitMsg = l.message.split(' ');
-        const message = splitMsg.slice(2).join(' ');
-        return `[${l.level}] [${l.timestamp}] ${message}`;
-      });
-      await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
-    }
+    const logEntries = await this.driver.manage().logs().get(logging.Type.BROWSER, logging.Level.ALL);
+    const jsonLogsStrings = logEntries.map(l => {
+      const splitMsg = l.message.split(' ');
+      const message = splitMsg.slice(2).join(' ');
+      return `[${l.level}] [${l.timestamp}] ${message}`;
+    });
+    await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
   }
   async getDriverLogs(testSuiteName, logFileName) {
     this.logger.info(`BasePage::getDriverLogs is called.`);
@@ -488,12 +486,7 @@ class BasePage {
   // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
   async getInfoFromIndexedDB(tableName) {
     this.logger.info(`BasePage::getInfoFromIndexedDB Table name "${tableName}"`);
-    let result;
-    if (isFirefox()) {
-      result = await this.getInfoFromIndexedDBFF(tableName);
-    } else {
-      result = await this.getInfoFromIndexedDBChrome(tableName);
-    }
+    const result = await this.getInfoFromIndexedDBChrome(tableName);
     this.logger.info(`BasePage::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
     return result;
   }
@@ -619,34 +612,6 @@ class BasePage {
     }
   }
 
-  async setInfoToIndexedDBFirefox(tableName, value) {
-    this.logger.info(`BasePage::setInfoToIndexedDBFirefox is called for the table ${tableName}.`);
-    for (const valueItem of value) {
-      await this.driver.executeScript(
-        (dbName, tableName, valueItem) => {
-          const dbRequest = window.indexedDB.open(dbName);
-          dbRequest.onsuccess = function (event) {
-            const db = event.target.result;
-            const tableContentRequest = db.transaction(tableName, 'readwrite').objectStore(tableName).put(valueItem);
-            tableContentRequest.onsuccess = function (event) {
-              console.log(`--> Tx is success.`);
-              console.log(`--> Tx result: ${event.target.result}`);
-            };
-            tableContentRequest.oncomplete = function (event) {
-              console.log(`--> Tx is complete. Result: ${event.target.result}`);
-            };
-            tableContentRequest.onerror = function (event) {
-              console.log('-----> Error happend:', event.target.result);
-            };
-          };
-        },
-        'yoroi-schema',
-        tableName,
-        valueItem
-      );
-    }
-  }
-
   async setInfoToIndexedDBChrome(tableName, value) {
     this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
     this.driver.executeScript(() => {
@@ -701,9 +666,7 @@ class BasePage {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`, true);
     for (const dbKey in dbSnapshot) {
-      isFirefox()
-        ? await this.setInfoToIndexedDBFirefox(dbKey, dbSnapshot[dbKey])
-        : await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
+      await this.setInfoToIndexedDBChrome(dbKey, dbSnapshot[dbKey]);
     }
     // set info into the chrome local storage
     const browserStorageFileName = `${useGeneralStorageInfo ? 'general' : templateName}.browserLocalStorage.json`;
