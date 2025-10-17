@@ -181,6 +181,10 @@ export const messages = Object.freeze(
       id: 'swap.selectToken',
       defaultMessage: '!!!Select token',
     },
+    buyAndSellToken: {
+      id: 'swap.buyAndSellToken',
+      defaultMessage: '!!Buy and sell tokens must be different',
+    },
   })
 );
 
@@ -230,6 +234,7 @@ export const useStrings = () => {
     noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
     startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
     selectToken: intl.formatMessage(messages.selectToken),
+    buyAndSellToken: intl.formatMessage(messages.buyAndSellToken),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
