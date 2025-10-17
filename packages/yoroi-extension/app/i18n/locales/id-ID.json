@@ -478,7 +478,7 @@
   "notifications.settings.enablePushNotificationsDesc": "Izinkan notifikasi push",
   "notifications.settings.enablePushNotificationsTitle": "Notifikasi push",
   "settings.cashback.title": "Wallet cashback",
-  "settings.cashback.note": "Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet.",
+  "settings.cashback.note": "Wallet Anda yang telah terhubung adalah wallet khusus untuk menerima cashback ADA dan diterapkan ke semua situs web mitra. Anda dapat beralih kapan saja ke wallet lain untuk menerima cashback ke wallet pilihan Anda.",
   "settings.cashback.label": "Wallet terhubung",
   "sidebar.assets": "Aset",
   "sidebar.faq": "FAQ",
