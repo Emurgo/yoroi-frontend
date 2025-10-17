@@ -478,7 +478,7 @@
   "notifications.settings.enablePushNotificationsDesc": "Allow push notifications",
   "notifications.settings.enablePushNotificationsTitle": "Push notifications",
   "settings.cashback.title": "Cashback rewards wallet",
-  "settings.cashback.note": "Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet or select “None” to decline this service.",
+  "settings.cashback.note": "Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet.",
   "settings.cashback.label": "Connected wallet",
   "sidebar.assets": "Tài sản",
   "sidebar.faq": "Câu hỏi thường gặp",
