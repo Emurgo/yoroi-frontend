@@ -16,7 +16,7 @@ export class SpeculosDockerController {
 
   getContainerOptions = (model, seedPhrase, appFile) => {
     return {
-      Image: 'ghcr.io/ledgerhq/speculos:4d320a7be879fba8d5f29a0c9516e47cb556fed8',
+      Image: 'ghcr.io/ledgerhq/speculos',
       ExposedPorts: {
         '5001/tcp': {},
       },
@@ -38,8 +38,6 @@ export class SpeculosDockerController {
 
   getAppFile(model) {
     switch (model) {
-      case LedgerModels.NanoS:
-        return 'apps/nanosApp.elf';
       case LedgerModels.NanoX:
         return 'apps/nanoxApp.elf';
       default:
