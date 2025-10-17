@@ -126,7 +126,7 @@ export const SwapOrders = (props: Props) => {
     }
     return null;
   };
-
+  console.log('completedOrders', completedOrders);
   return (
     <>
       <Box sx={{ mx: '24px' }}>
@@ -198,7 +198,7 @@ const OrderRow = ({ order, defaultTokenInfo, selectedExplorer, openOrdersOnly = 
   const priceCalc = amountOut === 0 ? 0 : order.amountIn / amountOut;
   const roundedPrice = priceCalc.toFixed(tokenOut?.decimals ?? 0).replace(/\.0+$/, '');
   const price = roundedPrice !== '0' ? roundedPrice : priceCalc.toFixed(6);
-
+  console.log('tokenOut', tokenOut);
   const priceStr = `1 ${tokenName(tokenIn)} = ${price} ${tokenName(tokenOut)}`;
   const amountOutStr = `${Number(amountOut.toFixed(tokenOut?.decimals ?? 0))} ${tokenName(tokenOut)}`;
   const totalStr = `${order.amountIn} ${tokenName(tokenIn)}`;
