@@ -32,7 +32,7 @@ import {
   asAddressedUtxo,
   multiTokenFromRemote,
 } from '../utils';
-import { hexToBytes, iterateLenGet, logErr } from '../../../../coreUtils';
+import { hexToBytes, iterateLenGet, logErr, forceNonNull } from '../../../../coreUtils';
 import { getCardanoHaskellBaseConfig, getNetworkById } from '../../lib/storage/database/prepackaged/networks';
 import { builtSendTokenList } from '../../../common';
 import type { TokenRow } from '../../lib/storage/database/primitives/tables';
@@ -61,6 +61,7 @@ import { PublicDeriver } from '../../lib/storage/models/PublicDeriver';
 import { asGetAllAccounting, asGetSigningKey } from '../../lib/storage/models/PublicDeriver/traits';
 import { genOwnStakingKey } from '../../staking';
 import { getStakingKeyHashesInTransactionBody } from '../../lib/cardanoCrypto/utils';
+import { getAllAddressesForWallet } from '../../lib/storage/bridge/traitUtils';
 
 // <TODO:FETCH> unmagic this
 const COSTMODELS =
@@ -1059,6 +1060,40 @@ export async function signTransactionFromWallet(
     publicDeriver: withStakingKey,
     password,
   });
+
+  const allAddresses = await getAllAddressesForWallet(wallet);
+  const addressPathByHash: Map<string, {| address: string, path: Array<number> |}> = new Map();
+  for (const { address, path } of [...allAddresses.utxoAddresses, ...allAddresses.accountingAddresses]) {
+    addressPathByHash.set(address.Hash.slice(2), { address: address.Hash, path });
+  }
+
+  let txBody;
+  if (unsignedTx instanceof RustModule.WalletV4.Transaction) {
+    txBody = unsignedTx.body();
+  } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBuilder) {
+    const tx = unsignedTx.build_tx();
+    txBody = tx.body();
+  } else if (unsignedTx instanceof RustModule.WalletV4.TransactionBody) {
+    txBody = unsignedTx;
+  } else if (unsignedTx instanceof Buffer || unsignedTx instanceof Uint8Array) {
+    txBody = RustModule.WalletV4.TransactionBody.from_bytes(unsignedTx);
+  } else {
+    throw new Error('unexpected tx body type');
+  }
+
+  iterateLenGet(txBody.required_signers()).map(requiredKeyHash => requiredKeyHash.to_hex()).forEach(requiredSignerKeyHash => {
+    if (addressPathByHash.has(requiredSignerKeyHash)) {
+      const addressAndPath = forceNonNull(addressPathByHash.get(requiredSignerKeyHash));
+      otherRequiredSigners.push({
+        address: addressAndPath.address,
+        addressing: {
+          path: addressAndPath.path,
+          startLevel: 1
+        }
+      });
+    }
+  });
+
   return signTransaction(
     senderUtxos,
     unsignedTx,
