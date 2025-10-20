@@ -46,18 +46,8 @@ export const getTestString = (basePart, stringLength, withCapitals) => {
 
 export const DRIVERS_AMOUNT = 1;
 export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
-export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
-export const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
-export const firefoxBin =
-  process.env.FIREFOX_BIN != null
-    ? process.env.FIREFOX_BIN
-    : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 export const chromeBin = process.env.CHROME_PATH;
-export const TargetBrowser = Object.freeze({
-  Chrome: 'chrome',
-  FF: 'firefox',
-});
+
 export const WalletWordsSize = Object.freeze({
   Shelley: 15,
   Daedalus: 24,
@@ -72,7 +62,7 @@ export const projectRootDir = path.resolve(__dirname, '..');
 
 export const dbSnapshotsDir = path.resolve(projectRootDir, 'helpers', 'wallet-dbSnapshots');
 
-export const testRunDir = browserName => path.resolve(__dirname, '..', `testRunsData_${browserName}`);
+export const testRunDir = path.resolve(__dirname, '..', `testRunsData`);
 
 export const getTestWalletName = (walletNameLength = 0, withCapitals = false) => {
   let basePart = 'test';

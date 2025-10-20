@@ -37,7 +37,6 @@ const canon = (raw?: string | { id: string } | null): string | null => {
   return t.toLowerCase();
 };
 
-/** Accepts policy(56 hex) or policy.asset(0..64 hex) or '.' for ADA */
 const canonAssetId = (raw?: string | { id: string } | null): string | null => {
   const s = canon(raw);
   if (!s) return null;
@@ -52,7 +51,6 @@ const canonAssetId = (raw?: string | { id: string } | null): string | null => {
   return asset != null ? `${policy}.${asset}` : policy;
 };
 
-/** Prefer the record that looks more “known” (don’t overwrite known with unknown) */
 const scoreInfo = (info?: Portfolio.Token.Info) => {
   if (!info) return -1;
   let score = 0;
@@ -69,7 +67,6 @@ const preferBetter = (prev: Portfolio.Token.Info | undefined, next: Portfolio.To
 const normalizeSyncResponse = (response: unknown): Array<[string, { record?: Portfolio.Token.Info } | undefined]> => {
   const out: Array<[string, { record?: Portfolio.Token.Info } | undefined]> = [];
 
-  // Map or iterable of [k, v]
   if (response && typeof (response as any)[Symbol.iterator] === 'function') {
     try {
       for (const item of response as any) {
@@ -88,7 +85,6 @@ const normalizeSyncResponse = (response: unknown): Array<[string, { record?: Por
     }
   }
 
-  // Array<{key,value}>
   if (Array.isArray(response)) {
     for (const obj of response) {
       if (obj && typeof obj === 'object' && 'key' in (obj as any)) {
@@ -101,7 +97,6 @@ const normalizeSyncResponse = (response: unknown): Array<[string, { record?: Por
   return out;
 };
 
-/* ---------------- sticky cache (avoid regressions across page changes) ---------------- */
 // One cache per networkId (so switching networks isolates data)
 const stickyByNetwork = new Map<string | number, Map<string, Portfolio.Token.Info>>();
 const getSticky = (networkId: string | number) => {
@@ -128,7 +123,6 @@ export const useSyncedTokenInfos = ({
 
   const primaryId = React.useMemo(() => canonAssetId(primaryTokenInfo?.id), [primaryTokenInfo?.id]);
 
-  // build a stable key; include excluded as a single array element to keep token identity stable
   const key = React.useMemo(
     () => ['syncedTokenInfos', networkId, primaryId ?? null, excluded] as const,
     [networkId, primaryId, excluded]
@@ -147,7 +141,6 @@ export const useSyncedTokenInfos = ({
         new Set(value.data.map(({ id }) => canonAssetId(id)).filter((id): id is string => !!id && !excluded.includes(id)))
       );
 
-      // Seed with sticky (last-known-good)
       const entries = new Map<string, Portfolio.Token.Info>(sticky);
 
       // Always include primary under its real id ('.' allowed)
@@ -172,7 +165,6 @@ export const useSyncedTokenInfos = ({
 
         const pairs = normalizeSyncResponse(response);
 
-        // fold in results (don’t regress known -> unknown)
         for (const [rawId, infoLike] of pairs) {
           const id = canonAssetId(rawId);
           if (!id || excluded.includes(id)) continue;
@@ -196,17 +188,14 @@ export const useSyncedTokenInfos = ({
       }
     },
 
-    // Merge with previous query cache AND sticky to avoid regressions
     select: (data): SelectedResult => {
       const prev = qc.getQueryData<SelectedResult>(key);
-      const merged = new Map<string, Portfolio.Token.Info>(sticky); // start from sticky
+      const merged = new Map<string, Portfolio.Token.Info>(sticky);
 
-      // fold in previous cached map
       if (prev?.tokenInfos) {
         for (const [id, info] of prev.tokenInfos) merged.set(id, preferBetter(merged.get(id), info));
       }
 
-      // fold in this result
       for (const [id, info] of data.tokenInfosArray) merged.set(id, preferBetter(merged.get(id), info));
 
       const tokenInfoList = Array.from(merged.values());

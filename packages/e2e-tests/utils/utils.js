@@ -1,5 +1,5 @@
 import { By } from 'selenium-webdriver';
-import { dbSnapshotsDir, handlesEndpoints, TargetBrowser, testRunDir } from '../helpers/constants.js';
+import { dbSnapshotsDir, handlesEndpoints, testRunDir } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
@@ -37,12 +37,6 @@ export function getMethod(locatorMethod) {
 
 export const getByLocator = locator => getMethod(locator.method)(locator.locator);
 
-export const getTargetBrowser = () => process.env.TARGETBROWSER;
-
-export const isFirefox = () => getTargetBrowser() === TargetBrowser.FF;
-export const isChrome = () => getTargetBrowser() === TargetBrowser.Chrome;
-export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
-
 export const getCurrentOS = () => process.platform;
 export const isLinux = () => getCurrentOS() === 'linux';
 export const isMacOS = () => getCurrentOS() === 'darwin';
@@ -53,8 +47,7 @@ export const isTrezorTests = () => process.env.IS_TREZOR === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');
-  const testsDataDir = testRunDir(getTargetBrowser());
-  const fullPath = path.resolve(testsDataDir, clearedTestSuiteName);
+  const fullPath = path.resolve(testRunDir, clearedTestSuiteName);
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
   }
@@ -103,8 +96,7 @@ export const getCircularReplacer = () => {
 };
 
 export const getDownloadsDir = () => {
-  const testRunDataDir = testRunDir(getTargetBrowser());
-  const fullPath = path.resolve(testRunDataDir, 'downloads');
+  const fullPath = path.resolve(testRunDir, 'downloads');
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
   }

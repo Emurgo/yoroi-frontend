@@ -181,6 +181,14 @@ export const messages = Object.freeze(
       id: 'swap.selectToken',
       defaultMessage: '!!!Select token',
     },
+    buyAndSellToken: {
+      id: 'swap.buyAndSellToken',
+      defaultMessage: '!!Buy and sell tokens must be different',
+    },
+    notEnoughBalance: {
+      id: 'buysell.dialog.error.not.enough',
+      defaultMessage: '!!!Not enough balance',
+    },
   })
 );
 
@@ -230,6 +238,8 @@ export const useStrings = () => {
     noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
     startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
     selectToken: intl.formatMessage(messages.selectToken),
+    buyAndSellToken: intl.formatMessage(messages.buyAndSellToken),
+    notEnoughBalance: intl.formatMessage(messages.notEnoughBalance),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
