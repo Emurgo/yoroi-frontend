@@ -502,6 +502,7 @@
   "swap.menu.swap": "資産をスワップ",
   "swap.total": "合計",
   "swap.buyAt": "購入価格",
+  "swap.buyAndSellToken": "Buy and sell tokens must be different",
   "swap.manual": "マニュアル",
   "swap.max": "最大",
   "swap.currentBalance": "現在の残高：",
