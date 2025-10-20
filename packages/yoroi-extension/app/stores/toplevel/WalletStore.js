@@ -142,7 +142,7 @@ export default class WalletStore extends Store<StoresMap> {
 
     const absoluteSlot = await absoluteSlotGetter();
 
-    return await new FlagsApi(forceNonNull(network.Backend.BackendService) + '/api', this.flagStorage)
+    return await new FlagsApi(environment.isDev(), this.flagStorage)
       .readFlag(feature, networkName, absoluteSlot);
   }
 
