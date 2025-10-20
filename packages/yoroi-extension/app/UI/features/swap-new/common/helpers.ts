@@ -151,7 +151,7 @@ export function sanitizeSlippageInput(
 
 export const toBaseUnits = (val?: string | null, decimals = 0): bigint | null => {
   const s = (val ?? '').trim();
-  if (s === '') return null; 
+  if (s === '') return null;
   const bn = new BigNumber(s);
   if (!bn.isFinite() || bn.isNegative()) return null;
   const dp = bn.decimalPlaces();
