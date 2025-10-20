@@ -1081,18 +1081,20 @@ export async function signTransactionFromWallet(
     throw new Error('unexpected tx body type');
   }
 
-  iterateLenGet(txBody.required_signers()).map(requiredKeyHash => requiredKeyHash.to_hex()).forEach(requiredSignerKeyHash => {
-    if (addressPathByHash.has(requiredSignerKeyHash)) {
-      const addressAndPath = forceNonNull(addressPathByHash.get(requiredSignerKeyHash));
-      otherRequiredSigners.push({
-        address: addressAndPath.address,
-        addressing: {
-          path: addressAndPath.path,
-          startLevel: 1
-        }
-      });
-    }
-  });
+  iterateLenGet(txBody.required_signers())
+    .map(requiredKeyHash => requiredKeyHash.to_hex())
+    .forEach(requiredSignerKeyHash => {
+      if (addressPathByHash.has(requiredSignerKeyHash)) {
+        const addressAndPath = forceNonNull(addressPathByHash.get(requiredSignerKeyHash));
+        otherRequiredSigners.push({
+          address: addressAndPath.address,
+          addressing: {
+            path: addressAndPath.path,
+            startLevel: 1,
+          },
+        });
+      }
+    });
 
   return signTransaction(
     senderUtxos,
