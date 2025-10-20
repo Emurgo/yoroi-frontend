@@ -37,6 +37,7 @@ const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
 const isDev = (): boolean => environment.isDev();
+const isNightly = (): boolean => environment.isNightly();
 const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
@@ -72,14 +73,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: isOnMainnet,
+    isVisible: () => !environment.isNightly(),
   },
   {
     className: 'swap2',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: isDev,
+    isVisible: params => isNightly(params) || isDev,
   },
   {
     className: 'portfolio',
