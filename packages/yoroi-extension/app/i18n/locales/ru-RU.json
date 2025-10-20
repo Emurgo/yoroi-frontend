@@ -502,6 +502,7 @@
   "swap.menu.swap": "Asset swap",
   "swap.total": "Total",
   "swap.buyAt": "Buy At",
+  "swap.buyAndSellToken": "Buy and sell tokens must be different",
   "swap.manual": "Manual",
   "swap.max": "MAX",
   "swap.currentBalance": "Current balance:",
