@@ -80,7 +80,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: params => isNightly() || isDev,
+    isVisible: () => isNightly() || isDev,
   },
   {
     className: 'portfolio',
