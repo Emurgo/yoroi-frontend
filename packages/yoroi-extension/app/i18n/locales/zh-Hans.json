@@ -502,6 +502,7 @@
   "swap.menu.swap": "资产交换",
   "swap.total": "总计",
   "swap.buyAt": "Buy At",
+  "swap.buyAndSellToken": "Buy and sell tokens must be different",
   "swap.manual": "手动选择",
   "swap.max": "最大",
   "swap.currentBalance": "当前的余额：",
