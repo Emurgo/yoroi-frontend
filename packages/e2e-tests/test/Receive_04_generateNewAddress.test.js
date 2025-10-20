@@ -22,7 +22,6 @@ describe('Generating a new address', function () {
   /** @type {ReceiveSubTab} */
   let receivePage = null;
 
-
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
