@@ -206,7 +206,12 @@ class AddCollateralPage extends Component<Props, State> {
     );
 
     const smartContractsLink = (
-      <Link href="https://help.yoroi-wallet.com/en/article/what-are-smart-contracts-l98lux/" target="_blank" rel="noreferrer" sx={{ textDecoration: 'none' }}>
+      <Link
+        href="https://help.yoroi-wallet.com/en/article/what-are-smart-contracts-l98lux/"
+        target="_blank"
+        rel="noreferrer"
+        sx={{ textDecoration: 'none' }}
+      >
         {intl.formatMessage(globalMessages.smartContracts).toLowerCase()}
       </Link>
     );
