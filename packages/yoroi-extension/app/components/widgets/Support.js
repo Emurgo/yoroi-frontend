@@ -1,73 +1,64 @@
 // @flow
-import { Component } from 'react';
-import type { Node } from 'react';
-import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg';
-import { IconButton } from '@mui/material';
-import { Box } from '@mui/system';
-import environment from '../../environment';
+import * as React from 'react'
+import { IconButton } from '@mui/material'
+import { Box } from '@mui/system'
+import { ReactComponent as SupportIcon } from '../../assets/images/support.inline.svg'
 
-type Props = {||};
-type State = {|
-  open: boolean,
-|};
-export default class Support extends Component<Props, State> {
-  state: State = {
-    open: false,
-  };
+export default function Support(): React.Node {
+  const iframeRef = React.useRef <? HTMLIFrameElement > (null)
+  const [ready, setReady] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
 
-  messageHandler: any => void = event => {
-    if (event.origin === 'null') {
-      return;
+  const crispSandboxUrl = React.useMemo(
+    () => (chrome?.runtime?.getURL ? chrome.runtime.getURL('3rd-party-crisp/crisp.html') : '/3rd-party-crisp/crisp.html'),
+    []
+  )
+
+  React.useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      const { type } = (e.data || {})
+      if (type === 'crisp:ready') setReady(true)
+      if (type === 'crisp:opened') setOpen(true)
+      if (type === 'crisp:closed') setOpen(false)
+      if (type === 'crisp:error') console.error('[Crisp sandbox] error:', e.data)
     }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
-    const eventType = event.data;
-    if (eventType === 'close') {
-      this.setState({ open: false });
-    }
-  };
+  const post = React.useCallback((msg) => {
+    const el = iframeRef.current
+    if (el?.contentWindow) el.contentWindow.postMessage(msg, '*')
+  }, [])
 
-  componentDidMount() {
-    window.addEventListener('message', this.messageHandler, false);
-  }
+  const openChat = () => post({ type: 'crisp:open' })
+  const closeChat = () => post({ type: 'crisp:close' })
 
-  componentWillUnmount() {
-    window.removeEventListener('message', this.messageHandler);
-  }
+  return (
+    <Box sx={{ position: 'fixed', bottom: 24, right: 30, zIndex: 9998 }}>
+      {ready && (
+        <IconButton sx={{ p: '3px' }} onClick={open ? closeChat : openChat} aria-label="Toggle support chat">
+          <SupportIcon />
+        </IconButton>
+      )}
 
-  getUrl(): string | null {
-    if (!environment.isExtension()) return null;
-    const agent = environment.isFirefox() ? 'firefox' : 'chrome';
-    return `https://emurgo.github.io/yoroi-support/?source=${agent}&extensionId=${window.location.hostname}`;
-  }
-
-  render(): Node {
-    const { open } = this.state;
-
-    const url = this.getUrl();
-    if (url === null) return null;
-
-    return (
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: '24px',
-          right: '30px',
-          zIndex: '9998',
+      <iframe
+        ref={iframeRef}
+        title="Crisp Support"
+        src={crispSandboxUrl}
+        style={{
+          position: 'fixed',
+          bottom: 0,
+          right: 0,
+          width: open ? 380 : 0,   // ⬅️ give it size when open
+          height: open ? 640 : 0,  // ⬅️ give it size when open
+          border: 0,
+          overflow: 'hidden',
+          zIndex: 9997,
+          transition: 'width 120ms ease, height 120ms ease',
+          background: 'transparent',
         }}
-      >
-        {open === false && (
-          <IconButton sx={{ padding: '3px' }} onClick={() => this.setState({ open: true })}>
-            <SupportIcon />
-          </IconButton>
-        )}
-        <iframe
-          style={{ marginRight: '-20px', marginBottom: '-30px', display: open ? 'block' : 'none' }}
-          width="375px"
-          height="560px"
-          src={url}
-          title="Zendesk"
-        />
-      </Box>
-    );
-  }
+      />
+    </Box>
+  )
 }

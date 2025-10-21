@@ -28,6 +28,7 @@ export function genCSP(request: {|
   frameSrc.push('https://emurgo.github.io/');
   frameSrc.push('https://www.youtube.com/');
 
+  frameSrc.push('https://connect.trezor.io/');
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
   connectSrc.push('https://api2.amplitude.com');

@@ -12,9 +12,13 @@ exports.copyAssets = (type: string, env: string) => {
   mkdir(type);
   mkdir(`${type}/js`);
   cp(`chrome/manifest.${env}.json`, `${type}/manifest.json`);
-  cp('-R', 'chrome/assets/*', type);
+  cp('-R', 'chrome/assets/*', type);  
   cp('chrome/content-scripts/3rd-party-trezor/*.js', `${type}/js/`);
   cp('chrome/content-scripts/3rd-party-trezor/trezor-usb-permissions.html', `${type}/`);
+  cp('chrome/content-scripts/3rd-party-crisp/crisp.html', `${type}/`);
+  // ✅ Crisp sandbox page: copy to 3rd-party-crisp/crisp.html
+  mkdir('-p', `${type}/3rd-party-crisp`);
+  cp('chrome/content-scripts/3rd-party-crisp/crisp.html', `${type}/3rd-party-crisp/crisp.html`);
 };
 
 const buildManifest = (
