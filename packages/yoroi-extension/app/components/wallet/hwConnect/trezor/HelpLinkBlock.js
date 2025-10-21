@@ -11,7 +11,7 @@ import { Link } from '@mui/material';
 const messages = defineMessages({
   helpLinkYoroiWithTrezor: {
     id: 'wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor',
-    defaultMessage: '!!!https://yoroi-wallet.com/',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/article/how-to-connect-a-trezor-hardware-wallet-to-yoroi-1t8ayx3/ ',
   },
   helpLinkYoroiWithTrezorText: {
     id: 'wallet.connect.trezor.dialog.common.step.link.helpYoroiWithTrezor.text',

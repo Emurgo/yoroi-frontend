@@ -21,7 +21,7 @@ const IconWrapper = styled(Box)(({ theme }) => ({
 const messages = defineMessages({
   helpLinkYoroiWithLedger: {
     id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger_v2',
-    defaultMessage: '!!!https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415580907279',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/article/how-to-connect-a-ledger-hardware-wallet-to-yoroi-1ghfwpw/',
   },
   helpLinkYoroiWithLedgerText: {
     id: 'wallet.connect.ledger.dialog.common.step.link.helpYoroiWithLedger.text',
