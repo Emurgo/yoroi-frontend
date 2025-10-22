@@ -230,6 +230,10 @@ export const messages = Object.freeze(
       id: 'buySell.actions.proceed',
       defaultMessage: '!!!Proceed',
     },
+    priceImpact: {
+      id: 'swap.priceImpact',
+      defaultMessage: '!!!Price impact',
+    },
   })
 );
 
@@ -290,6 +294,7 @@ export const useStrings = () => {
     disclaimerNote4: intl.formatMessage(messages.disclaimerNote4),
     disclaimerCheckboxLabel: intl.formatMessage(messages.disclaimerCheckboxLabel),
     disclaimerProceed: intl.formatMessage(messages.disclaimerProceed),
+    priceImpact: intl.formatMessage(messages.priceImpact),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

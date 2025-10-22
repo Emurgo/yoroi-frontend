@@ -17,6 +17,7 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
 import { useStrings } from '../../common/hooks/useStrings';
 import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
+import PriceImpact from '../../common/components/PriceImpact';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -83,6 +84,7 @@ export const AssetSwap = () => {
         <Stack {...atoms.pt_lg} />
         <ErrorMessage />
         <LimitInput />
+        <PriceImpact />
         <EstimateSummary />
       </Stack>
       <LoadingButton
