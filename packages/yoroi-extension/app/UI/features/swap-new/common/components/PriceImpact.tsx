@@ -9,7 +9,7 @@ import { useStrings } from '../hooks/useStrings';
 
 const PriceImpact = () => {
   const { swapForm } = useSwapRevamp();
-  const strings= useStrings()
+  const strings = useStrings();
   const effective = swapForm?.estimate?.priceImpact ?? 0;
   const risk = getPriceImpactRisk(effective);
   const { text: textColor } = usePriceImpactRiskThemeWeb(risk);
@@ -21,7 +21,7 @@ const PriceImpact = () => {
   return (
     <Stack direction="row" alignItems="center" spacing={2} sx={{ minHeight: 24, marginBottom: '-8px' }}>
       {risk === 'moderate' && <Icon.InfoCircle fill={textColor} />}
-      {risk === 'high' && <Icon.ErrorTriangle fill={textColor}/>}
+      {risk === 'high' && <Icon.ErrorTriangle fill={textColor} />}
 
       <Typography variant="body2" sx={{ color: textColor }} ml={4}>
         <span>{strings.priceImpact}</span>
