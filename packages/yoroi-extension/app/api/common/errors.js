@@ -8,7 +8,7 @@ const messages = defineMessages({
   serverStatusError: {
     id: 'api.errors.serverStatusError',
     defaultMessage:
-      '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335">here</a>.',
+      '!!!Server connection failed. Please check your internet connection or reach out to our support team <a target="_blank" href="https://help.yoroi-wallet.com/en/">here</a>.',
   },
   currentCoinPriceError: {
     id: 'api.errors.currentCoinPriceError',

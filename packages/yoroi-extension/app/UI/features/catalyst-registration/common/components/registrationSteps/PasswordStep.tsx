@@ -23,11 +23,7 @@ export const PasswordStep = () => {
     }
     if (error) {
       const supportRequestLink = (
-        <Link
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
-          target="_blank"
-          rel="noreferrer"
-        >
+        <Link href="https://help.yoroi-wallet.com/en/" target="_blank" rel="noreferrer">
           {intl.formatMessage(globalMessages.here)}
         </Link>
       );
