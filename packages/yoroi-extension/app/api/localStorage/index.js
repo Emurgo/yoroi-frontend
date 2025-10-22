@@ -45,6 +45,7 @@ const storageKeys = {
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
+  SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -76,8 +77,8 @@ type Disclaimer = 'cashback' | 'buySellAda' | 'swap';
 
 export type PushNotificationMetadata = {|
   duration?: number,
-  isEnabled?: boolean,
-  fcmToken?: string,
+    isEnabled ?: boolean,
+    fcmToken ?: string,
 |};
 
 type WalletClaimResult = {|
@@ -97,493 +98,500 @@ export default class LocalStorageApi {
 
   getUserLocale: void => Promise<?string> = () => getLocalItem(storageKeys.USER_LOCALE);
 
-  setUserLocale: string => Promise<void> = locale => setLocalItem(storageKeys.USER_LOCALE, locale);
+setUserLocale: string => Promise < void> = locale => setLocalItem(storageKeys.USER_LOCALE, locale);
 
-  unsetUserLocale: void => Promise<void> = () => removeLocalItem(storageKeys.USER_LOCALE);
+unsetUserLocale: void => Promise < void> = () => removeLocalItem(storageKeys.USER_LOCALE);
 
-  // ========== URI Scheme acceptance ========== //
+// ========== URI Scheme acceptance ========== //
 
-  getUriSchemeAcceptance: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE).then(accepted => {
-      if (accepted !== 'true') return false;
-      return JSON.parse(accepted);
-    });
+getUriSchemeAcceptance: void => Promise < boolean > = () =>
+  getLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE).then(accepted => {
+    if (accepted !== 'true') return false;
+    return JSON.parse(accepted);
+  });
 
-  setUriSchemeAcceptance: void => Promise<void> = () => setLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE, JSON.stringify(true));
+setUriSchemeAcceptance: void => Promise < void> = () => setLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE, JSON.stringify(true));
 
-  unsetUriSchemeAcceptance: void => Promise<void> = () => removeLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE);
+unsetUriSchemeAcceptance: void => Promise < void> = () => removeLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE);
 
-  // ========== User Theme Mode========== //
+// ========== User Theme Mode========== //
 
-  getUserThemeMode: void => Promise<?string> = () => getLocalItem(storageKeys.USER_THEME);
+getUserThemeMode: void => Promise <? string > = () => getLocalItem(storageKeys.USER_THEME);
 
-  setUserThemeMode: string => Promise<void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
+setUserThemeMode: string => Promise < void> = theme => setLocalItem(storageKeys.USER_THEME, theme);
 
-  // ========== Dred Yoroi Banner ========== //
+// ========== Dred Yoroi Banner ========== //
 
-  getDrepYoroiBanerTimestamp: void => Promise<?string> = () => getLocalItem(storageKeys.DREP_YOROI_BANNER);
+getDrepYoroiBanerTimestamp: void => Promise <? string > = () => getLocalItem(storageKeys.DREP_YOROI_BANNER);
 
-  setDrepYoroiBanerTimestamp: string => Promise<void> = timestamp => setLocalItem(storageKeys.DREP_YOROI_BANNER, timestamp);
+setDrepYoroiBanerTimestamp: string => Promise < void> = timestamp => setLocalItem(storageKeys.DREP_YOROI_BANNER, timestamp);
 
-  unsetDrepYoroiBanerTimestamp: void => Promise<void> = () => removeLocalItem(storageKeys.DREP_YOROI_BANNER);
+unsetDrepYoroiBanerTimestamp: void => Promise < void> = () => removeLocalItem(storageKeys.DREP_YOROI_BANNER);
 
-  // ========== Portfolio FIAT Pair ========== //
+// ========== Portfolio FIAT Pair ========== //
 
-  getPortfolioFiatPair: number => Promise<?string> = networkId =>
-    getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
+getPortfolioFiatPair: number => Promise <? string > = networkId =>
+  getLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-  setSetPortfolioFiatPair: (number, string) => Promise<void> = (networkId, pair) =>
-    setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
+setSetPortfolioFiatPair: (number, string) => Promise < void> = (networkId, pair) =>
+  setLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR, pair);
 
-  unsetPortfolioFiatPair: number => Promise<void> = networkId =>
-    removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
+unsetPortfolioFiatPair: number => Promise < void> = networkId =>
+  removeLocalItem(String(networkId) + storageKeys.PORTFOLIO_FIAT_PAIR);
 
-  // ========== Notifications Setting ========== //
+// ========== Notifications Setting ========== //
 
-  getNotificationsSetting: void => Promise<?string> = () => getLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
+getNotificationsSetting: void => Promise <? string > = () => getLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
-  setNotificationsSetting: string => Promise<void> = allowed => setLocalItem(storageKeys.NOTIFICATIONS_ENABLED, allowed);
+setNotificationsSetting: string => Promise < void> = allowed => setLocalItem(storageKeys.NOTIFICATIONS_ENABLED, allowed);
 
-  unsetNotificationsSetting: void => Promise<void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
+unsetNotificationsSetting: void => Promise < void> = () => removeLocalItem(storageKeys.NOTIFICATIONS_ENABLED);
 
-  // ========== Bring Banner ========== //
-  getBringBannerClosed: void => Promise<?string> = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
+// ========== Bring Banner ========== //
+getBringBannerClosed: void => Promise <? string > = () => getLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
+setBringBannerClosed: string => Promise < void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
 
-  unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+unsetBringBannerClosed: void => Promise < void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== CARDANO_CARD Modal ========== //
-  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+// ========== CARDANO_CARD Modal ========== //
+getCardanoCardModalClosed: void => Promise <? string > = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
-  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
+setCardanoCardModalClosed: string => Promise < void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
-  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+unsetCardanoCardModalClosed: void => Promise < void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
 
-  // ========== Midnight Banner Announcement ========== //
-  getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+// ========== SWAP Disclaimer Modal ========== //
+getSwapDisclaimerModalClosed: void => Promise <? string > = () => getLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
-  setMidnightBannerAnnouncementClosed: string => Promise<void> = closed =>
-    setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
+setSwapDisclaimerModalClosed: string => Promise < void> = closed => setLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED, closed);
 
-  unsetMidnightBannerAnnouncementClosed: void => Promise<void> = () =>
-    removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+unsetSwapDisclaimerModalClosed: void => Promise < void> = () => removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
-  // ========== Buy/Sell Disclaimer ========== //
-  getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+// ========== Midnight Banner Announcement ========== //
+getMidnightBannerAnnouncementClosed: void => Promise <? string > = () =>
+  getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
 
-  setBuySellDisclaimer: string => Promise<void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
+setMidnightBannerAnnouncementClosed: string => Promise < void> = closed =>
+  setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
 
-  unsetBuySellDisclaimer: void => Promise<void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
+unsetMidnightBannerAnnouncementClosed: void => Promise < void> = () =>
+  removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
 
-  // ========== Testnet Modal Info  ========== //
-  getTestnetModalDisplayed: void => Promise<boolean> = async () =>
-    (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
+// ========== Buy/Sell Disclaimer ========== //
+getBuySellDisclaimer: void => Promise <? string > = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
-  setTestnetModalDisplayed: boolean => Promise<void> = accepted =>
-    setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
+setBuySellDisclaimer: string => Promise < void> = accepted => setLocalItem(storageKeys.BUY_SELL_DISCLAIMER, accepted);
 
-  unsetTestnetModalDisplayed: void => Promise<void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
+unsetBuySellDisclaimer: void => Promise < void> = () => removeLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
 
-  // ========== Theme Migration ========== //
+// ========== Testnet Modal Info  ========== //
+getTestnetModalDisplayed: void => Promise < boolean > = async () =>
+  (await getLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED)) === 'true';
 
-  getUserRevampMigrationStatus: void => Promise<boolean> = async () =>
-    (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
+setTestnetModalDisplayed: boolean => Promise < void> = accepted =>
+  setLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED, String(accepted));
 
-  setUserRevampMigrationStatus: boolean => Promise<void> = status =>
-    setLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP, status.toString());
+unsetTestnetModalDisplayed: void => Promise < void> = () => removeLocalItem(storageKeys.TESTNET_MODAL_DISPLAYED);
 
-  // ========== Updates Announcement  ========== //
+// ========== Theme Migration ========== //
 
-  getLastAnnouncedFeatureVersion: void => Promise<string> = async () =>
-    (await getLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION)) ?? '';
+getUserRevampMigrationStatus: void => Promise < boolean > = async () =>
+  (await getLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP)) === 'true';
 
-  setLastAnnouncedFeatureVersion: string => Promise<void> = version =>
-    setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
+setUserRevampMigrationStatus: boolean => Promise < void> = status =>
+  setLocalItem(storageKeys.IS_USER_MIGRATED_TO_REVAMP, status.toString());
 
-  // ========== Legacy Select Wallet ========== //
+// ========== Updates Announcement  ========== //
 
-  getSelectedWalletId: void => Promise<number | null> = async () => {
-    let id = await getLocalItem(storageKeys.SELECTED_WALLET);
-    if (!id) {
-      id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
-      if (!/^\d+$/.test(id)) {
-        id = null;
-      }
-    }
+getLastAnnouncedFeatureVersion: void => Promise < string > = async () =>
+  (await getLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION)) ?? '';
 
-    if (!id) {
-      return null;
-    }
-    if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
-    return Number(id);
-  };
+setLastAnnouncedFeatureVersion: string => Promise < void> = version =>
+  setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
 
-  // ========== Selected Wallet ========== //
-  getSelectedWalletPublicKey: void => Promise<?string> = async () => {
-    return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
-  };
+// ========== Legacy Select Wallet ========== //
 
-  setSelectedWalletPublicKey: string => Promise<void> = async publicKey => {
-    await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
-  };
-
-  // ========== Legacy Theme ========== //
-
-  hasAnyLegacyThemeFlags: void => Promise<boolean> = async () => {
-    const [a, b] = await Promise.all([getLocalItem(storageKeys.THEME), getLocalItem(storageKeys.CUSTOM_THEME)]);
-    return a != null || b != null;
-  };
-
-  unsetLegacyThemeFlags: void => Promise<void> = async () => {
-    await Promise.all([removeLocalItem(storageKeys.THEME), removeLocalItem(storageKeys.CUSTOM_THEME)]);
-  };
-
-  // ========== Last Launch Version Number ========== //
-
-  getLastLaunchVersion: void => Promise<string> = () =>
-    getLocalItem(storageKeys.VERSION).then(versionNum => {
-      if (versionNum == null) return '0.0.0';
-      return versionNum;
-    });
-
-  setLastLaunchVersion: string => Promise<void> = (version: string) => setLocalItem(storageKeys.VERSION, version);
-
-  unsetLastLaunchVersion: void => Promise<void> = () => removeLocalItem(storageKeys.VERSION);
-
-  isEmpty: void => Promise<boolean> = () => isEmptyStorage();
-
-  clear: void => Promise<void> = async () => {
-    const storage = JSON.parse(await this.getStorage());
-    const tabKeys = new Set(Object.values(TabIdKeys));
-    await Promise.all(
-      Object.keys(storage).map(async key => {
-        // changing this key would cause the tab to close
-        if (!tabKeys.has(key)) {
-          await removeLocalItem(key);
-        }
-      })
-    );
-  };
-
-  // ========== Show/hide Balance ========== //
-
-  getHideBalance: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.HIDE_BALANCE).then(accepted => {
-      if (accepted !== 'true') return false;
-      return JSON.parse(accepted);
-    });
-
-  setHideBalance: boolean => Promise<void> = hideBalance => setLocalItem(storageKeys.HIDE_BALANCE, JSON.stringify(!hideBalance));
-
-  unsetHideBalance: void => Promise<void> = () => removeLocalItem(storageKeys.HIDE_BALANCE);
-
-  // ========== Expand / retract Sidebar ========== //
-
-  getToggleSidebar: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.TOGGLE_SIDEBAR).then(accepted => {
-      if (accepted !== 'true') return false;
-      return JSON.parse(accepted);
-    });
-
-  setToggleSidebar: boolean => Promise<void> = toggleSidebar =>
-    setLocalItem(storageKeys.TOGGLE_SIDEBAR, JSON.stringify(!toggleSidebar));
-
-  unsetToggleSidebar: void => Promise<void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
-
-  // ========== Expand / retract Sidebar ========== //
-
-  getBringSandbox: void => Promise<boolean> = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
-
-  setBringSandbox: boolean => Promise<void> = flag => {
-    return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
-  };
-
-  unsetBringSandbox: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
-
-  // ============ External storage provider ============ //
-
-  getExternalStorage: void => Promise<?SelectedExternalStorageProvider> = () =>
-    getLocalItem(storageKeys.EXTERNAL_STORAGE).then(result => {
-      if (result === undefined || result === null) return null;
-      return JSON.parse(result);
-    });
-
-  setExternalStorage: SelectedExternalStorageProvider => Promise<void> = provider =>
-    setLocalItem(storageKeys.EXTERNAL_STORAGE, JSON.stringify(provider));
-
-  unsetExternalStorage: void => Promise<void> = () => removeLocalItem(storageKeys.EXTERNAL_STORAGE);
-
-  // ========== CONNECTOR whitelist  ========== //
-  getWhitelist: void => Promise<?Array<WhitelistEntry>> = async () => {
-    const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
-    if (result === undefined || result === null) return undefined;
-    const filteredWhitelist = JSON.parse(result);
-    await this.setWhitelist(filteredWhitelist);
-    return filteredWhitelist;
-  };
-
-  setWhitelist: (Array<WhitelistEntry> | void) => Promise<void> = value =>
-    setLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST, JSON.stringify(value ?? []));
-
-  // ========== NFTs Grid View State  ========== //
-  getNftGridViewState: void => Promise<?string> = async () => {
-    return await getLocalItem(storageKeys.NFTS_GRID_VIEW_STATE);
-  };
-
-  setNftGridViewState: string => Promise<void> = async gridViewState => {
-    await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
-  };
-
-  // ========== Catalyst Disclaimer State ========== //
-
-  getCatalystDisclaimerState: void => Promise<boolean> = () =>
-    getLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE).then(s => s === 'false');
-
-  setCatalystDisclaimerState: boolean => Promise<void> = async state => {
-    await setLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE, state.toString());
-  };
-
-  // =========== Common =============== //
-
-  // ========== Unit of account ========== //
-
-  getUnitOfAccount: void => Promise<UnitOfAccountSettingType> = async () => {
-    const unitOfAccount = await getLocalItem(storageKeys.UNIT_OF_ACCOUNT);
-    if (unitOfAccount == null) {
-      return DEFAULT_CURRENCY_PAIR;
-    }
-    const unitOfAccountObject = JSON.parse(unitOfAccount);
-    if (unitOfAccountObject.currency === null) {
-      return DEFAULT_CURRENCY_PAIR;
-    }
-    return unitOfAccountObject;
-  };
-
-  setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
-    await setLocalItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
-  };
-
-  unsetUnitOfAccount: void => Promise<void> = async () => {
-    await removeLocalItem(storageKeys.UNIT_OF_ACCOUNT);
-  };
-
-  // ========== Coin price data public key  ========== //
-
-  getCoinPricePubKeyData: void => Promise<?string> = async () => {
-    return await getLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
-  };
-
-  setCoinPricePubKeyData: string => Promise<void> = async pubKeyData => {
-    await setLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
-  };
-
-  unsetCoinPricePubKeyData: void => Promise<void> = async () => {
-    try {
-      await removeLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
-    } catch (_) {
-      // ignore the error
-    }
-  };
-
-  // ========== FLAGS ========== //
-
-  getFlag: string => boolean = flag => {
-    return localStorage.getItem(`${storageKeys.FLAGS}/${flag}`) === 'true';
-  };
-
-  setFlag: (string, boolean) => void = (flag, state) => {
-    localStorage.setItem(`${storageKeys.FLAGS}/${flag}`, String(state));
-  };
-
-  // ========== Sort wallets - Revamp ========== //
-  getWalletsNavigation: void => Promise<?WalletsNavigation> = async () => {
-    let result = await getLocalItem(storageKeys.WALLETS_NAVIGATION);
-    if (result === undefined || result === null) return undefined;
-    result = JSON.parse(result);
-    // Added for backward compatibility
-    if (Array.isArray(result))
-      return {
-        cardano: [],
-      };
-
-    return result;
-  };
-
-  setWalletsNavigation: WalletsNavigation => Promise<void> = value =>
-    setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
-
-  loadAcceptedTosVersion: () => Promise<?number> = async () => {
-    const raw = await getLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
-    if (!raw) {
-      return undefined;
-    }
-    const version = parseFloat(raw);
-    if (Number.isNaN(version)) {
-      return undefined;
-    }
-    return version;
-  };
-
-  saveAcceptedTosVersion: (version: number) => Promise<void> = async version => {
-    await setLocalItem(storageKeys.ACCEPTED_TOS_VERSION, String(version));
-  };
-
-  unsetAcceptedTosVersion: void => Promise<void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
-
-  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
-  _getIsAnalyticsAllowedKey: () => string = () => {
-    let key = storageKeys.IS_ANALYTICS_ALLOWED;
-    if (environment.isFirefox()) {
-      key += '-firefox';
-    }
-    return key;
-  };
-
-  loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
-    const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
-    if (!json) {
-      return undefined;
-    }
-    return JSON.parse(json);
-  };
-
-  saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
-    await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
-  };
-
-  unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
-
-  saveCashbackWalletId: number => Promise<void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
-
-  getCashbackWalletId: () => Promise<number | null> = async () => {
-    const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
-    if (!v) {
-      return null;
-    }
-    return Number(v);
-  };
-
-  _getShownDisclaimerObject: () => Promise<Object> = async () => {
-    const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
-    const val = raw ? JSON.parse(raw) : {};
-    return val;
-  };
-
-  setShownDisclaimer: Disclaimer => Promise<void> = async which => {
-    const val = await this._getShownDisclaimerObject();
-    val[which] = true;
-    await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
-  };
-
-  isDisclaimerShown: Disclaimer => Promise<boolean> = async which => {
-    const val = await this._getShownDisclaimerObject();
-    return val[which] === true;
-  };
-
-  loadCurrentNetworkId: () => Promise<?number> = async () => {
-    const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
-    if (raw == null) {
-      return undefined;
-    }
-    return Number(raw);
-  };
-
-  saveCurrentNetworkId: number => Promise<void> = async networkId => {
-    await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
-  };
-
-  loadWalletListOrder: () => Promise<Array<string>> = async () => {
-    const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
-    if (raw == null) {
-      return [];
-    }
-    return JSON.parse(raw);
-  };
-
-  saveWalletListOrder: (Array<string>) => Promise<void> = async publicKeyList => {
-    await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
-  };
-
-  getPushNotificationMetadata: () => Promise<PushNotificationMetadata> = async () => {
-    const raw = await getLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA);
-    if (!raw) {
-      return { ...undefined /* just to please flow */ };
-    }
-    return JSON.parse(raw);
-  };
-
-  savePushNotificationMetadata: PushNotificationMetadata => Promise<void> = async metadata => {
-    await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
-  };
-
-  getAirdropClaimResults: () => Promise<Array<WalletClaimResult>> = async () => {
-    const raw = await getLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS);
-    if (!raw) {
-      return [];
-    }
-    return JSON.parse(raw);
-  };
-
-  saveAirdropClaimResults: (Array<WalletClaimResult>) => Promise<void> = async results => {
-    await setLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS, JSON.stringify(results));
-  };
-
-  async reset(): Promise<void> {
-    await this.unsetUserLocale();
-    await this.unsetLastLaunchVersion();
-    await this.unsetHideBalance();
-    await this.unsetUnitOfAccount();
-    await this.unsetCoinPricePubKeyData();
-    await this.unsetExternalStorage();
-    await this.unsetToggleSidebar();
-    await this.unsetAcceptedTosVersion();
-    await this.unsetIsAnalyticsAllowed();
-    await this.unsetBringSandbox();
-    for (const network of Object.values(networks)) {
-      // $FlowIgnore[incompatible-use]
-      await this.unsetPortfolioFiatPair(network.NetworkId);
+getSelectedWalletId: void => Promise < number | null > = async () => {
+  let id = await getLocalItem(storageKeys.SELECTED_WALLET);
+  if (!id) {
+    id = window.localStorage?.getItem(storageKeys.SELECTED_WALLET);
+    if (!/^\d+$/.test(id)) {
+      id = null;
     }
   }
 
-  getItem: string => Promise<?string> = key => getLocalItem(key);
+  if (!id) {
+    return null;
+  }
+  if (isNaN(Number(id))) throw new Error(`Invalid wallet Id: ${id}`);
+  return Number(id);
+};
 
-  setItem: (string, string) => Promise<void> = (key, value) => setLocalItem(key, value);
+// ========== Selected Wallet ========== //
+getSelectedWalletPublicKey: void => Promise <? string > = async () => {
+  return await getLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY);
+};
 
-  getOldStorage: void => Promise<Storage> = () =>
-    new Promise(resolve => {
-      resolve(localStorage);
-    });
+setSelectedWalletPublicKey: string => Promise < void> = async publicKey => {
+  await setLocalItem(storageKeys.SELECTED_WALLET_PUBLIC_KEY, publicKey);
+};
 
-  setStorage: ({ [key: string]: string, ... }) => Promise<void> = async localStorageData => {
-    const tabKeys = new Set(Object.values(TabIdKeys));
-    await Promise.all(
-      Object.keys(localStorageData).map(async key => {
-        // changing this key would cause the tab to close
-        if (!tabKeys.has(key)) {
-          await setLocalItem(key, localStorageData[key]);
-        }
-      })
-    );
-  };
+// ========== Legacy Theme ========== //
 
-  getStorage: void => Promise<string> = () => {
-    return getLocalItem(undefined).then(json => {
-      if (json == null) {
-        return '{}';
+hasAnyLegacyThemeFlags: void => Promise < boolean > = async () => {
+  const [a, b] = await Promise.all([getLocalItem(storageKeys.THEME), getLocalItem(storageKeys.CUSTOM_THEME)]);
+  return a != null || b != null;
+};
+
+unsetLegacyThemeFlags: void => Promise < void> = async () => {
+  await Promise.all([removeLocalItem(storageKeys.THEME), removeLocalItem(storageKeys.CUSTOM_THEME)]);
+};
+
+// ========== Last Launch Version Number ========== //
+
+getLastLaunchVersion: void => Promise < string > = () =>
+  getLocalItem(storageKeys.VERSION).then(versionNum => {
+    if (versionNum == null) return '0.0.0';
+    return versionNum;
+  });
+
+setLastLaunchVersion: string => Promise < void> = (version: string) => setLocalItem(storageKeys.VERSION, version);
+
+unsetLastLaunchVersion: void => Promise < void> = () => removeLocalItem(storageKeys.VERSION);
+
+isEmpty: void => Promise < boolean > = () => isEmptyStorage();
+
+clear: void => Promise < void> = async () => {
+  const storage = JSON.parse(await this.getStorage());
+  const tabKeys = new Set(Object.values(TabIdKeys));
+  await Promise.all(
+    Object.keys(storage).map(async key => {
+      // changing this key would cause the tab to close
+      if (!tabKeys.has(key)) {
+        await removeLocalItem(key);
       }
-      return json;
-    });
-  };
+    })
+  );
+};
+
+// ========== Show/hide Balance ========== //
+
+getHideBalance: void => Promise < boolean > = () =>
+  getLocalItem(storageKeys.HIDE_BALANCE).then(accepted => {
+    if (accepted !== 'true') return false;
+    return JSON.parse(accepted);
+  });
+
+setHideBalance: boolean => Promise < void> = hideBalance => setLocalItem(storageKeys.HIDE_BALANCE, JSON.stringify(!hideBalance));
+
+unsetHideBalance: void => Promise < void> = () => removeLocalItem(storageKeys.HIDE_BALANCE);
+
+// ========== Expand / retract Sidebar ========== //
+
+getToggleSidebar: void => Promise < boolean > = () =>
+  getLocalItem(storageKeys.TOGGLE_SIDEBAR).then(accepted => {
+    if (accepted !== 'true') return false;
+    return JSON.parse(accepted);
+  });
+
+setToggleSidebar: boolean => Promise < void> = toggleSidebar =>
+  setLocalItem(storageKeys.TOGGLE_SIDEBAR, JSON.stringify(!toggleSidebar));
+
+unsetToggleSidebar: void => Promise < void> = () => removeLocalItem(storageKeys.TOGGLE_SIDEBAR);
+
+// ========== Expand / retract Sidebar ========== //
+
+getBringSandbox: void => Promise < boolean > = () => getLocalItem(storageKeys.BRING_SANDBOX).then(s => s === 'true');
+
+setBringSandbox: boolean => Promise < void> = flag => {
+  return flag ? setLocalItem(storageKeys.BRING_SANDBOX, 'true') : this.unsetBringSandbox();
+};
+
+unsetBringSandbox: void => Promise < void> = () => removeLocalItem(storageKeys.BRING_SANDBOX);
+
+// ============ External storage provider ============ //
+
+getExternalStorage: void => Promise <? SelectedExternalStorageProvider > = () =>
+  getLocalItem(storageKeys.EXTERNAL_STORAGE).then(result => {
+    if (result === undefined || result === null) return null;
+    return JSON.parse(result);
+  });
+
+setExternalStorage: SelectedExternalStorageProvider => Promise < void> = provider =>
+  setLocalItem(storageKeys.EXTERNAL_STORAGE, JSON.stringify(provider));
+
+unsetExternalStorage: void => Promise < void> = () => removeLocalItem(storageKeys.EXTERNAL_STORAGE);
+
+// ========== CONNECTOR whitelist  ========== //
+getWhitelist: void => Promise <? Array < WhitelistEntry >> = async () => {
+  const result = await getLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST);
+  if (result === undefined || result === null) return undefined;
+  const filteredWhitelist = JSON.parse(result);
+  await this.setWhitelist(filteredWhitelist);
+  return filteredWhitelist;
+};
+
+setWhitelist: (Array < WhitelistEntry > | void) => Promise < void> = value =>
+  setLocalItem(storageKeys.DAPP_CONNECTOR_WHITELIST, JSON.stringify(value ?? []));
+
+// ========== NFTs Grid View State  ========== //
+getNftGridViewState: void => Promise <? string > = async () => {
+  return await getLocalItem(storageKeys.NFTS_GRID_VIEW_STATE);
+};
+
+setNftGridViewState: string => Promise < void> = async gridViewState => {
+  await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
+};
+
+// ========== Catalyst Disclaimer State ========== //
+
+getCatalystDisclaimerState: void => Promise < boolean > = () =>
+  getLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE).then(s => s === 'false');
+
+setCatalystDisclaimerState: boolean => Promise < void> = async state => {
+  await setLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE, state.toString());
+};
+
+// =========== Common =============== //
+
+// ========== Unit of account ========== //
+
+getUnitOfAccount: void => Promise < UnitOfAccountSettingType > = async () => {
+  const unitOfAccount = await getLocalItem(storageKeys.UNIT_OF_ACCOUNT);
+  if (unitOfAccount == null) {
+    return DEFAULT_CURRENCY_PAIR;
+  }
+  const unitOfAccountObject = JSON.parse(unitOfAccount);
+  if (unitOfAccountObject.currency === null) {
+    return DEFAULT_CURRENCY_PAIR;
+  }
+  return unitOfAccountObject;
+};
+
+setUnitOfAccount: UnitOfAccountSettingType => Promise < void> = async currency => {
+  await setLocalItem(storageKeys.UNIT_OF_ACCOUNT, JSON.stringify(currency));
+};
+
+unsetUnitOfAccount: void => Promise < void> = async () => {
+  await removeLocalItem(storageKeys.UNIT_OF_ACCOUNT);
+};
+
+// ========== Coin price data public key  ========== //
+
+getCoinPricePubKeyData: void => Promise <? string > = async () => {
+  return await getLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+};
+
+setCoinPricePubKeyData: string => Promise < void> = async pubKeyData => {
+  await setLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA, pubKeyData);
+};
+
+unsetCoinPricePubKeyData: void => Promise < void> = async () => {
+  try {
+    await removeLocalItem(storageKeys.COIN_PRICE_PUB_KEY_DATA);
+  } catch (_) {
+    // ignore the error
+  }
+};
+
+// ========== FLAGS ========== //
+
+getFlag: string => boolean = flag => {
+  return localStorage.getItem(`${storageKeys.FLAGS}/${flag}`) === 'true';
+};
+
+setFlag: (string, boolean) => void = (flag, state) => {
+  localStorage.setItem(`${storageKeys.FLAGS}/${flag}`, String(state));
+};
+
+// ========== Sort wallets - Revamp ========== //
+getWalletsNavigation: void => Promise <? WalletsNavigation > = async () => {
+  let result = await getLocalItem(storageKeys.WALLETS_NAVIGATION);
+  if (result === undefined || result === null) return undefined;
+  result = JSON.parse(result);
+  // Added for backward compatibility
+  if (Array.isArray(result))
+    return {
+      cardano: [],
+    };
+
+  return result;
+};
+
+setWalletsNavigation: WalletsNavigation => Promise < void> = value =>
+  setLocalItem(storageKeys.WALLETS_NAVIGATION, JSON.stringify(value));
+
+loadAcceptedTosVersion: () => Promise <? number > = async () => {
+  const raw = await getLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
+  if (!raw) {
+    return undefined;
+  }
+  const version = parseFloat(raw);
+  if (Number.isNaN(version)) {
+    return undefined;
+  }
+  return version;
+};
+
+saveAcceptedTosVersion: (version: number) => Promise < void> = async version => {
+  await setLocalItem(storageKeys.ACCEPTED_TOS_VERSION, String(version));
+};
+
+unsetAcceptedTosVersion: void => Promise < void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
+
+// Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
+_getIsAnalyticsAllowedKey: () => string = () => {
+  let key = storageKeys.IS_ANALYTICS_ALLOWED;
+  if (environment.isFirefox()) {
+    key += '-firefox';
+  }
+  return key;
+};
+
+loadIsAnalyticsAllowed: () => Promise <? boolean > = async () => {
+  const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
+  if (!json) {
+    return undefined;
+  }
+  return JSON.parse(json);
+};
+
+saveIsAnalysticsAllowed: (flag: boolean) => Promise < void> = async flag => {
+  await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
+};
+
+unsetIsAnalyticsAllowed: void => Promise < void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
+
+saveCashbackWalletId: number => Promise < void> = id => setLocalItem(storageKeys.CASHBACK_WALLET_ID, String(id));
+
+getCashbackWalletId: () => Promise < number | null > = async () => {
+  const v = await getLocalItem(storageKeys.CASHBACK_WALLET_ID);
+  if (!v) {
+    return null;
+  }
+  return Number(v);
+};
+
+_getShownDisclaimerObject: () => Promise < Object > = async () => {
+  const raw = await getLocalItem(storageKeys.SHOWN_DISCLAIMERS);
+  const val = raw ? JSON.parse(raw) : {};
+  return val;
+};
+
+setShownDisclaimer: Disclaimer => Promise < void> = async which => {
+  const val = await this._getShownDisclaimerObject();
+  val[which] = true;
+  await setLocalItem(storageKeys.SHOWN_DISCLAIMERS, JSON.stringify(val));
+};
+
+isDisclaimerShown: Disclaimer => Promise < boolean > = async which => {
+  const val = await this._getShownDisclaimerObject();
+  return val[which] === true;
+};
+
+loadCurrentNetworkId: () => Promise <? number > = async () => {
+  const raw = await getLocalItem(storageKeys.CURRENT_NETWORK_ID);
+  if (raw == null) {
+    return undefined;
+  }
+  return Number(raw);
+};
+
+saveCurrentNetworkId: number => Promise < void> = async networkId => {
+  await setLocalItem(storageKeys.CURRENT_NETWORK_ID, String(networkId));
+};
+
+loadWalletListOrder: () => Promise < Array < string >> = async () => {
+  const raw = await getLocalItem(storageKeys.WALLET_LIST_ORDER);
+  if (raw == null) {
+    return [];
+  }
+  return JSON.parse(raw);
+};
+
+saveWalletListOrder: (Array < string >) => Promise < void> = async publicKeyList => {
+  await setLocalItem(storageKeys.WALLET_LIST_ORDER, JSON.stringify(publicKeyList));
+};
+
+getPushNotificationMetadata: () => Promise < PushNotificationMetadata > = async () => {
+  const raw = await getLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA);
+  if (!raw) {
+    return { ...undefined /* just to please flow */ };
+  }
+  return JSON.parse(raw);
+};
+
+savePushNotificationMetadata: PushNotificationMetadata => Promise < void> = async metadata => {
+  await setLocalItem(storageKeys.PUSH_NOTIFICATION_METADATA, JSON.stringify(metadata));
+};
+
+getAirdropClaimResults: () => Promise < Array < WalletClaimResult >> = async () => {
+  const raw = await getLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS);
+  if (!raw) {
+    return [];
+  }
+  return JSON.parse(raw);
+};
+
+saveAirdropClaimResults: (Array < WalletClaimResult >) => Promise < void> = async results => {
+  await setLocalItem(storageKeys.AIRDROP_CLAIM_RESULTS, JSON.stringify(results));
+};
+
+  async reset(): Promise < void> {
+  await this.unsetUserLocale();
+  await this.unsetLastLaunchVersion();
+  await this.unsetHideBalance();
+  await this.unsetUnitOfAccount();
+  await this.unsetCoinPricePubKeyData();
+  await this.unsetExternalStorage();
+  await this.unsetToggleSidebar();
+  await this.unsetAcceptedTosVersion();
+  await this.unsetIsAnalyticsAllowed();
+  await this.unsetBringSandbox();
+  for(const network of Object.values(networks)) {
+  // $FlowIgnore[incompatible-use]
+  await this.unsetPortfolioFiatPair(network.NetworkId);
+}
+  }
+
+getItem: string => Promise <? string > = key => getLocalItem(key);
+
+setItem: (string, string) => Promise < void> = (key, value) => setLocalItem(key, value);
+
+getOldStorage: void => Promise < Storage > = () =>
+  new Promise(resolve => {
+    resolve(localStorage);
+  });
+
+setStorage: ({ [key: string]: string, ... }) => Promise < void> = async localStorageData => {
+  const tabKeys = new Set(Object.values(TabIdKeys));
+  await Promise.all(
+    Object.keys(localStorageData).map(async key => {
+      // changing this key would cause the tab to close
+      if (!tabKeys.has(key)) {
+        await setLocalItem(key, localStorageData[key]);
+      }
+    })
+  );
+};
+
+getStorage: void => Promise < string > = () => {
+  return getLocalItem(undefined).then(json => {
+    if (json == null) {
+      return '{}';
+    }
+    return json;
+  });
+};
 }
 
 export type PersistedSubmittedTransaction = {|
   networkId: number,
   publicDeriverId: number,
   transaction: CardanoShelleyTransactionCtorData,
-  usedUtxos: ?Array<{| txHash: string, index: number |}>,
-  isDrepDelegation?: boolean,
+  usedUtxos: ?Array < {| txHash: string, index: number |}>,
+    isDrepDelegation ?: boolean,
 |};
 
 const STORAGE_API =
@@ -626,8 +634,8 @@ export async function saveCatalystRoundInfo(data: CatalystRoundInfoResponse): Pr
 
 export function asyncLocalStorageWrapper(): {|
   getItem(key: string): Promise<string | null>,
-  setItem(key: string, value: string): Promise<void>,
-  removeItem(key: string): Promise<void>,
+  setItem(key: string, value: string): Promise < void>,
+    removeItem(key: string): Promise < void>,
 |} {
   return {
     getItem: key => getLocalItem(key).then(x => x ?? null),
@@ -637,10 +645,10 @@ export function asyncLocalStorageWrapper(): {|
 }
 
 export type StorageField<T> = {|
-  get: () => Promise<T>,
-  set: T => Promise<void>,
-  remove: () => Promise<void>,
-  defaultValue: () => T,
+  get: () => Promise < T >,
+    set: T => Promise < void>,
+      remove: () => Promise < void>,
+        defaultValue: () => T,
 |};
 
 export function createStorageField<T>(
@@ -660,7 +668,7 @@ export function createStorageField<T>(
 export function createStorageFlag(key: string, defaultValue: boolean): StorageField<boolean> {
   const serializer = String;
   const deserializer = s => s === 'true';
-  return createStorageField<boolean>(key, serializer, deserializer, defaultValue);
+  return createStorageField < boolean > (key, serializer, deserializer, defaultValue);
 }
 
 export function createFlagStorage(): StorageAPI {
