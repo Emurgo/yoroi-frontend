@@ -459,6 +459,8 @@ export default class PortfolioTab extends WalletCommonBase {
   async switchCurrencies() {
     this.logger.info(`PortfolioTab::switchCurrencies is called`);
     await this.click(this.switchBalanceBtnLocator);
+    // this sleep is required to make sure the action took effect
+    await this.sleep(quarterSecond);
   }
   async getSortingArrowDirection(columnName) {
     this.logger.info(`PortfolioTab::getSoringArrowDirection is called. Column: "${columnName}"`);
@@ -477,5 +479,21 @@ export default class PortfolioTab extends WalletCommonBase {
     } else {
       return SortingDirection.DESC;
     }
+  }
+
+  async waitPriceIsLoaded() {
+    this.logger.info(`PortfolioTab::waitPriceIsLoaded is called`);
+    const tokensAmount = await this.countTokens();
+    const allLocators = [];
+    for (let index = 0; index < tokensAmount; index++) {
+      const priceLocator = this.getTokenPriceLocator(index);
+      const dayChangeLocator = this.getTokenDayChangesLocator(index);
+      const weekChangeLocator = this.getTokenWeekChangesLocator(index);
+      const monthChangeLocator = this.getTokenMonthChangesLocator(index);
+      allLocators.push(priceLocator, dayChangeLocator, weekChangeLocator, monthChangeLocator);
+    }
+    const allPromises = allLocators.map(locator => this.customWaitIsPresented(locator, halfMinute, halfSecond));
+    const results = await Promise.all(allPromises);
+    return results.every(result => result === true);
   }
 }
