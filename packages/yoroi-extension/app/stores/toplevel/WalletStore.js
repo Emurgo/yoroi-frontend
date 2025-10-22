@@ -18,7 +18,7 @@ import { getWallets, subscribe, listenForWalletStateUpdate, setCashbackWallet } 
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
 import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
-import { forceNonNull, noop, timeCached } from '../../coreUtils';
+import { noop, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
 import type { CardanoAddressedUtxo } from '../../api/ada/transactions/types';
