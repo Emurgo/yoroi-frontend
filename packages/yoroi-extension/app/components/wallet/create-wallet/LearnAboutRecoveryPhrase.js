@@ -89,7 +89,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
         </Stack>
 
         <Link
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi-"
+          href="https://help.yoroi-wallet.com/en/"
           target="_blank"
           rel="noreferrer noopener"
           sx={{

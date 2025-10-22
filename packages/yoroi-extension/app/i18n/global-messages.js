@@ -335,7 +335,7 @@ const globalMessages: * = defineMessages({
   },
   faqLinkUrl: {
     id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/',
   },
   walletSendConfirmationDialogTitle: {
     id: 'wallet.send.confirmationDialog.title',

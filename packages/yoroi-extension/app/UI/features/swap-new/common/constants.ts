@@ -16,9 +16,9 @@ export const USDA_TOKEN_ID = 'fe7c786ab321f41c654ef6c1af7b3250a613c24e4213e0425a
 export const DEX_ROUTING = {
   AUTO: 'auto',
   DEXHUNTER: 'dexhunter',
-  MUESLISWAP: 'muesliswap',
+  // MUESLISWAP: 'muesliswap',
   MINSWAP: 'minswap',
 } as const;
 
-export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MUESLISWAP | typeof DEX_ROUTING.MINSWAP;
+export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MINSWAP; // | typeof DEX_ROUTING.MUESLISWAP;
 export type RoutingPref = typeof DEX_ROUTING.AUTO | Aggregator[];

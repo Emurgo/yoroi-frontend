@@ -35,7 +35,7 @@ export default class BaseWarningDialog extends Component<Props> {
     const contactSupportLink = (
       <a
         className={styles.link}
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
+        href="https://help.yoroi-wallet.com/en/"
         onClick={event => this.props.onExternalLinkClick(event)}
       >
         {intl.formatMessage(globalMessages.contactSupport)}

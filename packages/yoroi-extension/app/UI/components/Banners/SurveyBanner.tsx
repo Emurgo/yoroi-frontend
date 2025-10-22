@@ -8,7 +8,7 @@ export const SurveyBanner = (props: { onClose: () => void }) => {
   const handleClick = () => {
     props.onClose();
     window.open(
-      'https://emurgohelpdesk.zendesk.com/hc/en-us/articles/9634494298895-Yoroi-Wallet-Experience-Survey',
+      'https://help.yoroi-wallet.com/en/article/yoroi-wallet-experience-survey-10ae9ak/?bust=1761058992626',
       '_blank',
       'noreferrer,noopener'
     );
