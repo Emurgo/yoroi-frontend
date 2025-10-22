@@ -5,57 +5,78 @@
     <title>Crisp Sandbox</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <style>
-      html, body { height: 100%; margin: 0; }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+      }
       /* keep the widget pinned bottom-right inside this iframe */
-      #crisp-chatbox, .crisp-client { position: fixed !important; right: 0; bottom: 0; }
+      #crisp-chatbox,
+      .crisp-client {
+        position: fixed !important;
+        right: 0;
+        bottom: 0;
+      }
     </style>
     <script>
       (function () {
         // IMPORTANT: this runs in the sandboxed realm
         window.$crisp = [];
-        window.CRISP_WEBSITE_ID = "907e709e-25e9-4652-aa32-f03828c4de01";
+        window.CRISP_WEBSITE_ID = '907e709e-25e9-4652-aa32-f03828c4de01';
 
         // Load the Crisp SDK
-        var s = document.createElement("script");
-        s.src = "https://client.crisp.chat/l.js";
+        var s = document.createElement('script');
+        s.src = 'https://client.crisp.chat/l.js';
         s.async = 1;
         s.onload = function () {
           // Hide their default launcher; we control it from parent
-          try { window.$crisp.push(["config", "hide:on"]); } catch (e) {}
           try {
-            window.$crisp.push(["on", "chat:opened", function () {
-              parent.postMessage({ type: "crisp:opened" }, "*");
-            }]);
-            window.$crisp.push(["on", "chat:closed", function () {
-              parent.postMessage({ type: "crisp:closed" }, "*");
-            }]);
+            window.$crisp.push(['config', 'hide:on']);
           } catch (e) {}
-          parent.postMessage({ type: "crisp:ready" }, "*");
+          try {
+            window.$crisp.push([
+              'on',
+              'chat:opened',
+              function () {
+                parent.postMessage({ type: 'crisp:opened' }, '*');
+              },
+            ]);
+            window.$crisp.push([
+              'on',
+              'chat:closed',
+              function () {
+                parent.postMessage({ type: 'crisp:closed' }, '*');
+              },
+            ]);
+          } catch (e) {}
+          parent.postMessage({ type: 'crisp:ready' }, '*');
         };
         s.onerror = function () {
-          parent.postMessage({ type: "crisp:error", where: "load" }, "*");
+          parent.postMessage({ type: 'crisp:error', where: 'load' }, '*');
         };
         document.head.appendChild(s);
 
         // Listen for parent commands
-        window.addEventListener("message", function (evt) {
+        window.addEventListener('message', function (evt) {
           var data = evt && evt.data;
           if (!data || !data.type) return;
 
           try {
-            if (data.type === "crisp:open") {
-              window.$crisp.push(["do", "chat:show"]);
-              window.$crisp.push(["do", "chat:open"]);
-            } else if (data.type === "crisp:close") {
-              window.$crisp.push(["do", "chat:close"]);
-              window.$crisp.push(["do", "chat:hide"]);
+            if (data.type === 'crisp:open') {
+              window.$crisp.push(['do', 'chat:show']);
+              window.$crisp.push(['do', 'chat:open']);
+            } else if (data.type === 'crisp:close') {
+              window.$crisp.push(['do', 'chat:close']);
+              window.$crisp.push(['do', 'chat:hide']);
             }
           } catch (e) {
-            parent.postMessage({ type: "crisp:error", where: "command", cmd: data.type }, "*");
+            parent.postMessage({ type: 'crisp:error', where: 'command', cmd: data.type }, '*');
           }
         });
       })();
     </script>
   </head>
   <body></body>
+  <!-- <script
+        type="text/javascript">window.$crisp = []; window.CRISP_WEBSITE_ID = "907e709e-25e9-4652-aa32-f03828c4de01"; (function () { d = document; s = d.createElement("script"); s.src = "https://client.crisp.chat/l.js"; s.async = 1; d.getElementsByTagName("head")[0].appendChild(s); })();</script> -->
 </html>

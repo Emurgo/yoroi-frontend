@@ -48,14 +48,11 @@ export default ({
       },
     ],
 
-    // ✅ MV3 CSP locations
     content_security_policy: {
       extension_pages: contentSecurityPolicy,
       // ✅ minimal, Chrome-acceptable sandbox CSP (no inline)
-      sandbox: "script-src 'self' https://client.crisp.chat; connect-src https://client.crisp.chat wss://client.relay.crisp.chat; img-src https: data:; style-src 'self' https://client.crisp.chat"
+      //    sandbox: "script-src 'self' https://client.crisp.chat; connect-src https://client.crisp.chat wss://client.relay.crisp.chat; img-src https: data:; style-src 'self' https://client.crisp.chat"
     },
-
-    // ✅ Only list sandboxed pages here (define once)
     ...(isFirefox ? {} : {
       sandbox: { pages: ['3rd-party-crisp/crisp.html'] },
     }),

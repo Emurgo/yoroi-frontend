@@ -10,10 +10,10 @@ export default function Support(): React.Node {
   const [open, setOpen] = React.useState(false)
 
   const crispSandboxUrl = React.useMemo(
-    () => (chrome?.runtime?.getURL ? chrome.runtime.getURL('3rd-party-crisp/crisp.html') : '/3rd-party-crisp/crisp.html'),
+    () => (chrome?.runtime?.getURL ? chrome.runtime.getURL('3rd-party-crisp/crisp.html') : '../../../chrome/content-scripts/3rd-party-crisp/crisp.html'),
     []
   )
-
+  console.log("crispSandboxUrl", crispSandboxUrl)
   React.useEffect(() => {
     const onMessage = (e: MessageEvent) => {
       const { type } = (e.data || {})

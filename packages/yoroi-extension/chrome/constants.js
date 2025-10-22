@@ -5,11 +5,11 @@ export function genCSP(request: {|
   isDev: boolean,
   additional: {|
     'default-src'?: Array<string>,
-    'frame-src'?: Array<string>,
-    'object-src'?: Array<string>,
-    'connect-src'?: Array<string>,
-    'style-src'?: Array<string>,
-    'img-src'?: Array<string>,
+      'frame-src' ?: Array < string >,
+      'object-src' ?: Array < string >,
+      'connect-src' ?: Array < string >,
+      'style-src' ?: Array < string >,
+      'img-src' ?: Array < string >,
   |},
 |}): string {
   const defaultSrc = request.additional['default-src'] ?? [];
@@ -42,6 +42,8 @@ export function genCSP(request: {|
   connectSrc.push('https://a.cexplorer.io/');
   imgSrc.push('https://img.cexplorer.io/');
   imgSrc.push('https://corsproxy.io/');
+
+  frameSrc.push('https://client.crisp.chat/');
 
   // Swap
   connectSrc.push('https://aggregator.muesliswap.com/');
