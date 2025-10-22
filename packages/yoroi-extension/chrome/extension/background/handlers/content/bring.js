@@ -1,6 +1,5 @@
 // @flow
 import LocalStorageApi from '../../../../../app/api/localStorage';
-import { isAnyTrezorWallet } from '../../../../../app/api/ada/lib/storage/models/ConceptualWallet/index';
 import { getAllAddressesForDisplay } from '../../../../../app/api/ada/lib/storage/bridge/traitUtils';
 import { PublicDeriver } from '../../../../../app/api/ada/lib/storage/models/PublicDeriver/index';
 import { getDb } from '../../state';
@@ -48,13 +47,11 @@ const handlers = Object.freeze({
     const publicDerivers = await loadWalletsFromStorage(db);
     const result = [];
     for (const publicDeriver of publicDerivers) {
-      if (!isAnyTrezorWallet(publicDeriver.getParent())) {
-        result.push({
-          id: publicDeriver.getPublicDeriverId(),
-          address: (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address,
-          name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
-        });
-      }
+      result.push({
+        id: publicDeriver.getPublicDeriverId(),
+        address: (await getAllAddressesForDisplay({ publicDeriver, type: CoreAddressTypes.CARDANO_BASE }))[0].address,
+        name: (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
+      });
     }
     return { ok: result };
   },
@@ -77,7 +74,6 @@ async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
   const publicDerivers = (await loadWalletsFromStorage(db)).filter(
     publicDeriver =>
-      !isAnyTrezorWallet(publicDeriver.getParent()) &&
       publicDeriver.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   );
   if (!publicDerivers.length) {

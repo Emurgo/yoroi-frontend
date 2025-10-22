@@ -115,7 +115,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: params => isOnMainnet(params) && nonTrezorWallet(params),
+    isVisible: params => isOnMainnet(params),
   },
   {
     className: 'connected-websites',
