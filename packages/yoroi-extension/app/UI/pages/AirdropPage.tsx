@@ -105,14 +105,18 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   useEffect(() => {
     (async () => {
-      const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
+      const allocatedAddr = addressHexToBech32(
+        wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE][0].address
+      );
+      const claimedAmount = await checkClaimForAddress(claimEndpoint, allocatedAddr);
+
+      const allocatedAddrs: AddressClaimData[] = (claimedAmount > 0) ? [{
+        addrHex: '',
+        addrBech32: allocatedAddr,
+        path: [],
+        value: claimedAmount,
+      }]: [];
       const unclaimedAddrs: AddressClaimData[] = [];
-      for (const addr of allocatedAddrs) {
-        const claimed = await checkClaimForAddress(claimEndpoint, addr.addrBech32);
-        if (!claimed) {
-          unclaimedAddrs.push(addr);
-        }
-      }
 
       if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
         setIsClaimDone(true);
