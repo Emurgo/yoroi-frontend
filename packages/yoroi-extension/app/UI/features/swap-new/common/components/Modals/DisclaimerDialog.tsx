@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useStrings } from '../../hooks/useStrings';
 import { Stack, Typography, Checkbox, FormControlLabel, Box } from '@mui/material';
 import { useModal } from '../../../../../components/modals/ModalContext';
 import { LoadingButton } from '@mui/lab';
 import LocalStorageApi from '../../../../../../api/localStorage/index';
 import { useNavigateTo } from '../../../../../common/hooks/useNavigateTo';
+
+interface IDisclaimerDialogBody {
+  disclaimerAgreed: boolean;
+  setDisclaimerAgreed: (value: boolean) => void;
+  action: {
+    onClick: () => void;
+    disabled: boolean;
+    primary: boolean;
+    label: string;
+  };
+}
 
 export const DisclaimerDialog = () => {
   const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
@@ -17,48 +28,44 @@ export const DisclaimerDialog = () => {
     localStorage.setSwapDisclaimerModalClosed('true');
     closeModal();
   };
-  const action = {
+  const action: IDisclaimerDialogBody['action'] = {
     onClick: onAcceptDisclaimer,
     disabled: !disclaimerAgreed,
     primary: true,
     label: strings.disclaimerProceed,
   };
 
-  useEffect(() => {
-    const checkModalState = async () => {
-      try {
-        const wasClosed = await localStorage.getSwapDisclaimerModalClosed();
-        if (wasClosed === undefined || wasClosed === 'false') {
-          openModal({
-            title: strings.disclaimerTitle,
-            content: (
-              <DisclaimerDialogBody
-                disclaimerAgreed={disclaimerAgreed}
-                setDisclaimerAgreed={setDisclaimerAgreed}
-                action={action}
-              />
-            ),
-            height: '588px',
-            width: '702px',
-            modalId: 'swapDisclaimer',
-            onClose: () => {
-              navigate.walletTransactions();
-              localStorage.setSwapDisclaimerModalClosed('false');
-            },
-          });
-        }
-      } catch (error) {
-        console.error('Error checking modal state:', error);
+  const checkModalState = useCallback(async () => {
+    try {
+      const wasClosed = await localStorage.getSwapDisclaimerModalClosed();
+      if (wasClosed === undefined || wasClosed === 'false') {
+        openModal({
+          title: strings.disclaimerTitle,
+          content: (
+            <DisclaimerDialogBody disclaimerAgreed={disclaimerAgreed} setDisclaimerAgreed={setDisclaimerAgreed} action={action} />
+          ),
+          height: '588px',
+          width: '702px',
+          modalId: 'swapDisclaimer',
+          onClose: () => {
+            navigate.walletTransactions();
+            localStorage.setSwapDisclaimerModalClosed('false');
+          },
+        });
       }
-    };
-
-    checkModalState();
+    } catch (error) {
+      console.error('Error checking modal state:', error);
+    }
   }, [disclaimerAgreed]);
+
+  useEffect(() => {
+    checkModalState();
+  }, [checkModalState]);
 
   return <></>;
 };
 
-const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action }) => {
+const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action }: IDisclaimerDialogBody) => {
   const strings = useStrings();
 
   return (
@@ -123,9 +130,8 @@ const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action })
         <LoadingButton
           // @ts-ignore
           variant="primary"
-          loading={action.isSubmitting}
           onClick={action.onClick}
-          disabled={action.disabled === true}
+          disabled={action.disabled}
         >
           {action.label}
         </LoadingButton>
