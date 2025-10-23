@@ -329,9 +329,6 @@ const CashbackPageContainer = observer((props: AllProps) => {
           throw new convertToLocalizableError(error);
         }
       } else if (wallet.type === 'trezor') {
-        const ledgerConnect = new LedgerConnect({
-          locale: stores.profile.currentLocale,
-        });
         try {
           const network = getNetworkById(wallet.networkId);
           const config = network.BaseConfig[0];

@@ -73,8 +73,7 @@ const handlers = Object.freeze({
 async function getCashbackWallet(): Promise<PublicDeriver<> | null | void> {
   const db = await getDb();
   const publicDerivers = (await loadWalletsFromStorage(db)).filter(
-    publicDeriver =>
-      publicDeriver.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
+    publicDeriver => publicDeriver.getParent().getNetworkInfo().NetworkId === networks.CardanoMainnet.NetworkId
   );
   if (!publicDerivers.length) {
     return null;

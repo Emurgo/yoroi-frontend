@@ -359,7 +359,10 @@ export default class ConnectPage extends Component<Props> {
                             },
                           }}
                         >
-                          <WalletButton onClick={() => onSelectWallet(wallet, wallet.plate)} id="connector:connect-walletItem-button">
+                          <WalletButton
+                            onClick={() => onSelectWallet(wallet, wallet.plate)}
+                            id="connector:connect-walletItem-button"
+                          >
                             <ConnectedWallet
                               publicDeriver={wallet}
                               walletBalance={
@@ -437,9 +440,6 @@ const WalletButton = styled('button')({
   width: '100%',
   fontSize: '1rem',
   padding: '16px',
-});
-const DisabledWalletButton = styled(WalletButton)({
-  cursor: 'default',
 });
 
 const TestnetWarningBox = styled(Box)(({ theme }) => ({
