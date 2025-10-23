@@ -45,6 +45,7 @@ const storageKeys = {
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
+  SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -159,6 +160,16 @@ export default class LocalStorageApi {
   setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
 
   unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+
+  // ========== SWAP Disclaimer Modal ========== //
+  getSwapDisclaimerModalClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
+
+  setSwapDisclaimerModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED, closed);
+
+  unsetSwapDisclaimerModalClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>

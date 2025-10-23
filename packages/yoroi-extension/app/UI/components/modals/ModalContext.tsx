@@ -33,8 +33,8 @@ const defaultState: ModalState = Object.freeze({
   isOpen: false,
   title: '',
   content: null,
-  height: '648px',
-  width: '648px',
+  height: '0',
+  width: '0',
   isLoading: false,
   onClose: undefined,
 });
