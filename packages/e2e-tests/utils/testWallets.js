@@ -9,7 +9,7 @@ export const testWallet1Mainnet = Object.freeze({
   name: 'TestWallet1',
   plate: 'PXNL-6868',
   mnemonic: process.env.TEST_WALLET_MAINNET_1,
-  balance: 2.352103,
+  balance: 3.352103,
   receiveAddress: 'addr1q8gnztlsm9fn7jeuqhz7d8ul4e78jxvwgkwa40na6ygdd0z4lnxx06d9vfcjyf5hypq9alsh7k27gtgsykgns6w86v7q37z6pf',
 });
 export const testWallet2 = Object.freeze({
