@@ -22,5 +22,13 @@ export const TOKEN_3 = Object.freeze({
   websiteLink: null,
   cardanoscanLink: 'https://cardanoscan.io/token/asset1lsykdl5hvqg0ax2whp0f9zp3qc332yyhs9tu0v',
 });
+export const TOKEN_4 = Object.freeze({
+  name: 'USDA',
+  description: null,
+  policyId: 'fe7c786ab321f41c654ef6c1af7b3250a613c24e4213e0425a7ae456',
+  fingerprint: 'asset16fq594uun90f2jajmecjcdt4jnsnq7r3jdqsw5',
+  websiteLink: null,
+  cardanoscanLink: 'https://cardanoscan.io/token/asset16fq594uun90f2jajmecjcdt4jnsnq7r3jdqsw5',
+});
 
-export const allTokens = [TOKEN_1, TOKEN_2, TOKEN_3];
+export const allTokens = [TOKEN_1, TOKEN_2, TOKEN_3, TOKEN_4];
