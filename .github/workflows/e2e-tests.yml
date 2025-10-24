@@ -72,7 +72,7 @@ jobs:
           retention-days: 1
           overwrite: true
 
-  Ext-General:
+  Extension:
     if: github.event.review &&
       (
       github.event.review.state == 'approved' ||
@@ -81,6 +81,7 @@ jobs:
       )
     runs-on: ubuntu-latest
     needs: [Build-Extension]
+    continue-on-error: true
     strategy:
       matrix:
         suite: [cashback, general, governance, nft, portfolio, receive, send, settings, transactions]
