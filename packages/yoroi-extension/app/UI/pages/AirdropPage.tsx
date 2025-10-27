@@ -8,14 +8,7 @@ import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import {
-  getAllocatedAddresses,
-  checkClaimForAddress,
-  signClaim,
-  makeClaim,
-  getClaimMessage,
-  scanForOriginalDestAddress,
-} from '../../api/ada/midnight';
+import { checkClaimForAddress, signClaim, makeClaim, getClaimMessage, scanForOriginalDestAddress } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -60,6 +53,9 @@ interface Props {
         };
         name: string;
         plate: unknown;
+        allAddressesByType: {
+          address: string;
+        }[][];
       };
     };
     profile: {
@@ -69,9 +65,7 @@ interface Props {
 }
 
 const NUMBER_OF_NIGHT_DECIMALS = 6;
-const CHECK_ENDPOINT_MAINNET = 'https://proof.provtree-midnight.com';
 const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
-const CHECK_ENDPOINT_PREPROD = 'https://proof-staging.provtree-midnight.com';
 const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 export default function AirdropPage({ stores }: Readonly<Props>) {
@@ -89,7 +83,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const wallet = stores.wallets.selectedOrFail;
   const isMainnet = wallet.networkId === 0;
 
-  const checkEndpoint = isMainnet ? CHECK_ENDPOINT_MAINNET : CHECK_ENDPOINT_PREPROD;
   const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
 
   const isTrezor = wallet.type === 'trezor';
@@ -105,14 +98,23 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   useEffect(() => {
     (async () => {
-      const allocatedAddrs: AddressClaimData[] = await getAllocatedAddresses(checkEndpoint, wallet);
+      const allocatedAddr = addressHexToBech32(
+        forceNonNull(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE]?.[0]?.address)
+      );
+      const claimedAmount = await checkClaimForAddress(claimEndpoint, allocatedAddr);
+
+      const allocatedAddrs: AddressClaimData[] =
+        claimedAmount > 0
+          ? [
+              {
+                addrHex: '',
+                addrBech32: allocatedAddr,
+                path: [],
+                value: claimedAmount,
+              },
+            ]
+          : [];
       const unclaimedAddrs: AddressClaimData[] = [];
-      for (const addr of allocatedAddrs) {
-        const claimed = await checkClaimForAddress(claimEndpoint, addr.addrBech32);
-        if (!claimed) {
-          unclaimedAddrs.push(addr);
-        }
-      }
 
       if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
         setIsClaimDone(true);

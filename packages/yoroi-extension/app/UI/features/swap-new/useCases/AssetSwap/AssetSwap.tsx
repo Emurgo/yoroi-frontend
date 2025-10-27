@@ -16,6 +16,7 @@ import { ErrorMessage } from '../../common/components/ErrorMessage';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
 import { useStrings } from '../../common/hooks/useStrings';
+import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -71,6 +72,7 @@ export const AssetSwap = () => {
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
+      <DisclaimerDialog />
       <Stack>
         <TopBarActions />
         <Stack {...atoms.pt_lg} />

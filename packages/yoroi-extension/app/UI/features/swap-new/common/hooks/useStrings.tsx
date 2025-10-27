@@ -189,6 +189,47 @@ export const messages = Object.freeze(
       id: 'buysell.dialog.error.not.enough',
       defaultMessage: '!!!Not enough balance',
     },
+    disclaimerTitle: {
+      id: 'buySell.disclaimer.title',
+      defaultMessage: '!!!Disclaimer',
+    },
+    disclaimerDescription: {
+      id: 'buySell.disclaimer.description',
+      defaultMessage:
+        '!!!By clicking "Proceed," you acknowledge that you will be redirected to a third-party service provider offering Web3 on-and-off ramp solutions for fiat-to-ADA exchanges. You may be required to agree to the terms, conditions, and privacy policies of the third-party provider to complete the transaction. Yoroi Wallet does not control, endorse, or assume responsibility for the content, security, policies, or services provided by the third party.',
+    },
+    disclaimerPleaseNote: {
+      id: 'buySell.disclaimer.pleaseNote',
+      defaultMessage: '!!!Please note:',
+    },
+    disclaimerNote1: {
+      id: 'buySell.disclaimer.note1',
+      defaultMessage:
+        '!!!Yoroi Wallet is not liable for any losses, delays, or errors that may occur while using the third-party service.',
+    },
+    disclaimerNote2: {
+      id: 'buySell.disclaimer.note2',
+      defaultMessage:
+        "!!!Transactions may be subject to restrictions based on your geographic location, applicable laws, financial institution policies, or the service provider's limitations.",
+    },
+    disclaimerNote3: {
+      id: 'buySell.disclaimer.note3',
+      defaultMessage:
+        "!!!Ensure you review and understand the third party's terms, as your interactions are solely governed by their agreements.",
+    },
+    disclaimerNote4: {
+      id: 'buySell.disclaimer.note4',
+      defaultMessage:
+        '!!!Yoroi Wallet does not collect or store any personal or financial data submitted through the third-party platform.',
+    },
+    disclaimerCheckboxLabel: {
+      id: 'swap.swapDisclamerCheckbox',
+      defaultMessage: '!!!I understand this disclaimer',
+    },
+    disclaimerProceed: {
+      id: 'buySell.actions.proceed',
+      defaultMessage: '!!!Proceed',
+    },
   })
 );
 
@@ -240,6 +281,15 @@ export const useStrings = () => {
     selectToken: intl.formatMessage(messages.selectToken),
     buyAndSellToken: intl.formatMessage(messages.buyAndSellToken),
     notEnoughBalance: intl.formatMessage(messages.notEnoughBalance),
+    disclaimerTitle: intl.formatMessage(messages.disclaimerTitle),
+    disclaimerDescription: intl.formatMessage(messages.disclaimerDescription),
+    disclaimerPleaseNote: intl.formatMessage(messages.disclaimerPleaseNote),
+    disclaimerNote1: intl.formatMessage(messages.disclaimerNote1),
+    disclaimerNote2: intl.formatMessage(messages.disclaimerNote2),
+    disclaimerNote3: intl.formatMessage(messages.disclaimerNote3),
+    disclaimerNote4: intl.formatMessage(messages.disclaimerNote4),
+    disclaimerCheckboxLabel: intl.formatMessage(messages.disclaimerCheckboxLabel),
+    disclaimerProceed: intl.formatMessage(messages.disclaimerProceed),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };
