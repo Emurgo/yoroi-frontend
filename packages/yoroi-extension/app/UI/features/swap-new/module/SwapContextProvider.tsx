@@ -21,9 +21,9 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { useGetInputs } from '../common/helpers';
-import { ASSET_DIRECTION_IN } from '../common/constants';
-import { AssetDirectionType, MarketOrderType } from '../common/types';
+import { toBaseUnits, useGetInputs } from '../common/helpers';
+import { ASSET_DIRECTION_IN, USDA_TOKEN_ID } from '../common/constants';
+import { useStrings } from '../common/hooks/useStrings';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -43,15 +43,15 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const [isEstimateOrderLoading, setIsEstimateOrderLoading] = useState(false);
 
   const [stakingKey, setStakingKey] = useState<string | null>(null);
-  const { partners, excludedTokens } = useSwapConfig();
+  const { partners, excludedTokens, tokenOutId } = useSwapConfig();
 
   const tokenManager = tokenManagers[Chain.Network.Mainnet as Chain.SupportedNetworks];
   const tokenOutInputRef = useRef<HTMLInputElement | null>(null);
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
-
   const [state, action] = useReducer(swapReducer, defaultState);
+  const strings = useStrings();
 
   useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -77,7 +77,20 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     });
   }, [stakingKey, primaryTokenInfo, partners]);
 
-  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
+  const { data: orders = [], refetch: refetchOrders } = useQuery({
+    queryKey: ['useSwapOrders', stakingKey, swapManager.settings.routingPreference],
+    queryFn: async () => {
+      const res = await swapManager.api.orders();
+      if (isRight(res)) return res.value.data;
+      return [];
+    },
+  });
+
+  const {
+    data: { tokenInfos = new Map(), tokenInfoList = [] } = {},
+    isLoading: loadingTokenList,
+    refetch: refetchTokenList,
+  } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
     primaryTokenInfo,
@@ -86,10 +99,22 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   });
 
   useEffect(() => {
+    refetchTokenList();
+  }, []);
+
+  useEffect(() => {
+    if (tokenOutId) {
+      action({ type: SwapActionType.TokenOutIdChanged, value: tokenOutId as Portfolio.Token.Id });
+    }
+  }, [tokenOutId]);
+
+  useEffect(() => {
     action({ type: 'SlippageInputChanged', value: swapManager.settings.slippage });
   }, [swapManager.settings.slippage]);
 
-  const { data: limitOptions } = useQuery(
+  const estimateReqIdRef = useRef(0);
+
+  const { data: limitOptions, isLoading: isLimitOptionsLoading } = useQuery(
     [
       'useSwapLimitOptions',
       'mainet',
@@ -117,11 +142,11 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
     if (value !== undefined && state.selectedProtocol.isTouched === false && state.selectedProtocol.value !== value) {
-      action({ type: 'ProtocolChanged', value });
+      action({ type: SwapActionType.ProtocolChanged, value });
     } else {
       const current = limitOptions?.options.find(p => p.protocol === state.selectedProtocol.value);
-      if (state.selectedProtocol.isTouched === true && current === undefined) {
-        action({ type: 'ProtocolChanged', value });
+      if (current === undefined) {
+        action({ type: SwapActionType.ProtocolChanged, value });
       }
     }
 
@@ -137,22 +162,21 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   ]);
 
   useEffect(() => {
-    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : (id ?? ''));
 
-    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+    const asset = ftAssetList.find(a => a.info.id === normalizeId(state.tokenInInput.tokenId));
+    const balance = asset ? BigInt(asset.quantity) : BigInt(0);
+    const decimals = asset?.info.numberOfDecimals ?? 0;
+    const needed = toBaseUnits(state.tokenInInput.value, decimals);
 
-    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
+    const error = asset && needed !== null && balance < needed ? strings.notEnoughBalance : null;
 
-    if (!hasEnoughBalance) {
-      action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
-    } else {
-      action({ type: 'TokenInErrorChanged', value: null });
-    }
+    action({ type: 'TokenInErrorChanged', value: error });
   }, [ftAssetList, state.tokenInInput.tokenId, state.tokenInInput.value]);
 
   useEffect(() => {
     if (!state.needsNewEstimate) return;
-    action({ type: SwapAction.EstimateError, value: { message: '', status: 0, responseData: null } });
+    action({ type: SwapActionType.EstimateError, value: { message: '', status: 0, responseData: null } });
 
     if (
       state.tokenInInput.tokenId === undefined ||
@@ -161,6 +185,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     )
       return;
     setIsEstimateOrderLoading(true);
+    const reqId = ++estimateReqIdRef.current;
+
     swapManager.api
       .estimate({
         slippage: state.slippageInput.value,
@@ -169,7 +195,9 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         ...(state.lastInputTouched === ASSET_DIRECTION_IN
           ? {
               amountIn: Number(state.tokenInInput.value),
-              ...(state.orderType === 'limit' && { wantedPrice: Number(state.wantedPrice) }),
+              ...(state.orderType === 'limit' && {
+                wantedPrice: Number(state.wantedPrice),
+              }),
             }
           : {
               amountOut: Number(state.tokenOutInput.value),
@@ -178,28 +206,46 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         protocol: state.selectedProtocol.value,
       })
       .then(response => {
+        if (reqId !== estimateReqIdRef.current) return;
         if (isLeft(response)) {
-          action({ type: SwapAction.EstimateError, value: response.error });
+          action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
-          action({ type: SwapAction.EstimateResponse, value: response.value.data });
+          action({ type: SwapActionType.EstimateResponse, value: response.value.data });
         }
+      })
+      .catch(() => {
+        if (reqId !== estimateReqIdRef.current) return;
+        action({
+          type: SwapActionType.EstimateError,
+          value: {
+            status: -1,
+            message: 'Failed to estimate swap. Please try again.',
+            responseData: {},
+          },
+        });
       })
       .finally(() => {
         setIsEstimateOrderLoading(false);
       });
-  }, [state, swapManager.api]);
+  }, [
+    state.needsNewEstimate,
+    state.tokenInInput.tokenId,
+    state.tokenOutInput.tokenId,
+    state.tokenInInput.value,
+    state.tokenOutInput.value,
+    state.slippageInput.value,
+    state.lastInputTouched,
+    state.orderType,
+    state.wantedPrice,
+    state.selectedProtocol.value,
+    swapManager.api,
+    action,
+  ]);
 
   const create = useCallback(async () => {
     if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
-
     setIsCreateOrderLoading(true);
-
-    const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
-    const quantityIn =
-      Number(state.tokenInInput.value) *
-      10 ** (state.tokenInInput.tokenId === '.' ? primaryTokenInfo.decimals : tokenInInfo?.decimals);
-    const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
-    const inputs = await getInputs(amountsIn);
+    const inputs = await getInputs();
 
     swapManager.api
       .create({
@@ -209,14 +255,14 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
         ...(state.orderType === 'limit' ? { wantedPrice: Number(state.wantedPrice) } : { slippage: state.slippageInput.value }),
         blockedProtocols: [],
         protocol: state.selectedProtocol.value,
-        inputs,
+        inputs: inputs,
       })
       .then(response => {
         setIsCreateOrderLoading(false);
         if (isLeft(response)) {
-          action({ type: SwapAction.CreateError, value: response.error });
+          action({ type: SwapActionType.CreateError, value: response.error });
         } else {
-          action({ type: SwapAction.CreateResponse, value: response.value.data });
+          action({ type: SwapActionType.CreateResponse, value: response.value.data });
         }
       });
   }, [
@@ -236,7 +282,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const context: any = useMemo(
     () => ({
-      swapForm: { action, ...state },
+      swapForm: { action, orders, refetchOrders, ...state },
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
@@ -249,12 +295,13 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       explorer,
       createOrder: create,
       isCreateOrderLoading,
+      isLimitOptionsLoading,
       isEstimateOrderLoading,
       limitOptions,
       swapManager,
       stores,
     }),
-    [state.tokenInInput, state.tokenOutInput, action, tokenInfos]
+    [state.tokenInInput, state.tokenOutInput, action, tokenInfos, orders, refetchOrders]
   );
 
   if (!selectedWallet) return null;
@@ -265,45 +312,53 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 export const useSwapRevamp = () =>
   useContext(SwapContext) ?? console.log('useSwapRevamp: needs to be wrapped in a SwapContextProvider');
 
-const swapReducer = (state: SwapState, action: SwapAction) => {
+export const swapReducer = (state: SwapState, action: SwapAction) => {
   return produce(state, draft => {
     draft.needsNewEstimate = true;
     draft.lastInputTouched = ASSET_DIRECTION_IN;
 
     switch (action.type) {
-      case SwapAction.ChangeOrderType:
+      case SwapActionType.ChangeOrderType:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.orderType = action.value;
         break;
 
-      case SwapAction.TokenInInputTouched:
+      case SwapActionType.TokenInInputTouched:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.tokenInInput.isTouched = true;
         draft.tokenInInput.value = '';
         draft.tokenInInput.error = null;
         break;
 
-      case SwapAction.TokenOutInputTouched:
+      case SwapActionType.TokenOutInputTouched:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.tokenOutInput.isTouched = true;
         draft.tokenOutInput.value = '';
         draft.tokenOutInput.error = null;
         break;
 
-      case SwapAction.TokenInIdChanged:
-        if ('value' in action) {
-          draft.tokenInInput.tokenId = action.value;
-          draft.selectedProtocol.isTouched = false;
-          draft.wantedPrice = '';
-        }
+      case SwapActionType.TokenInIdChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
+        draft.tokenInInput.tokenId = action.value;
+        draft.selectedProtocol.isTouched = false;
+        draft.wantedPrice = '';
         break;
 
-      case SwapAction.TokenOutIdChanged:
-        if ('value' in action) {
-          draft.tokenOutInput.tokenId = action.value;
-          draft.selectedProtocol.isTouched = false;
-          draft.wantedPrice = '';
-        }
+      case SwapActionType.TokenOutIdChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
+        draft.tokenOutInput.tokenId = action.value;
+        draft.selectedProtocol.isTouched = false;
+        draft.wantedPrice = '';
         break;
 
-      case SwapAction.TokenInAmountChanged:
+      case SwapActionType.TokenInAmountChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.tokenInInput.value = parseNumber(action.value);
         if (action.value === '' || action.value === '0') {
           draft.tokenOutInput.value = '0';
@@ -312,7 +367,8 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         }
         break;
 
-      case SwapAction.TokenOutAmountChanged:
+      case SwapActionType.TokenOutAmountChanged:
+        draft.needsNewEstimate = true;
         draft.lastInputTouched = 'out';
         draft.tokenOutInput.value = parseNumber(action.value);
         if (action.value === '' || action.value === '0') {
@@ -322,28 +378,40 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         }
         break;
 
-      case SwapAction.TokenInErrorChanged:
+      case SwapActionType.TokenInErrorChanged:
+        draft.needsNewEstimate = false;
         draft.lastInputTouched = state.lastInputTouched;
         draft.tokenInInput.error = action.value;
-        draft.needsNewEstimate = false;
+        if (action.value !== null) {
+          draft.canSwap = false;
+        }
         break;
 
-      case SwapAction.TokenOutErrorChanged:
+      case SwapActionType.TokenOutErrorChanged:
+        draft.needsNewEstimate = false;
         draft.lastInputTouched = state.lastInputTouched;
         draft.tokenOutInput.error = action.value;
-        draft.needsNewEstimate = false;
+        if (action.value !== null) {
+          draft.canSwap = false;
+        }
         break;
 
-      case SwapAction.SlippageInputChanged:
+      case SwapActionType.SlippageInputChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.slippageInput.value = action.value;
         break;
 
-      case SwapAction.WantedPriceInputChanged:
+      case SwapActionType.WantedPriceInputChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.wantedPrice = parseNumber(action.value);
         if (Number(draft.wantedPrice) === 0) draft.needsNewEstimate = false;
         break;
 
-      case SwapAction.SwitchTouched:
+      case SwapActionType.SwitchTouched:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.tokenOutInput.isTouched = state.tokenInInput.isTouched;
         draft.tokenOutInput.tokenId = state.tokenInInput.tokenId;
         draft.tokenOutInput.value = '';
@@ -357,64 +425,78 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
         draft.wantedPrice = '';
         break;
 
-      case SwapAction.ProtocolSelected:
+      case SwapActionType.ProtocolSelected:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.selectedProtocol.isTouched = true;
         draft.selectedProtocol.value = action.value;
         break;
 
-      case SwapAction.ProtocolChanged:
+      case SwapActionType.ProtocolChanged:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.selectedProtocol.isTouched = false;
         draft.selectedProtocol.value = action.value;
         break;
 
-      case SwapAction.Refresh:
+      case SwapActionType.Refresh:
+        draft.needsNewEstimate = true;
         draft.lastInputTouched = state.lastInputTouched;
         draft.tokenInInput.error = null;
         draft.tokenOutInput.error = null;
+        draft.canSwap = false;
         break;
 
-      case SwapAction.ResetAmounts:
+      case SwapActionType.ResetAmounts:
+        draft.needsNewEstimate = true;
+        draft.lastInputTouched = 'in';
         draft.tokenInInput.value = '';
         draft.tokenOutInput.value = '';
 
         draft.tokenInInput.error = null;
         draft.tokenOutInput.error = null;
+        draft.canSwap = false;
         break;
 
-      case SwapAction.ResetForm:
+      case SwapActionType.ResetForm:
         Object.assign(draft, defaultState);
         break;
 
-      case SwapAction.EstimateResponse:
-        draft.lastInputTouched = state.lastInputTouched;
+      case SwapActionType.EstimateResponse:
         draft.needsNewEstimate = false;
+        draft.lastInputTouched = state.lastInputTouched;
         draft.estimate = action.value;
         draft.tokenOutInput.error = null;
-        draft.canSwap = true;
+        // Only enable swap if there are no input errors
+        draft.canSwap = state.tokenInInput.error === null;
 
-        if (state.lastInputTouched === ASSET_DIRECTION_IN) {
+        if (state.lastInputTouched === 'in') {
           draft.tokenOutInput.value = String(action.value.totalOutputWithoutSlippage ?? 0);
         } else {
           draft.tokenInInput.value = String(action.value.totalInput ?? 0);
         }
         break;
 
-      case SwapAction.EstimateError:
+      case SwapActionType.EstimateError:
         draft.needsNewEstimate = false;
+        draft.lastInputTouched = 'in';
         draft.estimate = undefined;
         draft.tokenOutInput.error = action.value.message;
         draft.canSwap = false;
         break;
 
-      case SwapAction.CreateResponse:
+      case SwapActionType.CreateResponse:
         draft.needsNewEstimate = false;
+        draft.lastInputTouched = 'in';
         draft.createTx = action.value;
         break;
 
-      case SwapAction.CreateError:
+      case SwapActionType.CreateError:
         draft.needsNewEstimate = false;
+        draft.lastInputTouched = 'in';
         draft.createTx = undefined;
         draft.tokenOutInput.error = action.value.message;
+        draft.canSwap = false;
         break;
 
       default:
@@ -423,7 +505,7 @@ const swapReducer = (state: SwapState, action: SwapAction) => {
   });
 };
 
-export const SwapAction = {
+export const SwapActionType = {
   ChangeOrderType: 'ChangeOrderType',
   TokenInInputTouched: 'TokenInInputTouched',
   TokenOutInputTouched: 'TokenOutInputTouched',
@@ -447,73 +529,36 @@ export const SwapAction = {
   CreateError: 'CreateError',
 } as const;
 
-type SwapActionValueMap = {
-  ChangeOrderType: 'limit' | 'market';
-  TokenInInputTouched: undefined;
-  TokenOutInputTouched: undefined;
-  TokenInIdChanged: any;
-  TokenOutIdChanged: any;
-  TokenInAmountChanged: string;
-  TokenOutAmountChanged: string;
-  TokenInErrorChanged: string | null;
-  TokenOutErrorChanged: string | null;
-  WantedPriceInputChanged: string;
-  SlippageInputChanged: number;
-  SwitchTouched: undefined;
-  ProtocolSelected: Swap.Protocol;
-  ProtocolChanged: Swap.Protocol | undefined;
-  Refresh: undefined;
-  ResetAmounts: undefined;
-  ResetForm: undefined;
-  EstimateResponse: Swap.EstimateResponse;
-  EstimateError: Api.ResponseError;
-  CreateResponse: Swap.CreateResponse;
-  CreateError: Api.ResponseError;
-};
-
-export type SwapAction = {
-  [K in keyof SwapActionValueMap]: SwapActionValueMap[K] extends undefined
-    ? { type: K }
-    : { type: K; value: SwapActionValueMap[K] };
-}[keyof SwapActionValueMap];
-
-const defaultState: SwapState = Object.freeze({
-  needsNewEstimate: false,
-  orderType: 'market',
-  lastInputTouched: ASSET_DIRECTION_IN,
-  tokenInInput: {
-    isTouched: true,
-    tokenId: primaryTokenId,
-    disabled: false,
-    error: null,
-    value: '',
-  },
-  tokenOutInput: {
-    isTouched: false,
-    tokenId: undefined,
-    disabled: false,
-    error: null,
-    value: '',
-  },
-  slippageInput: {
-    value: 1,
-  },
-  selectedProtocol: {
-    isTouched: false,
-    value: undefined,
-  },
-  wantedPrice: '',
-  canSwap: false,
-  estimate: undefined,
-  createTx: undefined,
-  cancelTx: undefined,
-  cancelError: undefined,
-} as const);
+type SwapAction =
+  | { type: typeof SwapActionType.ChangeOrderType; value: 'limit' | 'market' }
+  | { type: typeof SwapActionType.TokenInInputTouched }
+  | { type: typeof SwapActionType.TokenOutInputTouched }
+  | { type: typeof SwapActionType.TokenInIdChanged; value: Portfolio.Token.Id }
+  | { type: typeof SwapActionType.TokenOutIdChanged; value: Portfolio.Token.Id }
+  | { type: typeof SwapActionType.TokenInAmountChanged; value: string }
+  | { type: typeof SwapActionType.TokenOutAmountChanged; value: string }
+  | { type: typeof SwapActionType.TokenInErrorChanged; value: string | null }
+  | { type: typeof SwapActionType.TokenOutErrorChanged; value: string | null }
+  | { type: typeof SwapActionType.WantedPriceInputChanged; value: string }
+  | { type: typeof SwapActionType.SlippageInputChanged; value: number }
+  | { type: typeof SwapActionType.SwitchTouched }
+  | { type: typeof SwapActionType.ProtocolSelected; value: Swap.Protocol }
+  | {
+      type: typeof SwapActionType.ProtocolChanged;
+      value: Swap.Protocol | undefined;
+    }
+  | { type: typeof SwapActionType.Refresh }
+  | { type: typeof SwapActionType.ResetAmounts }
+  | { type: typeof SwapActionType.ResetForm }
+  | { type: typeof SwapActionType.EstimateResponse; value: Swap.EstimateResponse }
+  | { type: typeof SwapActionType.EstimateError; value: Api.ResponseError }
+  | { type: typeof SwapActionType.CreateResponse; value: Swap.CreateResponse }
+  | { type: typeof SwapActionType.CreateError; value: Api.ResponseError };
 
 type SwapState = {
   needsNewEstimate: boolean;
-  orderType: MarketOrderType;
-  lastInputTouched: AssetDirectionType;
+  orderType: 'market' | 'limit';
+  lastInputTouched: 'in' | 'out';
   tokenInInput: {
     isTouched: boolean;
     tokenId?: Portfolio.Token.Id;
@@ -541,6 +586,39 @@ type SwapState = {
   createTx?: Swap.CreateResponse;
 };
 
+const defaultState: SwapState = Object.freeze({
+  needsNewEstimate: false,
+  orderType: 'market',
+  lastInputTouched: ASSET_DIRECTION_IN,
+  tokenInInput: {
+    isTouched: true,
+    tokenId: primaryTokenId,
+    disabled: false,
+    error: null,
+    value: '',
+  },
+  tokenOutInput: {
+    isTouched: true,
+    tokenId: USDA_TOKEN_ID,
+    disabled: false,
+    error: null,
+    value: '',
+  },
+  slippageInput: {
+    value: 1,
+  },
+  selectedProtocol: {
+    isTouched: false,
+    value: undefined,
+  },
+  wantedPrice: '',
+  canSwap: false,
+  estimate: undefined,
+  createTx: undefined,
+  cancelTx: undefined,
+  cancelError: undefined,
+} as const);
+
 export type SwapContext = SwapState & {
   isLoading: boolean;
   limitOptions?: Swap.LimitOptionsResponse;
@@ -563,6 +641,7 @@ export type SwapContext = SwapState & {
   loadingTokenList: boolean;
   isCreateOrderLoading: boolean;
   isEstimateOrderLoading: boolean;
+  isLimitOptionsLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
   swapManager: any;
 };
@@ -589,6 +668,7 @@ const SwapContext = createContext<SwapContext>({
   loadingTokenList: false,
   isCreateOrderLoading: false,
   isEstimateOrderLoading: false,
+  isLimitOptionsLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
   swapManager: {},
 });
@@ -597,6 +677,6 @@ const parseNumber = (text: string) =>
   !Number.isNaN(Number(text.replace(',', '.')))
     ? text
         .replace(',', '.')
-        .replace(/^0+(.+)/, '$1')
+        .replace(/^0+(?=\d|\.)/, '0')
         .replace(/^\.$/, '0.')
     : '0';

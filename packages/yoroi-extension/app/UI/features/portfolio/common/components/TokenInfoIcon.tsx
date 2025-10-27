@@ -33,10 +33,10 @@ export const TokenInfoIcon = ({ info, size = 'lg', imageStyle }: TokenInfoIconPr
     height: 64,
   });
 
-  if (!info?.id || uri === undefined) {
+  if (!info?.id || uri === undefined || fallback) {
     return (
       <StyledIconBox size={dimension} bg={theme.palette.ds.gray_200} style={imageStyle}>
-        <IconWrapper icon={fallback ? Icons.AdaToken : Icons.Assets} />
+        <IconWrapper icon={fallback ? Icons.Assets1 : Icons.Assets} />
       </StyledIconBox>
     );
   }

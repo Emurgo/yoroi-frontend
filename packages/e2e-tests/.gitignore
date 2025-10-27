@@ -1,5 +1,5 @@
 node_modules/
 ExtBuilds/
-testRunsData_*/
+testRunsData/
 .DS_Store
 mochawesome-report/

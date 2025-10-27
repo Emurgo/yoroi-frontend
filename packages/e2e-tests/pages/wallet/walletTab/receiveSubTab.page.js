@@ -3,12 +3,13 @@ import GenerateURIModal from './receiveModals/generateURIModal.page.js';
 import DisplayURIModal from './receiveModals/displayURIModal.page.js';
 import { balanceReplacer } from '../../../helpers/constants.js';
 import VerifyAddressModal from './receiveModals/verifyAddressModal.page.js';
+import { quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 
 class ReceiveSubTab extends WalletTab {
   // locators
   // * base addresses menu item
   baseAddrsMenuItemLocator = {
-    locator: 'wallet:wallet:receive:navigationPanel-baseMenuItem-button',
+    locator: 'wallet:receive:navigationPanel-baseMenuItem-button',
     method: 'id',
   };
   // * base external addrs menu item
@@ -124,6 +125,17 @@ class ReceiveSubTab extends WalletTab {
     };
   };
   // methods
+  async isDisplayed() {
+    this.logger.info(`ReceiveSubTab::isDisplayed is called`);
+    const timeout = twoSeconds;
+    const repeatPeriod = quarterSecond;
+    const states = await Promise.all([
+      this.customWaitIsPresented(this.baseAddrsMenuItemLocator, timeout, repeatPeriod),
+      this.customWaitIsPresented(this.currentAddressToUseTextLocator, timeout, repeatPeriod),
+      this.customWaitIsPresented(this.addrQrCodeImageLocator, timeout, repeatPeriod),
+    ]);
+    return states.every(state => state === true);
+  }
   /**
    * Generating a new address by clicking on the "Generate new address" button
    * @param {number} amount Amount of addresses to generate

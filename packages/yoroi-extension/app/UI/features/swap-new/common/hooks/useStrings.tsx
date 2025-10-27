@@ -63,6 +63,10 @@ export const messages = Object.freeze(
       id: 'swap.slippage',
       defaultMessage: '!!!Slippage',
     },
+    swapToLabel: {
+      id: 'swap.swapToLabel',
+      defaultMessage: '!!!Swap to',
+    },
     slippageInfo: {
       id: 'swap.slippageInfo',
       defaultMessage:
@@ -80,9 +84,9 @@ export const messages = Object.freeze(
       id: 'swap.manual',
       defaultMessage: '!!!Slippage tolerance',
     },
-    routingPreferance: {
-      id: 'swap.routingPreferance',
-      defaultMessage: '!!!Slippage tolerance',
+    routingPreference: {
+      id: 'swap.routingPreference',
+      defaultMessage: '!!!Routing preference',
     },
     autoLabel: {
       id: 'swap.auto',
@@ -121,6 +125,111 @@ export const messages = Object.freeze(
       id: 'global.labels.apply',
       defaultMessage: '!!! Apply',
     },
+    ordersPair: {
+      id: 'swap.ordersPair',
+      defaultMessage: '!!!Pair (From / To)',
+    },
+    assetPrice: {
+      id: 'swap.assetPrice',
+      defaultMessage: '!!!Asset price',
+    },
+    assetAmount: {
+      id: 'swap.assetAmount',
+      defaultMessage: '!!!Asset amount',
+    },
+    total: {
+      id: 'swap.total',
+      defaultMessage: '!!!Total',
+    },
+    timeExecuted: {
+      id: 'swap.timeExecuted',
+      defaultMessage: '!!!Time executed',
+    },
+    timeCreated: {
+      id: 'swap.timeCreated',
+      defaultMessage: '!!!Time created',
+    },
+    txId: {
+      id: 'swap.txId',
+      defaultMessage: '!!!Transaction ID',
+    },
+    ordersCompletedLabel: {
+      id: 'swap.ordersCompletedLabel',
+      defaultMessage: '!!!Completed orders',
+    },
+    openOrdersLabel: {
+      id: 'swap.openOrdersLabel',
+      defaultMessage: '!!!Open orders',
+    },
+    cancel: {
+      id: 'global.labels.cancel',
+      defaultMessage: '!!!Cancel',
+    },
+    noOrdersCompleted: {
+      id: 'swap.noOrdersCompleted',
+      defaultMessage: '!!!No orders completed yet',
+    },
+    noOrdersAvailable: {
+      id: 'swap.noOrdersAvailable',
+      defaultMessage: '!!!No orders available yet',
+    },
+    startDoingSwaps: {
+      id: 'swap.startDoingSwaps',
+      defaultMessage: '!!!Start doing the swap operations to see your open orders here',
+    },
+    selectToken: {
+      id: 'swap.selectToken',
+      defaultMessage: '!!!Select token',
+    },
+    buyAndSellToken: {
+      id: 'swap.buyAndSellToken',
+      defaultMessage: '!!Buy and sell tokens must be different',
+    },
+    notEnoughBalance: {
+      id: 'buysell.dialog.error.not.enough',
+      defaultMessage: '!!!Not enough balance',
+    },
+    disclaimerTitle: {
+      id: 'buySell.disclaimer.title',
+      defaultMessage: '!!!Disclaimer',
+    },
+    disclaimerDescription: {
+      id: 'buySell.disclaimer.description',
+      defaultMessage:
+        '!!!By clicking "Proceed," you acknowledge that you will be redirected to a third-party service provider offering Web3 on-and-off ramp solutions for fiat-to-ADA exchanges. You may be required to agree to the terms, conditions, and privacy policies of the third-party provider to complete the transaction. Yoroi Wallet does not control, endorse, or assume responsibility for the content, security, policies, or services provided by the third party.',
+    },
+    disclaimerPleaseNote: {
+      id: 'buySell.disclaimer.pleaseNote',
+      defaultMessage: '!!!Please note:',
+    },
+    disclaimerNote1: {
+      id: 'buySell.disclaimer.note1',
+      defaultMessage:
+        '!!!Yoroi Wallet is not liable for any losses, delays, or errors that may occur while using the third-party service.',
+    },
+    disclaimerNote2: {
+      id: 'buySell.disclaimer.note2',
+      defaultMessage:
+        "!!!Transactions may be subject to restrictions based on your geographic location, applicable laws, financial institution policies, or the service provider's limitations.",
+    },
+    disclaimerNote3: {
+      id: 'buySell.disclaimer.note3',
+      defaultMessage:
+        "!!!Ensure you review and understand the third party's terms, as your interactions are solely governed by their agreements.",
+    },
+    disclaimerNote4: {
+      id: 'buySell.disclaimer.note4',
+      defaultMessage:
+        '!!!Yoroi Wallet does not collect or store any personal or financial data submitted through the third-party platform.',
+    },
+    disclaimerCheckboxLabel: {
+      id: 'swap.swapDisclamerCheckbox',
+      defaultMessage: '!!!I understand this disclaimer',
+    },
+    disclaimerProceed: {
+      id: 'buySell.actions.proceed',
+      defaultMessage: '!!!Proceed',
+    },
   })
 );
 
@@ -147,7 +256,7 @@ export const useStrings = () => {
     slippageInputInfo: intl.formatMessage(messages.slippageInputInfo),
     manualLabel: intl.formatMessage(messages.manualLabel),
     applyLabel: intl.formatMessage(messages.applyLabel),
-    routingPreferance: intl.formatMessage(messages.routingPreferance),
+    routingPreference: intl.formatMessage(messages.routingPreference),
     autoLabel: intl.formatMessage(messages.autoLabel),
     slippageToleranceHigh: intl.formatMessage(messages.slippageToleranceHigh),
     swapLabel: intl.formatMessage(messages.swapLabel),
@@ -155,6 +264,32 @@ export const useStrings = () => {
     selectRoute: intl.formatMessage(messages.selectRoute),
     buyAt: intl.formatMessage(messages.buyAt),
     allAssets: intl.formatMessage(messages.allAssets),
+    ordersPair: intl.formatMessage(messages.ordersPair),
+    assetPrice: intl.formatMessage(messages.assetPrice),
+    assetAmount: intl.formatMessage(messages.assetAmount),
+    timeExecuted: intl.formatMessage(messages.timeExecuted),
+    timeCreated: intl.formatMessage(messages.timeCreated),
+    total: intl.formatMessage(messages.total),
+    txId: intl.formatMessage(messages.txId),
+    ordersCompletedLabel: intl.formatMessage(messages.ordersCompletedLabel),
+    openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
+    cancel: intl.formatMessage(messages.cancel),
+    swapToLabel: intl.formatMessage(messages.swapToLabel),
+    noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
+    noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
+    startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
+    selectToken: intl.formatMessage(messages.selectToken),
+    buyAndSellToken: intl.formatMessage(messages.buyAndSellToken),
+    notEnoughBalance: intl.formatMessage(messages.notEnoughBalance),
+    disclaimerTitle: intl.formatMessage(messages.disclaimerTitle),
+    disclaimerDescription: intl.formatMessage(messages.disclaimerDescription),
+    disclaimerPleaseNote: intl.formatMessage(messages.disclaimerPleaseNote),
+    disclaimerNote1: intl.formatMessage(messages.disclaimerNote1),
+    disclaimerNote2: intl.formatMessage(messages.disclaimerNote2),
+    disclaimerNote3: intl.formatMessage(messages.disclaimerNote3),
+    disclaimerNote4: intl.formatMessage(messages.disclaimerNote4),
+    disclaimerCheckboxLabel: intl.formatMessage(messages.disclaimerCheckboxLabel),
+    disclaimerProceed: intl.formatMessage(messages.disclaimerProceed),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
   }).current;
 };

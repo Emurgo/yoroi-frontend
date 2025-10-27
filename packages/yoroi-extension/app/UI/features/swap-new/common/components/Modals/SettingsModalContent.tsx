@@ -2,9 +2,10 @@ import { Box, Button, Stack, Typography, styled, useTheme } from '@mui/material'
 import React, { useState, useRef, useEffect } from 'react';
 import { useStrings } from '../../hooks/useStrings';
 import { Switch } from '../../../../../components/Switch/Switch';
-import { SwapAction, useSwapRevamp } from '../../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../../module/SwapContextProvider';
 import { useModal } from '../../../../../components/modals/ModalContext';
-import { DEX_ROUTING } from '../../constants';
+import { Aggregator, DEX_ROUTING, RoutingPref } from '../../constants';
+import { sanitizeSlippageInput } from '../../helpers';
 
 const defaultSlippages = ['0', '0.1', '0.5', '1', '2', '3', '5', '10'];
 
@@ -12,7 +13,7 @@ export const SettingsModalContent = () => {
   const { swapManager, swapForm } = useSwapRevamp();
   const { closeModal } = useModal();
 
-  const [routingPreferance, setRoutingPreferance] = useState<any>(swapForm.selectedProtocol.value || DEX_ROUTING.AUTO);
+  const [routingPreference, setRoutingPreference] = useState<any>(swapManager.settings.routingPreference);
   const [selectedSlippage, setSelectedSlippage] = useState(swapForm.slippageInput.value || 1);
   const [isManualSlippage, setIsManualSlippage] = useState(!defaultSlippages.includes(String(selectedSlippage)));
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -31,11 +32,14 @@ export const SettingsModalContent = () => {
   };
 
   const applyChanges = async () => {
-    await swapForm.action({ type: SwapAction.ProtocolChanged, value: routingPreferance });
-    await swapForm.action({ type: SwapAction.SlippageInputChanged, value: Number(selectedSlippage) });
+    await swapForm.action({
+      type: SwapActionType.ProtocolSelected,
+      value: routingPreference,
+    });
+    await swapForm.action({ type: SwapActionType.SlippageInputChanged, value: Number(selectedSlippage) });
     await swapManager.assignSettings({
       slippage: Number(selectedSlippage),
-      routingPreferance: [routingPreferance],
+      routingPreference: routingPreference,
     });
     closeModal();
   };
@@ -58,9 +62,9 @@ export const SettingsModalContent = () => {
           <SlippageInput selectedSlippage={selectedSlippage} setSelectedSlippage={setSelectedSlippage} inputRef={inputRef} />
         )}
         <Typography variant="body1" color="ds.text_gray_medium" my={16}>
-          {strings.routingPreferance}
+          {strings.routingPreference}
         </Typography>
-        <RoutingPreferance setRoutingPreferance={setRoutingPreferance} routingPreferance={routingPreferance} />
+        <RoutingPreference setRoutingPreference={setRoutingPreference} routingPreference={routingPreference} />
       </Box>
       {/* @ts-ignore */}
       <SButton fullWidth variant="primary" onClick={applyChanges}>
@@ -101,56 +105,64 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
     </Box>
   );
 };
-const RoutingPreferance = ({ setRoutingPreferance, routingPreferance }) => {
+
+const ALL: Aggregator[] = [DEX_ROUTING.DEXHUNTER, DEX_ROUTING.MINSWAP, DEX_ROUTING.MUESLISWAP];
+
+export const seedAllManual = (): Aggregator[] => [...ALL];
+
+export const toggleAggregator = (current: Aggregator[], target: Aggregator): Aggregator[] =>
+  current.includes(target) ? current.filter(x => x !== target) : [...current, target];
+
+type Props = {
+  routingPreference: RoutingPref;
+  setRoutingPreference: (val: RoutingPref) => void;
+};
+
+export const RoutingPreference: React.FC<Props> = ({ routingPreference, setRoutingPreference }) => {
   const strings = useStrings();
 
-  const autoSelected = routingPreferance === DEX_ROUTING.AUTO;
-  const dexHunter =
-    routingPreferance === DEX_ROUTING.AUTO ||
-    routingPreferance === DEX_ROUTING.DEXHUNTER ||
-    routingPreferance === DEX_ROUTING.BOTH;
-  const muesliswap =
-    routingPreferance === DEX_ROUTING.AUTO ||
-    routingPreferance === DEX_ROUTING.MUESLISWAP ||
-    routingPreferance === DEX_ROUTING.BOTH;
+  const isAuto = routingPreference === DEX_ROUTING.AUTO;
+  const list: Aggregator[] = Array.isArray(routingPreference) ? routingPreference : [];
 
-  const handleDexHunterToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.DEXHUNTER : DEX_ROUTING.MUESLISWAP);
+  const setAuto = (on: boolean) => {
+    setRoutingPreference(on ? DEX_ROUTING.AUTO : seedAllManual());
   };
 
-  const handleMuesliswapToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.MUESLISWAP : DEX_ROUTING.DEXHUNTER);
+  const onToggle = (dex: Aggregator) => {
+    const nextList = toggleAggregator(list, dex);
+    setRoutingPreference(nextList.length === 0 ? DEX_ROUTING.AUTO : nextList);
   };
 
-  const handleAutoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-    setRoutingPreferance(checked ? DEX_ROUTING.AUTO : DEX_ROUTING.BOTH);
-  };
   return (
     <Stack gap={32}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
         <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
           {strings.autoLabel}
         </Typography>
-        <Switch checked={autoSelected} onChange={handleAutoChange} />
+        <Switch checked={isAuto} onChange={e => setAuto(e.target.checked)} />
       </Stack>
 
-      {!autoSelected && (
+      {!isAuto && (
         <>
           <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
             <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
               DexHunter
             </Typography>
-            <Switch checked={dexHunter} onChange={handleDexHunterToggle} />
+            <Switch checked={list.includes(DEX_ROUTING.DEXHUNTER)} onChange={() => onToggle(DEX_ROUTING.DEXHUNTER)} />
           </Stack>
 
           <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
             <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
               MuesliSwap
             </Typography>
-            <Switch checked={muesliswap} onChange={handleMuesliswapToggle} />
+            <Switch checked={list.includes(DEX_ROUTING.MUESLISWAP)} onChange={() => onToggle(DEX_ROUTING.MUESLISWAP)} />
+          </Stack>
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
+            <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
+              Minswap
+            </Typography>
+            <Switch checked={list.includes(DEX_ROUTING.MINSWAP)} onChange={() => onToggle(DEX_ROUTING.MINSWAP)} />
           </Stack>
         </>
       )}
@@ -197,9 +209,14 @@ const SlippageInput = ({ selectedSlippage, setSelectedSlippage, inputRef }) => {
         <input
           ref={inputRef}
           type="text"
+          inputMode="decimal"
           placeholder="0"
           value={selectedSlippage}
-          onChange={e => setSelectedSlippage(e.target.value)}
+          onChange={e => {
+            const next = sanitizeSlippageInput(e.target.value, { max: 75, maxDecimals: 1 });
+            if (next === null) return;
+            setSelectedSlippage(next);
+          }}
           style={{
             border: 'none',
             outline: 'none',

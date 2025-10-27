@@ -6,11 +6,12 @@ import { undefinedToken } from '../../common/constants';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
+import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
 
 export const EstimateSummary = () => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
-  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading } = useSwapRevamp();
+  const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading, isLimitOptionsLoading } = useSwapRevamp();
   const { openModal } = useModal();
 
   const tokenInInfo = tokenInfos.get(swapForm.tokenInInput.tokenId ?? undefinedToken);
@@ -19,7 +20,7 @@ export const EstimateSummary = () => {
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
 
-  if (isEstimateOrderLoading) {
+  if (isEstimateOrderLoading || isLimitOptionsLoading) {
     return (
       <Stack gap={12}>
         {Array.from({ length: 4 }).map((_, index) => (
@@ -32,10 +33,7 @@ export const EstimateSummary = () => {
   if (swapForm.estimate === undefined) return null;
 
   const protocol = swapForm.estimate?.splits[0]?.protocol;
-
-  const netPrice = swapForm.estimate.netPrice;
-  const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
-  const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
+  const pickTokenTicker = (t?: string) => (t && t !== '-' ? t : primaryTokenInfo.ticker);
 
   const openRouteModal = () => {
     openModal({
@@ -51,20 +49,22 @@ export const EstimateSummary = () => {
   };
 
   return (
-    <Stack direction="column" {...atoms.gap_md} width="100%" {...atoms.mt_lg}>
+    <Stack direction="column" {...atoms.gap_md} width="503px" {...atoms.mt_lg}>
       <DisplayInfoInRow
         label={strings.routeLabel}
         tooltip={strings.routePath}
         value={
-          <Typography>
-            <Link onClick={openRouteModal}>{protocol}</Link>
+          <Typography sx={{ cursor: 'pointer' }}>
+            <Link onClick={openRouteModal}>
+              <ProtocolAvatar protocol={protocol} preventOpenLink />
+            </Link>
           </Typography>
         }
       />
       <DisplayInfoInRow
         label={strings.priceLabel}
         tooltip="Asset Price"
-        value={`1 ${tokenInTicker === '-' ? primaryTokenInfo.ticker : tokenInTicker} = ${price} ${tokenOutTicker}`}
+        value={`1 ${pickTokenTicker(tokenInTicker)} = ${swapForm.estimate?.netPrice ?? 0} ${pickTokenTicker(tokenOutTicker)}`}
       />
       <DisplayInfoInRow
         label="Fees"
@@ -86,13 +86,15 @@ export const EstimateSummary = () => {
       <DisplayInfoInRow
         label={strings.minReceived}
         tooltip={strings.guaranteedMin}
-        value={`${swapForm.estimate?.totalOutput} ${tokenOutTicker}`}
+        value={`${swapForm.estimate?.totalOutput} ${pickTokenTicker(tokenOutTicker)}`}
       />
-      <DisplayInfoInRow
-        label={strings.slippageLabel}
-        tooltip={strings.slippageInfo}
-        value={`${swapForm.slippageInput.value} %`}
-      />
+      {!isLimitOrder && (
+        <DisplayInfoInRow
+          label={strings.slippageLabel}
+          tooltip={strings.slippageInfo}
+          value={`${swapForm.slippageInput.value} %`}
+        />
+      )}
     </Stack>
   );
 };
