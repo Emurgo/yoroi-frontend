@@ -6,8 +6,8 @@ export const SupportChatbox: React.FC = () => {
     <iframe
       title="Yoroi Support"
       src={SUPPORT_CRISP_CHATBOX_URL}
-      width={680}
-      height={840}
+      width={480}
+      height={640}
       style={{
         position: 'fixed',
         bottom: 0,
