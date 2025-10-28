@@ -7,9 +7,7 @@ import { getHandler } from './handlers/yoroi';
 import { init } from './state';
 import { startMonitorServerStatus } from './serverStatus';
 import { startPoll } from './coinPrice';
-import { environment } from '../../../app/environment';
 import { bringInitBackground } from '@emurgo/bringweb3-chrome-extension-kit';
-import LocalStorageApi from '../../../app/api/localStorage/index';
 import type { ConfigType } from '../../../config/config-types';
 // $FlowIgnore
 import { makeAccessorServer } from '../../../api/objectModel';
@@ -66,15 +64,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 init().catch(console.error);
 startMonitorServerStatus();
 startPoll();
-
-if (environment.isFirefox()) {
-  browser.runtime.onInstalled.addListener(async () => {
-    const analyticsFlag = await new LocalStorageApi().loadIsAnalyticsAllowed();
-    if (analyticsFlag == null) {
-      onYoroiIconClicked();
-    }
-  });
-}
 
 const { request } = makeAccessorServer(appState, async (serverEvent) => {
   const tabs = await chrome.tabs.query({});
