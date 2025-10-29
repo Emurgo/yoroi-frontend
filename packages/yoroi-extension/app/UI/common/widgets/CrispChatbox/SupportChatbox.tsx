@@ -5,14 +5,13 @@ import { Icon } from '../../../components/icons';
 const CRISP_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
 const CRISP_ORIGIN = new URL(CRISP_URL).origin;
 
-const OPEN_WIDTH = 500;
+const OPEN_WIDTH = 480;
 const OPEN_HEIGHT = 750;
 
 export const SupportChatbox: React.FC = () => {
   const iframeRef = React.useRef<HTMLIFrameElement | null>(null);
   const [ready, setReady] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-  console.log('SupportChatbox render', { ready, open });
 
   React.useEffect(() => {
     const handleMessage = (e: MessageEvent) => {
@@ -49,7 +48,7 @@ export const SupportChatbox: React.FC = () => {
       requestAnimationFrame(() => {
         if (ready) post('crisp:open');
         // Safety re-fire in case Crisp wasn’t initialized yet
-        setTimeout(() => ready && post('crisp:open'), 120);
+        // setTimeout(() => ready && post('crisp:open'), 120);
       });
     });
   }, [ready, post]);
@@ -90,6 +89,7 @@ export const SupportChatbox: React.FC = () => {
           border: 0,
           zIndex: 9997,
           pointerEvents: open ? 'auto' : 'none',
+          transition: 'width 0s ease, height 0.1s ease',
         }}
       />
     </Box>
