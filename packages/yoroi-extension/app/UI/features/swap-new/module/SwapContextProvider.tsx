@@ -21,8 +21,9 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { useGetInputs } from '../common/helpers';
-import { ASSET_DIRECTION_IN } from '../common/constants';
+import { toBaseUnits, useGetInputs } from '../common/helpers';
+import { ASSET_DIRECTION_IN, USDA_TOKEN_ID } from '../common/constants';
+import { useStrings } from '../common/hooks/useStrings';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -49,8 +50,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const tokenInInputRef = useRef<HTMLInputElement | null>(null);
 
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
-
   const [state, action] = useReducer(swapReducer, defaultState);
+  const strings = useStrings();
 
   useEffect(() => {
     const stakignAddr = stores.wallets.selected.stakingAddress;
@@ -85,13 +86,21 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     },
   });
 
-  const { data: { tokenInfos = new Map(), tokenInfoList = [] } = {}, isLoading: loadingTokenList } = useSyncedTokenInfos({
+  const {
+    data: { tokenInfos = new Map(), tokenInfoList = [] } = {},
+    isLoading: loadingTokenList,
+    refetch: refetchTokenList,
+  } = useSyncedTokenInfos({
     swapManager,
     tokenManager,
     primaryTokenInfo,
     networkId: Chain.Network.Mainnet,
     excludedTokens: excludedTokens,
   });
+
+  useEffect(() => {
+    refetchTokenList();
+  }, []);
 
   useEffect(() => {
     if (tokenOutId) {
@@ -153,17 +162,16 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   ]);
 
   useEffect(() => {
-    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : (id ?? ''));
 
-    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+    const asset = ftAssetList.find(a => a.info.id === normalizeId(state.tokenInInput.tokenId));
+    const balance = asset ? BigInt(asset.quantity) : BigInt(0);
+    const decimals = asset?.info.numberOfDecimals ?? 0;
+    const needed = toBaseUnits(state.tokenInInput.value, decimals);
 
-    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
+    const error = asset && needed !== null && balance < needed ? strings.notEnoughBalance : null;
 
-    if (!hasEnoughBalance) {
-      action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
-    } else {
-      action({ type: 'TokenInErrorChanged', value: null });
-    }
+    action({ type: 'TokenInErrorChanged', value: error });
   }, [ftAssetList, state.tokenInInput.tokenId, state.tokenInInput.value]);
 
   useEffect(() => {
@@ -199,7 +207,6 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       })
       .then(response => {
         if (reqId !== estimateReqIdRef.current) return;
-
         if (isLeft(response)) {
           action({ type: SwapActionType.EstimateError, value: response.error });
         } else {
@@ -237,15 +244,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const create = useCallback(async () => {
     if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) return;
-
     setIsCreateOrderLoading(true);
-
-    const tokenInInfo = tokenInfos.get(state.tokenInInput.tokenId);
-    const quantityIn =
-      Number(state.tokenInInput.value) *
-      10 ** (state.tokenInInput.tokenId === '.' ? primaryTokenInfo.decimals : tokenInInfo?.decimals);
-    const amountsIn = { [state.tokenInInput.tokenId]: String(quantityIn) };
-    const inputs = await getInputs(amountsIn);
+    const inputs = await getInputs();
 
     swapManager.api
       .create({
@@ -599,7 +599,7 @@ const defaultState: SwapState = Object.freeze({
   },
   tokenOutInput: {
     isTouched: true,
-    tokenId: undefined,
+    tokenId: USDA_TOKEN_ID,
     disabled: false,
     error: null,
     value: '',

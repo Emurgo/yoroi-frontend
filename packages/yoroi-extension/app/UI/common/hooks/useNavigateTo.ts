@@ -7,5 +7,6 @@ export const useNavigateTo = () => {
 
   return React.useRef({
     midnightAirdropClaim: () => navigate(ROUTES.AIRDROP),
+    walletTransactions: () => navigate(ROUTES.WALLETS.TRANSACTIONS),
   }).current;
 };

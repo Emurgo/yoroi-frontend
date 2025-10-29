@@ -27,7 +27,7 @@ const messages = defineMessages({
   note: {
     id: 'settings.cashback.note',
     defaultMessage:
-      '!!!Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet or select “None” to decline this service.',
+      '!!!Your connected wallet is the designated wallet for receiving ADA cashback rewards and applied to all partner websites. You can switch to a different wallet anytime to ensure your cashback is directed to your preferred wallet.',
   },
   label: {
     id: 'settings.cashback.label',

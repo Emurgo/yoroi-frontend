@@ -33,10 +33,7 @@ export const EstimateSummary = () => {
   if (swapForm.estimate === undefined) return null;
 
   const protocol = swapForm.estimate?.splits[0]?.protocol;
-
-  const netPrice = swapForm.estimate.netPrice;
-  const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
-  const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
+  const pickTokenTicker = (t?: string) => (t && t !== '-' ? t : primaryTokenInfo.ticker);
 
   const openRouteModal = () => {
     openModal({
@@ -52,7 +49,7 @@ export const EstimateSummary = () => {
   };
 
   return (
-    <Stack direction="column" {...atoms.gap_md} width="100%" {...atoms.mt_lg}>
+    <Stack direction="column" {...atoms.gap_md} width="503px" {...atoms.mt_lg}>
       <DisplayInfoInRow
         label={strings.routeLabel}
         tooltip={strings.routePath}
@@ -67,7 +64,7 @@ export const EstimateSummary = () => {
       <DisplayInfoInRow
         label={strings.priceLabel}
         tooltip="Asset Price"
-        value={`1 ${tokenInTicker === '-' ? primaryTokenInfo.ticker : tokenInTicker} = ${price} ${tokenOutTicker}`}
+        value={`1 ${pickTokenTicker(tokenInTicker)} = ${swapForm.estimate?.netPrice ?? 0} ${pickTokenTicker(tokenOutTicker)}`}
       />
       <DisplayInfoInRow
         label="Fees"
@@ -89,13 +86,15 @@ export const EstimateSummary = () => {
       <DisplayInfoInRow
         label={strings.minReceived}
         tooltip={strings.guaranteedMin}
-        value={`${swapForm.estimate?.totalOutput} ${tokenOutTicker}`}
+        value={`${swapForm.estimate?.totalOutput} ${pickTokenTicker(tokenOutTicker)}`}
       />
-      <DisplayInfoInRow
-        label={strings.slippageLabel}
-        tooltip={strings.slippageInfo}
-        value={`${swapForm.slippageInput.value} %`}
-      />
+      {!isLimitOrder && (
+        <DisplayInfoInRow
+          label={strings.slippageLabel}
+          tooltip={strings.slippageInfo}
+          value={`${swapForm.slippageInput.value} %`}
+        />
+      )}
     </Stack>
   );
 };

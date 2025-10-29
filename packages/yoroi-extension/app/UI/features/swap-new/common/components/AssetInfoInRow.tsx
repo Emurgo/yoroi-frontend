@@ -79,7 +79,7 @@ export const AssetInfoInRow = React.memo(
           <TokenInfoIcon info={{ id: formatId(token?.id), policy: token?.fingerprint, name: token?.name }} size="md" />
           <Stack direction="column" justifyContent="space-between">
             <Typography variant="body1" color="ds.text_gray_medium">
-              {token.name}
+              {token.longName ?? token.name}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_low">
               {direction === ASSET_DIRECTION_IN ? token.name : token.fingerprint}
@@ -90,7 +90,7 @@ export const AssetInfoInRow = React.memo(
         {direction === ASSET_DIRECTION_IN ? (
           <Stack direction="column" alignItems="flex-end">
             <Typography variant="body1" color="ds.text_gray_medium">
-              {token.formatedAmount} {token.name}
+              {token.formatedAmount} {token.longName ?? token.name}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_low">
               {totalPrice} {currency}

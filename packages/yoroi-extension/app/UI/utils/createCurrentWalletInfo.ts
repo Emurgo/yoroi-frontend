@@ -101,6 +101,7 @@ const getFTAssetWalletAssetList = (stores: any, noFilter: boolean) => {
         info: {
           id: token.entry.identifier,
           name: tokenName,
+          longName: token.info?.Metadata.longName,
           policyId: token.info.Metadata.policyId,
           fingerprint: tokenId,
           metadata: extractMetadataInfo({

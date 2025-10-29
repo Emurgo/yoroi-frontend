@@ -72,14 +72,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: isOnMainnet,
+    isVisible: isDev,
   },
   {
-    className: 'swap',
+    className: 'swap2',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
-    label: { id: 'sidebar.swap2', defaultMessage: '!!!Swap2' },
-    isVisible: isDev,
+    label: globalMessages.sidebarSwap,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'portfolio',

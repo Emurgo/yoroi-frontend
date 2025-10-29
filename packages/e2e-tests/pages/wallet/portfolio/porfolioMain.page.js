@@ -2,9 +2,9 @@ import WalletCommonBase from '../../walletCommonBase.page.js';
 import { ElementLocator } from '../../locator.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { strNumberToNumber } from '../../../utils/utils.js';
-import { fiveSeconds, halfMinute, halfSecond, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
+import { fiveSeconds, halfMinute, halfSecond, oneSecond, quarterSecond, twoSeconds } from '../../../helpers/timeConstants.js';
 import { Colors } from '../../../helpers/constants.js';
-import { Columns } from '../../../helpers/portfolioHelper.js';
+import { Columns, SortingDirection } from '../../../helpers/portfolioHelper.js';
 import { PORTFOLIO_NO_RESULTS } from '../../../helpers/messages.js';
 
 export default class PortfolioTab extends WalletCommonBase {
@@ -386,14 +386,25 @@ export default class PortfolioTab extends WalletCommonBase {
             break;
 
           case Columns.Total:
-            const [tokenAmountText, tokenName, secondBalance] = await Promise.all([
+            const [tokenAmountText, tokenName] = await Promise.all([
               this.getText(this.getTokenTotalMainCurrencyValueLocator(rowIndex)),
               this.getText(this.getTokenTotalMainCurrencyFiatLocator(rowIndex)),
-              this.getText(this.getTokenTotalSecondLocator(rowIndex)),
             ]);
             const tokenAmount = this._getNumberOrNull(tokenAmountText);
-            const [currencyBalanceText, currencyFiat] = secondBalance.split(/\s/g);
-            const currencyBalance = this._getNumberOrNull(currencyBalanceText);
+            let currencyBalance = null;
+            let currencyFiat = null;
+            const secondValueIsPresented = await this.customWaitIsPresented(
+              this.getTokenTotalSecondLocator(rowIndex),
+              oneSecond,
+              quarterSecond
+            );
+            if (secondValueIsPresented) {
+              const secondBalance = await this.getText(this.getTokenTotalSecondLocator(rowIndex));
+              const secondBalanceArrText = secondBalance.split(/\s/g);
+              const currencyBalanceText = secondBalanceArrText[0];
+              currencyFiat = secondBalanceArrText[1];
+              currencyBalance = this._getNumberOrNull(currencyBalanceText);
+            }
             value = {
               token: {
                 balance: tokenAmount,
@@ -448,5 +459,41 @@ export default class PortfolioTab extends WalletCommonBase {
   async switchCurrencies() {
     this.logger.info(`PortfolioTab::switchCurrencies is called`);
     await this.click(this.switchBalanceBtnLocator);
+    // this sleep is required to make sure the action took effect
+    await this.sleep(quarterSecond);
+  }
+  async getSortingArrowDirection(columnName) {
+    this.logger.info(`PortfolioTab::getSoringArrowDirection is called. Column: "${columnName}"`);
+    const [ascArrowColor, descArrowColor] = await Promise.all([
+      this.getCssValue(this.getAscColumnIconLocator(columnName), 'fill'),
+      this.getCssValue(this.getDescColumnIconLocator(columnName), 'fill'),
+    ]);
+    const ascSelected = ascArrowColor === Colors.arrowSelected;
+    const descSelected = descArrowColor === Colors.arrowSelected;
+    if (ascSelected && descSelected) {
+      throw new Error('Both sorting direction are applied');
+    } else if (!ascSelected && !descSelected) {
+      throw new Error('None of directions are applied');
+    } else if (ascSelected) {
+      return SortingDirection.ASC;
+    } else {
+      return SortingDirection.DESC;
+    }
+  }
+
+  async waitPriceIsLoaded() {
+    this.logger.info(`PortfolioTab::waitPriceIsLoaded is called`);
+    const tokensAmount = await this.countTokens();
+    const allLocators = [];
+    for (let index = 0; index < tokensAmount; index++) {
+      const priceLocator = this.getTokenPriceLocator(index);
+      const dayChangeLocator = this.getTokenDayChangesLocator(index);
+      const weekChangeLocator = this.getTokenWeekChangesLocator(index);
+      const monthChangeLocator = this.getTokenMonthChangesLocator(index);
+      allLocators.push(priceLocator, dayChangeLocator, weekChangeLocator, monthChangeLocator);
+    }
+    const allPromises = allLocators.map(locator => this.customWaitIsPresented(locator, halfMinute, halfSecond));
+    const results = await Promise.all(allPromises);
+    return results.every(result => result === true);
   }
 }
