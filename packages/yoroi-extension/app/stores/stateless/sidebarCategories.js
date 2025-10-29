@@ -37,7 +37,6 @@ const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
 const isDev = (): boolean => environment.isDev();
-const isNightly = (): boolean => environment.isNightly();
 const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
