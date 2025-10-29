@@ -14,7 +14,7 @@ import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import { walletNameShortener } from '../utils/utils.js';
 import { extensionTabName, serviceWorkersLink, serviceWorkersTabName, WindowManager } from './windowManager.js';
-import { halfMinute, quarterSecond } from './timeConstants.js';
+import { quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
