@@ -14,7 +14,7 @@ import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import { walletNameShortener } from '../utils/utils.js';
 import { extensionTabName, serviceWorkersLink, serviceWorkersTabName, WindowManager } from './windowManager.js';
-import { quarterSecond } from './timeConstants.js';
+import { halfMinute, quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
@@ -169,11 +169,11 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
-    locator: 'div.worker-controls > button:nth-child(1)',
+    locator: 'div.worker-controls > cr-button:nth-child(1)',
     method: 'css',
   };
   const startBtnLocator = {
-    locator: 'div.registration-controls > button:nth-child(2)',
+    locator: 'div.registration-controls > cr-button:nth-child(2)',
     method: 'css',
   };
 
