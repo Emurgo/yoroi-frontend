@@ -490,33 +490,6 @@ class BasePage {
     this.logger.info(`BasePage::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
     return result;
   }
-  async getInfoFromIndexedDBFF(tableName) {
-    this.logger.info(`BasePage::getInfoFromIndexedDBFF Table name "${tableName}"`);
-    await this.driver.executeScript(table => {
-      const dbName = 'yoroi-schema';
-      const dbRequest = window.indexedDB.open(dbName);
-      dbRequest.onsuccess = function (event) {
-        const db = event.target.result;
-        // without that it doesn't work
-        window.dataBase = db;
-        const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).mozGetAll();
-        tableContentRequest.onsuccess = function (event) {
-          window.tableData = event.target.result;
-        };
-      };
-    }, tableName);
-    let tableContent;
-    try {
-      // without that it doesn't work
-      await this.driver.executeScript(() => window.dataBase);
-      tableContent = await this.driver.executeScript(() => window.tableData);
-    } catch (error) {
-      this.webDriverLogger.warn(error);
-      tableContent = {};
-    }
-
-    return tableContent;
-  }
   async getInfoFromIndexedDBChrome(tableName) {
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
