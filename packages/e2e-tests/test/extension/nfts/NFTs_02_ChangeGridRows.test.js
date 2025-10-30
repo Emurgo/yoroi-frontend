@@ -62,11 +62,11 @@ describe('Changing NFTs grid appearance', function () {
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await basePage.closeBrowser();
   });
 });

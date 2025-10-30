@@ -42,14 +42,12 @@ describe('Invalid address for sending', function () {
     expect(errorMessageIsDisplayed, 'A different error message is displayed').to.equal(true);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

@@ -46,9 +46,8 @@ describe('Changing wallet password. Negative. Incorrect old one.', function () {
     expect(realErrMsg, "The error message isn't correct").to.equal(WRONG_PASSWORD);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

@@ -75,14 +75,12 @@ describe('Restoring already existing wallet', function () {
     expect(walletInfo.plate, `The wallet plate should be "${testWallet1.plate}"`).to.equal(testWallet1.plate);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

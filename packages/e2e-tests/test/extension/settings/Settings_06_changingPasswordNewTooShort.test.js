@@ -43,9 +43,8 @@ describe('Changing wallet password. Negative. New one is short', function () {
     expect(realErrMsg, 'Incorrect error is shown').to.equal(PASSWORD_TOO_SHORT);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

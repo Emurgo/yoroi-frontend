@@ -11,11 +11,11 @@ describe("Can't proceed without accepting the ToS", function () {
   let webdriver = null;
   let logger = null;
 
-  before(function () {
+  before(async function () {
     webdriver = getDriver();
     logger = getTestLogger(this.test.parent.title);
     const basePage = new BasePage(webdriver, logger);
-    basePage.goToExtension();
+    await basePage.goToExtension();
   });
 
   it('Checking the continue button', async function () {
@@ -24,14 +24,12 @@ describe("Can't proceed without accepting the ToS", function () {
     expect(result, 'The continue button is enabled').to.be.true;
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

@@ -95,14 +95,12 @@ describe('Hide and show balance', function () {
   });
   // add checking Staking page when testnetwork is added
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

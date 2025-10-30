@@ -53,15 +53,13 @@ describe('dApp, getCollateral, error, max limit', function () {
     expect(collateralResponse.errMsg.code, 'A wrong error code is received').to.equal(ApiErrorCode.InternalError);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await basePage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

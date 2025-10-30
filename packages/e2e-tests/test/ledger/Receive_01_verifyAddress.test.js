@@ -127,14 +127,13 @@ for (const model in LedgerModels) {
       expect(cleanedLedgerData.addressDerivationPath, 'Derivation path is different').to.equal(verifyModalInfo.derivationPath);
     });
 
-    afterEach(function (done) {
-      customAfterEach(this, webdriver, logger);
-      done();
+    afterEach(async function () {
+      await customAfterEach(this, webdriver, logger);
     });
 
     after(async function () {
       const basePage = new BasePage(webdriver, logger);
-      basePage.closeBrowser();
+      await basePage.closeBrowser();
       await speculosDockerController.killAndRemove();
     });
   });

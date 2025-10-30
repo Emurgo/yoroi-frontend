@@ -81,15 +81,13 @@ describe('dApp, connection, no wallets', function () {
     expect(connectedWalletInfo.dappUrl).to.equal('localhost');
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await basePage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

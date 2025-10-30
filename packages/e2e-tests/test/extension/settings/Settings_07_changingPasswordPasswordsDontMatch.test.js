@@ -45,9 +45,8 @@ describe('Changing wallet password. Negative. Wrong repeated password', function
     expect(realErrMsg, 'Incorrect error is shown').to.equal(PASSWORDS_DONT_MATCH);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });

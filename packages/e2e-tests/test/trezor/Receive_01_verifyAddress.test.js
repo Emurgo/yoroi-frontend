@@ -116,14 +116,13 @@ for (const model in TrezorModels) {
       expect(trezorContentCleaned.stakingKeyHash, 'Stakey key is different').to.equal(convertedStakeKeyAddress);
     });
 
-    afterEach(function (done) {
-      customAfterEach(this, webdriver, logger);
-      done();
+    afterEach(async function () {
+      await customAfterEach(this, webdriver, logger);
     });
 
     after(async function () {
       const basePage = new BasePage(webdriver, logger);
-      basePage.closeBrowser();
+      await basePage.closeBrowser();
       await trezorController.bridgeStop();
       await trezorController.emulatorStop();
       trezorController.closeWsConnection();

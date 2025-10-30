@@ -134,22 +134,12 @@ describe('Creating wallet _smoke_', function () {
     expect(noNftsIsDisplayed, `No NFTs banner should be shown`).to.be.true;
   });
 
-  // check banners on Transactions page
-  // Portfolio Start your crypto jounrney banner
-  // Not enough funds for voting
-  // "You don't have any websites connected yet" banner on Connector page
-  // Governance
-  // Cashback banner
-  // Settings testnets banner
-
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
+  after(async function () {
     const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+    await basePage.closeBrowser();
   });
 });
