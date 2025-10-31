@@ -18,6 +18,7 @@ import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 import links from '../links';
+// $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from '../UI/utils/createCurrentWalletInfo';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({
