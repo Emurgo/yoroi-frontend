@@ -34,6 +34,7 @@ import { CardanoCardDialog } from '../../UI/components/Dialogs/CardanoCardDialog
 import { useYoroiRemoteConfig } from '../../UI/common/hooks/useYoroiRemoteConfig';
 // $FlowIgnore: suppressing this error
 import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteConfig';
+// $FlowIgnore: suppressing this error
 import { FirefoxSupportBanner } from '../../UI/components/Dialogs/FirefoxSupportBanner';
 
 type Props = {|
