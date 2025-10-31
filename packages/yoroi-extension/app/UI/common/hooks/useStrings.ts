@@ -51,6 +51,10 @@ export const messages = Object.freeze(
       id: 'banners.usda.button',
       defaultMessage: '!!!Go to swap',
     },
+    firefoxNoSupport: {
+      id: 'banners.firefox.noSupport',
+      defaultMessage: '!!!Firefox is no longer supporting hardware wallets. Please consider another browser to continue.',
+    },
     cardanoCard: {
       id: 'banners.cardanoCard.register',
       defaultMessage:
@@ -191,5 +195,6 @@ export const useStrings = () => {
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
     multipleAssetsSent: intl.formatMessage(messages.multipleAssetsSent),
+    firefoxNoSupport: intl.formatMessage(messages.firefoxNoSupport),
   }).current;
 };

@@ -12,6 +12,8 @@ import { ServerStatusErrors } from '../../types/serverStatusErrorType';
 import { getTokenName, genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { truncateToken } from '../../utils/formatters';
 import type { StoresProps } from '../../stores';
+// $FlowIgnore: suppressing this error
+import { FirefoxWarningBanner } from '../../UI/components/Banners/FirefoxWarningBanner';
 
 @observer
 export default class BannerContainer extends Component<StoresProps> {
@@ -29,6 +31,7 @@ export default class BannerContainer extends Component<StoresProps> {
           <IncorrectTimeBanner serverTime={this.props.stores.serverConnectionStore.serverTime} />
         )}
         {serverStatus !== ServerStatusErrors.Healthy && <ServerErrorBanner errorType={serverStatus} />}
+        {(!isWalletTestnet && environment.isFirefox()) && <FirefoxWarningBanner />}
         <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
