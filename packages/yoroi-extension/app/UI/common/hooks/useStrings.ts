@@ -148,6 +148,23 @@ export const messages = Object.freeze(
       id: 'notification.multiplesAssetSent',
       defaultMessage: '!!!Multiple assets sent',
     },
+    understandLabel: {
+      id: 'global.labels.understand',
+      defaultMessage: '!!!I understand',
+    },
+    firefoxSupportSubtitle: {
+      id: 'banners.firefoxSupport.subtitle',
+      defaultMessage: '!!!Firefox support ending for updates',
+    },
+    firefoxSupportDescription: {
+      id: 'banners.firefoxSupport.description',
+      defaultMessage:
+        '!!!We’ve stopped pushing updates to Firefox because hardware wallets aren’t supported. To keep using hardware wallets, open the app in a supported browser.',
+    },
+    firefoxSupportLearnMore: {
+      id: 'banners.firefoxSupport.learnMore',
+      defaultMessage: '!!!Learn more about Firefox deprecation',
+    },
   })
 );
 
@@ -191,5 +208,9 @@ export const useStrings = () => {
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
     multipleAssetsSent: intl.formatMessage(messages.multipleAssetsSent),
+    understandLabel: intl.formatMessage(messages.understandLabel),
+    firefoxSupportSubtitle: intl.formatMessage(messages.firefoxSupportSubtitle),
+    firefoxSupportDescription: intl.formatMessage(messages.firefoxSupportDescription),
+    firefoxSupportLearnMore: intl.formatMessage(messages.firefoxSupportLearnMore),
   }).current;
 };
