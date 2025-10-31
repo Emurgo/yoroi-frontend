@@ -31,7 +31,7 @@ export default class BannerContainer extends Component<StoresProps> {
           <IncorrectTimeBanner serverTime={this.props.stores.serverConnectionStore.serverTime} />
         )}
         {serverStatus !== ServerStatusErrors.Healthy && <ServerErrorBanner errorType={serverStatus} />}
-        {(!isWalletTestnet && environment.isFirefox()) && <FirefoxWarningBanner />}
+        {!isWalletTestnet && environment.isFirefox() && <FirefoxWarningBanner />}
         <TestnetWarningBanner isTestnet={isWalletTestnet} />
         {!environment.isProduction() && <NotProductionBanner />}
         {deprecationBanner}
