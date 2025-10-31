@@ -18,6 +18,7 @@ import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 import links from '../links';
+import { createCurrrentWalletInfo } from '../UI/utils/createCurrentWalletInfo';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
@@ -82,28 +83,29 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
   render(): Node {
     const { updateHideBalance } = this;
     const { stores, pageBanner, isErrorPage } = this.props;
-    const { profile, wallets } = stores;
-    const { selected, selectedWalletName } = wallets;
+    const { profile } = stores;
+    const currentWalletInfo = createCurrrentWalletInfo(stores);
+    const selectedWallet = currentWalletInfo?.selectedWallet;
     const shouldHideBalance = profile.shouldHideBalance;
 
     const DropdownHead = () => {
-      if (!selected || !selectedWalletName) {
+      if (!selectedWallet) {
         return null;
       }
-      const { plate } = selected;
+      const { plate } = selectedWallet;
 
-      const rewards: MultiToken = stores.delegation.getRewardBalanceOrZero(selected);
+      const rewards: MultiToken = stores.delegation.getRewardBalanceOrZero(selectedWallet);
 
       return (
         <NavWalletDetailsRevamp
           plate={plate}
-          name={selectedWalletName}
+          name={selectedWallet.name}
           onUpdateHideBalance={updateHideBalance}
           shouldHideBalance={shouldHideBalance}
           rewards={rewards}
-          walletAmount={selected.balance}
+          walletAmount={selectedWallet.balance}
           getTokenInfo={genLookupOrFail(stores.tokenInfoStore.tokenInfo)}
-          defaultToken={stores.tokenInfoStore.getDefaultTokenInfo(selected.networkId)}
+          defaultToken={stores.tokenInfoStore.getDefaultTokenInfo(selectedWallet.networkId)}
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
@@ -150,7 +152,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
         <NavBarRevamp
           title={title}
           menu={this.props.menu}
-          walletDetails={selected !== null ? <DropdownHead /> : null}
+          walletDetails={selectedWallet !== null ? <DropdownHead /> : null}
           buyButton={
             <BuySellAdaButton
               onBuySellClick={() => {
