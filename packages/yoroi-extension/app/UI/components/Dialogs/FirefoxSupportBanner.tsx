@@ -7,6 +7,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { FIREFOX_DEPRECATION_LEARN_MORE_URL } from '../../common/constants';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 import { FirefoxsupportIlustration } from './FirefoxsupportIlustration';
+import { environment } from '../../../environment';
 
 export const FirefoxSupportBanner = () => {
   const strings = useStrings();
@@ -18,7 +19,11 @@ export const FirefoxSupportBanner = () => {
       const localStorage = new LocalStorageApi();
       const wasClosed = await localStorage.getFirefoxSupportModalClosed();
 
-      if (data?.popups?.firefoxSupportAnnouncement?.display === true && (wasClosed === undefined || wasClosed === 'false')) {
+      if (
+        environment.isFirefox() &&
+        data?.popups?.firefoxSupportAnnouncement?.display === true &&
+        (wasClosed === undefined || wasClosed === 'false')
+      ) {
         openModal({
           title: strings.importantUpdates,
           height: '608px',
