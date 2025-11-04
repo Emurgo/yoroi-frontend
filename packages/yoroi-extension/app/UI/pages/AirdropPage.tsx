@@ -19,7 +19,6 @@ import LocalStorageApi from '../../api/localStorage';
 
 const localStorageApi = new LocalStorageApi();
 
-
 interface Props {
   stores: {
     wallets: {
@@ -146,9 +145,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       }
       showInContainer
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-        {content}
-      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
     </TopBarLayout>
   );
 }

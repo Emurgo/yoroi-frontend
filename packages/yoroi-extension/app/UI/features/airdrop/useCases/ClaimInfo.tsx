@@ -1,4 +1,4 @@
-import { Box, Typography, styled, Stack, Divider } from '@mui/material';
+import { Box, Button, Typography, Stack, Divider } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 import CopyableText from '../../../components/CopyableText';
@@ -6,9 +6,9 @@ import globalMessages from '../../../../i18n/global-messages';
 import { constructPlate } from '../../../../components/topbar/WalletCard';
 
 const messages = defineMessages({
-  size: {
-    id: 'airdrop.size',
-    defaultMessage: '!!!Your allocation size',
+  phase1Allocation: {
+    id: 'airdrop.phase1Allocation',
+    defaultMessage: '!!!Phase 1: Your successfully claimed allocation',
   },
   destinationAddress: {
     id: 'airdrop.destinationAddress',
@@ -23,81 +23,16 @@ const messages = defineMessages({
     defaultMessage:
       '!!!A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.',
   },
-  allocation: {
-    id: 'airdrop.success.allocation',
-    defaultMessage: '!!!Your successfully claimed allocation',
+  phase2Title: {
+    id: 'airdrop.phase2Title',
+    defaultMessage: '!!!🧩  Phase 2 of midnight airdrop has started',
   },
-  next1: {
-    id: 'airdrop.next1',
-    defaultMessage: '!!!What’s next?',
-  },
-  next2: {
-    id: 'airdrop.next2',
-    defaultMessage: '!!!After this claim phase ends, a second claim phase (Scavenger Mine) will start.',
-  },
-  next3: {
-    id: 'airdrop.next3',
+  phase2Text: {
+    id: 'airdrop.phase2Text',
     defaultMessage:
-      "!!!When that phase ends, the Redemption period will start, and you'll be able to redeem your claimed allocations as they thaw.",
+      '!!!The 2nd phase of midnight claiming called “Scavenger mine” has now started. Navigate to the midnight portal and connect your yoroi wallet to start earning NIGHT',
   },
 });
-
-const BoxWithInfo = styled(Box)(({ theme }) => ({
-  '& svg': {
-    verticalAlign: 'bottom',
-    marginLeft: '8px',
-    '& path': {
-      // @ts-ignore
-      fill: theme.palette.ds.el_gray_low,
-    },
-  },
-}));
-
-interface Props1 {
-  alloc: string;
-  destAddrBech32: string;
-  isTrezor: boolean;
-}
-
-export function ClaimInfo1(props: Readonly<Props1>) {
-  const intl = useIntl();
-  const { alloc, destAddrBech32, isTrezor } = props;
-
-  return (
-    <BoxWithInfo
-      sx={{
-        borderRadius: '8px',
-        bgcolor: 'ds.bg_color_contrast_min',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '24px',
-      }}
-    >
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <Typography variant="body2" color="ds.text_gray_low">
-          {intl.formatMessage(messages.size)}
-          <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
-        </Typography>
-        {/*  @ts-ignore */}
-        <Typography variant="h1xl">{alloc} NIGHT</Typography>
-      </Box>
-      {!isTrezor && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {intl.formatMessage(messages.destinationAddress)}
-            <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
-          </Typography>
-          <CopyableText value={destAddrBech32} copyButtonFollowText>
-            <Typography variant="body1" sx={{ wordBreak: 'break-all' }}>
-              {destAddrBech32}
-            </Typography>
-          </CopyableText>
-        </Box>
-      )}
-    </BoxWithInfo>
-  );
-}
 
 interface Props2 {
   alloc: string;
@@ -118,11 +53,11 @@ export function ClaimInfo2(props: Readonly<Props2>) {
   });
 
   return (
-    <Stack spacing="24px">
+    <Stack spacing="24px" sx={{ width: '565px', marginLeft: 'auto', marginRight: 'auto' }}>
       <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px' }}>
         <Stack spacing="16px" sx={{ padding: '16px' }}>
           <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
-            {intl.formatMessage(messages.allocation)}
+            {intl.formatMessage(messages.phase1Allocation)}
             <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
           </Typography>
           <Box>
@@ -166,17 +101,22 @@ export function ClaimInfo2(props: Readonly<Props2>) {
           </Box>
         </Stack>
       </Box>
-      <Stack spacing="4px">
-        <Typography variant="body1" color="ds.text_gray_low">
-          {intl.formatMessage(messages.next1)}
-        </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium">
-          {intl.formatMessage(messages.next2)}
-        </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium">
-          {intl.formatMessage(messages.next3)}
-        </Typography>
-      </Stack>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          borderRadius: '8px',
+          background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+          padding: '24px',
+        }}
+      >
+        <Typography>{intl.formatMessage(messages.phase2Title)}</Typography>
+        <Typography>{intl.formatMessage(messages.phase2Text)}</Typography>
+        <Button variant="outlined" style={{ border: '2px solid' }} onClick={() => window.open('https://www.midnight.gd/')}>
+          {intl.formatMessage(globalMessages.goToMidnightApp)}
+        </Button>
+      </Box>
     </Stack>
   );
 }
