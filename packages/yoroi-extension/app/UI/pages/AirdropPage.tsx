@@ -8,30 +8,17 @@ import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { checkClaimForAddress, signClaim, makeClaim, getClaimMessage, scanForOriginalDestAddress } from '../../api/ada/midnight';
+import { checkClaimForAddress, scanForOriginalDestAddress } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { forceNonNull } from '../../coreUtils.js';
 import Zero from '../features/airdrop/useCases/Zero';
-import ClaimDialog from '../features/airdrop/useCases/ClaimDialog';
-import LedgerClaimDialog from '../features/airdrop/useCases/LedgerClaimDialog';
-import ClaimContent from '../features/airdrop/useCases/ClaimContent';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import LocalStorageApi from '../../api/localStorage';
-import AbortDialog from '../features/airdrop/useCases/AbortDialog';
-import { useYoroiRemoteConfig } from '../common/hooks/useYoroiRemoteConfig';
 
 const localStorageApi = new LocalStorageApi();
 
-const ALLOW_ABORT_DELAY = 10 * 1000;
-
-type AddressClaimData = {
-  addrHex: string;
-  addrBech32: string;
-  path: Array<number>;
-  value: number;
-};
 
 interface Props {
   stores: {
@@ -73,19 +60,13 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
 
   // null means querying
   const [alloc, setAlloc] = useState<BigNumber | null>(null);
-  const [unclaimedAddrs, setUnclaimedAddrs] = useState<AddressClaimData[]>([]);
-  const [isClaimDialog, setIsClaimDialog] = useState(false);
-  const [isClaimDone, setIsClaimDone] = useState(false);
-  const [allowAborting, setAllowAborting] = useState(false);
 
   const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
   const wallet = stores.wallets.selectedOrFail;
+
   const isMainnet = wallet.networkId === 0;
-
   const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
-
-  const isTrezor = wallet.type === 'trezor';
 
   const destAddrBech32 = addressHexToBech32(
     forceNonNull(
@@ -94,119 +75,58 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   );
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
 
-  const { data: config } = useYoroiRemoteConfig();
-
   useEffect(() => {
     (async () => {
       const allocatedAddr = addressHexToBech32(
         forceNonNull(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE]?.[0]?.address)
       );
       const claimedAmount = await checkClaimForAddress(claimEndpoint, allocatedAddr);
+      setAlloc(new BigNumber(claimedAmount));
 
-      const allocatedAddrs: AddressClaimData[] =
-        claimedAmount > 0
-          ? [
-              {
-                addrHex: '',
-                addrBech32: allocatedAddr,
-                path: [],
-                value: claimedAmount,
-              },
-            ]
-          : [];
-      const unclaimedAddrs: AddressClaimData[] = [];
-
-      if (allocatedAddrs.length > 0 && unclaimedAddrs.length === 0) {
-        setIsClaimDone(true);
-
-        const airdropClaims = await localStorageApi.getAirdropClaimResults();
-        const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
-        if (currentWalletClaim) {
-          setOriginalDestAddrBech32(currentWalletClaim.destAddr);
-        } else {
-          const usedAddresses = wallet.allAddresses.utxoAddresses
-            .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-            .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
-          const unusedAddresses = wallet.allAddresses.utxoAddresses.filter(
-            a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed
-          );
-          const result = await scanForOriginalDestAddress(
-            claimEndpoint,
-            destAddrBech32,
-            [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
-          );
-          if (result && result.success) {
-            setOriginalDestAddrBech32(result.destAddr);
-            airdropClaims.push({
-              publicDeriverId: wallet.publicDeriverId,
-              destAddr: result.destAddr,
-              claimId: result.claimId,
-              amount: result.amount,
-            });
-            await localStorageApi.saveAirdropClaimResults(airdropClaims);
-          } else if (result) {
-            setOriginalDestAddrBech32(result.error);
-          }
+      const airdropClaims = await localStorageApi.getAirdropClaimResults();
+      const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
+      if (currentWalletClaim) {
+        setOriginalDestAddrBech32(currentWalletClaim.destAddr);
+      } else {
+        const usedAddresses = wallet.allAddresses.utxoAddresses
+          .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+        const unusedAddresses = wallet.allAddresses.utxoAddresses.filter(
+          a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed
+        );
+        const result = await scanForOriginalDestAddress(
+          claimEndpoint,
+          destAddrBech32,
+          [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
+        );
+        if (result && result.success) {
+          setOriginalDestAddrBech32(result.destAddr);
+          airdropClaims.push({
+            publicDeriverId: wallet.publicDeriverId,
+            destAddr: result.destAddr,
+            claimId: result.claimId,
+            amount: result.amount,
+          });
+          await localStorageApi.saveAirdropClaimResults(airdropClaims);
+        } else if (result) {
+          setOriginalDestAddrBech32(result.error);
         }
       }
-      setAlloc(allocatedAddrs.reduce((accu, addrData) => accu.plus(addrData.value), new BigNumber('0')));
-      setUnclaimedAddrs(unclaimedAddrs);
     })();
     return () => {
       // switch wallet
       setAlloc(null);
-      setIsClaimDone(false);
-      setUnclaimedAddrs([]);
       setOriginalDestAddrBech32('');
-      setIsClaimDialog(false);
     };
   }, [wallet.publicDeriverId]);
 
-  const showClaimDialog = async () => {
-    setIsClaimDialog(true);
-  };
-
-  const closeClaimDialog = async () => {
-    setIsClaimDialog(false);
-  };
-
-  const claim = async password => {
-    const addr = forceNonNull(unclaimedAddrs[0]);
-
-    const claimParams = await signClaim(wallet, addr, destAddrBech32, password, stores.profile.currentLocale);
-
-    let claimResult;
-    let allowAbortDelayTimeoutId = setTimeout(() => {
-      setAllowAborting(true);
-    }, ALLOW_ABORT_DELAY);
-
-    try {
-      claimResult = await makeClaim(claimEndpoint, claimParams);
-    } finally {
-      clearTimeout(allowAbortDelayTimeoutId);
-      setAllowAborting(false);
-    }
-    setOriginalDestAddrBech32(destAddrBech32);
-    setIsClaimDialog(false);
-    setIsClaimDone(true);
-
-    const airdropClaims = await localStorageApi.getAirdropClaimResults();
-    airdropClaims.push({
-      amount: addr.value,
-      claimId: claimResult.claimId,
-      publicDeriverId: wallet.publicDeriverId,
-      destAddr: destAddrBech32,
-    });
-    await localStorageApi.saveAirdropClaimResults(airdropClaims);
-  };
-
   let content;
 
-  if (!alloc || (isTrezor && !config)) {
+  if (!alloc) {
     content = <LoadingSpinner />;
   } else if (alloc.isZero()) {
     content = <Zero />;
-  } else if (isClaimDone) {
+  } else {
     content = (
       <ClaimDone
         alloc={formattedAlloc}
@@ -215,17 +135,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
         walletName={wallet.name}
       />
     );
-  } else {
-    content = (
-      <ClaimContent
-        alloc={formattedAlloc}
-        isTrezor={isTrezor && !forceNonNull(config).enableTrezorAirdrop}
-        destAddrBech32={destAddrBech32}
-        isClaimDialog={isClaimDialog}
-        showClaimDialog={showClaimDialog}
-      />
-    );
   }
+
   return (
     <TopBarLayout
       banner={<BannerContainer stores={stores} />}
@@ -237,30 +148,6 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     >
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {content}
-        {isClaimDialog &&
-          (wallet.type === 'mnemonic' ? (
-            <ClaimDialog
-              onClose={closeClaimDialog}
-              onClaim={claim}
-              message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
-            />
-          ) : (
-            <LedgerClaimDialog
-              onClose={closeClaimDialog}
-              onClaim={claim}
-              message={getClaimMessage(forceNonNull(unclaimedAddrs[0]).value, destAddrBech32)}
-            />
-          ))}
-        {isClaimDialog && allowAborting && (
-          <AbortDialog
-            onClose={() => {
-              history.back();
-            }}
-            onContinue={() => {
-              setAllowAborting(false);
-            }}
-          />
-        )}
       </Box>
     </TopBarLayout>
   );
