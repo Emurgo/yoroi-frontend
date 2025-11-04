@@ -53,7 +53,7 @@ interface Props {
 
 const NUMBER_OF_NIGHT_DECIMALS = 6;
 const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
-const CLAIM_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
+const CLAIM_ENDPOINT_PREPROD = 'https://external-claim.gd.midnighttge.io';
 
 export default function AirdropPage({ stores }: Readonly<Props>) {
   const intl = useIntl();
