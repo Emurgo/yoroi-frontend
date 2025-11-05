@@ -72,7 +72,7 @@ jobs:
           retention-days: 1
           overwrite: true
 
-  Ext-General:
+  Extension:
     if: github.event.review &&
       (
       github.event.review.state == 'approved' ||
@@ -81,6 +81,10 @@ jobs:
       )
     runs-on: ubuntu-latest
     needs: [Build-Extension]
+    continue-on-error: true
+    strategy:
+      matrix:
+        suite: [cashback, general, governance, nft, portfolio, receive, send, settings, transactions]
 
     steps:
       - uses: browser-actions/setup-chrome@v2
@@ -132,13 +136,13 @@ jobs:
           SECOND_STATIC_TEST_WALLET: ${{ secrets.SECOND_STATIC_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET: ${{ secrets.SECOND_SMOKE_TEST_WALLET }}
           SECOND_SMOKE_TEST_WALLET_FF: ${{ secrets.SECOND_SMOKE_TEST_WALLET_FF }}
-        run: npm run test:ext
+        run: npm run test:ext:${{ matrix.suite }}
 
       - name: Archive tests screenshots and logs
         if: ${{ failure() }}
         uses: actions/upload-artifact@v4
         with:
-          name: testRunsData_E2E_tests_extension
+          name: testRunsData_E2E_tests_extension_${{ matrix.suite }}
           path: |
             ./packages/e2e-tests/mochawesome-report
             ./packages/e2e-tests/testRunsData
