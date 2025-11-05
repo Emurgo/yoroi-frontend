@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconButton, Box } from '@mui/material';
-import { Icon } from '../../../components/icons';
+import { Icon } from '../../icons';
 
 const CRISP_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
 const CRISP_ORIGIN = new URL(CRISP_URL).origin;
