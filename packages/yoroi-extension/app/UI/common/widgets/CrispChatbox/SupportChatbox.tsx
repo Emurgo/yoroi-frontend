@@ -95,4 +95,3 @@ export const SupportChatbox: React.FC = () => {
     </Box>
   );
 };
-
