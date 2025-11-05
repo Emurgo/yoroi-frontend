@@ -60,7 +60,7 @@ const FirefoxCardContent = ({ onClose }) => {
         <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mt={24} mb={8}>
           {strings.firefoxSupportSubtitle}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_medium" textAlign="center" mx="24px">
+        <Typography variant="body1" color="ds.text_gray_medium" textAlign="center">
           {strings.firefoxSupportDescription}
         </Typography>
       </Stack>
