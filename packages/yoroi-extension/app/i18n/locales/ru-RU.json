@@ -79,6 +79,7 @@
   "app.errors.unknowError": "Произошла ошибка. Попробуйте снова чуть позже.",
   "banners.bring.button": "Исследуйте кэшбэк",
   "banners.bring.title": "Зарабатывайте ADA, совершая покупки 🛍️",
+  "banners.firefox.noSupport": "Firefox is no longer supporting hardware wallets. Please consider another browser to continue.",
   "banners.bring.desc": "Получайте мгновенный ADA кэшбэк за каждую покупку за фиатную валюту - пополняйте свое портфель без особых усилий.",
   "banners.usda.title": "Обменять USDA в Yoroi",
   "banners.usda.desc": "Обменяйте USDA без труда в Yoroi и наслаждайтесь мощью первого оригинального стейблкоина кардана.",
