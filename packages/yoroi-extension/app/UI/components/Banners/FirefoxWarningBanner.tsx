@@ -28,7 +28,7 @@ export const FirefoxWarningBanner: React.FC = () => {
         <Icon.InfoCircle fill={theme.palette.ds.sys_orange_500} />
       </WarningIcon>
 
-      <Typography variant="body1" color="text_gray_medium" textTransform="uppercase" lineHeight={0}>
+      <Typography variant="body1" color="text_gray_medium" lineHeight={0}>
         {strings.firefoxNoSupport}
       </Typography>
     </NotProdWarningRoot>
