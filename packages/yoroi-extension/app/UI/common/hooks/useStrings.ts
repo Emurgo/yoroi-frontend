@@ -69,7 +69,7 @@ export const messages = Object.freeze(
       defaultMessage: '!!!Join the future of finance',
     },
     cardanoCardLearnMore: {
-      id: 'banners.cardanoCard.leanMore',
+      id: 'banners.cardanoCard.learnMore',
       defaultMessage: '!!!Register Interest',
     },
     receiverFieldLabelUnresolvedAddress: {
