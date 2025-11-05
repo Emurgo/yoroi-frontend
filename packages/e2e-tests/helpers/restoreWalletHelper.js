@@ -169,11 +169,11 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
-    locator: 'div.worker-controls > button:nth-child(1)',
+    locator: 'div.worker-controls > cr-button:nth-child(1)',
     method: 'css',
   };
   const startBtnLocator = {
-    locator: 'div.registration-controls > button:nth-child(2)',
+    locator: 'div.registration-controls > cr-button:nth-child(2)',
     method: 'css',
   };
 
