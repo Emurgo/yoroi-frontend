@@ -5,16 +5,25 @@ import { getDriver } from '../../../utils/driverBootstrap.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import { getTestLogger } from '../../../utils/utils.js';
 import { oneMinute } from '../../../helpers/timeConstants.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Changing language on the initial screen', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {BasePage} */
+  let basePage = null;
+  /** @type {InitialStepsPage} */
+  let initialStepsPage = null;
 
   before(async function () {
     webdriver = getDriver();
     logger = getTestLogger(this.test.parent.title);
-    const basePage = new BasePage(webdriver, logger);
+    basePage = new BasePage(webdriver, logger);
+    initialStepsPage = new InitialStepsPage(webdriver, logger);
     await basePage.goToExtension();
   });
 
@@ -68,12 +77,10 @@ describe('Changing language on the initial screen', function () {
   for (const testDatum of testData) {
     describe(`Changing language to ${testDatum.lang}`, function () {
       it(`Selecting language ${testDatum.lang}`, async function () {
-        const initialStepsPage = new InitialStepsPage(webdriver, logger);
         await initialStepsPage.selectLanguage(testDatum.lang);
       });
 
       it(`Checking translation on the button ${testDatum.lang}`, async function () {
-        const initialStepsPage = new InitialStepsPage(webdriver, logger);
         const btnText = await initialStepsPage.getContinueButtonText();
         expect(btnText).to.equal(testDatum.btnTransalation.toLocaleUpperCase());
       });
@@ -85,7 +92,6 @@ describe('Changing language on the initial screen', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
     await basePage.closeBrowser();
   });
 });

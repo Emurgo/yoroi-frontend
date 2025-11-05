@@ -11,15 +11,34 @@ import { getTestLogger } from '../../../utils/utils.js';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { restoreWallet } from '../../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Restoring already existing wallet', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonBasePage = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {RestoreWalletStepOne} */
+  let restoreWalletStepOnePage = null;
+  /** @type {RestoreWalletStepTwo} */
+  let restoreWalletStepTwoPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    walletCommonBasePage = new WalletCommonBase(webdriver, logger);
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
+    restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   it('Restore a 15-word wallet', async function () {
@@ -28,19 +47,15 @@ describe('Restoring already existing wallet', function () {
 
   // Restoring the same wallet again
   it('Start adding new wallet', async function () {
-    const walletCommonBasePage = new WalletCommonBase(webdriver, logger);
     await walletCommonBasePage.addNewWallet();
   });
 
   it('Selecting Restore wallet 15-word', async function () {
-    const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectRestoreWallet();
-    const restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
     await restoreWalletStepOnePage.selectFifteenWordWallet();
   });
 
   it('Enter the wallet seed phrase', async function () {
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet1.mnemonic);
     await restoreWalletStepTwoPage.sleep(100);
     const phraseIsVerified = await restoreWalletStepTwoPage.recoveryPhraseIsVerified();
@@ -48,7 +63,6 @@ describe('Restoring already existing wallet', function () {
   });
 
   it('Check duplicated info', async function () {
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     // the window is displayed
     const duplicatedWindowIsDisplayed = await restoreWalletStepTwoPage.duplicatedWalletDialogIsDisplayed();
     expect(duplicatedWindowIsDisplayed, 'The duplicated wallet dialog is not displayed').to.be.true;
@@ -64,9 +78,7 @@ describe('Restoring already existing wallet', function () {
   });
 
   it('Check opening existing wallet', async function () {
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     await restoreWalletStepTwoPage.openExistingWallet();
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
@@ -80,7 +92,6 @@ describe('Restoring already existing wallet', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });

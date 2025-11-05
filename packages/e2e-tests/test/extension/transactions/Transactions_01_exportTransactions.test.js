@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { testWallet1 } from '../../../utils/testWallets.js';
@@ -15,12 +14,18 @@ import { oneMinute } from '../../../helpers/timeConstants.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import { compareExportedTxsAndDisplayedTxs } from '../../../helpers/customChecks.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 // There is an issue https://emurgo.atlassian.net/browse/YOEXT-1589
 describe('Export transactions, positive', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
   // mm/dd/yyyy - 11/13/2023, it is only for testWallet1
   const startDate = '03262025';
   // mm/dd/yyyy - 03/08/2024, it is only for testWallet1
@@ -31,11 +36,11 @@ describe('Export transactions, positive', function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1', this);
     cleanDownloads();
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   // Open the export txs modal window
   it('Open the export modal window', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const exportDialog = await transactionsPage.openExportModalWindow();
     const exportDialogIsDisplayed = await exportDialog.isDisplayed();
     expect(exportDialogIsDisplayed, 'Something wrong with Export Transaction Dialog').to.be.true;
@@ -43,7 +48,6 @@ describe('Export transactions, positive', function () {
   // set dates
   // export txs
   it('Set correct dates', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const exportDialog = transactionsPage.getExportDialog();
     await exportDialog.setStartDate(startDate);
     await exportDialog.setEndDate(endDate);
@@ -77,7 +81,6 @@ describe('Export transactions, positive', function () {
     const fileContent = getDownloadedFileContent(fileName);
     const parsedFileContent = parseExportedCSV(fileContent);
 
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const displayedTxs = await transactionsPage.getTxsInfo(startDate, endDate);
     compareExportedTxsAndDisplayedTxs(parsedFileContent, displayedTxs);
   });
@@ -87,7 +90,6 @@ describe('Export transactions, positive', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });

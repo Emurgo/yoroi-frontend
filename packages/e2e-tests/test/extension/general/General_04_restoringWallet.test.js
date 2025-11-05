@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import AddNewWallet from '../../../pages/addNewWallet.page.js';
 import RestoreWalletStepOne from '../../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
@@ -12,11 +11,25 @@ import { getTestLogger } from '../../../utils/utils.js';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import { preloadBrowserStorage } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Restoring 15-wallet _smoke_', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {RestoreWalletStepOne} */
+  let restoreWalletStepOnePage = null;
+  /** @type {RestoreWalletStepTwo} */
+  let restoreWalletStepTwoPage = null;
+  /** @type {WalletDetails} */
+  let walletDetailsPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
@@ -24,17 +37,19 @@ describe('Restoring 15-wallet _smoke_', function () {
     await preloadBrowserStorage(webdriver, logger, null, true, {
       'test-CURRENT_NETWORK_ID': '0',
     });
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
+    restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
+    walletDetailsPage = new WalletDetails(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   it('Selecting Restore wallet 15-word', async function () {
-    const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectRestoreWallet();
-    const restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
     await restoreWalletStepOnePage.selectFifteenWordWallet();
   });
 
   it('Enter the wallet seed phrase', async function () {
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet1Mainnet.mnemonic);
     await restoreWalletStepTwoPage.sleep(100);
     const phraseIsVerified = await restoreWalletStepTwoPage.recoveryPhraseIsVerified();
@@ -43,7 +58,6 @@ describe('Restoring 15-wallet _smoke_', function () {
   });
 
   it('Enter wallet details', async function () {
-    const walletDetailsPage = new WalletDetails(webdriver, logger);
     // close info dialog
     await walletDetailsPage.closeTipsModalWindow();
     // enter wallet details
@@ -68,7 +82,6 @@ describe('Restoring 15-wallet _smoke_', function () {
   });
 
   it('Check new wallet', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
@@ -85,7 +98,6 @@ describe('Restoring 15-wallet _smoke_', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });

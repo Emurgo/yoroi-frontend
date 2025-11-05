@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import NftGalleryTab from '../../../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import WalletCommonBase from '../../../pages/walletCommonBase.page.js';
 
@@ -16,6 +15,10 @@ describe('Changing NFTs grid appearance', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
+  /** @type {NftGalleryTab} */
+  let nftsMainPage = null;
   let initialNFTCardSize = {
     width: 0,
     height: 0,
@@ -26,12 +29,12 @@ describe('Changing NFTs grid appearance', function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWalletNFTs', this);
+    walletCommonPage = new WalletCommonBase(webdriver, logger);
+    nftsMainPage = new NftGalleryTab(webdriver, logger);
   });
 
   it('Open NFTs Gallery', async function () {
-    const walletCommonPage = new WalletCommonBase(webdriver, logger);
     await walletCommonPage.goToNftsTab();
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const nftsPageIsDisplayed = await nftsMainPage.isDisplayed();
     expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
     initialNFTCardSize = await nftsMainPage.getNftCardSize(nftIndex);
@@ -40,7 +43,6 @@ describe('Changing NFTs grid appearance', function () {
   });
 
   it('Set 6 column grid', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.setSixColumnsView();
     const newNftCardSize = await nftsMainPage.getNftCardSize(nftIndex);
     expect(
@@ -52,7 +54,6 @@ describe('Changing NFTs grid appearance', function () {
   });
 
   it('Set 4 column grid', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
     await nftsMainPage.setFourColumnsView();
     const newNftCardSize = await nftsMainPage.getNftCardSize(nftIndex);
     expect(newNftCardSize.width, 'NFT card width is different').to.be.equal(initialNFTCardSize.width);
@@ -66,7 +67,6 @@ describe('Changing NFTs grid appearance', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

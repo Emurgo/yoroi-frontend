@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
 import { getSpendableWallet } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -14,14 +13,23 @@ import DAppSignTx from '../../pages/dapp/dAppSignTx.page.js';
 import { signTxWithCSL } from '../../helpers/mock-dApp-webpage/dAppTxHelper.js';
 import { ApiErrorCode, TxSendErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
 describe('dApp, submitTx', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
-  let windowManager = new WindowManager(webdriver, logger);
+  /** @type {WindowManager} */
+  let windowManager = null;
   let mockServer = null;
-  let mockedDApp = new MockDAppWebpage(webdriver, logger);
+  /** @type {MockDAppWebpage} */
+  let mockedDApp = null;
+  /** @type {DAppSignTx} */
+  let dappSingTxPage = null;
+
   let uTxHex = '';
   let witnessSet = '';
   const testWallet = getSpendableWallet();
@@ -36,6 +44,7 @@ describe('dApp, submitTx', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappSingTxPage = new DAppSignTx(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -154,8 +163,7 @@ describe('dApp, submitTx', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await dappSingTxPage.closeBrowser();
     mockServer.close();
   });
 });

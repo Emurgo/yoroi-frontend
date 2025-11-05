@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import PortfolioTab from '../../../pages/wallet/portfolio/porfolioMain.page.js';
 import PortfolioTokenDetails from '../../../pages/wallet/portfolio/portfolioDetails.page.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
@@ -117,7 +116,6 @@ describe('Portfolio switching currencies', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });

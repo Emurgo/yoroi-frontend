@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
@@ -10,6 +9,9 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { getTestWalletName } from '../../helpers/constants.js';
 import { collectInfo, createWallet, preloadBrowserStorage } from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
+import WalletCommonBase from '../../pages/walletCommonBase.page.js';
 
 describe('dApp, getUtxos, empty wallet', function () {
   const testWalletName = getTestWalletName();
@@ -19,11 +21,17 @@ describe('dApp, getUtxos, empty wallet', function () {
     balance: 0,
   };
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
 
   before(async function () {
     try {
@@ -36,6 +44,7 @@ describe('dApp, getUtxos, empty wallet', function () {
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadBrowserStorage(webdriver, logger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -65,8 +74,7 @@ describe('dApp, getUtxos, empty wallet', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
     mockServer.close();
   });
 });

@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
 import { expect } from 'chai';
 import { getTestLogger } from '../../utils/utils.js';
@@ -13,6 +12,7 @@ import driversPoolsManager from '../../utils/driversPool.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { testWallet1 } from '../../utils/testWallets.js';
+import WalletCommonBase from '../../pages/walletCommonBase.page.js';
 
 describe('dApp, getCollateral, no popup, positive', function () {
   this.timeout(2 * oneMinute);
@@ -25,6 +25,8 @@ describe('dApp, getCollateral, no popup, positive', function () {
   let mockServer = null;
   /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
 
   before(async function () {
     try {
@@ -38,6 +40,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -126,8 +129,7 @@ describe('dApp, getCollateral, no popup, positive', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
     mockServer.close();
   });
 });

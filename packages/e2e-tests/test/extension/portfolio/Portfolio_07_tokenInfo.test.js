@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import WalletTab from '../../../pages/wallet/walletTab/walletTab.page.js';
 import PortfolioTab from '../../../pages/wallet/portfolio/porfolioMain.page.js';
 import { allTokens } from '../../../helpers/tokensInfo.js';
@@ -67,7 +66,6 @@ describe('Portfolio Check token Details', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

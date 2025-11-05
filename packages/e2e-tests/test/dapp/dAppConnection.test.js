@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -25,6 +24,8 @@ describe('dApp, connection in extension', function () {
   let mockServer = null;
   /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {ConnectorTab} */
+  let connectorTabPage = null;
 
   before(async function () {
     try {
@@ -38,6 +39,7 @@ describe('dApp, connection in extension', function () {
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
+      connectorTabPage = new ConnectorTab(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -56,7 +58,6 @@ describe('dApp, connection in extension', function () {
     // switch to the extension
     await windowManager.switchTo(extensionTabName);
     // go to the extension connector tab
-    const connectorTabPage = new ConnectorTab(webdriver, logger);
     await connectorTabPage.goToConnectorTab();
     // check displayed info
     const connectedWalletInfo = await connectorTabPage.getConnectedWalletInfo(testWallet1.name);
@@ -65,7 +66,6 @@ describe('dApp, connection in extension', function () {
   });
 
   it('Disconnect the wallet', async function () {
-    const connectorTabPage = new ConnectorTab(webdriver, logger);
     await connectorTabPage.disconnectWallet(testWallet1.name, 'localhost');
     const connectedWalletsAmount = (await connectorTabPage.getAllConnectedWallets()).length;
     expect(connectedWalletsAmount).to.equal(0);
@@ -82,8 +82,7 @@ describe('dApp, connection in extension', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await connectorTabPage.closeBrowser();
     mockServer.close();
   });
 });

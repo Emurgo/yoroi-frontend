@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import { testWallet1, testWallet2 } from '../../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -11,23 +10,40 @@ import WalletCommonBase from '../../../pages/walletCommonBase.page.js';
 import AddNewWallet from '../../../pages/addNewWallet.page.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Removing the first wallet, two wallets is added', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonBasePage = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SettingsTab} */
+  let settingsPage = null;
+  /** @type {WalletSubTab} */
+  let settingsWalletPage = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1', this);
+    walletCommonBasePage = new WalletCommonBase(webdriver, logger);
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    settingsPage = new SettingsTab(webdriver, logger);
+    settingsWalletPage = new WalletSubTab(webdriver, logger);
   });
 
   // restore the second wallet
   it('Restore the test wallet 2', async function () {
-    const walletCommonBasePage = new WalletCommonBase(webdriver, logger);
     await walletCommonBasePage.addNewWallet();
-    const addNewWalletPage = new AddNewWallet(webdriver, logger);
     const pageIsDisplayed = await addNewWalletPage.isDisplayed();
     expect(pageIsDisplayed, 'Adding a new wallet is not displayed').to.be.true;
     await restoreWallet(webdriver, logger, testWallet2, false, false);
@@ -35,19 +51,15 @@ describe('Removing the first wallet, two wallets is added', function () {
 
   // switch back to first wallet
   it('Switch back to the test wallet 1', async function () {
-    const walletCommonBasePage = new WalletCommonBase(webdriver, logger);
     await walletCommonBasePage.switchToFirstWallet();
     await checkCorrectWalletIsDisplayed(webdriver, logger, testWallet1);
   });
 
   it('Remove wallet', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     await transactionsPage.goToSettingsTab();
-    const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToWalletSubMenu();
-    const settingsWalletPage = new WalletSubTab(webdriver, logger);
     await settingsWalletPage.removeWallet();
   });
 
@@ -61,7 +73,6 @@ describe('Removing the first wallet, two wallets is added', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonBasePage.closeBrowser();
   });
 });

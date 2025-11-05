@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -11,14 +10,23 @@ import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import { adaInLovelaces } from '../../helpers/constants.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
+import WalletCommonBase from '../../pages/walletCommonBase.page.js';
 
 describe('dApp, general functions, without pop-up', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
 
   before(async function () {
     try {
@@ -32,6 +40,7 @@ describe('dApp, general functions, without pop-up', function () {
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -174,7 +183,6 @@ describe('dApp, general functions, without pop-up', function () {
     it('Request getRegisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getRegisteredPubStakeKeys();
       expect(extensionsResponse.success, 'The request getRegisteredPubStakeKeys failed').to.be.true;
-      // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array');
     });
   });
@@ -187,7 +195,6 @@ describe('dApp, general functions, without pop-up', function () {
     it('Request getUnregisteredPubStakeKeys', async function () {
       const extensionsResponse = await mockedDApp.getUnregisteredPubStakeKeys();
       expect(extensionsResponse.success, 'The request getUnregisteredPubStakeKeys failed').to.be.true;
-      // update it when the SanchoNet is released
       expect(extensionsResponse.retValue).to.be.an('array').that.is.not.empty;
       expect(extensionsResponse.retValue.length).to.equal(1);
       expect(extensionsResponse.retValue[0]).to.be.an('string').that.is.not.empty;
@@ -199,8 +206,7 @@ describe('dApp, general functions, without pop-up', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
     mockServer.close();
   });
 });

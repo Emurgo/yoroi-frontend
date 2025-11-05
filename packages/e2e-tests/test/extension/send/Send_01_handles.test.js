@@ -1,25 +1,37 @@
 import { expect } from 'chai';
-import BasePage from '../../../pages/basepage.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
-import { getTestLogger, isLocalRun, resolverEndpointIsAvailable } from '../../../utils/utils.js';
+import { getTestLogger, resolverEndpointIsAvailable } from '../../../utils/utils.js';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
 import SendSubTab from '../../../pages/wallet/walletTab/sendSubTab.page.js';
 import TxReviewOverviewTab from '../../../pages/transactionReviewPages/txReviewOverviewTab.page.js';
 import { getTestString, handlesEndpoints } from '../../../helpers/constants.js';
 import { ADA_HANDLE_UNEXPECTED_ERROR, RECEIVER_DOESNT_EXIST } from '../../../helpers/messages.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Handle handles', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SendSubTab} */
+  let sendSubTab = null;
+  /** @type {TxReviewOverviewTab} */
+  let txReviewOverview = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    sendSubTab = new SendSubTab(webdriver, logger);
+    txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
   });
 
   const testDataPositive = [
@@ -58,15 +70,12 @@ describe('Handle handles', function () {
     }
     describe(`Positive case, ${testDatum.provider}`, function () {
       it(`Refresh page, ${testDatum.provider}`, async function () {
-        const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.refreshPage();
       });
 
       it(`Go to Send page, ${testDatum.provider}`, async function () {
-        const walletPage = new TransactionsSubTab(webdriver, logger);
-        await walletPage.goToSendSubMenu();
-        const sendPage = new SendSubTab(webdriver, logger);
-        const stepOneDisplayed = await sendPage.stepOneIsDisplayed();
+        await transactionsPage.goToSendSubMenu();
+        const stepOneDisplayed = await sendSubTab.stepOneIsDisplayed();
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
       });
 
@@ -78,15 +87,13 @@ describe('Handle handles', function () {
       });
 
       it(`Enter the value, ${testDatum.provider}`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        await sendStep1Page.enterReceiver(testDatum.userHandle);
+        await sendSubTab.enterReceiver(testDatum.userHandle);
       });
 
       it(`Wait for domain resolver response, ${testDatum.provider}`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        const greenMarkIsDisplayed = await sendStep1Page.receiverIsGood();
+        const greenMarkIsDisplayed = await sendSubTab.receiverIsGood();
         if (testDatum.provider === 'ADA Handle' && !greenMarkIsDisplayed) {
-          const helpText = await sendStep1Page.getReceiverHelperText();
+          const helpText = await sendSubTab.getReceiverHelperText();
           if (helpText === ADA_HANDLE_UNEXPECTED_ERROR) {
             console.warn(`The error "${helpText}" happen we can do nothing about it`);
             this.skip();
@@ -97,25 +104,19 @@ describe('Handle handles', function () {
       });
 
       it(`Check displayed info and continue, ${testDatum.provider}`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        const helperText = await sendStep1Page.getReceiverHelperText();
+        const helperText = await sendSubTab.getReceiverHelperText();
         expect(helperText, 'A different provider is displayed').to.equal(testDatum.provider);
-        const handlerAddress = await sendStep1Page.getReceiverHandlerAddress();
+        const handlerAddress = await sendSubTab.getReceiverHandlerAddress();
         expect(handlerAddress, 'Address is in a wrong format').to.match(/addr1[a-z0-9]{5}\.{3}[a-z0-9]{10}/);
-        await sendStep1Page.takeScreenshot(
-          this.test.parent.parent.title,
-          `Check displayed info and continue_${testDatum.provider}`
-        );
-        await sendStep1Page.clickNextToStep2();
+        await sendSubTab.takeScreenshot(this.test.parent.parent.title, `Check displayed info and continue_${testDatum.provider}`);
+        await sendSubTab.clickNextToStep2();
       });
 
       it(`Enter amount and continue, ${testDatum.provider}`, async function () {
-        const sendStep2Page = new SendSubTab(webdriver, logger);
-        await sendStep2Page.addAssets('1');
+        await sendSubTab.addAssets('1');
       });
 
       it(`Check info on confirmation page, ${testDatum.provider}`, async function () {
-        const txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
         const userHandle = await txReviewOverview.getReceiver();
         expect(userHandle, 'User handler is different').to.equal(testDatum.userHandle);
       });
@@ -128,15 +129,12 @@ describe('Handle handles', function () {
     }
     describe(`Negative case, ${testNegativeDatum.provider}`, function () {
       it(`Refresh page, ${testNegativeDatum.provider}`, async function () {
-        const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.refreshPage();
       });
 
       it(`Go to Send page, ${testNegativeDatum.provider}`, async function () {
-        const walletPage = new TransactionsSubTab(webdriver, logger);
-        await walletPage.goToSendSubMenu();
-        const sendPage = new SendSubTab(webdriver, logger);
-        const stepOneDisplayed = await sendPage.stepOneIsDisplayed();
+        await transactionsPage.goToSendSubMenu();
+        const stepOneDisplayed = await sendSubTab.stepOneIsDisplayed();
         expect(stepOneDisplayed, 'Step one is not displayed').to.be.true;
       });
 
@@ -148,15 +146,13 @@ describe('Handle handles', function () {
       });
 
       it(`Enter the value, ${testNegativeDatum.provider}`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        await sendStep1Page.enterReceiver(testNegativeDatum.userHandle);
+        await sendSubTab.enterReceiver(testNegativeDatum.userHandle);
       });
 
       it(`Wait and check displayed info, ${testNegativeDatum.provider}`, async function () {
-        const sendStep1Page = new SendSubTab(webdriver, logger);
-        const errorMessageIsDisplayed = await sendStep1Page.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
+        const errorMessageIsDisplayed = await sendSubTab.waitReceiverHelperTextEqual(RECEIVER_DOESNT_EXIST);
         if (!errorMessageIsDisplayed) {
-          const loaderIsDisplayed = await sendStep1Page.isReceiverLoaderDisplayed();
+          const loaderIsDisplayed = await sendSubTab.isReceiverLoaderDisplayed();
           if (loaderIsDisplayed) {
             this.skip();
           }
@@ -171,7 +167,6 @@ describe('Handle handles', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });
