@@ -16,7 +16,8 @@ import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
-import Support from './components/widgets/Support';
+// $FlowIgnore: suppressing this error
+import { SupportChatbox } from './UI/common/widgets/CrispChatbox/SupportChatbox';
 // $FlowIgnore: suppressing this error
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error
@@ -178,7 +179,7 @@ class App extends Component<Props, State> {
       >
         <NotificationsManager />
         <div style={{ height: '100%' }}>
-          <Support />
+          <SupportChatbox />
           {YoroiRoutes(stores)}
           <RoutingHelper stores={stores} />
         </div>
