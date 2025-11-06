@@ -37,13 +37,14 @@ const messages = defineMessages({
 interface Props2 {
   alloc: string;
   destAddrBech32: string;
+  destAddrError: string;
   walletPlate: unknown;
   walletName: string;
 }
 
 export function ClaimInfo2(props: Readonly<Props2>) {
   const intl = useIntl();
-  const { alloc, destAddrBech32, walletPlate, walletName } = props;
+  const { alloc, destAddrBech32, destAddrError, walletPlate, walletName } = props;
   const [accountPlateId, iconComponent] = constructPlate(walletPlate, {
     saturationFactor: 0,
     size: 8,
@@ -89,16 +90,22 @@ export function ClaimInfo2(props: Readonly<Props2>) {
             {intl.formatMessage(messages.destinationAddress)}
             <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
           </Typography>
-          <Box>
-            <Typography variant="body1" sx={{ fontWeight: 500 }}>
-              {intl.formatMessage(globalMessages.addressLabel)}
+          {destAddrError ? (
+            <Typography variant="body1" color="red">
+              {destAddrError}
             </Typography>
-            <CopyableText value={destAddrBech32} copyButtonFollowText>
-              <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
-                {destAddrBech32}
+          ) : (
+            <Box>
+              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                {intl.formatMessage(globalMessages.addressLabel)}
               </Typography>
-            </CopyableText>
-          </Box>
+              <CopyableText value={destAddrBech32} copyButtonFollowText>
+                <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
+                  {destAddrBech32}
+                </Typography>
+              </CopyableText>
+            </Box>
+          )}
         </Stack>
       </Box>
       <Box

@@ -73,6 +73,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     ).address.Hash
   );
   const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
+  const [destAddrError, setDestAddrError] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -98,7 +99,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
           destAddrBech32,
           [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
         );
-        if (result && result.success) {
+        if (result.success) {
           setOriginalDestAddrBech32(result.destAddr);
           airdropClaims.push({
             publicDeriverId: wallet.publicDeriverId,
@@ -107,8 +108,9 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
             amount: result.amount,
           });
           await localStorageApi.saveAirdropClaimResults(airdropClaims);
-        } else if (result) {
-          setOriginalDestAddrBech32(result.error);
+        } else {
+          setDestAddrError(result.error);
+          setOriginalDestAddrBech32('');
         }
       }
     })();
@@ -130,6 +132,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       <ClaimDone
         alloc={formattedAlloc}
         destAddrBech32={originalDestAddrBech32}
+        destAddrError={destAddrError}
         walletPlate={wallet.plate}
         walletName={wallet.name}
       />
