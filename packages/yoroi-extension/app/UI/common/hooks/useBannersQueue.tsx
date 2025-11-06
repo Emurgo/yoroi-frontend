@@ -1,20 +1,13 @@
 import { useState, useEffect } from 'react';
-import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
+import { createStorageFlag } from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 
 const surveyDismissed = createStorageFlag('SURVEY_DISMISSED', false);
 
 export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
-  const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   useEffect(() => {
     async function resolve() {
-      if (
-        (await localStorage.getMidnightBannerAnnouncementClosed()) === undefined &&
-        bannersRemoteConfig?.midnightAnnouncement.display === true
-      ) {
-        return BannerType.Midnight;
-      }
       if (!(await surveyDismissed.get())) {
         return BannerType.Survey;
       }
@@ -39,10 +32,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
 
   const dismiss = async type => {
     switch (type) {
-      case BannerType.Midnight:
-        setVisible(null);
-        await localStorage.setMidnightBannerAnnouncementClosed('true');
-        break;
       case BannerType.Survey:
         surveyDismissed.set(true);
         setVisible(null);
