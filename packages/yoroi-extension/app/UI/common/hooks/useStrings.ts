@@ -101,11 +101,11 @@ export const messages = Object.freeze(
     },
     midnightDappConnect: {
       id: 'banners.midnight.dappConnect',
-      defaultMessage: '!!!Go to the midnight Dapp and connect your Yoroi wallet to start earning NIGHT."',
+      defaultMessage: '!!!Go to the midnight Dapp and connect your Yoroi wallet to start earning <strong>NIGHT</strong>."',
     },
     goToMidnight: {
       id: 'banners.midnight.goToMidnight',
-      defaultMessage: '!!!Go to midnight"',
+      defaultMessage: '!!!Go to midnight',
     },
     surveyTitle: {
       id: 'survey.title',
