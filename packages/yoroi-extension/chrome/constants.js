@@ -63,7 +63,7 @@ export function genCSP(request: {|
   connectSrc.push('https://mainnet.prod.gd.midnighttge.io');
   connectSrc.push('https://proof.provtree-midnight.com');
   connectSrc.push('https://proof-staging.provtree-midnight.com');
-  connectSrc.push('https://preprod.gd.midnighttge.io');
+  connectSrc.push('https://external-claim.gd.midnighttge.io');
 
   // FCM
   connectSrc.push('https://firebaseinstallations.googleapis.com');
