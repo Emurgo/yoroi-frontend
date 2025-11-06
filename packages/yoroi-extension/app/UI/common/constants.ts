@@ -6,6 +6,7 @@ export const RESTORE_WALLET_HELP_URL =
   'https://help.yoroi-wallet.com/en/article/i-have-lost-my-password-how-to-reset-it-17w85zj/';
 
 export enum BannerType {
+  MidnightPhase2 = 'midnightPhase2Banner',
   Survey = 'surveyBanner',
   DRep = 'drepBanner',
   BuyAda = 'buyAdaBanner',
@@ -14,5 +15,6 @@ export enum BannerType {
 }
 
 export const SUPPORT_CRISP_CHATBOX_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
+export const MIDNIGHT_PHASE2_URL = 'https://www.midnight.gd/';
 export const FIREFOX_DEPRECATION_LEARN_MORE_URL =
   'https://help.yoroi-wallet.com/en/article/end-of-support-for-yoroi-on-firefox-browser-extension-1shxoae/';

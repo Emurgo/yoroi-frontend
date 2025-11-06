@@ -36,8 +36,7 @@ const storageKeys = {
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
-  MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
-  MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
+  MIDNIGHT_BANNER_PHASE2_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_PHASE2_CLOSED',
   CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
   FIREFOX_SUPPORT_MODAL_CLOSED: networkForLocalStorage + '-FIREFOX_SUPPORT_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
@@ -174,14 +173,12 @@ export default class LocalStorageApi {
     removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
   // ========== Midnight Banner Announcement ========== //
-  getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+  getMidnightBannerPhase2Closed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);
 
-  setMidnightBannerAnnouncementClosed: string => Promise<void> = closed =>
-    setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
+  setMidnightBannerPhase2Closed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED, closed);
 
-  unsetMidnightBannerAnnouncementClosed: void => Promise<void> = () =>
-    removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+  unsetMidnightBannerPhase2Closed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);
 
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);

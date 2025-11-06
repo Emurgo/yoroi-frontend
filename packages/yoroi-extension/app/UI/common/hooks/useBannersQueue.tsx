@@ -1,13 +1,20 @@
 import { useState, useEffect } from 'react';
-import { createStorageFlag } from '../../../api/localStorage';
+import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 
 const surveyDismissed = createStorageFlag('SURVEY_DISMISSED', false);
 
 export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
+  const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   useEffect(() => {
     async function resolve() {
+      if (
+        (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
+        bannersRemoteConfig?.midnightPhase2Announcement.display === true
+      ) {
+        return BannerType.MidnightPhase2;
+      }
       if (!(await surveyDismissed.get())) {
         return BannerType.Survey;
       }
@@ -18,13 +25,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
         return BannerType.DRep;
       }
 
-      // Not used yet - TODO add condition for these banners
-      //   if (false) {
-      //     return BannerType.Bring;
-      //   }
-      //   if (false) {
-      //     return BannerType.Usda;
-      //   }
       return null;
     }
     resolve().then(setVisible);
@@ -32,6 +32,10 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
 
   const dismiss = async type => {
     switch (type) {
+      case BannerType.MidnightPhase2:
+        setVisible(null);
+        await localStorage.setMidnightBannerPhase2Closed('true');
+        break;
       case BannerType.Survey:
         surveyDismissed.set(true);
         setVisible(null);

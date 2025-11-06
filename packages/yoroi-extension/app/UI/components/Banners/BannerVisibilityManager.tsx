@@ -8,6 +8,7 @@ import WalletEmptyBanner from '../../../containers/wallet/WalletEmptyBanner';
 import { BannerType } from '../../common/constants';
 import { BringBanner } from './BringBanner';
 import { UsdaBanner } from './UsdaBanner';
+import { MidnightPhase2Banner } from './MidnightPhase2Banner';
 
 export const BannerVisibilityManager = ({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
@@ -21,6 +22,7 @@ export const BannerVisibilityManager = ({ stores, intl }) => {
 
   return (
     <>
+      {visible === BannerType.MidnightPhase2 && <MidnightPhase2Banner onClose={() => dismiss(BannerType.MidnightPhase2)} />}
       {visible === BannerType.Survey && <SurveyBanner onClose={() => dismiss(BannerType.Survey)} />}
       {visible === BannerType.DRep && (
         <DrepPromotionBanner onClose={() => dismiss(BannerType.DRep)} stores={stores} intl={intl} />
