@@ -17,7 +17,7 @@ import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
 // $FlowIgnore: suppressing this error
-import { SupportChatbox } from './UI/common/widgets/CrispChatbox/SupportChatbox';
+import { SupportChatbox } from './UI/components/widgets/CrispChatbox/SupportChatbox';
 // $FlowIgnore: suppressing this error
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error

@@ -39,6 +39,7 @@ const storageKeys = {
   MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
   MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
   CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
+  FIREFOX_SUPPORT_MODAL_CLOSED: networkForLocalStorage + '-FIREFOX_SUPPORT_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -154,12 +155,13 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== CARDANO_CARD Modal ========== //
-  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+  // ========== FIREFOX SUPPORT Modal ========== //
+  getFirefoxSupportModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED);
 
-  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
+  setFirefoxSupportModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED, closed);
 
-  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+  unsetFirefoxSupportModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED);
 
   // ========== SWAP Disclaimer Modal ========== //
   getSwapDisclaimerModalClosed: void => Promise<?string> = () =>
