@@ -15,3 +15,5 @@ export enum BannerType {
 }
 
 export const SUPPORT_CRISP_CHATBOX_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
+export const FIREFOX_DEPRECATION_LEARN_MORE_URL =
+  'https://help.yoroi-wallet.com/en/article/end-of-support-for-yoroi-on-firefox-browser-extension-1shxoae/';

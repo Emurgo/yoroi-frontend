@@ -79,6 +79,7 @@
   "app.errors.unknowError": "Erreur inconnue.",
   "banners.bring.button": "Explorer le Cashback",
   "banners.bring.title": "Obtenez des ADA en faisant vos achats",
+  "banners.firefox.noSupport": "Firefox is no longer supporting hardware wallets. Please consider another browser to continue.",
   "banners.bring.desc": "Obtenez des ADA pour chacun de vos achats - Faîtes grandir votre portfolio sans efforts.",
   "banners.usda.title": "Échangez vos USDA avec Yoroi",
   "banners.usda.desc": "Échangez vos USDA facilement avec Yoroi et bénéficiez des capacités du premier stablecoin Cardano.",

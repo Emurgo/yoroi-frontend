@@ -79,6 +79,7 @@
   "app.errors.unknowError": "未知错误。",
   "banners.bring.button": "探索现金返还",
   "banners.bring.title": "购物的同时赚取ADA 🛍️",
+  "banners.firefox.noSupport": "Firefox is no longer supporting hardware wallets. Please consider another browser to continue.",
   "banners.bring.desc": "使用法币购买即可立即获得ADA现金返还 - 轻松积累您的投资组合。",
   "banners.usda.title": "使用 Yoroi 交换 USDA",
   "banners.usda.desc": "在Yoroi中轻松交换USDA，并体验Cardano首个原生稳定币的强大功能。",

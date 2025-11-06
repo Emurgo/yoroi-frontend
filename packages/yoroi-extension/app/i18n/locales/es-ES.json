@@ -79,6 +79,7 @@
   "app.errors.unknowError": "Error desconocido.",
   "banners.bring.button": "Explore cashback",
   "banners.bring.title": "Gana ADA mientras compras 🛍️",
+  "banners.firefox.noSupport": "Firefox is no longer supporting hardware wallets. Please consider another browser to continue.",
   "banners.bring.desc": "Obtén premios con reembolso instantáneo de ADA en cada compra fiat - apile tu cartera sin esfuerzo.",
   "banners.usda.title": "Intercambiar USDA con ► oi",
   "banners.usda.desc": "Intercambiar el USDA sin esfuerzo dentro del área, y disfrutar del poder de la primera moneda estable nativa de Cardano.",
