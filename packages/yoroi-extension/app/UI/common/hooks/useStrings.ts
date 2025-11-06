@@ -193,7 +193,9 @@ export const useStrings = () => {
     firefoxSupportDescription: intl.formatMessage(messages.firefoxSupportDescription),
     firefoxSupportLearnMore: intl.formatMessage(messages.firefoxSupportLearnMore),
     firefoxNoSupport: intl.formatMessage(messages.firefoxNoSupport),
-    midnightDappConnect: intl.formatMessage(messages.midnightDappConnect),
+    midnightDappConnect: intl.formatMessage(messages.midnightDappConnect, {
+      strong: chunks => React.createElement('strong', null, chunks),
+    }),
     goToMidnight: intl.formatMessage(messages.goToMidnight),
     claimAnnouncementPhase2: intl.formatMessage(messages.claimAnnouncementPhase2),
   }).current;

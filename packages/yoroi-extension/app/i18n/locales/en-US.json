@@ -92,7 +92,7 @@
   "banners.firefoxSupport.description": "We’ve stopped pushing updates to Firefox because hardware wallets aren’t supported. To keep using hardware wallets, open the app in a supported browser.",
   "banners.firefoxSupport.learnMore": "Learn more about Firefox deprecation",
   "banners.midnight.claimAnnouncementPhase2": "🧩  Phase 2 of midnight claiming is now live - The scavenger mine",
-  "banners.midnight.dappConnect": "Go to the midnight Dapp and connect your Yoroi wallet to start earning NIGHT.",
+  "banners.midnight.dappConnect": "Go to the midnight Dapp and connect your Yoroi wallet to start earning <strong>NIGHT</strong>.",
   "banners.midnight.goToMidnight": "Go to midnight",
   "banners.midnight.takePartInMidnight": "Take part in the Midnight NIGHT token distribution",
   "banners.midnight.midnightSupport": "Yoroi will support Midnight’s multi-phase token distribution — a bold initiative to empower a diverse, global community.",
