@@ -154,13 +154,6 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== CARDANO_CARD Modal ========== //
-  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
-
-  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
-
-  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
-
   // ========== FIREFOX SUPPORT Modal ========== //
   getFirefoxSupportModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED);
 
