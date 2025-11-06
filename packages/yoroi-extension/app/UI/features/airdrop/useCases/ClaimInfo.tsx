@@ -118,7 +118,7 @@ export function ClaimInfo2(props: Readonly<Props2>) {
           padding: '24px',
         }}
       >
-        <Typography>{intl.formatMessage(messages.phase2Title)}</Typography>
+        <Typography variant="h5">{intl.formatMessage(messages.phase2Title)}</Typography>
         <Typography>{intl.formatMessage(messages.phase2Text)}</Typography>
         <Button
           variant="outlined"
