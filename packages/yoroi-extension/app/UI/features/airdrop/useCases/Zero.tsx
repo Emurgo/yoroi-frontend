@@ -56,7 +56,11 @@ export default function Zero() {
         {intl.formatMessage(messages.phase1Closed4)}
       </Typography>
 
-      <Button variant="outlined" style={{ border: '2px solid' }} onClick={() => window.open('https://www.midnight.gd/')}>
+      <Button
+        variant="outlined"
+        style={{ border: '2px solid' }}
+        onClick={() => window.open('https://www.midnight.gd/', '_blank', 'noopener,noreferrer')}
+      >
         {intl.formatMessage(globalMessages.goToMidnightApp)}
       </Button>
     </Box>

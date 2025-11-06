@@ -120,7 +120,11 @@ export function ClaimInfo2(props: Readonly<Props2>) {
       >
         <Typography>{intl.formatMessage(messages.phase2Title)}</Typography>
         <Typography>{intl.formatMessage(messages.phase2Text)}</Typography>
-        <Button variant="outlined" style={{ border: '2px solid' }} onClick={() => window.open('https://www.midnight.gd/')}>
+        <Button
+          variant="outlined"
+          style={{ border: '2px solid' }}
+          onClick={() => window.open('https://www.midnight.gd/', '_blank', 'noopener,noreferrer')}
+        >
           {intl.formatMessage(globalMessages.goToMidnightApp)}
         </Button>
       </Box>
