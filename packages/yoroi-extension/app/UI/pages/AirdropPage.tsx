@@ -118,6 +118,7 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       // switch wallet
       setAlloc(null);
       setOriginalDestAddrBech32('');
+      setDestAddrError('');
     };
   }, [wallet.publicDeriverId]);
 
