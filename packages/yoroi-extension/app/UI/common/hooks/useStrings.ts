@@ -55,23 +55,6 @@ export const messages = Object.freeze(
       id: 'banners.firefox.noSupport',
       defaultMessage: '!!!Firefox is no longer supporting hardware wallets. Please consider another browser to continue.',
     },
-    cardanoCard: {
-      id: 'banners.cardanoCard.register',
-      defaultMessage:
-        '!!!Register here for the upcoming Cardano Card — a next-gen crypto card built to make your digital assets more useful in everyday life.',
-    },
-    cardanoCardTitle: {
-      id: 'banners.cardanoCard.title',
-      defaultMessage: '!!!Cardano Card',
-    },
-    cardanoCardJoin: {
-      id: 'banners.cardanoCard.join',
-      defaultMessage: '!!!Join the future of finance',
-    },
-    cardanoCardLearnMore: {
-      id: 'banners.cardanoCard.learnMore',
-      defaultMessage: '!!!Register Interest',
-    },
     receiverFieldLabelUnresolvedAddress: {
       id: 'wallet.send.form.receiver.label.unresolvedAddress',
       defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
@@ -189,10 +172,6 @@ export const useStrings = () => {
     surveyTitle: intl.formatMessage(messages.surveyTitle),
     surveyDescription: intl.formatMessage(messages.surveyDescription),
     surveyButton: intl.formatMessage(messages.surveyButton),
-    cardanoCard: intl.formatMessage(messages.cardanoCard),
-    cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
-    cardanoCardJoin: intl.formatMessage(messages.cardanoCardJoin),
-    cardanoCardLearnMore: intl.formatMessage(messages.cardanoCardLearnMore),
     assetReceived: (asset: string) => intl.formatMessage(messages.assetReceived, { asset }),
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
