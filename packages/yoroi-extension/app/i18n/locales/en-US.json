@@ -36,7 +36,6 @@
   "airdrop.trezorText": "Claiming is currently unavailable for Trezor users. Please use a different wallet to proceed.",
   "airdrop.trezorTitle": "Trezor not supported",
   "airdrop.wrongPassword": "Wrong password",
-  "airdrop.wrongPassword": "Wrong password",
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.CannotSendBelowMinimumValueError": "A minimum of 1 ADA is required",
   "api.errors.GenericApiError": "An error occurred. Please retry.",
