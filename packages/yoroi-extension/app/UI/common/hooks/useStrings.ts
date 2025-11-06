@@ -97,11 +97,11 @@ export const messages = Object.freeze(
     },
     claimAnnouncementPhase2: {
       id: 'banners.midnight.claimAnnouncementPhase2',
-      defaultMessage: '!!!🧩  Phase 2 of midnight claiming is now live - The scavenger mine"',
+      defaultMessage: '!!!🧩  Phase 2 of midnight claiming is now live - The scavenger mine',
     },
     midnightDappConnect: {
       id: 'banners.midnight.dappConnect',
-      defaultMessage: '!!!Go to the midnight Dapp and connect your Yoroi wallet to start earning <strong>NIGHT</strong>."',
+      defaultMessage: '!!!Go to the midnight Dapp and connect your Yoroi wallet to start earning <strong>NIGHT</strong>.',
     },
     goToMidnight: {
       id: 'banners.midnight.goToMidnight',
