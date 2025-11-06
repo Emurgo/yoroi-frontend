@@ -79,6 +79,7 @@
   "app.errors.unknowError": "Terjadi kesalahan yang tidak diketahui.",
   "banners.bring.button": "Jelajahi cashback",
   "banners.bring.title": "Dapatkan ADA saat Anda belanja 🛍️",
+  "banners.firefox.noSupport": "Firefox is no longer supporting hardware wallets. Please consider another browser to continue.",
   "banners.bring.desc": "Dapatkan cashback berupa ADA secara instan pada setiap pembelian dengan fiat - penuhi portofolio Anda dengan mudah.",
   "banners.usda.title": "SWAP USDA bersama Yoroi",
   "banners.usda.desc": "Swap USDA dengan mudah di Yoroi dan nikmati stablecoin Cardano yang asli dan pertama.",
