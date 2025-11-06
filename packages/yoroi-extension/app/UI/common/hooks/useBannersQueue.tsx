@@ -28,7 +28,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
       return null;
     }
     resolve().then(setVisible);
-  }, [bannersRemoteConfig, walletBalance]);
+  }, [bannersRemoteConfig, visible, walletBalance]);
 
   const dismiss = async type => {
     switch (type) {
