@@ -8,7 +8,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
-  
+
   const resolveBanner = useCallback(async () => {
     if (
       (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
