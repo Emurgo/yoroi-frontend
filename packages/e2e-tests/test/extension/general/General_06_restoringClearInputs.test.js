@@ -1,37 +1,54 @@
-import BasePage from '../../pages/basepage.js';
-import { customAfterEach } from '../../utils/customHooks.js';
-import AddNewWallet from '../../pages/addNewWallet.page.js';
-import RestoreWalletStepOne from '../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
-import RestoreWalletStepTwo from '../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
-import WalletDetails from '../../pages/newWalletPages/walletDetails.page.js';
-import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
-import { testWallet1, testWallet2 } from '../../utils/testWallets.js';
-import { getPassword } from '../../helpers/constants.js';
+import { customAfterEach } from '../../../utils/customHooks.js';
+import AddNewWallet from '../../../pages/addNewWallet.page.js';
+import RestoreWalletStepOne from '../../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepOne.page.js';
+import RestoreWalletStepTwo from '../../../pages/newWalletPages/restoreWalletSteps/restoreWalletStepTwo.page.js';
+import WalletDetails from '../../../pages/newWalletPages/walletDetails.page.js';
+import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
+import { testWallet1, testWallet2 } from '../../../utils/testWallets.js';
+import { getPassword } from '../../../helpers/constants.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../utils/utils.js';
-import { oneMinute } from '../../helpers/timeConstants.js';
-import driversPoolsManager from '../../utils/driversPool.js';
+import { getTestLogger, walletNameShortener } from '../../../utils/utils.js';
+import { oneMinute } from '../../../helpers/timeConstants.js';
+import driversPoolsManager from '../../../utils/driversPool.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+import { preloadBrowserStorage } from '../../../helpers/restoreWalletHelper.js';
 
-// The test case is based on the issue https://emurgo.atlassian.net/browse/YOEXT-811
 describe('Restoring 15-wallet, clear input and restore other 15-wallet', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {RestoreWalletStepOne} */
+  let restoreWalletStepOnePage = null;
+  /** @type {RestoreWalletStepTwo} */
+  let restoreWalletStepTwoPage = null;
+  /** @type {WalletDetails} */
+  let walletDetailsPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    await preloadBrowserStorage(webdriver, logger);
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
+    restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
+    walletDetailsPage = new WalletDetails(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   it('Selecting Restore wallet 15-word', async function () {
-    const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectRestoreWallet();
     const restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
     await restoreWalletStepOnePage.selectFifteenWordWallet();
   });
 
   it('Enter the wallet seed phrase of first wallet', async function () {
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet1.mnemonic);
     await restoreWalletStepTwoPage.sleep(100);
     const phraseIsVerified = await restoreWalletStepTwoPage.recoveryPhraseIsVerified();
@@ -40,17 +57,13 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
   });
 
   it('Check the wallet plate of the first wallet', async function () {
-    const walletDetailsPage = new WalletDetails(webdriver, logger);
     await walletDetailsPage.closeTipsModalWindow();
     const walletPlate = await walletDetailsPage.getWalletPlate();
     expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1.plate);
   });
 
   it('Clear all inputs and restore the second wallet', async function () {
-    const walletDetailsPage = new WalletDetails(webdriver, logger);
     await walletDetailsPage.backOnPreviousStep();
-
-    const restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     await restoreWalletStepTwoPage.clearAllInputsManually();
 
     const inputsAreEmpty = await restoreWalletStepTwoPage.allInputsAreEmpty();
@@ -63,7 +76,6 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
   });
 
   it('Enter wallet details', async function () {
-    const walletDetailsPage = new WalletDetails(webdriver, logger);
     const walletPassword = getPassword();
     await walletDetailsPage.enterWalletName(testWallet2.name);
     await walletDetailsPage.enterWalletPassword(walletPassword);
@@ -85,16 +97,15 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
   });
 
   it('Check new wallet', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
-    await transactionsPage.closeUpdatesModalWindow();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const walletInfo = await transactionsPage.getSelectedWalletInfo();
     expect(walletInfo.balance, 'The wallet balance is different').to.equal(testWallet2.balance);
     const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
+    const shortenedWalletName = walletNameShortener(expWalletName);
     const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
-    expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);
+    expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(shortenedWalletName);
     expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(expWalletPlate);
   });
 
@@ -103,7 +114,6 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });
