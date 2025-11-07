@@ -1107,6 +1107,10 @@ const globalMessages: * = defineMessages({
   airdrop: {
     id: 'airdrop.label',
     defaultMessage: '!!!Airdrop',
+  },
+  goToMidnightApp: {
+    id: 'airdrop.goToMidnightApp',
+    defaultMessage: '!!!Go to Midnight App',
   }
 });
 export default globalMessages;
