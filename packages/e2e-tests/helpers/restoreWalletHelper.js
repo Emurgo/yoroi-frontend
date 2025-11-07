@@ -177,10 +177,15 @@ export const restartServiceWorker = async (webdriver, logger) => {
     method: 'css',
   };
 
-  await basepage.click(stopBtnLocator);
-  await basepage.sleep(500);
-  await basepage.click(startBtnLocator);
-  await basepage.sleep(500);
+  await basepage.waitPresentedAndAct(stopBtnLocator, async () => {
+    await basepage.click(stopBtnLocator);
+    await basepage.sleep(500);
+  });
+
+  await basepage.waitPresentedAndAct(startBtnLocator, async () => {
+    await basepage.click(startBtnLocator);
+    await basepage.sleep(500);
+  });
 
   await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);
   await basepage.refreshPage();
