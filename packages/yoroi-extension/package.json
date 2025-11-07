@@ -34,8 +34,6 @@
     "test:build": "npm run prod:build -- --env 'test' --isE2E && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
-    "metrics:pull": "ampli pull extension",
-    "metrics:status": "babel-node scripts/checkMetrics.js",
     "tsc": "tsc --project tsconfig.json --noEmit",
     "check": "npm run flow && npm run eslint && npm run tsc"
   },
@@ -140,7 +138,6 @@
     "webpack-httpolyglot-server": "git+https://github.com/Emurgo/webpack-httpolyglot-server.git"
   },
   "dependencies": {
-    "@amplitude/analytics-browser": "^2.1.3",
     "@babel/preset-typescript": "^7.24.7",
     "@cardano-foundation/ledgerjs-hw-app-cardano": "7.1.3",
     "@emotion/react": "^11.4.1",
