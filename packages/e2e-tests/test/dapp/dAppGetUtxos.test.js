@@ -1,25 +1,33 @@
-import BasePage from '../../../pages/basepage.js';
-import { customAfterEach, customBeforeNestedDAppTest } from '../../../utils/customHooks.js';
-import { testWallet1 } from '../../../utils/testWallets.js';
+import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
+import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
-import { getTestLogger } from '../../../utils/utils.js';
-import { oneMinute } from '../../../helpers/timeConstants.js';
-import { WindowManager, mockDAppName } from '../../../helpers/windowManager.js';
-import { getMockServer, mockDAppUrl } from '../../../helpers/mock-dApp-webpage/mockServer.js';
-import { MockDAppWebpage } from '../../../helpers/mock-dApp-webpage/mockedDApp.js';
-import { connectNonAuth } from '../../../helpers/mock-dApp-webpage/dAppHelper.js';
-import { adaInLovelaces } from '../../../helpers/constants.js';
-import driversPoolsManager from '../../../utils/driversPool.js';
-import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../../helpers/restoreWalletHelper.js';
+import { getTestLogger } from '../../utils/utils.js';
+import { oneMinute } from '../../helpers/timeConstants.js';
+import { WindowManager, mockDAppName } from '../../helpers/windowManager.js';
+import { getMockServer, mockDAppUrl } from '../../helpers/mock-dApp-webpage/mockServer.js';
+import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
+import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
+import { adaInLovelaces } from '../../helpers/constants.js';
+import driversPoolsManager from '../../utils/driversPool.js';
+import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+import WalletCommonBase from '../../pages/walletCommonBase.page.js';
 
 // Related issue https://emurgo.atlassian.net/browse/YOEXT-1723
 describe('dApp, getUtxos, nested tests', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
 
   before(async function () {
     try {
@@ -33,6 +41,7 @@ describe('dApp, getUtxos, nested tests', function () {
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -68,8 +77,8 @@ describe('dApp, getUtxos, nested tests', function () {
       await customBeforeNestedDAppTest(this, windowManager);
     });
 
-    it('Request getUtxos for 6 ADA', async function () {
-      const getUtxosResponse = await mockedDApp.getUTXOs(String(6 * adaInLovelaces), false);
+    it('Request getUtxos for 10 ADA', async function () {
+      const getUtxosResponse = await mockedDApp.getUTXOs(String(10 * adaInLovelaces), false);
       expect(getUtxosResponse.success, 'The request getUtxos failed').to.be.true;
       expect(getUtxosResponse.retValue).to.equal(null);
     });
@@ -95,8 +104,7 @@ describe('dApp, getUtxos, nested tests', function () {
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    await basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
     mockServer.close();
   });
 });
