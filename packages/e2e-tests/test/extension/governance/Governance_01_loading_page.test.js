@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import BasePage from '../../../pages/basepage.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import driversPoolsManager from '../../../utils/driversPool.js';
@@ -16,33 +15,35 @@ describe('Governance page loading _smoke_', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {GovernanceTab} */
+  let governancePage = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    governancePage = new GovernanceTab(webdriver, logger);
   });
 
   it('Open the Governance page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToGovernanceTab();
-    const governancePage = new GovernanceTab(webdriver, logger);
     const pageIsDiplayed = await governancePage.isDisplayed();
     expect(pageIsDiplayed, 'The Governance page is not displayed').to.be.true;
   });
 
   it('Check page is loaded', async function () {
-    const governancePage = new GovernanceTab(webdriver, logger);
     const contentIsLoaded = await governancePage.isLoaded();
     expect(contentIsLoaded, 'The Governance page content is not loaded').to.be.true;
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });

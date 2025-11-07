@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
-import BasePage from '../../../pages/basepage.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import ReceiveSubTab from '../../../pages/wallet/walletTab/receiveSubTab.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
@@ -50,11 +49,10 @@ describe('Generating a new address', function () {
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await transactionsPage.closeBrowser();
   });
 });
