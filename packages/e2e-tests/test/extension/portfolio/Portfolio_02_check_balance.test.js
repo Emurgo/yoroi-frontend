@@ -58,9 +58,9 @@ describe('Portfolio Check the displayed balance', function () {
     // ADA token is first by default if there is no sorting applied
     await portfolioMainPage.selectTokenByIndex(0);
     const topBarBalance = await portfolioMainPage.getSelectedWalletInfo();
-    const mainCurrency = await detailsPage.getMainBalance();
+    const mainCurrency = await tokenDetailsPage.getMainBalance();
     expect(mainCurrency.value, 'Token details. ADA balance is different from the top-bar').to.be.equal(topBarBalance.balance);
-    const secondCurrency = await detailsPage.getSecondBalance();
+    const secondCurrency = await tokenDetailsPage.getSecondBalance();
     expect(secondCurrency.value, 'Token details. Fiat balance is different from the top-bar').to.be.equal(
       topBarBalance.fiatBalance
     );
