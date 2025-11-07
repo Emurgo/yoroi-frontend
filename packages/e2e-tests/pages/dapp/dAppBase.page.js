@@ -5,8 +5,8 @@ import BasePage from '../basepage.js';
 class DAppBase extends BasePage {
   // locators
   loaderSpinner = {
-    locator: '.LoadingSpinner_component',
-    method: 'css',
+    locator: 'dApp-loadingSpinner-component',
+    method: 'id',
   };
   // functions
   async popUpIsDisplayed(windowManager) {
