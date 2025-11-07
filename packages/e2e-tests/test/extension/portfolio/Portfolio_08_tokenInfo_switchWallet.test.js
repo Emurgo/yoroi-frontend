@@ -74,10 +74,10 @@ describe('Portfolio Switch wallet after selecting a token', function () {
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    walletCommonPage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
@@ -8,16 +7,29 @@ import SettingsTab from '../../../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import BlockchainSubTab from '../../../pages/wallet/settingsTab/blockchainSubTab.page.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Changing explorer', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SettingsTab} */
+  let settingsPage = null;
+  /** @type {BlockchainSubTab} */
+  let blockchainSubTab = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    settingsPage = new SettingsTab(webdriver, logger);
+    blockchainSubTab = new BlockchainSubTab(webdriver, logger);
   });
 
   const testData = [
@@ -46,21 +58,16 @@ describe('Changing explorer', function () {
   for (const testDatum of testData) {
     describe(`Changing Cardano explorer to ${testDatum.explorerName}`, function () {
       it('Open Blockchain settings', async function () {
-        const transactionsPage = new TransactionsSubTab(webdriver, logger);
         await transactionsPage.goToSettingsTab();
-        const settingsPage = new SettingsTab(webdriver, logger);
         await settingsPage.goToBlockchainSubMenu();
       });
 
       it('Select explorer', async function () {
-        const blockchainSubTab = new BlockchainSubTab(webdriver, logger);
         await blockchainSubTab.selectExplorer(testDatum.explorerName);
       });
 
       it('Check the selected explorer is applied', async function () {
-        const blockchainSubTab = new BlockchainSubTab(webdriver, logger);
         await blockchainSubTab.goToWalletTab();
-        const transactionsPage = new TransactionsSubTab(webdriver, logger);
         const allTxLinks = await transactionsPage.getTxURLs(0, 0);
         for (const key in allTxLinks) {
           const links = allTxLinks[key];
@@ -72,14 +79,11 @@ describe('Changing explorer', function () {
     });
   }
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });
