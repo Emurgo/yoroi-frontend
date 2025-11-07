@@ -39,9 +39,9 @@ describe('dApp, signData', function () {
       await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappSignDataPage = new DAppSignData(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
-      dappSignDataPage = new DAppSignData(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);

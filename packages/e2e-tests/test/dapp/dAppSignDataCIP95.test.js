@@ -39,9 +39,9 @@ describe('dApp, CIP-95, signData', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappSignDataPage = new DAppSignData(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
-      dappSignDataPage = new DAppSignData(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
