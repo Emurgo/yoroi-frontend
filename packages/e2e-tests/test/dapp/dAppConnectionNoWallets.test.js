@@ -15,14 +15,24 @@ import ConnectorTab from '../../pages/wallet/connectorTab/connectorTab.page.js';
 import DAppConnectWallet from '../../pages/dapp/dAppConnectWallet.page.js';
 import { collectInfo } from '../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
 describe('dApp, connection, no wallets', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {DAppConnectWallet} */
+  let dappConnectPage = null;
+  /** @type {ConnectorTab} */
+  let connectorTabPage = null;
 
   before(async function () {
     try {
@@ -37,6 +47,8 @@ describe('dApp, connection, no wallets', function () {
       basePage.goToUrl(mockDAppUrl);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappConnectPage = new DAppConnectWallet(webdriver, logger);
+      connectorTabPage = new ConnectorTab(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -45,13 +57,11 @@ describe('dApp, connection, no wallets', function () {
 
   it('Request connection', async function () {
     await mockedDApp.requestAccess();
-    const dappConnectPage = new DAppConnectWallet(webdriver, logger);
     const popUpAppeared = await dappConnectPage.popUpIsDisplayed(windowManager);
     expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
   });
 
   it('No wallets are displayed', async function () {
-    const dappConnectPage = new DAppConnectWallet(webdriver, logger);
     const warningIsDisplayed = await dappConnectPage.noWalletsWarningIsDisplayed();
     expect(warningIsDisplayed).to.be.true;
     await dappConnectPage.clickCreateWallet();
@@ -73,7 +83,6 @@ describe('dApp, connection, no wallets', function () {
     // switch to the extension
     await windowManager.switchTo(extensionTabName);
     // go to the extension connector tab
-    const connectorTabPage = new ConnectorTab(webdriver, logger);
     await connectorTabPage.goToConnectorTab();
     // check displayed info
     const connectedWalletInfo = await connectorTabPage.getConnectedWalletInfo(testWallet1.name);
@@ -81,15 +90,12 @@ describe('dApp, connection, no wallets', function () {
     expect(connectedWalletInfo.dappUrl).to.equal('localhost');
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+  after(async function () {
+    await connectorTabPage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

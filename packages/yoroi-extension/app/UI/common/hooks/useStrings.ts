@@ -95,6 +95,18 @@ export const messages = Object.freeze(
       id: 'global.labels.skip',
       defaultMessage: '!!!Skip',
     },
+    claimAnnouncementPhase2: {
+      id: 'banners.midnight.claimAnnouncementPhase2',
+      defaultMessage: '!!!🧩  Phase 2 of midnight claiming is now live - The scavenger mine',
+    },
+    midnightDappConnect: {
+      id: 'banners.midnight.dappConnect',
+      defaultMessage: '!!!Go to the midnight Dapp and connect your Yoroi wallet to start earning <strong>NIGHT</strong>.',
+    },
+    goToMidnight: {
+      id: 'banners.midnight.goToMidnight',
+      defaultMessage: '!!!Go to midnight',
+    },
     surveyTitle: {
       id: 'survey.title',
       defaultMessage: '!!!We’d love your feedback!',
@@ -181,5 +193,10 @@ export const useStrings = () => {
     firefoxSupportDescription: intl.formatMessage(messages.firefoxSupportDescription),
     firefoxSupportLearnMore: intl.formatMessage(messages.firefoxSupportLearnMore),
     firefoxNoSupport: intl.formatMessage(messages.firefoxNoSupport),
+    midnightDappConnect: intl.formatMessage(messages.midnightDappConnect, {
+      strong: chunks => React.createElement('strong', null, chunks),
+    }),
+    goToMidnight: intl.formatMessage(messages.goToMidnight),
+    claimAnnouncementPhase2: intl.formatMessage(messages.claimAnnouncementPhase2),
   }).current;
 };
