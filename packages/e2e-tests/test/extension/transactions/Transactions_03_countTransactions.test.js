@@ -12,7 +12,7 @@ import { Logger } from 'simple-node-logger';
 const testData = [
   {
     testWallet: testWallet1,
-    expectedTxsAmount: 6,
+    expectedTxsAmount: 8,
   },
   {
     testWallet: testWallet2,
