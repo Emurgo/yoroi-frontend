@@ -13,7 +13,6 @@ import BigNumber from 'bignumber.js';
 import TransactionSuccessDialog from '../../components/wallet/send/TransactionSuccessDialog';
 import AddNFTDialog from '../../components/wallet/send/WalletSendFormSteps/AddNFTDialog';
 import AddTokenDialog from '../../components/wallet/send/WalletSendFormSteps/AddTokenDialog';
-import { ampli } from '../../../ampli/index';
 import { getNetworkById } from '../../api/ada/lib/storage/database/prepackaged/networks';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import VerticallyCenteredLayout from '../../components/layout/VerticallyCenteredLayout';
@@ -29,6 +28,7 @@ import { ModalProvider } from '../../UI/components/modals/ModalContext';
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
+import { captureEvent } from '../../../posthog';
 
 @observer
 export default class WalletSendPage extends Component<StoresProps> {
@@ -63,7 +63,7 @@ export default class WalletSendPage extends Component<StoresProps> {
       loadProtocolParametersRequest.reset();
       loadProtocolParametersRequest.execute();
     }
-    ampli.sendInitiated();
+    captureEvent('Send Initiated');
   }
 
   @action
