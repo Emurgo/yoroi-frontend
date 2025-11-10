@@ -43,8 +43,8 @@ describe('dApp, getUtxos, empty wallet', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
-      await preloadBrowserStorage(webdriver, logger);
       walletCommonPage = new WalletCommonBase(webdriver, logger);
+      await preloadBrowserStorage(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);

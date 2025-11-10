@@ -24,6 +24,7 @@ describe('Renaming the wallet', function () {
   /** @type {WalletSubTab} */
   let settingsWalletPage = null;
   const newWalletName = 'newWalletName';
+  let oldWalletName = '';
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
@@ -40,11 +41,15 @@ describe('Renaming the wallet', function () {
   });
 
   it('Renaming wallet', async function () {
+    const walletInfo = await settingsWalletPage.getSelectedWalletInfo();
+    oldWalletName = walletInfo.name;
     await settingsWalletPage.changeWalletName(newWalletName, testWallet1.name);
   });
 
   // Check the wallet name is changed
   it('Check changes', async function () {
+    const nameIsChanged = await settingsWalletPage.walletNameIsChanged(oldWalletName);
+    expect(nameIsChanged, 'The wallet name is not changed').to.be.true;
     const walletInfo = await settingsWalletPage.getSelectedWalletInfo();
     const shortedWalletName = walletNameShortener(newWalletName);
     expect(walletInfo.name, `The wallet name should be "${newWalletName}"`).to.equal(shortedWalletName);

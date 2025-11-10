@@ -36,9 +36,9 @@ describe('dApp, Yoroi object in Cardano', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
-      walletCommonPage = new WalletCommonBase(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);

@@ -37,9 +37,9 @@ describe('dApp, connection in extension', function () {
       await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      connectorTabPage = new ConnectorTab(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
-      connectorTabPage = new ConnectorTab(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
