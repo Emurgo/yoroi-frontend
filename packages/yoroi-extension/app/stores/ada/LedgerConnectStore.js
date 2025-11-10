@@ -30,7 +30,7 @@ import type { GetExtendedPublicKeyResponse } from '@cardano-foundation/ledgerjs-
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { ampli } from '../../../ampli/index';
+import { captureEvent } from '../../../posthog';
 
 export default class LedgerConnectStore
   extends Store<StoresMap>
@@ -287,7 +287,7 @@ export default class LedgerConnectStore
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
-    ampli.connectWalletDetailsPageViewed();
+    captureEvent('Connect Wallet Details Page Viewed');
   };
 
   @action _goToTransfer: void => void = () => {
@@ -302,7 +302,7 @@ export default class LedgerConnectStore
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.PROCESS;
     await this._saveHW(walletName);
-    ampli.connectWalletDetailsSubmitted({ hardware_wallet: 'Ledger' });
+    captureEvent('Connect Wallet Details Submitted', { hardware_wallet: 'Ledger' });
   };
 
   /** creates new wallet and loads it */

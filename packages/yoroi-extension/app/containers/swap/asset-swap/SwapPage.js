@@ -29,7 +29,6 @@ import { observer } from 'mobx-react';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { injectIntl } from 'react-intl';
-import { ampli } from '../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
@@ -125,12 +124,6 @@ function SwapPage(props: StoresProps & Intl): Node {
   useEffect(() => {
     // MOUNT
 
-    ampli.swapInitiated({
-      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-      slippage_tolerance: defaultSlippage,
-      order_type: orderType,
-    });
-
     disclaimerFlag
       .get()
       .then(setDisclaimerStatus)
@@ -182,9 +175,6 @@ function SwapPage(props: StoresProps & Intl): Node {
       slippage.save(newSlippage);
       slippageChanged(newSlippage);
       setSlippageValue(String(newSlippage));
-      ampli.swapSlippageChanged({
-        slippage_tolerance: newSlippage,
-      });
     });
   };
 
@@ -290,19 +280,6 @@ function SwapPage(props: StoresProps & Intl): Node {
       setOrderStepValue(2);
       showTxResultModal(TransactionResult.SUCCESS);
 
-      try {
-        ampli.swapOrderSubmitted({
-          ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-          from_amount: sellQuantity.displayValue,
-          to_amount: buyQuantity.displayValue,
-          pool_source: selectedPoolCalculation?.pool.provider,
-          order_type: orderType,
-          slippage_tolerance: Number(slippageValue),
-          swap_fees: Number(formattedFeeQuantity),
-        });
-      } catch (e) {
-        console.error('analytics fail', e);
-      }
       resetSwapForm();
     } catch (e) {
       handleTransactionError(e);

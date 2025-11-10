@@ -20,7 +20,6 @@ import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/image
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
-import { ampli } from '../../../../../ampli/index';
 import Dialog from '../../../widgets/Dialog';
 import styles from './AddTokenDialog.scss';
 import SingleTokenRow from './SingleTokenRow';
@@ -215,11 +214,6 @@ export default class AddTokenDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
-    if (changed) {
-      ampli.sendSelectAssetUpdated({
-        asset_count: tokens.length,
-      });
-    }
   };
 
   getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {

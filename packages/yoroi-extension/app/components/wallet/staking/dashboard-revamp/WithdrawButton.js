@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { GovernanceParticipateDialog } from '../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
 import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
 import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
-import { ampli } from '../../../../../ampli/index';
 
 export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDisabled }) => {
   const { openTxReviewModal, stopLoadingTxReview, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
@@ -19,7 +18,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
       });
       return;
     }
-    ampli.claimAdaPageViewed();
     return createWithdrawalTx();
   };
 
@@ -59,10 +57,6 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
 
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.SUCCESS);
-
-      // ampli.claimAdaTransactionSubmitted({
-      //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.shiftedBy(-numberOfDecimals).toNumber(),
-      // });
     } catch (_error) {
       stopLoadingTxReview();
       showTxResultModal(TransactionResult.FAIL);

@@ -12,7 +12,7 @@ import AddWalletDetailsStep from './AddWalletDetailsStep';
 import CreateWalletPageHeader from './CreateWalletPageHeader';
 import { ROUTES } from '../../../routes-config';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { ampli } from '../../../../ampli/index';
+import { captureEvent } from '../../../../posthog';
 
 type Props = {|
   genWalletRecoveryPhrase: void => Promise<Array<string>>,
@@ -36,13 +36,11 @@ function CreateWalletPage(props: Props): Node {
   const setCurrentStepAndTrack = step => {
     setCurrentStep(step);
     if (step === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
-      ampli.createWalletLearnPhraseStepViewed();
+      captureEvent('Create Wallet Learn Phrase Step Viewed');
     } else if (step === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
-      ampli.createWalletSavePhraseStepViewed();
+      captureEvent('Create Wallet Save Phrase Step Viewed');
     } else if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
-      ampli.createWalletVerifyPhraseStepViewed();
-    } else if (step === CREATE_WALLET_SETPS.ADD_WALLET_DETAILS) {
-      ampli.createWalletDetailsStepViewed();
+      captureEvent('Create Wallet Verify Phrase Step Viewed');
     }
   };
 
@@ -118,7 +116,7 @@ function CreateWalletPage(props: Props): Node {
             recoveryPhrase,
           });
 
-          ampli.createWalletDetailsSubmitted();
+          captureEvent('Create Wallet Details Submitted');
         }}
         {...manageDialogsProps}
       />

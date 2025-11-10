@@ -7,7 +7,6 @@ import { ReactComponent as CoverBg } from '../../assets/images/transaction/walle
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
-import { ampli } from '../../../ampli/index';
 import links from '../../links';
 
 type Props = {|
@@ -78,7 +77,6 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
                 window.open(links.testnetFaucet, '_blank');
               } else {
                 onBuySellClick();
-                ampli.walletPageBuyBannerClicked();
               }
             }}
           >

@@ -6,7 +6,6 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { useSellVerifiedSwapTokens } from '../hooks';
-import { ampli } from '../../../../../ampli/index';
 import { tokenInfoToAnalyticsFromAsset } from '../../swapAnalytics';
 
 type Props = {|
@@ -50,7 +49,6 @@ export default function SelectSellTokenFromList({
     if (shouldUpdateToken) {
       sellTouched(token);
       onTokenInfoChanged({ id, decimals: decimals ?? 0 });
-      ampli.swapAssetFromChanged(tokenInfoToAnalyticsFromAsset(token));
     }
 
     onClose();

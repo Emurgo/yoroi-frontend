@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { defineMessages, useIntl } from 'react-intl';

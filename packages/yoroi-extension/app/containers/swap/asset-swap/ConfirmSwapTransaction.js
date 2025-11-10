@@ -4,7 +4,6 @@ import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } 
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
 import { useSwapFeeDisplay } from '../hooks';
-import { ampli } from '../../../../ampli/index';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
 import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
@@ -65,16 +64,6 @@ function ConfirmSwapTransaction({
   });
   useEffect(() => {
     // MOUNT
-
-    ampli.swapOrderSelected({
-      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-      from_amount: sellQuantity.displayValue,
-      to_amount: buyQuantity.displayValue,
-      order_type: orderData.type,
-      pool_source: pool?.provider,
-      slippage_tolerance: orderData.slippage,
-      swap_fees: Number(formattedFeeQuantity),
-    });
 
     if (walletAddress == null) {
       alert('Wallet address is not available');

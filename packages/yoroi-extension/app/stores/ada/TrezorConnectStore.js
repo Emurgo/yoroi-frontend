@@ -21,7 +21,7 @@ import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
-import { ampli } from '../../../ampli/index';
+import { captureEvent } from '../../../posthog';
 
 type TrezorConnectionResponse = {|
   trezorResp: Success<CardanoPublicKey> | Unsuccessful,
@@ -252,7 +252,7 @@ export default class TrezorConnectStore extends Store<StoresMap> implements HWCo
     this.error = null;
     this.progressInfo.currentStep = ProgressStep.SAVE;
     this.progressInfo.stepState = StepState.LOAD;
-    ampli.connectWalletDetailsPageViewed();
+    captureEvent('Connect Wallet Details Page Viewed');
   };
 
   /** SAVE dialog submit (Save button) */
@@ -262,7 +262,7 @@ export default class TrezorConnectStore extends Store<StoresMap> implements HWCo
     this.progressInfo.stepState = StepState.PROCESS;
 
     await this._saveHW(walletName);
-    ampli.connectWalletDetailsSubmitted({ hardware_wallet: 'Trezor' });
+    captureEvent('Connect Wallet Details Submitted', { hardware_wallet: 'Trezor' });
   };
 
   /** creates new wallet and loads it */

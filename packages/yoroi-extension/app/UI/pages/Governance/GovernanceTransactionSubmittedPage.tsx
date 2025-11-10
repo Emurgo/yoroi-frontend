@@ -23,12 +23,6 @@ const TransactionSubmittedWrapper = () => {
   const navigate = useNavigate();
   const strings = useStrings();
 
-  const { ampli } = useGovernance();
-  React.useEffect(() => {
-    // ON MOUNT
-    ampli?.governanceTransactionSuccessPageViewed();
-  }, []);
-
   return (
     <TransactionSubmitted
       title={strings.thanksForParticipation}

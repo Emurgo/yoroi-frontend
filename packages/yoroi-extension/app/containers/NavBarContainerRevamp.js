@@ -107,7 +107,6 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
-            ampli.allWalletsPageViewed();
             stores.uiDialogs.open({ dialog: WalletListDialog });
           }}
         />

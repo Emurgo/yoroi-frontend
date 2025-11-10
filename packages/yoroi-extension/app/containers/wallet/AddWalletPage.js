@@ -22,7 +22,7 @@ import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../stores';
-import { ampli } from '../../../ampli/index';
+import { captureEvent } from '../../../posthog';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
@@ -52,7 +52,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.trezorConnect.init();
-      ampli.connectWalletCheckPageViewed();
+      captureEvent('Connect Wallet Check Page Viewed');
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
@@ -63,7 +63,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.ledgerConnect.init();
-      ampli.connectWalletCheckPageViewed();
+      captureEvent('Connect Wallet Check Page Viewed');
     };
 
     let activeDialog = null;

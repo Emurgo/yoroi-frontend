@@ -17,7 +17,7 @@ import { THEMES } from '../../styles/themes';
 import { refreshCurrentCoinPrice } from '../../api/thunk';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
-import { enablePosthog } from '../../../posthog';
+import { enablePosthog, disablePosthog } from '../../../posthog';
 
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void;
@@ -393,7 +393,11 @@ export default class BaseProfileStore<
   onOptForAnalytics: boolean => void = isAnalyticsAllowed => {
     this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
     this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
-    ampli.client.setOptOut(!isAnalyticsAllowed);
+    if (isAnalyticsAllowed) {
+      enablePosthog();
+    } else {
+      disablePosthog();
+    }
   };
 
   @computed get isAnalyticsOpted(): boolean {

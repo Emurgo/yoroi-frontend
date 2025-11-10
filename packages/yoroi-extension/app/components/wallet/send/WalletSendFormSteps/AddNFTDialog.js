@@ -14,7 +14,6 @@ import { getNFTs } from '../../../../utils/wallet';
 import { OutlinedInput, Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Box } from '@mui/system';
-import { ampli } from '../../../../../ampli/index';
 import MinAda from './MinAda';
 import Dialog from '../../../widgets/Dialog';
 import styles from './AddNFTDialog.scss';
@@ -155,11 +154,6 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
-    if (changed) {
-      ampli.sendSelectAssetUpdated({
-        asset_count: tokens.length,
-      });
-    }
   };
 
   render(): Node {

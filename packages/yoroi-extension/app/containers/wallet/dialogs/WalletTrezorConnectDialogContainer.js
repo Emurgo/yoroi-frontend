@@ -13,7 +13,7 @@ import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresProps } from '../../../stores';
-import { ampli } from '../../../../ampli/index';
+import { captureEvent } from '../../../../posthog';
 
 type LocalProps = {|
   +onClose: void => void,
@@ -50,7 +50,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             submit={() => {
               trezorConnectStore.submitCheck();
-              ampli.connectWalletConnectPageViewed();
+              captureEvent('Connect Wallet Connect Page Viewed');
             }}
             cancel={this.cancel}
             onBack={this.props.onBack}
@@ -66,7 +66,7 @@ export default class WalletTrezorConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             goBack={() => {
               trezorConnectStore.goBackToCheck();
-              ampli.connectWalletCheckPageViewed();
+              captureEvent('Connect Wallet Check Page Viewed');
             }}
             submit={trezorConnectStore.submitConnect}
             cancel={this.cancel}

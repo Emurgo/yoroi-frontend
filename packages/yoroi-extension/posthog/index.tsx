@@ -20,6 +20,10 @@ export function enablePosthog() {
   isEnabled = true;
 }
 
+export function disablePosthog() {
+  isEnabled = false;
+}
+
 export function YoroiPosthogProvider(children) {
   return (
     <PostHogProvider client={posthog}>
