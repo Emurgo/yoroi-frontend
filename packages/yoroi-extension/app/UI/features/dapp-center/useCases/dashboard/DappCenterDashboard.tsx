@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { ampli } from '../../../../../../ampli/index';
 import { defineMessages, useIntl } from 'react-intl';
 import NoDappsConnected from '../../common/components/NoDappsConnected';
 import ConnectionRow from '../../common/components/ConnectionRow';
@@ -31,10 +30,6 @@ const DappCenterDashboard = observer(() => {
   const theme = useTheme();
   const intl = useIntl();
   //const strings = useStrings();
-
-  useEffect(() => {
-    ampli.connectorPageViewed();
-  }, []);
 
   const { cardanoNodes = [] } = useDappConnections();
 

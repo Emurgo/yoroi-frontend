@@ -12,12 +12,12 @@ import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
-import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 import links from '../links';
+import { captureEvent } from '../../posthog';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
@@ -158,7 +158,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
                   window.open(links.testnetFaucet, '_blank');
                 } else {
                   if (stores.routing.currentRoute.startsWith(ROUTES.WALLETS.ROOT)) {
-                    ampli.walletPageExchangeClicked();
+                    captureEvent('Wallet Page Exchange Clicked');
                   }
                   this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
                 }

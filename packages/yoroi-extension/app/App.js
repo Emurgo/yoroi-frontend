@@ -58,7 +58,7 @@ function RoutingHelper(props: Props) {
     } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
       ampli.createWalletLanguagePageViewed();
     } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
-      ampli.connectorPageViewed();
+      captureEvent('Connector Page Viewed');
     } else if (pathname === ROUTES.WALLETS.ADD) {
       ampli.createWalletSelectMethodPageViewed();
     } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
@@ -70,14 +70,13 @@ function RoutingHelper(props: Props) {
     } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
       ampli.transactionsPageViewed();
     } else if (pathname === ROUTES.STAKING) {
-      ampli.stakingCenterPageViewed();
+      captureEvent('Staking Center Page Viewed');
     } else if (pathname === ROUTES.WALLETS.ROOT) {
       ampli.walletPageViewed();
     } else if (pathname === ROUTES.Governance.ROOT) {
-      ampli.governanceDashboardPageViewed();
+      captureEvent('Governance Dashboard Page Viewed');
     } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
-      const TAB = 'Wallet Token';
-      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
+      captureEvent('Portfolio Dashboard Page Viewed');
     } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
       const TAB = 'Overview';
       ampli.portfolioTokenDetails({ token_details_tab: TAB });

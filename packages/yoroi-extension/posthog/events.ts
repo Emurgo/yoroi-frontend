@@ -15,4 +15,11 @@ export interface EventDefinitions {
   'Payment Urls Page Viewed': [],
   'Send Initiated': [],
   'Send Select Asset Page Viewed': [],
+  'Staking Center Page Viewed': [],
+  'Governance Dashboard Page Viewed': [],
+  'Wallet Page Exchange Clicked': [],
+  'Portfolio Dashboard Page Viewed': [],
+  'NFT Gallery Page Viewed': [],
+  'NFT Gallery Details Page Viewed': [],
+  'Connector Page Viewed': [],
 }
