@@ -29,5 +29,5 @@ export function captureEvent<EventName extends keyof EventDefinitions>(event: Ev
   if (environment.isDev()) {
     console.info('posthog event %s captured', event);
   }
-  posthog.capture(event, { ...params, platform: PLATFORM_ID });
+  posthog.capture(event, { ...(params[0]), platform: PLATFORM_ID });
 }
