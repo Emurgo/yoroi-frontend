@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import WalletTab from '../../../pages/wallet/walletTab/walletTab.page.js';
 import PortfolioTab from '../../../pages/wallet/portfolio/porfolioMain.page.js';
 import PortfolioTokenDetails from '../../../pages/wallet/portfolio/portfolioDetails.page.js';
@@ -17,17 +16,24 @@ describe('Portfolio Check the displayed balance', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
+  /** @type {WalletTab} */
+  let walletCommonPage = null;
+  /** @type {PortfolioTab} */
+  let portfolioMainPage = null;
+  /** @type {PortfolioTokenDetails} */
+  let tokenDetailsPage = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    walletCommonPage = new WalletTab(webdriver, logger);
+    portfolioMainPage = new PortfolioTab(webdriver, logger);
+    tokenDetailsPage = new PortfolioTokenDetails(webdriver, logger);
   });
 
   it('Open Portfolio page', async function () {
-    const walletCommonPage = new WalletTab(webdriver, logger);
     await walletCommonPage.goToPortfolioTab();
-    const portfolioMainPage = new PortfolioTab(webdriver, logger);
     const pageIsDisplayed = await portfolioMainPage.isDisplayed();
     expect(pageIsDisplayed, 'Portfolio page is not displayed').to.be.true;
     const isLoaded = await portfolioMainPage.waitIsLoaded();
@@ -35,7 +41,6 @@ describe('Portfolio Check the displayed balance', function () {
   });
 
   it('Check the displayed balance on main page', async function () {
-    const portfolioMainPage = new PortfolioTab(webdriver, logger);
     const pageIsLoaded = await portfolioMainPage.waitIsLoaded();
     expect(pageIsLoaded, 'Portfolio is not loaded').to.be.true;
     const portfolioBalance = await portfolioMainPage.getPortfolioBalance();
@@ -50,14 +55,12 @@ describe('Portfolio Check the displayed balance', function () {
   });
 
   it('Check the displayed balance on details page', async function () {
-    const portfolioMainPage = new PortfolioTab(webdriver, logger);
     // ADA token is first by default if there is no sorting applied
     await portfolioMainPage.selectTokenByIndex(0);
-    const detailsPage = new PortfolioTokenDetails(webdriver, logger);
     const topBarBalance = await portfolioMainPage.getSelectedWalletInfo();
-    const mainCurrency = await detailsPage.getMainBalance();
+    const mainCurrency = await tokenDetailsPage.getMainBalance();
     expect(mainCurrency.value, 'Token details. ADA balance is different from the top-bar').to.be.equal(topBarBalance.balance);
-    const secondCurrency = await detailsPage.getSecondBalance();
+    const secondCurrency = await tokenDetailsPage.getSecondBalance();
     expect(secondCurrency.value, 'Token details. Fiat balance is different from the top-bar').to.be.equal(
       topBarBalance.fiatBalance
     );
@@ -67,11 +70,10 @@ describe('Portfolio Check the displayed balance', function () {
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

@@ -41,18 +41,31 @@ class BasePage {
     method: 'xpath',
   };
 
+  /**
+   * Navigates the browser to the given URL.
+   * @param {string} theURL - URL to go to
+   */
   async goToUrl(theURL) {
     this.logger.info(`BasePage::goToUrl is called. "${theURL}"`);
     await this.driver.get(theURL);
   }
+  /**
+   * Refreshes the current page.
+   */
   async refreshPage() {
     this.logger.info('BasePage::refreshPage is called');
     await this.driver.navigate().refresh();
   }
+  /**
+   * Closes the browser.
+   */
   async closeBrowser() {
     this.logger.info('BasePage::closeBrowser is called');
     await this.driver.quit();
   }
+  /**
+   * Navigates to the browser extension's root URL and waits for root element.
+   */
   async goToExtension() {
     this.logger.info('BasePage::goToExtension is called');
     await this.setImplicitTimeout(halfSecond, this.goToExtension.name);
@@ -63,6 +76,9 @@ class BasePage {
 
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtension.name);
   }
+  /**
+   * Navigates to the Transactions URL of the extension and waits for root element.
+   */
   async goToExtensionTransactions() {
     this.logger.info('BasePage::goToExtensionTransactions is called');
     await this.setImplicitTimeout(halfSecond, this.goToExtensionTransactions.name);
@@ -71,6 +87,10 @@ class BasePage {
 
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToExtensionTransactions.name);
   }
+  /**
+   * Clicks an element found by the given locator, with retries on stale element error.
+   * @param {ElementLocator} locator
+   */
   async click(locator) {
     this.logger.info(`BasePage::click is called. Locator: ${JSON.stringify(locator)}`);
     let success = false;
@@ -94,20 +114,36 @@ class BasePage {
       throw new Error(`StaleElementReferenceError on the element ${JSON.stringify(locator)}`);
     }
   }
+  /**
+   * Clicks the element specified by locator using JavaScript.
+   * @param {ElementLocator} locator
+   */
   async clickByScript(locator) {
     this.logger.info(`BasePage::clickByScript is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     await this.driver.executeScript(`arguments[0].click()`, element);
   }
+  /**
+   * Clicks the given WebElement using JavaScript.
+   * @param {WebElement} webElement
+   */
   async clickElementByScript(webElement) {
     this.logger.info(`BasePage::clickElementByScript is called.`);
     await this.driver.executeScript(`arguments[0].click()`, webElement);
   }
+  /**
+   * Focuses on the element by locator.
+   * @param {ElementLocator} locator
+   */
   async focus(locator) {
     this.logger.info(`BasePage::focus is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     await this.driver.executeScript('arguments[0].focus();', element);
   }
+  /**
+   * Dispatches a mouse down event on the given locator.
+   * @param {ElementLocator} locator
+   */
   async dispatchMouseDownEvent(locator) {
     this.logger.info(`BasePage::dispatchMouseDownEvent is called. Locator: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
@@ -116,26 +152,47 @@ class BasePage {
       element
     );
   }
+  /**
+   * Hovers over the element specified by locator.
+   * @param {ElementLocator} locator
+   */
   async hover(locator) {
     this.logger.info(`BasePage::hoverOnElement is called. Locator: ${JSON.stringify(locator)}`);
     const webElement = await this.findElement(locator);
     await this.hoverOnElement(webElement);
   }
+  /**
+   * Hovers over the provided web element.
+   * @param {WebElement} webElement
+   */
   async hoverOnElement(webElement) {
     this.logger.info(`BasePage::hoverOnElement is called.`);
     const actions = this.driver.actions();
     await actions.move({ origin: webElement }).perform();
   }
+  /**
+   * Scrolls the element found by locator into view.
+   * @param {ElementLocator} locator
+   */
   async scrollIntoView(locator) {
     this.logger.info(`BasePage::scrollIntoView is called. Values: ${JSON.stringify(locator)}`);
     await this.waitForElement(locator);
     const clickable = await this.findElement(locator);
     await this.driver.executeScript('arguments[0].scrollIntoView()', clickable);
   }
+  /**
+   * Scrolls the provided web element into view.
+   * @param {WebElement} webElement
+   */
   async scrollIntoViewElement(webElement) {
     this.logger.info(`BasePage::scrollIntoViewElement is called.`);
     await this.driver.executeScript('arguments[0].scrollIntoView()', webElement);
   }
+  /**
+   * Finds an element using the locator.
+   * @param {ElementLocator} locator
+   * @returns {Promise<WebElement>}
+   */
   async findElement(locator) {
     this.logger.info(`BasePage::findElement is called. Locator: ${JSON.stringify(locator)}`);
     return await this.driver.findElement(getByLocator(locator));
@@ -175,6 +232,12 @@ class BasePage {
       }
     });
   }
+  /**
+   * Gets the CSS value for a specific style property of an element by locator.
+   * @param {ElementLocator} locator
+   * @param {string} cssStyleProperty
+   * @returns {Promise<*>}
+   */
   async getCssValue(locator, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValue is called. Locator: ${JSON.stringify(locator)}, property: ${cssStyleProperty}`);
     const element = await this.driver.findElement(getByLocator(locator));
@@ -182,6 +245,12 @@ class BasePage {
     this.logger.info(`BasePage::getCssValue Result: ${result}`);
     return result;
   }
+  /**
+   * Gets the CSS value for a specific style property of a WebElement.
+   * @param {WebElement} webElement
+   * @param {string} cssStyleProperty
+   * @returns {Promise<*>}
+   */
   async getCssValueElement(webElement, cssStyleProperty) {
     this.logger.info(`BasePage::getCssValueElement is called. Property: ${cssStyleProperty}`);
     const result = await webElement.getCssValue(cssStyleProperty);
@@ -204,14 +273,31 @@ class BasePage {
     }
   }
 
+  /**
+   * Gets the value of an attribute for an element by locator.
+   * @param {ElementLocator} locator
+   * @param {string} property
+   * @returns {Promise<*>}
+   */
   async getAttribute(locator, property) {
     this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
     return await this.driver.findElement(getByLocator(locator)).getAttribute(property);
   }
+  /**
+   * Gets the value of an attribute for a WebElement.
+   * @param {WebElement} webElement
+   * @param {string} property
+   * @returns {Promise<*>}
+   */
   async getAttributeElement(webElement, property) {
     this.logger.info(`BasePage::getAttributeElement is called. Property: ${property}`);
     return await webElement.getAttribute(property);
   }
+  /**
+   * Gets a link URL from a component using a locator.
+   * @param {ElementLocator} locator
+   * @returns {Promise<string>}
+   */
   async getLinkFromComponent(locator) {
     this.logger.info(`BasePage::getLinkFromComponent is called. Locator: ${JSON.stringify(locator)}`);
     const webElem = await this.driver.findElement(getByLocator(locator));
@@ -219,6 +305,12 @@ class BasePage {
     const linkText = await this.getAttributeElement(linkElem, 'href');
     return linkText;
   }
+  /**
+   * Gets the parent web element above the given element by a certain level.
+   * @param {ElementLocator} locator
+   * @param {number} numberAbove
+   * @returns {Promise<WebElement>}
+   */
   async getWebElementAbove(locator, numberAbove) {
     this.logger.info(
       `BasePage::getWebElementAbove is called. Locator: ${JSON.stringify(locator)}, NumberAbove: ${JSON.stringify(numberAbove)}`
@@ -226,6 +318,12 @@ class BasePage {
     const webElement = await this.findElement(locator);
     return await this.getWebElementAboveElement(webElement, numberAbove);
   }
+  /**
+   * Gets the parent web element above the given WebElement by a certain level.
+   * @param {WebElement} webElement
+   * @param {number} numberAbove
+   * @returns {Promise<WebElement>}
+   */
   async getWebElementAboveElement(webElement, numberAbove) {
     this.logger.info(`BasePage::getWebElementAboveElement is called. NumberAbove: ${JSON.stringify(numberAbove)}`);
     const parentLocator = '.' + '/..'.repeat(numberAbove);
@@ -237,10 +335,22 @@ class BasePage {
 
     return parentElement;
   }
+  /**
+   * Executes a given script on local storage.
+   * @param {string} script
+   * @returns {Promise<*>}
+   */
   async executeLocalStorageScript(script) {
     this.logger.info(`BasePage::executeLocalStorageScript is called. Script: ${JSON.stringify(script)}`);
     return await this.driver.executeScript(`return localStorage.${script}`);
   }
+  /**
+   * Types a value into an input found by locator.
+   * @param {ElementLocator} locator
+   * @param {string} value
+   * @param {boolean} [hideInLog=false]
+   * @returns {Promise<void>}
+   */
   async input(locator, value, hideInLog = false) {
     this.logger.info(`BasePage::input is called. Locator: ${JSON.stringify(locator)}, Value: ${hideInLog ? '******' : value}`);
     const input = await this.findElement(locator);
@@ -249,6 +359,13 @@ class BasePage {
       await this.sleep(5, false);
     }
   }
+  /**
+   * Types a value into a WebElement input.
+   * @param {WebElement} webElement
+   * @param {string} value
+   * @param {boolean} [hideInLog=false]
+   * @returns {Promise<void>}
+   */
   async inputElem(webElement, value, hideInLog = false) {
     this.logger.info(`BasePage::inputElem is called. Value: ${hideInLog ? '******' : value}`);
     for (let index = 0; index < value.length; index++) {
@@ -256,15 +373,31 @@ class BasePage {
       await this.sleep(5, false);
     }
   }
+  /**
+   * Clears the value in an input field found by locator.
+   * @param {ElementLocator} locator
+   * @returns {Promise<void>}
+   */
   async clearInput(locator) {
     this.logger.info(`BasePage::clearInput is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
     await input.clear();
   }
+  /**
+   * Clears the value in an input WebElement.
+   * @param {WebElement} inputWebElement
+   * @returns {Promise<void>}
+   */
   async clearInputElem(inputWebElement) {
     this.logger.info(`BasePage::clearInput is clearInputElem.`);
     await inputWebElement.clear();
   }
+  /**
+   * Clears the input and updates the underlying form by simulating backspaces.
+   * @param {ElementLocator} locator
+   * @param {number} textLength
+   * @returns {Promise<void>}
+   */
   async clearInputUpdatingForm(locator, textLength) {
     this.logger.info(
       `BasePage::clearInputUpdatingForm is called. Locator: ${JSON.stringify(locator)}, Text lenght: ${textLength}`
@@ -274,6 +407,11 @@ class BasePage {
       await input.sendKeys(Key.BACK_SPACE);
     }
   }
+  /**
+   * Selects all text in the input and deletes it.
+   * @param {ElementLocator} locator
+   * @returns {Promise<void>}
+   */
   async clearInputAll(locator) {
     this.logger.info(`BasePage::clearInputAll is called. Locator: ${JSON.stringify(locator)}`);
     const input = await this.findElement(locator);
@@ -284,22 +422,49 @@ class BasePage {
     await input.sendKeys(Key.NULL);
     await input.sendKeys(Key.BACK_SPACE);
   }
+  /**
+   * Sets the implicit wait timeout for driver commands.
+   * @param {number} timeoutMs
+   * @param {string} functionName
+   * @returns {Promise<void>}
+   */
   async setImplicitTimeout(timeoutMs, functionName) {
     this.logger.info(`BasePage::setImplicitTimeout is called. Function: ${functionName}. Timeout: ${timeoutMs}`);
     await this.driver.manage().setTimeouts({ implicit: timeoutMs });
   }
+  /**
+   * Gets a JSON value from local storage by key.
+   * @param {string} key
+   * @returns {Promise<*>}
+   */
   async getFromLocalStorage(key) {
     this.logger.info(`BasePage::getFromLocalStorage is called. Key: ${key}`);
     const result = await this.executeLocalStorageScript(`getItem("${key}")`);
     return JSON.parse(result);
   }
+  /**
+   * Saves a value to local storage under the specified key.
+   * @param {string} key
+   * @param {*} value
+   * @returns {Promise<void>}
+   */
   async saveToLocalStorage(key, value) {
     this.logger.info(`BasePage::saveToLocalStorage is called. Key: "${key}", Value: "${value}"`);
     await this.executeLocalStorageScript(`setItem("${key}", '${JSON.stringify(value)}')`);
   }
+  /**
+   * Drops the Yoroi extension's Ada database.
+   * @returns {Promise<void>}
+   */
   async dropDB() {
     await this.driver.executeScript(() => window.yoroi.api.ada.dropDB());
   }
+  /**
+   * Takes a screenshot and writes it to the test suite's data directory.
+   * @param {string} testSuiteName
+   * @param {string} screenshotName
+   * @returns {Promise<void>}
+   */
   async takeScreenshot(testSuiteName, screenshotName) {
     this.logger.info(
       `BasePage::takeScreenshot is called. testSuiteName: "${testSuiteName}", screenshotName: "${screenshotName}" `
@@ -311,6 +476,12 @@ class BasePage {
     const screenshotPath = path.resolve(testRundDataDir, `screenshot_${cleanName}.png`);
     await writeFile(screenshotPath, screenshot, 'base64');
   }
+  /**
+   * Takes a DOM snapshot and writes it to the test suite's data directory.
+   * @param {string} testSuiteName
+   * @param {string} snapshotName
+   * @returns {Promise<void>}
+   */
   async takeSnapshot(testSuiteName, snapshotName) {
     this.logger.info(`BasePage::takeSnapshot is called. testSuiteName: "${testSuiteName}", snapshotName: "${snapshotName}" `);
     const testRundDataDir = createTestRunDataDir(testSuiteName);
@@ -320,6 +491,12 @@ class BasePage {
     const html = await this.driver.executeScript('return document.body.innerHTML;');
     await writeFile(snapshotPath, html);
   }
+  /**
+   * Collects browser logs and saves them to file.
+   * @param {string} testSuiteName
+   * @param {string} logFileName
+   * @returns {Promise<void>}
+   */
   async getBrowserLogs(testSuiteName, logFileName) {
     this.logger.info(`BasePage::getBrowserLogs is called. testSuiteName: "${testSuiteName}", logFileName: "${logFileName}" `);
     const testRundDataDir = createTestRunDataDir(testSuiteName);
@@ -333,6 +510,12 @@ class BasePage {
     });
     await writeFile(logsPaths, jsonLogsStrings.join(',\n'));
   }
+  /**
+   * Collects driver logs and saves them to file.
+   * @param {string} testSuiteName
+   * @param {string} logFileName
+   * @returns {Promise<void>}
+   */
   async getDriverLogs(testSuiteName, logFileName) {
     this.logger.info(`BasePage::getDriverLogs is called.`);
     const testRundDataDir = createTestRunDataDir(testSuiteName);
@@ -342,22 +525,42 @@ class BasePage {
     const driverLogsStrings = driverLogEntries.map(l => `[${l.level}] [${l.timestamp}] ${l.message}`);
     await writeFile(driverLogsPaths, driverLogsStrings.join(''));
   }
+  /**
+   * Waits for an element at the given locator to be located.
+   * @param {ElementLocator} locator
+   * @returns {Promise<WebElement>}
+   */
   async waitForElementLocated(locator) {
     this.logger.info(`BasePage::waitForElementLocated is called. Value: ${JSON.stringify(locator)}`);
     const isLocated = until.elementLocated(getByLocator(locator));
     return await this.driver.wait(isLocated);
   }
+  /**
+   * Waits for an element at the given locator to become visible.
+   * @param {ElementLocator} locator
+   * @returns {Promise<WebElement>}
+   */
   async waitForElement(locator) {
     this.logger.info(`BasePage::waitForElement is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.waitForElementLocated(locator);
     return await this.driver.wait(until.elementIsVisible(element));
   }
+  /**
+   * Waits for an element at the given locator to become enabled.
+   * @param {ElementLocator} locator
+   * @returns {Promise<WebElement>}
+   */
   async waitEnable(locator) {
     this.logger.info(`BasePage::waitEnable is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     const condition = until.elementIsEnabled(element);
     return this.driver.wait(condition);
   }
+  /**
+   * Returns a boolean indicating if a button is enabled by checking the 'disabled' attribute.
+   * @param {ElementLocator} locator
+   * @returns {Promise<boolean>}
+   */
   async buttonIsEnabled(locator) {
     this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
     const buttonIsEnabled = await this.customWaiter(
@@ -371,12 +574,22 @@ class BasePage {
 
     return buttonIsEnabled;
   }
+  /**
+   * Waits for an element at the given locator to become disabled.
+   * @param {ElementLocator} locator
+   * @returns {Promise<WebElement>}
+   */
   async waitDisabled(locator) {
     this.logger.info(`BasePage::waitDisabled is called. Value: ${JSON.stringify(locator)}`);
     const element = await this.findElement(locator);
     const condition = until.elementIsDisabled(element);
     return this.driver.wait(condition);
   }
+  /**
+   * Waits for an element at the locator to not be present.
+   * @param {ElementLocator} locator
+   * @returns {Promise<void>}
+   */
   async waitForElementNotPresent(locator) {
     this.logger.info(`BasePage::waitForElementNotPresent is called. Value: ${JSON.stringify(locator)}`);
     await this.driver.wait(async () => {
@@ -384,6 +597,12 @@ class BasePage {
       return elements.length === 0;
     });
   }
+  /**
+   * Waits for an element at the locator and checks its text matches a regex.
+   * @param {ElementLocator} locator
+   * @param {RegExp} regex
+   * @returns {Promise<WebElement>}
+   */
   async waitElementTextMatches(locator, regex) {
     this.logger.info(`BasePage::waitElementTextMatches is called. Value: ${JSON.stringify(locator)}. Regex "${regex}"`);
     await this.waitForElement(locator);
@@ -392,6 +611,13 @@ class BasePage {
     await this.driver.wait(condition);
     return element;
   }
+  /**
+   * Waits for a custom condition function until timeout or repeat period.
+   * @param {function():Promise<boolean>} conditionFunc
+   * @param {number} [timeout=defaultWaitTimeout]
+   * @param {number} [repeatPeriod=defaultRepeatPeriod]
+   * @returns {Promise<boolean>}
+   */
   async customWaiter(conditionFunc, timeout = defaultWaitTimeout, repeatPeriod = defaultRepeatPeriod) {
     this.logger.info(`BasePage::customWaiter is called.`);
     const endTime = Date.now() + timeout;
@@ -409,6 +635,13 @@ class BasePage {
     await this.setImplicitTimeout(defaultWaitTimeout, this.customWaiter.name);
     return false;
   }
+  /**
+   * Waits until the element at locator is presented on the page.
+   * @param {ElementLocator} locator
+   * @param {number} [timeout=defaultWaitTimeout]
+   * @param {number} [repeatPeriod=defaultRepeatPeriod]
+   * @returns {Promise<boolean>}
+   */
   async customWaitIsPresented(locator, timeout = defaultWaitTimeout, repeatPeriod = defaultRepeatPeriod) {
     this.logger.info(`BasePage::customWaitIsPresented is called.`);
     const result = await this.customWaiter(
@@ -421,6 +654,13 @@ class BasePage {
     );
     return result;
   }
+  /**
+   * Waits until the element at locator is not presented on the page.
+   * @param {ElementLocator} locator
+   * @param {number} [timeout=defaultWaitTimeout]
+   * @param {number} [repeatPeriod=defaultRepeatPeriod]
+   * @returns {Promise<boolean>}
+   */
   async customWaitIsNotPresented(locator, timeout = defaultWaitTimeout, repeatPeriod = defaultRepeatPeriod) {
     this.logger.info(`BasePage::customWaitIsNotPresented is called.`);
     const result = await this.customWaiter(
@@ -450,12 +690,23 @@ class BasePage {
       throw new Error(`The element is not found. Element: ${locator.locator}`);
     }
   }
+  /**
+   * Sleeps for the given amount of milliseconds.
+   * @param {number} milliseconds
+   * @param {boolean} [logIt=true]
+   * @returns {Promise<void>}
+   */
   async sleep(milliseconds, logIt = true) {
     if (logIt) {
       this.logger.info(`BasePage::sleep is called. Value: ${milliseconds}`);
     }
     await this.driver.sleep(milliseconds);
   }
+  /**
+   * Checks if the given locator exists on the page.
+   * @param {ElementLocator} locator
+   * @returns {Promise<boolean>}
+   */
   async checkIfExists(locator) {
     this.logger.info(`BasePage::checkIfExists: Checking if element exists "${JSON.stringify(locator)}"`);
     await this.setImplicitTimeout(oneSecond, this.checkIfExists.name);
@@ -483,40 +734,22 @@ class BasePage {
       webElement
     );
   }
-  // tableNames are [ 'UtxoAtSafePointTable', 'UtxoDiffToBestBlock', 'UtxoTransactionInput', 'UtxoTransactionOutput']
+  /**
+   * Gets info from IndexedDB for a given table name.
+   * @param {string} tableName
+   * @returns {Promise<*>}
+   */
   async getInfoFromIndexedDB(tableName) {
     this.logger.info(`BasePage::getInfoFromIndexedDB Table name "${tableName}"`);
     const result = await this.getInfoFromIndexedDBChrome(tableName);
     this.logger.info(`BasePage::getInfoFromIndexedDB::result ${JSON.stringify(result)}`);
     return result;
   }
-  async getInfoFromIndexedDBFF(tableName) {
-    this.logger.info(`BasePage::getInfoFromIndexedDBFF Table name "${tableName}"`);
-    await this.driver.executeScript(table => {
-      const dbName = 'yoroi-schema';
-      const dbRequest = window.indexedDB.open(dbName);
-      dbRequest.onsuccess = function (event) {
-        const db = event.target.result;
-        // without that it doesn't work
-        window.dataBase = db;
-        const tableContentRequest = db.transaction(table, 'readonly').objectStore(table).mozGetAll();
-        tableContentRequest.onsuccess = function (event) {
-          window.tableData = event.target.result;
-        };
-      };
-    }, tableName);
-    let tableContent;
-    try {
-      // without that it doesn't work
-      await this.driver.executeScript(() => window.dataBase);
-      tableContent = await this.driver.executeScript(() => window.tableData);
-    } catch (error) {
-      this.webDriverLogger.warn(error);
-      tableContent = {};
-    }
-
-    return tableContent;
-  }
+  /**
+   * Gets info from IndexedDB (Chrome) for a given table name.
+   * @param {string} tableName
+   * @returns {Promise<*>}
+   */
   async getInfoFromIndexedDBChrome(tableName) {
     await this.driver.executeScript(() => {
       window.allDBsPromise = window.indexedDB.databases();
@@ -554,6 +787,10 @@ class BasePage {
     return tableContent;
   }
 
+  /**
+   * Gets the complete IndexedDB database from Chrome.
+   * @returns {Promise<*>}
+   */
   async getFullIndexedDBFromChrome() {
     this.logger.info(`BasePage::getFullIndexedDBFromChrome is called.`);
     await this.driver.executeScript(() => {
@@ -598,6 +835,12 @@ class BasePage {
     return fullDBDataResult;
   }
 
+  /**
+   * Saves the full IndexedDB from Chrome to a file, optionally overwriting.
+   * @param {string} fileName
+   * @param {boolean} [overwrite=false]
+   * @returns {Promise<void>}
+   */
   async saveFullIndexedDBChrome(fileName, overwrite = false) {
     this.logger.info(`BasePage::saveFullIndexedDBChrome is called. File name: "${fileName}"`);
     const fullDB = await this.getFullIndexedDBFromChrome();
@@ -612,6 +855,12 @@ class BasePage {
     }
   }
 
+  /**
+   * Sets info into an IndexedDB table in Chrome.
+   * @param {string} tableName
+   * @param {Array} value
+   * @returns {Promise<void>}
+   */
   async setInfoToIndexedDBChrome(tableName, value) {
     this.logger.info(`BasePage::setInfoToIndexedDBChrome is called for the table ${tableName}.`);
     this.driver.executeScript(() => {
@@ -649,6 +898,11 @@ class BasePage {
     }
   }
 
+  /**
+   * Gets info from Chrome browser local storage for a specified key.
+   * @param {string} key
+   * @returns {Promise<*>}
+   */
   async getInfoBrowserLocalStorage(key) {
     this.logger.info(`BasePage::getInfoBrowserLocalStorage is called. Key: "${key}"`);
     this.driver.executeScript(`await chrome.storage.local.get('${key}', function (result) {window.someKeyValue = result})`);
@@ -657,11 +911,23 @@ class BasePage {
     return result;
   }
 
+  /**
+   * Sets information in Chrome browser local storage under a specific key.
+   * @param {string} key
+   * @param {string} value
+   * @returns {Promise<void>}
+   */
   async setInfoBrowserLocalStorage(key, value) {
     this.logger.info(`BasePage::setInfoChromeLocalStorage is called. Key: "${key}", value: "${value}"`);
     await this.driver.executeScript(`chrome.storage.local.set({ "${key}": "${value}" })`);
   }
 
+  /**
+   * Prepares IndexedDB, Chrome local storage, and localStorage using predefined templates.
+   * @param {string} templateName
+   * @param {boolean} [useGeneralStorageInfo=true]
+   * @returns {Promise<void>}
+   */
   async prepareDBAndStorage(templateName, useGeneralStorageInfo = true) {
     // import info into the indexedDB
     const dbSnapshot = getSnapshotObjectFromJSON(`${templateName}.indexedDB.json`, true);

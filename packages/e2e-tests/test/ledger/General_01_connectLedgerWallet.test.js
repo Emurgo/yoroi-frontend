@@ -3,7 +3,6 @@ import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import { LedgerEmulatorController } from '../../helpers/ledgerEmulatorController.js';
 import { WindowManager, extensionTabName, ledgerConnectTabName } from '../../helpers/windowManager.js';
-import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import LedgerConnect from '../../pages/ledgerConnect.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
@@ -29,6 +28,12 @@ for (const model in LedgerModels) {
     let ledgerController = null;
     /** @type {WindowManager} */
     let windowManager = null;
+    /** @type {AddNewWallet} */
+    let addNewWalletPage = null;
+    /** @type {LedgerConnect} */
+    let ledgerConnectPage = null;
+    /** @type {TransactionsSubTab} */
+    let transactionsPage = null;
 
     before(async function () {
       const speculosDockerLogger = getTestLogger('speculosDocker', this.test.parent.title);
@@ -51,6 +56,9 @@ for (const model in LedgerModels) {
       await preloadBrowserStorage(webdriver, logger, null, true, {
         'test-CURRENT_NETWORK_ID': '0',
       });
+      addNewWalletPage = new AddNewWallet(webdriver, logger);
+      ledgerConnectPage = new LedgerConnect(webdriver, logger);
+      transactionsPage = new TransactionsSubTab(webdriver, logger);
     });
 
     it('Ledger is ready', async function () {
@@ -59,7 +67,6 @@ for (const model in LedgerModels) {
     });
 
     it('Selecting Connect HW wallet', async function () {
-      const addNewWalletPage = new AddNewWallet(webdriver, logger);
       await addNewWalletPage.selectConnectHW();
       await addNewWalletPage.selectLedgerHW();
       await addNewWalletPage.confirmChecking();
@@ -68,7 +75,6 @@ for (const model in LedgerModels) {
 
     it('Approve connection', async function () {
       await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
-      const ledgerConnectPage = new LedgerConnect(webdriver, logger);
       if (ledgerController.isLedgerX()) {
         await ledgerConnectPage.selectNanoX();
       } else {
@@ -81,13 +87,11 @@ for (const model in LedgerModels) {
     });
 
     it('Enter wallet details', async function () {
-      const addNewWalletPage = new AddNewWallet(webdriver, logger);
       await addNewWalletPage.enterHWWalletName(testWalletLedger.name);
       await addNewWalletPage.saveHWInfo();
     });
 
     it('Check new wallet', async function () {
-      const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.waitPrepareWalletBannerIsClosed();
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
@@ -97,14 +101,12 @@ for (const model in LedgerModels) {
       expect(walletInfo.plate, `The wallet plate is different`).to.equal(testWalletLedger.plate);
     });
 
-    afterEach(function (done) {
-      customAfterEach(this, webdriver, logger);
-      done();
+    afterEach(async function () {
+      await customAfterEach(this, webdriver, logger);
     });
 
     after(async function () {
-      const basePage = new BasePage(webdriver, logger);
-      basePage.closeBrowser();
+      await transactionsPage.closeBrowser();
       await speculosDockerController.killAndRemove();
     });
   });

@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import WalletTab from '../../../pages/wallet/walletTab/walletTab.page.js';
 import PortfolioTab from '../../../pages/wallet/portfolio/porfolioMain.page.js';
 import { allTokens } from '../../../helpers/tokensInfo.js';
@@ -19,11 +18,20 @@ describe('Portfolio Redirection from token details', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
+  /** @type {WalletTab} */
+  let walletCommonPage = null;
+  /** @type {PortfolioTab} */
+  let portfolioMainPage = null;
+  /** @type {PortfolioTokenDetails} */
+  let tokenDetailsPage = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    walletCommonPage = new WalletTab(webdriver, logger);
+    portfolioMainPage = new PortfolioTab(webdriver, logger);
+    tokenDetailsPage = new PortfolioTokenDetails(webdriver, logger);
   });
 
   const testData = Object.keys(RedirectionButtons);
@@ -33,9 +41,7 @@ describe('Portfolio Redirection from token details', function () {
       const btnValue = RedirectionButtons[testDatum];
 
       it('Open Portfolio page', async function () {
-        const walletCommonPage = new WalletTab(webdriver, logger);
         await walletCommonPage.goToPortfolioTab();
-        const portfolioMainPage = new PortfolioTab(webdriver, logger);
         const pageIsDisplayed = await portfolioMainPage.isDisplayed();
         expect(pageIsDisplayed, 'Portfolio page is not displayed').to.be.true;
         const isLoaded = await portfolioMainPage.waitIsLoaded();
@@ -45,9 +51,7 @@ describe('Portfolio Redirection from token details', function () {
       const randomToken = getRandomItem(allTokens);
 
       it(`Open ${randomToken.name} token details`, async function () {
-        const portfolioMainPage = new PortfolioTab(webdriver, logger);
         await portfolioMainPage.selectTokenByName(randomToken.name);
-        const tokenDetailsPage = new PortfolioTokenDetails(webdriver, logger);
         const pageIsDisplayed = await tokenDetailsPage.isDisplayed();
         expect(pageIsDisplayed, 'Token details page is not displayed').to.be.true;
       });
@@ -60,11 +64,10 @@ describe('Portfolio Redirection from token details', function () {
   }
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

@@ -9,20 +9,32 @@ import { getTestLogger } from '../../../utils/utils.js';
 import { oneMinute, twoSeconds } from '../../../helpers/timeConstants.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Cashback One wallet added', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WalletTab} */
+  let walletTab = null;
+  /** @type {CashbackTermsModal} */
+  let termsModal = null;
+  /** @type {CashbackPage} */
+  let cashbackPage = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1Mainnet', this, false);
+    walletTab = new WalletTab(webdriver, logger);
+    termsModal = new CashbackTermsModal(webdriver, logger);
+    cashbackPage = new CashbackPage(webdriver, logger);
   });
 
   it('Navigates to Cashback page', async function () {
-    const walletTab = new WalletTab(webdriver, logger);
     await walletTab.goToCashbackTab();
     await walletTab.sleep(twoSeconds);
 
@@ -32,8 +44,6 @@ describe('Cashback One wallet added', function () {
   });
 
   it('Check first-time popup is displayed', async function () {
-    const termsModal = new CashbackTermsModal(webdriver, logger);
-
     // Verify the disclaimer modal is displayed
     const modalDisplayed = await termsModal.isDisplayed();
     expect(modalDisplayed, 'Terms modal should be displayed').to.be.true;
@@ -43,18 +53,15 @@ describe('Cashback One wallet added', function () {
     const modalIsClosed = await termsModal.closeCashbackTermsModal();
     expect(modalIsClosed, 'Terms modal should not be displayed').to.be.true;
 
-    const walletTabPage = new WalletTab(webdriver, logger);
-    const currentTitle = await walletTabPage.getPageTitle();
+    const currentTitle = await walletTab.getPageTitle();
     expect(currentTitle).to.equal(pageTitle.wallet, `Expected to be on ${pageTitle.wallet} page`);
   });
 
   it('Verify cannot continue without accepting terms on popup', async function () {
-    const walletTabPage = new WalletTab(webdriver, logger);
-    await walletTabPage.goToCashbackTab();
-    await walletTabPage.sleep(twoSeconds);
+    await walletTab.goToCashbackTab();
+    await walletTab.sleep(twoSeconds);
 
     // Check if proceed button is initially disabled
-    const termsModal = new CashbackTermsModal(webdriver, logger);
     const isInitiallyEnabled = await termsModal.isProceedButtonEnabled();
     expect(isInitiallyEnabled, 'Proceed button should be disabled initially').to.be.false;
 
@@ -69,8 +76,6 @@ describe('Cashback One wallet added', function () {
   });
 
   it('Check page has cashback cards', async function () {
-    const cashbackPage = new CashbackPage(webdriver, logger);
-
     // Verify the claim button is visible
     const claimButtonVisible = await cashbackPage.isClaimCashbackButtonVisible();
     expect(claimButtonVisible).to.be.true;
@@ -80,14 +85,11 @@ describe('Cashback One wallet added', function () {
     expect(cardCount).to.be.greaterThan(0, 'Cashback cards should be displayed');
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await walletTab.closeBrowser();
   });
 });

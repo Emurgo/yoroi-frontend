@@ -15,29 +15,56 @@ import StakingTab from '../../../pages/wallet/stakingTab/stakingTab.page.js';
 import ReceiveSubTab from '../../../pages/wallet/walletTab/receiveSubTab.page.js';
 import { pageTitle } from '../../../helpers/pageTitles.js';
 import { preloadBrowserStorage } from '../../../helpers/restoreWalletHelper.js';
-import WalletCommonBase from '../../../pages/walletCommonBase.page.js';
 import NftGalleryTab from '../../../pages/wallet/nftGallery/nftGalleryMain.page.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Creating wallet _smoke_', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {CreateWalletStepOne} */
+  let createWalletStepOnePage = null;
+  /** @type {CreateWalletStepTwo} */
+  let createWalletStepTwoPage = null;
+  /** @type {CreateWalletStepThree} */
+  let createWalletStepThreePage = null;
+  /** @type {WalletDetails} */
+  let walletDetailsPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {ReceiveSubTab} */
+  let receivePage = null;
+  /** @type {StakingTab} */
+  let stakingPage = null;
+  /** @type {NftGalleryTab} */
+  let nftsGalleryPage = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     await preloadBrowserStorage(webdriver, logger);
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
+    createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
+    createWalletStepThreePage = new CreateWalletStepThree(webdriver, logger);
+    walletDetailsPage = new WalletDetails(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    receivePage = new ReceiveSubTab(webdriver, logger);
+    stakingPage = new StakingTab(webdriver, logger);
+    nftsGalleryPage = new NftGalleryTab(webdriver, logger);
   });
 
   it('Selecting Create wallet', async function () {
-    const addNewWalletPage = new AddNewWallet(webdriver, logger);
     await addNewWalletPage.selectCreateNewWallet();
   });
 
   it('Remember a seed phrase', async function () {
-    const createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
     await createWalletStepOnePage.continue();
-    const createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
     await createWalletStepTwoPage.closeTipsModalWindow();
     const allWordsBlurredBefore = await createWalletStepTwoPage.recoveryPhraseIsBlurred();
     expect(allWordsBlurredBefore).to.true;
@@ -49,7 +76,6 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Repeat the seed phrase', async function () {
-    const createWalletStepThreePage = new CreateWalletStepThree(webdriver, logger);
     const recoveryPhrase = await createWalletStepThreePage.getRecoveryPhraseFromStorage();
     await createWalletStepThreePage.enterRecoveryPhrase(recoveryPhrase);
     const phraseIsValid = await createWalletStepThreePage.recoveryPhraseIsValid();
@@ -58,7 +84,6 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Enter wallet details', async function () {
-    const walletDetailsPage = new WalletDetails(webdriver, logger);
     // close info dialog
     await walletDetailsPage.closeTipsModalWindow();
     // enter wallet details
@@ -82,7 +107,6 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Check new wallet info', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.waitPrepareWalletBannerIsClosed();
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed).to.be.true;
@@ -97,15 +121,12 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Check the wallet is empty', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txsAmount = await transactionsPage.walletIsEmpty();
     expect(txsAmount, 'A new wallet is not empty').to.be.true;
   });
 
   it('Check amount of external and internal addresses', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToReceiveSubMenu();
-    const receivePage = new ReceiveSubTab(webdriver, logger);
     await receivePage.selectBaseExtAllAddrs();
     const extAddrsAmount = await receivePage.getAmountOfAddresses();
     expect(extAddrsAmount, 'A wrong amount of external addresses').to.equal(1);
@@ -115,9 +136,7 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Check Staking page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToStakingTab();
-    const stakingPage = new StakingTab(webdriver, logger);
     const titleIsCorrect = await stakingPage.titleIsCorrect(pageTitle.staking);
     expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
     const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
@@ -125,31 +144,18 @@ describe('Creating wallet _smoke_', function () {
   });
 
   it('Check NFTs Gallery', async function () {
-    const walletBasePage = new WalletCommonBase(webdriver, logger);
-    await walletBasePage.goToNftsTab();
-    const nftsGalleryPage = new NftGalleryTab(webdriver, logger);
+    await stakingPage.goToNftsTab();
     const titleIsCorrect = await nftsGalleryPage.titleIsCorrect(pageTitle.nfts);
     expect(titleIsCorrect, `Title for NFTs Gallery is different from "${pageTitle.staking}"`).to.be.true;
     const noNftsIsDisplayed = await nftsGalleryPage.noNftsIsDisplayed();
     expect(noNftsIsDisplayed, `No NFTs banner should be shown`).to.be.true;
   });
 
-  // check banners on Transactions page
-  // Portfolio Start your crypto jounrney banner
-  // Not enough funds for voting
-  // "You don't have any websites connected yet" banner on Connector page
-  // Governance
-  // Cashback banner
-  // Settings testnets banner
-
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });
