@@ -28,7 +28,7 @@ export const ReviewTxSection = () => {
   const formattedTx = useFormattedTx(cborTx ? txBody : txBody?.body);
   const formattedMetadata = useFormattedMetadata({
     txBody: cborTx ? txBody : txBody?.body,
-    unsignedTx: txBody,
+    unsignedTx: unsignedTx,
     cbor: cborTx,
   });
   const location = useLocation();
