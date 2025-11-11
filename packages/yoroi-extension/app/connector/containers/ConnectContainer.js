@@ -10,6 +10,7 @@ import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import type { ConnectorStoresProps } from '../stores';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../posthog';
 
 type State = {|

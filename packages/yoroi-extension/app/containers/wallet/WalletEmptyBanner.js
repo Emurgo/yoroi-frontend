@@ -8,6 +8,8 @@ import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { observer } from 'mobx-react';
 import links from '../../links';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../posthog';
 
 type Props = {|
   onBuySellClick: () => void,
@@ -78,6 +80,7 @@ function WalletEmptyBanner({ isTestnet, onBuySellClick, intl }: Props & Intl): N
               } else {
                 onBuySellClick();
               }
+              captureEvent('Wallet Page Buy Banner Clicked');
             }}
           >
             <Typography

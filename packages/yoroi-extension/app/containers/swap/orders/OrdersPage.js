@@ -22,7 +22,6 @@ import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { useRichOrders } from './hooks';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
-import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
@@ -274,7 +273,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
   };
 
-  const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, order: any) => {
+  const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, _order: any) => {
     try {
       startLoadingTxReview();
       const { signedTxHex: signedCancelTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({

@@ -28,6 +28,7 @@ import { ModalProvider } from '../../UI/components/modals/ModalContext';
 import { ModalManager } from '../../UI/components/modals/ModalManager';
 // $FlowIgnore: suppressing this error
 import { CurrencyProvider } from '../../UI/context/CurrencyContext';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../posthog';
 
 @observer

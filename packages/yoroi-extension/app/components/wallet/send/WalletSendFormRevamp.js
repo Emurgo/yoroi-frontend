@@ -48,6 +48,7 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../posthog';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
@@ -909,7 +910,6 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               tokens={tokens}
               nfts={nfts}
               onRemoveTokens={tokensRemove => {
-                const assetCount = totalAmount.nonDefaultEntries().length - 1;
                 this.props.onRemoveTokens(tokensRemove);
               }}
               shouldSendAll={shouldSendAll}

@@ -18,6 +18,7 @@ import { Stack, Typography, Box, styled } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../posthog';
 
 const IconWrapper = styled(Box)(({ theme }) => ({

@@ -13,6 +13,7 @@ import SaveDialog from '../../../components/wallet/hwConnect/trezor/SaveDialog';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresProps } from '../../../stores';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../posthog';
 
 type LocalProps = {|

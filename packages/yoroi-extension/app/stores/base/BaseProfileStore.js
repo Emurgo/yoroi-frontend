@@ -17,6 +17,7 @@ import { THEMES } from '../../styles/themes';
 import { refreshCurrentCoinPrice } from '../../api/thunk';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+// $FlowFixMe[cannot-resolve-module]
 import { enablePosthog, disablePosthog } from '../../../posthog';
 
 interface LoadingStore {

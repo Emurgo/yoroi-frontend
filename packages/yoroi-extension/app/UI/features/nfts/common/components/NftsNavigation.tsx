@@ -13,16 +13,12 @@ type NftsNavigationProps = {
 const NftsNavigation = ({ prevNftId, nextNftId, activeTab }: NftsNavigationProps) => {
   return (
     <Stack direction="row" spacing={16}>
-      <Link
-        to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab.id}`}
-      >
+      <Link to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', prevNftId) + `?tab=${activeTab.id}`}>
         <Button aria-label="Previous" size="small" id="nftDetails-previousNFT-button">
           <IconWrapper icon={Icons.ChevronLeft} />
         </Button>
       </Link>
-      <Link
-        to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab.id}`}
-      >
+      <Link to={ROUTES.NFT_GALLERY.DETAILS.replace(':nftId', nextNftId) + `?tab=${activeTab.id}`}>
         <Button aria-label="Next" size="small" id="nftDetails-nextNFT-button">
           <IconWrapper icon={Icons.ChevronRight} />
         </Button>

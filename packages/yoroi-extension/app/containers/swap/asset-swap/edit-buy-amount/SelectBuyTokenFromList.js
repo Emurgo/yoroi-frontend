@@ -4,7 +4,6 @@ import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types'
 import { useSwap } from 'legacySwap';
 import { useSwapForm } from '../../context/swap-form';
 import { useBuyVerifiedSwapTokens } from '../hooks';
-import { tokenInfoToAnalyticsToAsset } from '../../swapAnalytics';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import SwapStore from '../../../../stores/ada/SwapStore';
 

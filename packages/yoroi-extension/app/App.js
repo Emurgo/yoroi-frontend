@@ -23,10 +23,10 @@ import NotificationsProvider from './UI/features/notifications/module/Notificati
 // $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
 import { ROUTES } from './routes-config';
-import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
 import { filterByValues } from './coreUtils';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../posthog';
 
 type Props = {|

@@ -18,7 +18,9 @@ import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
 import { strong } from '../../../../../i18n/htmlEmbeddedMessageHelper';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../../../posthog';
+
 const messages = defineMessages({
   description: {
     id: 'wallet.restore.thirdStep.description',

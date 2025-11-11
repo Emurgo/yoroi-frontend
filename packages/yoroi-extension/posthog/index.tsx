@@ -1,4 +1,3 @@
-import { PostHogProvider } from '@posthog/react';
 import posthog from 'posthog-js/dist/module.no-external';
 import environment from '../app/environment';
 import type { EventDefinitions } from './events';
@@ -7,12 +6,9 @@ const PUBLIC_POSTHOG_KEY_PROD = 'phc_jmeOubKnbivH9L85PPvXVMbDFZevJLd1BLzuett3dII
 const PUBLIC_POSTHOG_KEY_DEV = 'phc_zUcStVLHhwXBHajxusEvlwS77zBVAEQWhpZDx5Ef8oj';
 const PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com';
 
-posthog.init(
-  (environment.isNightly() || environment.isDev()) ? PUBLIC_POSTHOG_KEY_DEV : PUBLIC_POSTHOG_KEY_PROD,
-  {
-    api_host: PUBLIC_POSTHOG_HOST,
-  }
-);
+posthog.init(environment.isNightly() || environment.isDev() ? PUBLIC_POSTHOG_KEY_DEV : PUBLIC_POSTHOG_KEY_PROD, {
+  api_host: PUBLIC_POSTHOG_HOST,
+});
 
 let isEnabled = false;
 

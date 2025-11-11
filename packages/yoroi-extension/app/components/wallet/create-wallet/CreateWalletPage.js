@@ -12,6 +12,7 @@ import AddWalletDetailsStep from './AddWalletDetailsStep';
 import CreateWalletPageHeader from './CreateWalletPageHeader';
 import { ROUTES } from '../../../routes-config';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../posthog';
 
 type Props = {|

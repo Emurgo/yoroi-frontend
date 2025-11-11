@@ -3,10 +3,8 @@ import { Box, Typography } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from 'legacySwap';
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
-import { useSwapFeeDisplay } from '../hooks';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
-import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { SwapTxInfo } from './SwapTxInfo';
 import { observer } from 'mobx-react';
@@ -34,12 +32,8 @@ function ConfirmSwapTransaction({
   onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
-  const {
-    selectedPoolCalculation: { pool },
-  } = orderData;
-  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity, sellFeeAmountErrorChanged } = useSwapForm();
+  const { sellFeeAmountErrorChanged } = useSwapForm();
   const { setOrderStepValue } = swapStore;
-  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
 

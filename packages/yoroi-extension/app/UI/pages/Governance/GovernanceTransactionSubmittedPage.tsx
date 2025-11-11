@@ -1,10 +1,8 @@
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { TransactionSubmitted } from '../../components';
 import { useStrings } from '../../features/governace/common/useStrings';
 import GovernanceLayout from './layout';
-import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 
 type Props = {
   stores: any;

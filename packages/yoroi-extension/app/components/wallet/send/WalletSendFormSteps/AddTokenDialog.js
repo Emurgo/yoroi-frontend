@@ -179,7 +179,6 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll: void => void = () => {
     const toRemove = [];
-    let changed = false;
     const tokens = this.props.plannedTxInfoMap
       .filter(({ token }) => !token.IsDefault)
       .map(({ token, amount }) => ({ tokenId: token.TokenId, amount }));
@@ -189,15 +188,12 @@ export default class AddTokenDialog extends Component<Props, State> {
         if (included && amount != null) {
           if (amount.toString() !== tokens[tokenIndex].amount) {
             tokens[tokenIndex].amount = amount.toString();
-            changed = true;
           }
         } else {
           tokens.splice(tokenIndex, 1);
-          changed = true;
         }
       } else if (included && amount != null) {
         tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
-        changed = true;
       }
       if (!included) {
         toRemove.push(token);

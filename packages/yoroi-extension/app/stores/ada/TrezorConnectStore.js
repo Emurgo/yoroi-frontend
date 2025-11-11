@@ -21,6 +21,7 @@ import type { StoresMap } from '../index';
 import { createHardwareWallet } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../posthog';
 
 type TrezorConnectionResponse = {|

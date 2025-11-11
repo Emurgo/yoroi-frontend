@@ -22,6 +22,7 @@ import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../stores';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../posthog';
 
 @observer

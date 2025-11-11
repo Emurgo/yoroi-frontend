@@ -17,6 +17,7 @@ import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 import links from '../links';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../posthog';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({

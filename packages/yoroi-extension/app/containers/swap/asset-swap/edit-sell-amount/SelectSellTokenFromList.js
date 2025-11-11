@@ -6,7 +6,6 @@ import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import { useSwapForm } from '../../context/swap-form';
 import SwapStore from '../../../../stores/ada/SwapStore';
 import { useSellVerifiedSwapTokens } from '../hooks';
-import { tokenInfoToAnalyticsFromAsset } from '../../swapAnalytics';
 
 type Props = {|
   store: SwapStore,

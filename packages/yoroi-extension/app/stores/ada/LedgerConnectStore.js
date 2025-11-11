@@ -30,6 +30,7 @@ import type { GetExtendedPublicKeyResponse } from '@cardano-foundation/ledgerjs-
 import { createHardwareWallet, getProtocolParameters } from '../../api/thunk';
 import type { CreateHardwareWalletRequest } from '../../api/thunk';
 import type { WalletState } from '../../../chrome/extension/background/types';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../posthog';
 
 export default class LedgerConnectStore

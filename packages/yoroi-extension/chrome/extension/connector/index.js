@@ -11,8 +11,8 @@ import { translations } from '../../../app/i18n/translations';
 import App from '../../../app/connector/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
-import environment from '../../../app/environment';
 import LocalStorageApi from '../../../app/api/localStorage';
+// $FlowFixMe[cannot-resolve-module]
 import { enablePosthog } from '../../../posthog';
 
 // run MobX in strict mode

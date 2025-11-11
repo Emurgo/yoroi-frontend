@@ -29,8 +29,6 @@ import { observer } from 'mobx-react';
 import { CoreAddressTypes } from '../../../api/ada/lib/storage/database/primitives/enums';
 import { getNetworkById } from '../../../api/ada/lib/storage/database/prepackaged/networks';
 import { injectIntl } from 'react-intl';
-import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
-import { useSwapFeeDisplay } from '../hooks';
 import { useStrings } from '../common/useStrings';
 import { downloadLogs } from '../../../utils/logging';
 // $FlowIgnore: suppressing this error
@@ -86,8 +84,6 @@ function SwapPage(props: StoresProps & Intl): Node {
   const impact = isMarketOrder ? Number(selectedPoolCalculation?.prices.priceImpact ?? 0) : 0;
   const priceImpactState: PriceImpact | null =
     impact > PRICE_IMPACT_MODERATE_RISK ? { isSevere: impact > PRICE_IMPACT_HIGH_RISK } : null;
-
-  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const [disclaimerStatus, setDisclaimerStatus] = useState<?boolean>(null);
   const [selectedWalletAddress, setSelectedWalletAddress] = useState<?string>(null);

@@ -127,7 +127,7 @@ export default class AddNFTDialog extends Component<Props, State> {
   onAddAll: void => void = () => {
     const amount = new BigNumber('1');
     const toRemove = [];
-    let changed = false;
+
     const tokens = this.props.plannedTxInfoMap
       .filter(({ token }) => !token.IsDefault)
       .map(({ token }) => ({ tokenId: token.TokenId }));
@@ -136,11 +136,9 @@ export default class AddNFTDialog extends Component<Props, State> {
       if (tokenIndex !== -1) {
         if (!included) {
           tokens.splice(tokenIndex, 1);
-          changed = true;
         }
       } else if (included) {
         tokens.push({ tokenId: token.TokenId });
-        changed = true;
       }
       if (!included) {
         toRemove.push(token);

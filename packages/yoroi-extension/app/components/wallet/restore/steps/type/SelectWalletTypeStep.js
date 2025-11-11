@@ -12,6 +12,7 @@ import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
 import styles from './SelectWalletTypeStep.scss';
 import globalMessages from '../../../../../i18n/global-messages';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
+// $FlowFixMe[cannot-resolve-module]
 import { captureEvent } from '../../../../../../posthog';
 
 const messages: * = defineMessages({
@@ -38,7 +39,6 @@ function SelectWalletTypeStep(props: Props & Intl): Node {
   useEffect(() => {
     captureEvent('Restore Wallet Type Step Viewed');
   }, []);
-
 
   const { onNext, goBack, intl } = props;
 
