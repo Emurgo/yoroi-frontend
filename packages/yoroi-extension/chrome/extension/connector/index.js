@@ -38,7 +38,7 @@ const initializeDappConnector: void => Promise<void> = async () => {
   if (container == null) {
     throw new Error('Root element not found.');
   }
-  const isAnalyticsAllowd = new LocalStorageApi().loadIsAnalyticsAllowed();
+  const isAnalyticsAllowd: ?boolean = await (new LocalStorageApi()).loadIsAnalyticsAllowed();
   if (isAnalyticsAllowd) {
     enablePosthog();
   }
