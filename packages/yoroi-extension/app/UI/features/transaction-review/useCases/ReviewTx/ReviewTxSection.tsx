@@ -29,9 +29,8 @@ export const ReviewTxSection = () => {
   const formattedMetadata = useFormattedMetadata({
     txBody: cborTx ? txBody : txBody?.body,
     unsignedTx: txBody,
-    cbor: null,
+    cbor: cborTx,
   });
-
   const location = useLocation();
   const tabSearchParam = new URLSearchParams(location.search).get('tab') || 'overview';
 

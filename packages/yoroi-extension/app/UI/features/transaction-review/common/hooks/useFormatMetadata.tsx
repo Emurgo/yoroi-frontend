@@ -1,8 +1,9 @@
 import { useQuery } from 'react-query';
 
 import { TransactionBody } from '../types';
+import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
-export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): Promise<any> => {
+export const formatUnsignedTxMetadata = async (unsignedTx: any, txBody: TransactionBody): Promise<any> => {
   try {
     const hash = txBody.auxiliary_data_hash ?? null;
     const decodedMetadata = await unsignedTx.auxiliary_data.metadata;
@@ -16,8 +17,16 @@ export const formatMetadata = async (unsignedTx: any, txBody: TransactionBody): 
     console.error('Error parsing metadata');
   }
 };
+export const formatCborMetadata = async (cbor: any, txBody: TransactionBody): Promise<any> => {
+  try {
+    const tx = RustModule.WalletV4.Transaction.from_hex(cbor);
+    return { hash: txBody.auxiliary_data_hash ?? null, metadata: format674(tx?.auxiliary_data().to_json()) };
+  } catch {
+    console.error('Error parsing metadata');
+  }
+};
 
-const parseMetadata = (metadata: Record<string, string>) => {
+export const parseMetadata = (metadata: Record<string, string>) => {
   try {
     const parsed = metadata['674'] ? JSON.parse(metadata['674']) : {};
     const mapArray = parsed.map[0];
@@ -26,7 +35,6 @@ const parseMetadata = (metadata: Record<string, string>) => {
     const rawList = mapArray.v.list.map((item: any) => item.string);
     let jsonString = rawList.join('').replace(/\\/g, '');
 
-    // Safer way to extract multiple JSON objects
     const jsonFragments: object[] = [];
     let braceCount = 0;
     let currentFragment = '';
@@ -71,13 +79,60 @@ export const useFormattedMetadata = ({
   cbor: string | null;
   txBody: TransactionBody;
 }) => {
-  const query = useQuery({
-    queryFn: () => formatMetadata(unsignedTx, txBody),
-    queryKey: ['useFormattedMetadata', cbor, unsignedTx, txBody],
+  const hasCbor = typeof cbor === 'string' && cbor.length > 0;
+  const canUnsigned = Boolean(unsignedTx?.auxiliary_data?.metadata);
+
+  const { data } = useQuery({
+    queryKey: ['useFormattedMetadata', hasCbor ? cbor : unsignedTx, txBody?.auxiliary_data_hash],
+    enabled: hasCbor || canUnsigned,
     useErrorBoundary: true,
-    suspense: true,
-    enabled: unsignedTx?.auxiliary_data?.metadata !== undefined,
+    queryFn: () => (hasCbor && cbor ? formatCborMetadata(cbor, txBody) : formatUnsignedTxMetadata(unsignedTx, txBody)),
   });
 
-  return query?.data;
+  return data;
+};
+
+// 1) de-string any double-encoded JSON
+const deepParse = (x: any, d = 0): any => {
+  if (d > 6 || x == null) return x;
+  const tryParse = (s: string) => {
+    const t = s.trim();
+    if ((t.startsWith('{') && t.endsWith('}')) || (t.startsWith('[') && t.endsWith(']'))) {
+      try {
+        return JSON.parse(t);
+      } catch {
+        return s;
+      }
+    }
+    return s;
+  };
+  const v = typeof x === 'string' ? tryParse(x) : x;
+  if (Array.isArray(v)) return v.map(y => deepParse(y, d + 1));
+  if (typeof v === 'object') {
+    return Object.fromEntries(Object.entries(v).map(([k, val]) => [k, deepParse(val, d + 1)]));
+  }
+  return v;
+};
+
+// 2) turn the 674 "CBOR-JSON" shape into { key: value }
+const format674 = (raw: any) => {
+  const data = deepParse(raw);
+  const label =
+    data?.metadata?.['674'] ??
+    data?.['674'] ?? // sometimes it’s already at root
+    null;
+
+  if (!label || typeof label !== 'object' || !Array.isArray(label.map)) return null;
+
+  const out: Record<string, any> = {};
+  for (const entry of label.map) {
+    const key = entry?.k?.string ?? entry?.k;
+    let val = entry?.v;
+
+    if (val?.list) val = val.list.map((x: any) => x?.string ?? x);
+    else if (val?.string) val = val.string;
+
+    if (key != null) out[key] = val;
+  }
+  return out;
 };
