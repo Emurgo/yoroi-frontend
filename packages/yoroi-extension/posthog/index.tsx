@@ -1,5 +1,5 @@
 import { PostHogProvider } from '@posthog/react';
-import posthog from 'posthog-js';
+import posthog from 'posthog-js/dist/module.no-external';
 import environment from '../app/environment';
 import type { EventDefinitions } from './events';
 
@@ -24,19 +24,14 @@ export function disablePosthog() {
   isEnabled = false;
 }
 
-export function YoroiPosthogProvider(children) {
-  return (
-    <PostHogProvider client={posthog}>
-      {children}
-    </PostHogProvider>
-  );
-}
-
 const PLATFORM_ID = 'web';
 
 export function captureEvent<EventName extends keyof EventDefinitions>(event: EventName, ...params: EventDefinitions[EventName]) {
   if (!isEnabled) {
     return;
+  }
+  if (environment.isDev()) {
+    console.info('posthog event %s captured', event);
   }
   posthog.capture(event, { ...params, platform: PLATFORM_ID });
 }

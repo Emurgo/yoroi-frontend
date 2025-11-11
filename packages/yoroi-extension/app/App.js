@@ -27,7 +27,7 @@ import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
 import { filterByValues } from './coreUtils';
-import { YoroiPosthogProvider, captureEvent } from '../posthog';
+import { captureEvent } from '../posthog';
 
 type Props = {|
   +stores: StoresMap,
@@ -142,18 +142,16 @@ class App extends Component<Props, State> {
 
     return (
       <div style={{ height: '100%' }}>
-        <YoroiPosthogProvider>
-          <ColorModeProvider>
-            <CssBaseline />
-            {globalStyles(muiTheme)}
-            <ThemeManager cssVariables={themeVars} />
-            <HashRouter>
-              <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
-                {this.getContent()}
-              </IntlProvider>
-            </HashRouter>
-          </ColorModeProvider>
-        </YoroiPosthogProvider>
+        <ColorModeProvider>
+          <CssBaseline />
+          {globalStyles(muiTheme)}
+          <ThemeManager cssVariables={themeVars} />
+          <HashRouter>
+            <IntlProvider locale={locale} key={locale} messages={mergedMessages}>
+              {this.getContent()}
+            </IntlProvider>
+          </HashRouter>
+        </ColorModeProvider>
       </div>
     );
   }
