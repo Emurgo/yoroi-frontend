@@ -17,12 +17,17 @@ export const formatUnsignedTxMetadata = async (unsignedTx: any, txBody: Transact
     console.error('Error parsing metadata');
   }
 };
-export const formatCborMetadata = async (cbor: any, txBody: TransactionBody): Promise<any> => {
+type FormattedMetadata = { hash: string | null; metadata: unknown | null };
+
+export const formatCborMetadata = (cbor: string, txBody: TransactionBody): FormattedMetadata => {
+  const hash = txBody?.auxiliary_data_hash ?? null;
   try {
     const tx = RustModule.WalletV4.Transaction.from_hex(cbor);
-    return { hash: txBody.auxiliary_data_hash ?? null, metadata: format674(tx?.auxiliary_data().to_json()) };
-  } catch {
-    console.error('Error parsing metadata');
+    const aux = tx?.auxiliary_data()?.to_json();
+    return { hash, metadata: format674(aux) };
+  } catch (e) {
+    console.error('Error parsing metadata', e);
+    return { hash, metadata: null };
   }
 };
 
@@ -107,6 +112,10 @@ const deepParse = (x: any, d = 0): any => {
     return s;
   };
   const v = typeof x === 'string' ? tryParse(x) : x;
+
+  // handle "null"
+  if (v == null) return v;
+
   if (Array.isArray(v)) return v.map(y => deepParse(y, d + 1));
   if (typeof v === 'object') {
     return Object.fromEntries(Object.entries(v).map(([k, val]) => [k, deepParse(val, d + 1)]));
