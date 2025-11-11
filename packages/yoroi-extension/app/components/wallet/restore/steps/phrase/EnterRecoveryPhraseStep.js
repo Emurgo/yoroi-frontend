@@ -1,6 +1,6 @@
 // @flow
 import type { ComponentType, Node } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, FormattedMessage, injectIntl } from 'react-intl';
 import type { ManageDialogsProps } from '../../../dialogs/types';
@@ -18,7 +18,7 @@ import type { MultiToken } from '../../../../../api/common/lib/MultiToken';
 import type { TokenInfoMap } from '../../../../../stores/toplevel/TokenInfoStore';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
 import { strong } from '../../../../../i18n/htmlEmbeddedMessageHelper';
-
+import { captureEvent } from '../../../../../../posthog';
 const messages = defineMessages({
   description: {
     id: 'wallet.restore.thirdStep.description',
@@ -50,6 +50,10 @@ type Props = {|
 |};
 
 function EnterRecoveryPhraseStep(props: Props & Intl): Node {
+  useEffect(() => {
+    captureEvent('Restore Wallet Enter Phrase Step Viewed');
+  }, []);
+
   const [enableNext, setEnableNext] = useState(false);
   const [duplicatedWalletId, setDuplicatedWalletId] = useState(null);
   const {

@@ -19,7 +19,6 @@ import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresMap } from '../../../stores';
 import { forceNonNull } from '../../../coreUtils';
 import type { RestoreModeType } from '../../../stores/toplevel/WalletRestoreStore';
-import { captureEvent } from '../../../../posthog';
 
 const messages: * = defineMessages({
   title: {
@@ -114,7 +113,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
               setSelectedRestoreMode(mode);
               setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
             });
-            captureEvent('Restore Wallet Enter Phrase Step Viewed');
           }}
           goBack={() => {
             resetRestoreWalletData();
@@ -136,7 +134,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
           closeDialog={closeDialog}
           setCurrentStep={step => {
             setCurrentStep(step);
-            captureVent('Restore Wallet Details Step Viewed');
           }}
           checkValidPhrase={phrase => {
             if (!selectedRestoreMode) {
@@ -163,7 +160,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
               duplicatedWallet: existingWallet,
               recoveryPhrase: enteredRecoveryPhrase,
             });
-
             return existingWallet?.publicDeriverId;
           }}
         />
