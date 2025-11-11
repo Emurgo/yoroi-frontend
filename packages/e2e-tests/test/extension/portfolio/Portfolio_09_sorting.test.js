@@ -73,10 +73,10 @@ describe('Portfolio Sorting columns', function () {
   }
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    walletCommonPage.closeBrowser();
+    await walletCommonPage.closeBrowser();
   });
 });

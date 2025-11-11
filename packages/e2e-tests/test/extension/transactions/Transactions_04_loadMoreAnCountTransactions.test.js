@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { testWallet3 } from '../../../utils/testWallets.js';
@@ -7,15 +6,22 @@ import { getTestLogger } from '../../../utils/utils.js';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { restoreWallet } from '../../../helpers/restoreWalletHelper.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Show more txs', function () {
   this.timeout(5 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   it(`Restore a 15-word test wallet ${testWallet3.name}`, async function () {
@@ -23,7 +29,6 @@ describe('Show more txs', function () {
   });
 
   it('Check amount of auto-loaded transactions', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
@@ -32,20 +37,16 @@ describe('Show more txs', function () {
   });
 
   it('Load txs and check amount', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.loadMoreTxs(1);
     const displayedTxsAmount = await transactionsPage.getAmountOfTxs();
     expect(displayedTxsAmount, 'The amount of txs is different from expected').to.be.at.least(testWallet3.minTxs);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });
