@@ -10,10 +10,10 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
   useEffect(() => {
     async function resolve() {
       if (
-        (await localStorage.getMidnightBannerAnnouncementClosed()) === undefined &&
-        bannersRemoteConfig?.midnightAnnouncement.display === true
+        (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
+        bannersRemoteConfig?.midnightPhase2Announcement.display === true
       ) {
-        return BannerType.Midnight;
+        return BannerType.MidnightPhase2;
       }
       if (!(await surveyDismissed.get())) {
         return BannerType.Survey;
@@ -25,13 +25,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
         return BannerType.DRep;
       }
 
-      // Not used yet - TODO add condition for these banners
-      //   if (false) {
-      //     return BannerType.Bring;
-      //   }
-      //   if (false) {
-      //     return BannerType.Usda;
-      //   }
       return null;
     }
     resolve().then(setVisible);
@@ -39,9 +32,9 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
 
   const dismiss = async type => {
     switch (type) {
-      case BannerType.Midnight:
+      case BannerType.MidnightPhase2:
         setVisible(null);
-        await localStorage.setMidnightBannerAnnouncementClosed('true');
+        await localStorage.setMidnightBannerPhase2Closed('true');
         break;
       case BannerType.Survey:
         surveyDismissed.set(true);
