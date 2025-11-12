@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import { atomicBreakdown, isNumber } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
+import { useMemo } from 'react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
 import tokenPng from '../../common/assets/images/token.png';
 import { HiddenAmount } from '../../common/components/HiddenAmount';
@@ -11,7 +12,6 @@ import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/co
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
-import { useMemo } from 'react';
 import { getTotalAmount } from '../../../../utils/createCurrentWalletInfo';
 
 export const TokenDisplay = ({ token, pathId }: { token: TokenInfoType; pathId: string }) => {
@@ -151,6 +151,35 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
   const totalBalanceAmount = getTotalAmount(balance, rewards);
   const defaultEntry = totalBalanceAmount?.getDefaultEntry();
   const primaryBalance = defaultEntry?.amount.shiftedBy(-primaryTokenInfo?.decimals || 0);
+  const {
+    ptActivity: { close: ptPrice },
+  } = useCurrencyPairing();
+
+  const isPrimary: boolean = token.id === '-';
+
+  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
+  const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
+
+  const showingAda = accountPair?.from.name === primaryTokenInfo.name;
+  const currency = accountPair?.from.name;
+  const decimals = isPrimary ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
+
+  const totalPrice = useMemo(
+    () =>
+      ptPrice &&
+      atomicBreakdown(tokenQuantityAsBigInt, decimals)
+        .bn.times(tokenPrice ?? 1)
+        .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
+        .toFormat(decimals),
+    [decimals, ptPrice, showingAda, tokenPrice, tokenQuantityAsBigInt]
+  );
+
+  if (ptPrice === null) return `... ${currency}`;
+
+  const primaryAda = isPrimary && showingAda;
+
+  const totalTicker = primaryAda ? accountPair?.to.name : accountPair?.from.name;
+  const totalTokenPrice = primaryAda ? '' : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
@@ -177,36 +206,6 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     );
   }
 
-  const isPrimary: boolean = token.id === '-';
-
-  const {
-    ptActivity: { close: ptPrice },
-  } = useCurrencyPairing();
-
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
-  const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
-
-  const showingAda = accountPair?.from.name === primaryTokenInfo.name;
-  const currency = accountPair?.from.name;
-  const decimals = isPrimary ? primaryTokenInfo.decimals : token.info.numberOfDecimals;
-
-  if (ptPrice === null) return `... ${currency}`;
-
-  const totalPrice = useMemo(() => {
-    return (
-      ptPrice &&
-      atomicBreakdown(tokenQuantityAsBigInt, decimals)
-        .bn.times(tokenPrice ?? 1)
-        .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
-        .toFormat(decimals)
-    );
-  }, [primaryBalance, selectedWallet?.balance]);
-
-  const primaryAda = isPrimary && showingAda;
-
-  const totalTicker = primaryAda ? accountPair?.to.name : accountPair?.from.name;
-  const totalTokenPrice = primaryAda ? '' : `${isPrimary || tokenPrice !== undefined ? totalPrice : '-'}`;
-
   return (
     <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
       <Stack direction="column">
@@ -219,11 +218,14 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
           <Typography id={mainCurrencyFiatFullPathId}>{token.info.name}</Typography>
         </Typography>
         {token.info.name === accountPair?.from.name ? (
-          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }} />
         ) : (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }} id={secondFiatFullPathId}>
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{totalTokenPrice}</HiddenAmount>
-            <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
+            <span>
+              &nbsp;
+              {totalTicker ?? DEFAULT_FIAT_PAIR}
+            </span>
           </Typography>
         )}
       </Stack>

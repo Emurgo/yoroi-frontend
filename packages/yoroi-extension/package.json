@@ -30,7 +30,7 @@
     "test": "NODE_ENV=jest jest",
     "test-win": "SET NODE_ENV=jest && jest",
     "eslint": "npm run eslint-loud -- --quiet",
-    "eslint-loud": "eslint app chrome scripts webpack/*.js",
+    "eslint-loud": "eslint app chrome webpack/*.js",
     "test:build": "npm run prod:build -- --env 'test' --isE2E && npm run prod:compress -- --env 'test' --app-id 'yoroi' --codebase 'https://yoroiwallet.com/dw/yoroi-test-extension.crx' --key ./e2etest-key.pem",
     "translations:manage": "node ./translations/translation-runner.js",
     "translations:purge": "rimraf ./translations/messages",
@@ -106,6 +106,7 @@
     "eslint-plugin-prettier": "3.3.1",
     "eslint-plugin-promise": "4.3.1",
     "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-simple-import-sort": "^12.1.0",
     "file-loader": "6.2.0",
     "flow-bin": "0.142.0",
@@ -137,7 +138,8 @@
     "webpack-dev-middleware": "4.1.0",
     "webpack-dev-server": "^4.9.3",
     "webpack-hot-middleware": "2.25.0",
-    "webpack-httpolyglot-server": "git+https://github.com/Emurgo/webpack-httpolyglot-server.git"
+    "webpack-httpolyglot-server": "git+https://github.com/Emurgo/webpack-httpolyglot-server.git",
+    "zod": "^4.1.12"
   },
   "dependencies": {
     "@amplitude/analytics-browser": "^2.1.3",
@@ -234,7 +236,10 @@
     "util": "0.12.5"
   },
   "overrides": {
-    "@babel/helpers": "7.16.0"
+    "@babel/helpers": "7.16.0",
+    "eslint-plugin-react-hooks": {
+      "zod": "^4.0.0"
+    }
   },
   "engineStrict": true,
   "engine": {
