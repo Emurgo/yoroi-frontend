@@ -78,13 +78,7 @@ function CreateWalletPage(props: Props): Node {
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
       <SaveRecoveryPhraseStep
-        setCurrentStep={step => {
-          if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
-            setCurrentStep(step);
-          } else {
-            setCurrentStep(step);
-          }
-        }}
+        setCurrentStep={setCurrentStep}
         recoveryPhrase={recoveryPhrase}
         {...manageDialogsProps}
       />
