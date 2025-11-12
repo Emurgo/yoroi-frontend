@@ -169,7 +169,7 @@
     "@yoroi/portfolio": "1.0.3",
     "@yoroi/resolver": "2.0.2",
     "@yoroi/staking": "^1.6.0",
-    "@yoroi/swap": "7.0.0",
+    "@yoroi/swap": "7.0.3",
     "@yoroi/types": "6.0.0",
     "assert": "2.1.0",
     "async-await-queue": "2.1.4",
