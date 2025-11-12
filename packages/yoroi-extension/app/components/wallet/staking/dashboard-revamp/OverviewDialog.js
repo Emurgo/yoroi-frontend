@@ -71,7 +71,7 @@ export default class OverviewModal extends Component<Props> {
 
     const faqLink = (
       <Link
-        href="https://emurgohelpdesk.zendesk.com"
+        href="https://help.yoroi-wallet.com/en/article/ive-been-delegating-for-more-than-20-days-but-i-still-dont-have-any-rewards-bvgfuc/"
         target="_blank"
         rel="noreferrer noopener"
         sx={{

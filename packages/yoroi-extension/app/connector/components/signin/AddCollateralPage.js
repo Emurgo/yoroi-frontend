@@ -196,7 +196,7 @@ class AddCollateralPage extends Component<Props, State> {
 
     const learnMoreLink = (
       <Link
-        href="https://docs.cardano.org/plutus/collateral-mechanism"
+        href="https://help.yoroi-wallet.com/en/article/about-the-collateral-mechanism-on-cardano-8wkf3i/"
         target="_blank"
         rel="noreferrer"
         sx={{ textDecoration: 'none' }}
@@ -207,7 +207,7 @@ class AddCollateralPage extends Component<Props, State> {
 
     const smartContractsLink = (
       <Link
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4415793858959-What-are-smart-contracts"
+        href="https://help.yoroi-wallet.com/en/article/what-are-smart-contracts-l98lux/"
         target="_blank"
         rel="noreferrer"
         sx={{ textDecoration: 'none' }}
