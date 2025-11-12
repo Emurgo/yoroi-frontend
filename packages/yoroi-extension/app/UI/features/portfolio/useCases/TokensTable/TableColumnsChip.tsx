@@ -174,7 +174,17 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     [decimals, ptPrice, showingAda, tokenPrice, tokenQuantityAsBigInt]
   );
 
-  if (ptPrice === null) return `... ${currency}`;
+  if (ptPrice === null) {
+    return (
+      <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
+        <Stack direction="column">
+          <Typography color="ds.text_gray_medium" id={mainCurrencyFiatFullPathId}>
+            ... {currency}
+          </Typography>
+        </Stack>
+      </Stack>
+    );
+  }
 
   const primaryAda = isPrimary && showingAda;
 
