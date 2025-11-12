@@ -1,5 +1,5 @@
 // @flow
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -34,16 +34,16 @@ export type ManageDialogsProps = {|
 function CreateWalletPage(props: Props): Node {
   const { genWalletRecoveryPhrase, createWallet, selectedNetwork, isDialogOpen, openDialog, closeDialog, goToRoute } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
-  const setCurrentStepAndTrack = step => {
-    setCurrentStep(step);
-    if (step === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
+
+  useEffect(() => {
+    if (currentStep === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
       captureEvent('Create Wallet Learn Phrase Step Viewed');
-    } else if (step === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
+    } else if (currentStep === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
       captureEvent('Create Wallet Save Phrase Step Viewed');
-    } else if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
+    } else if (currentStep === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
       captureEvent('Create Wallet Verify Phrase Step Viewed');
     }
-  };
+  }, [currentStep]);
 
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [isRecoveryPhraseEntered, markRecoveryPhraseAsEntered] = useState<boolean>(false);
@@ -61,7 +61,7 @@ function CreateWalletPage(props: Props): Node {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
         nextStep={() => {
-          setCurrentStepAndTrack(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+          setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase === null) {
             genWalletRecoveryPhrase()
               .then(setRecoveryPhrase)
@@ -80,7 +80,7 @@ function CreateWalletPage(props: Props): Node {
       <SaveRecoveryPhraseStep
         setCurrentStep={step => {
           if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
-            setCurrentStepAndTrack(step);
+            setCurrentStep(step);
           } else {
             setCurrentStep(step);
           }
@@ -95,7 +95,7 @@ function CreateWalletPage(props: Props): Node {
         prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
         nextStep={() => {
           markRecoveryPhraseAsEntered(true);
-          setCurrentStepAndTrack(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
+          setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
         }}
         isRecoveryPhraseEntered={isRecoveryPhraseEntered}
       />
