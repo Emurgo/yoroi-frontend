@@ -8,6 +8,12 @@ const PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com';
 
 posthog.init(environment.isNightly() || environment.isDev() ? PUBLIC_POSTHOG_KEY_DEV : PUBLIC_POSTHOG_KEY_PROD, {
   api_host: PUBLIC_POSTHOG_HOST,
+  autocapture: false,
+  capture_pageview: false,
+  capture_pageleave: false,
+  capture_dead_clicks: false,
+  disable_surveys: true,
+  disable_session_recording: true,
 });
 
 let isEnabled = false;
