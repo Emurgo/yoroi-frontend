@@ -259,6 +259,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       })
       .then(response => {
         setIsCreateOrderLoading(false);
+        action({ type: SwapActionType.SwapReviewSelected, value: false });
+
         if (isLeft(response)) {
           action({ type: SwapActionType.CreateError, value: response.error });
         } else {
@@ -499,6 +501,17 @@ export const swapReducer = (state: SwapState, action: SwapAction) => {
         draft.canSwap = false;
         break;
 
+      case SwapActionType.CreateError:
+        draft.needsNewEstimate = false;
+        draft.lastInputTouched = 'in';
+        draft.createTx = undefined;
+        draft.tokenOutInput.error = action.value.message;
+        draft.canSwap = false;
+        break;
+      case SwapActionType.SwapReviewSelected:
+        draft.reviewSwapSelected = action.value;
+        break;
+
       default:
         throw new Error(`swapReducer invalid action`);
     }
@@ -527,6 +540,7 @@ export const SwapActionType = {
   EstimateError: 'EstimateError',
   CreateResponse: 'CreateResponse',
   CreateError: 'CreateError',
+  SwapReviewSelected: 'SwapReviewSelected',
 } as const;
 
 type SwapAction =
@@ -553,7 +567,8 @@ type SwapAction =
   | { type: typeof SwapActionType.EstimateResponse; value: Swap.EstimateResponse }
   | { type: typeof SwapActionType.EstimateError; value: Api.ResponseError }
   | { type: typeof SwapActionType.CreateResponse; value: Swap.CreateResponse }
-  | { type: typeof SwapActionType.CreateError; value: Api.ResponseError };
+  | { type: typeof SwapActionType.CreateError; value: Api.ResponseError }
+  | { type: typeof SwapActionType.SwapReviewSelected; value: boolean };
 
 type SwapState = {
   needsNewEstimate: boolean;
@@ -582,6 +597,7 @@ type SwapState = {
   };
   wantedPrice: string;
   canSwap: boolean;
+  reviewSwapSelected: boolean;
   estimate?: Swap.EstimateResponse;
   createTx?: Swap.CreateResponse;
 };
@@ -613,6 +629,7 @@ const defaultState: SwapState = Object.freeze({
   },
   wantedPrice: '',
   canSwap: false,
+  reviewSwapSelected: false,
   estimate: undefined,
   createTx: undefined,
   cancelTx: undefined,
@@ -644,6 +661,7 @@ export type SwapContext = SwapState & {
   isLimitOptionsLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
   swapManager: any;
+  reviewSwapSelected: boolean;
 };
 
 const SwapContext = createContext<SwapContext>({
@@ -671,6 +689,7 @@ const SwapContext = createContext<SwapContext>({
   isLimitOptionsLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
   swapManager: {},
+  reviewSwapSelected: false,
 });
 
 const parseNumber = (text: string) =>

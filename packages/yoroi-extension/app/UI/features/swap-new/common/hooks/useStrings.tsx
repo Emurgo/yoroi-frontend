@@ -234,6 +234,32 @@ export const messages = Object.freeze(
       id: 'swap.priceImpact',
       defaultMessage: '!!!Price impact',
     },
+    priceImpactSevere: {
+      id: 'swap.priceImpactSevere',
+      defaultMessage:
+        '!!!<strong>Price impact over 10%</strong> may cause a significant loss of funds. Please bear this in mind and proceed with an extra caution.',
+    },
+    priceImpactModerate: {
+      id: 'swap.priceImpactNotSevere',
+      defaultMessage:
+        '!!!<strong>Price impact over 1%</strong> may cause a difference in the amount you actually receive. Consider this at your own risk.',
+    },
+    swapFromLabel: {
+      id: 'swap.swapFromLabel',
+      defaultMessage: '!!!Swap from',
+    },
+    swapDetails: {
+      id: 'swap.swapDetails',
+      defaultMessage: '!!!Swap details',
+    },
+    back: {
+      id: 'global.labels.back',
+      defaultMessage: '!!!Back',
+    },
+    confirm: {
+      id: 'global.labels.confirm',
+      defaultMessage: '!!!Confirm',
+    },
   })
 );
 
@@ -279,6 +305,7 @@ export const useStrings = () => {
     openOrdersLabel: intl.formatMessage(messages.openOrdersLabel),
     cancel: intl.formatMessage(messages.cancel),
     swapToLabel: intl.formatMessage(messages.swapToLabel),
+    swapFromLabel: intl.formatMessage(messages.swapFromLabel),
     noOrdersCompleted: intl.formatMessage(messages.noOrdersCompleted),
     noOrdersAvailable: intl.formatMessage(messages.noOrdersAvailable),
     startDoingSwaps: intl.formatMessage(messages.startDoingSwaps),
@@ -295,6 +322,15 @@ export const useStrings = () => {
     disclaimerCheckboxLabel: intl.formatMessage(messages.disclaimerCheckboxLabel),
     disclaimerProceed: intl.formatMessage(messages.disclaimerProceed),
     priceImpact: intl.formatMessage(messages.priceImpact),
+    swapDetails: intl.formatMessage(messages.swapDetails),
+    backLabel: intl.formatMessage(messages.back),
+    confirmLabel: intl.formatMessage(messages.confirm),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
+    priceImpactSevere: intl.formatMessage(messages.priceImpactSevere, {
+      strong: chunks => React.createElement('strong', null, chunks),
+    }),
+    priceImpactModerate: intl.formatMessage(messages.priceImpactModerate, {
+      strong: chunks => React.createElement('strong', null, chunks),
+    }),
   }).current;
 };

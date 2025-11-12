@@ -21,7 +21,7 @@ export const usePriceImpactRiskThemeWeb = (risk: SwapPriceImpactRisk) => {
   }
 
   return {
-    text: ds?.grey_900 ?? ds?.text?.primary,
+    text: ds?.grey_900 ?? ds?.text_gray_medium,
     background: ds?.grey_50 ?? ds?.background?.paper,
   };
 };
