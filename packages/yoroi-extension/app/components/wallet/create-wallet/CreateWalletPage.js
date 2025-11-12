@@ -36,9 +36,7 @@ function CreateWalletPage(props: Props): Node {
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
 
   useEffect(() => {
-    if (currentStep === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
-      captureEvent('Create Wallet Learn Phrase Step Viewed');
-    } else if (currentStep === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
+    if (currentStep === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
       captureEvent('Create Wallet Save Phrase Step Viewed');
     } else if (currentStep === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
       captureEvent('Create Wallet Verify Phrase Step Viewed');

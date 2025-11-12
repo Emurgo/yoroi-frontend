@@ -125,7 +125,10 @@ export default class AddWalletPage extends Component<StoresProps> {
           onHardwareConnect={() => {
             this.openDialogWrapper(WalletConnectHWOptionDialog);
           }}
-          onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
+          onCreate={() => {
+            goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET });
+            captureEvent('Create Wallet Learn Phrase Step Viewed');
+          }}
           onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}
           goToCurrentWallet={() => goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
           hasAnyWallets={hasAnyWallets === true}
