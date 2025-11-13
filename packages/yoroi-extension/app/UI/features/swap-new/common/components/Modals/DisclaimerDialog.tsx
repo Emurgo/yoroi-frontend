@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useStrings } from '../../hooks/useStrings';
-import { Stack, Typography, Checkbox, FormControlLabel, Box } from '@mui/material';
+import { Stack, Typography, Checkbox, FormControlLabel, Box, Button } from '@mui/material';
 import { useModal } from '../../../../../components/modals/ModalContext';
-import { LoadingButton } from '@mui/lab';
 import LocalStorageApi from '../../../../../../api/localStorage/index';
 import { useNavigateTo } from '../../../../../common/hooks/useNavigateTo';
 
@@ -120,15 +119,14 @@ const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action })
       </Box>
 
       <Stack pt={20}>
-        <LoadingButton
+        <Button
           // @ts-ignore
           variant="primary"
-          loading={action.isSubmitting}
           onClick={action.onClick}
           disabled={action.disabled === true}
         >
           {action.label}
-        </LoadingButton>
+        </Button>
       </Stack>
     </Stack>
   );
