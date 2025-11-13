@@ -10,6 +10,7 @@ import { useEffect } from 'react';
 import { AssetSummary } from '../../common/components/AssetSummary';
 import { ASSET_DIRECTION_OUT } from '../../common/constants';
 import { useStrings } from '../../common/hooks/useStrings';
+import { captureEvent } from '../../../../../../posthog';
 
 const ReviewSwap = ({ stores }) => {
   const { swapForm } = useSwapRevamp();
@@ -21,6 +22,10 @@ const ReviewSwap = ({ stores }) => {
 
   const tokenInInfo = swapForm['tokenInInput'];
   const tokenOutInfo = swapForm['tokenOutInput'];
+
+  useEffect(() => {
+    captureEvent('Swap Initiated');
+  }, []);
 
   useEffect(() => {
     if (swapForm.createTx?.cbor === undefined) {

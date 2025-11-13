@@ -17,6 +17,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
 import PriceImpact from '../../common/components/PriceImpact';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { captureEvent } from '../../../../../../posthog';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
@@ -32,6 +33,10 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
+
+  useEffect(() => {
+    captureEvent('Swap Initiated');
+  }, []);
 
   useEffect(() => {
     if (swapForm.createTx?.cbor && swapForm.reviewSwapSelected === false) {

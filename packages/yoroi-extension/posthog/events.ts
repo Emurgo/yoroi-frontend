@@ -32,4 +32,6 @@ export interface EventDefinitions {
   'Settings Page Viewed': [];
   'Transactions Page Viewed': [];
   'Midnight Airdrop Page Viewed': [];
+  'Swap Initiated': [];
+  'Swap Review Page Viewed': [];
 }
