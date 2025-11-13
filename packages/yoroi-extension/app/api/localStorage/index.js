@@ -172,16 +172,6 @@ export default class LocalStorageApi {
   unsetSwapDisclaimerModalClosed: void => Promise<void> = () =>
     removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
-  // ========== SWAP Disclaimer Modal ========== //
-  getSwapDisclaimerModalClosed: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
-
-  setSwapDisclaimerModalClosed: string => Promise<void> = closed =>
-    setLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED, closed);
-
-  unsetSwapDisclaimerModalClosed: void => Promise<void> = () =>
-    removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
-
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerPhase2Closed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);
 

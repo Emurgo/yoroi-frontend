@@ -501,13 +501,6 @@ export const swapReducer = (state: SwapState, action: SwapAction) => {
         draft.canSwap = false;
         break;
 
-      case SwapActionType.CreateError:
-        draft.needsNewEstimate = false;
-        draft.lastInputTouched = 'in';
-        draft.createTx = undefined;
-        draft.tokenOutInput.error = action.value.message;
-        draft.canSwap = false;
-        break;
       case SwapActionType.SwapReviewSelected:
         draft.reviewSwapSelected = action.value;
         break;
