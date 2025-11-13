@@ -10,10 +10,10 @@ import { ASSET_DIRECTION_OUT, AssetDirection } from '../constants';
 type AssetSummaryProps = {
   tokenId: any;
   value: string | number;
-  direction?: AssetDirection ; 
-}
+  direction?: AssetDirection;
+};
 
-export const AssetSummary = ({ tokenId, value,direction }: AssetSummaryProps) => {
+export const AssetSummary = ({ tokenId, value, direction }: AssetSummaryProps) => {
   const { tokenInfos, swapForm } = useSwapRevamp();
   const tokenInfo = tokenInfos.get(tokenId);
   const effective = swapForm?.estimate?.priceImpact ?? 0;
