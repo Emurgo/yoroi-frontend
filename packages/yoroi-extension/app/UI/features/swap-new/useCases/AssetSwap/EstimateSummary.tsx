@@ -8,6 +8,7 @@ import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
 import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
 import PriceImpact from '../../common/components/PriceImpact';
+import { getPriceImpactRisk } from '../../common/helpers';
 
 type EstimateSummaryProps = {
   showPriceImpact?: boolean;
@@ -25,6 +26,8 @@ export const EstimateSummary = ({ showPriceImpact, showToolTips }: EstimateSumma
   const tokenInTicker = tokenInInfo?.ticker ?? tokenInInfo?.name ?? '-';
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
+  const effective = swapForm?.estimate?.priceImpact ?? 0;
+  const risk = getPriceImpactRisk(effective);
 
   if (isEstimateOrderLoading || isLimitOptionsLoading) {
     return (
@@ -91,7 +94,7 @@ export const EstimateSummary = ({ showPriceImpact, showToolTips }: EstimateSumma
         }
         value={`${swapForm.estimate?.totalFee} ${primaryTokenInfo.ticker}`}
       />
-      {showPriceImpact && <DisplayInfoInRow label={strings.priceImpact} value={<PriceImpact />} />}
+      {showPriceImpact && risk !== 'none' && <DisplayInfoInRow label={strings.priceImpact} value={<PriceImpact />} />}
       <DisplayInfoInRow
         label={strings.minReceived}
         tooltip={showToolTips ? strings.guaranteedMin : undefined}

@@ -26,7 +26,7 @@ const PriceImpact = () => {
       <Typography variant="body2" sx={{ color: textColor }} ml={4}>
         <span>{strings.priceImpact}</span>
         <span>{' = '}</span>
-        <span style={{ paddingRight: 10 }}>{formatted}</span>
+        <span>{formatted}</span>
       </Typography>
     </Stack>
   );

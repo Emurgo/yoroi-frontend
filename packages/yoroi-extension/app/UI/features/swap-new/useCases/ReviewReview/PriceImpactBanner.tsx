@@ -12,9 +12,7 @@ export const PriceImpactBanner = () => {
   const strings = useStrings();
   const effective = swapForm?.estimate?.priceImpact ?? 0;
   const risk = getPriceImpactRisk(effective);
-  console.log('risk', risk);
   const { text: textColor, background } = usePriceImpactRiskThemeWeb(risk);
-  console.log('risk', { risk, textColor, background });
 
   if (swapForm.orderType === 'limit' || risk === 'none') return null;
 
