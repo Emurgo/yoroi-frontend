@@ -65,6 +65,10 @@ const ReviewSwap = ({ stores }) => {
           handleSubmitTransaction(passswordInput);
         },
         cborTx: swapForm.createTx.cbor,
+        operations: {
+          kind: 'swap',
+          aggregator: swapForm.createTx.aggregator,
+        },
       });
     }
   };

@@ -5,14 +5,22 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { Ilustration } from './Ilustration';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RESTORE_WALLET_HELP_URL } from '../../../../common/constants';
+import { useTxBody } from '../../common/hooks/usetxBody';
+import { useFormattedTx } from '../../common/hooks/useFormattedTx';
+import { EventDefinitions } from '../../../../../../posthog/events';
 import { captureEvent } from '../../../../../../posthog';
 
 export const SubmitInput = () => {
-  const { inputError, changePasswordInputValue, passswordInput, setInputError, walletType } = useTxReviewModal();
+  const { inputError, changePasswordInputValue, passswordInput, operations, setInputError, walletType, cborTx, unsignedTx } =
+    useTxReviewModal();
   const strings = useStrings();
 
+  const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
+  const formattedTx = useFormattedTx(cborTx ? txBody : txBody?.body);
+
   useEffect(() => {
-    captureEvent('Transaction Review Submit Modal Viewed');
+    const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
+    captureEvent('Transaction Review Modal Viewed', analyticsParams);
   }, []);
 
   useEffect(() => {
@@ -63,4 +71,61 @@ export const SubmitInput = () => {
       </Stack>
     </Stack>
   );
+};
+
+type TxAnalyticsPayload = EventDefinitions['Transaction Review Modal Viewed'][0];
+
+/**
+ * Builds analytics properties for a transaction using the
+ * not owned - outputs (tokens leaving the wallet)
+ */
+export const getTransactionAnalyticsPropertiesFromRaw = (formattedTx, context?, aggregator?: string): TxAnalyticsPayload => {
+  const notOwnedOutputs = formattedTx.outputs.filter(output => !output.ownAddress);
+
+  const spentAssets = notOwnedOutputs.flatMap(output => output.assets ?? []);
+
+  const uniqueAssets = new Map<
+    string,
+    {
+      policy_id: string;
+      asset_name: string;
+      asset_ticker: string;
+    }
+  >();
+
+  spentAssets.forEach(asset => {
+    const ti = asset.tokenInfo;
+    let rawId: string | undefined;
+
+    if (ti.info?.id) {
+      rawId = ti.info.id;
+    } else if (ti.id && ti.id.includes('.')) {
+      rawId = ti.id;
+    }
+
+    // Handle ADA or weird cases (no policy/asset).
+    if (!rawId) {
+      rawId = ti.id ?? '.';
+    }
+
+    const [policyId = '', assetNameHex = ''] = (rawId ?? '.').split('.');
+    const key = `${policyId}.${assetNameHex}`;
+
+    if (!uniqueAssets.has(key)) {
+      const ticker = ti.ticker ?? ti.info?.name ?? ti.name ?? '';
+
+      uniqueAssets.set(key, {
+        policy_id: policyId,
+        asset_name: assetNameHex,
+        asset_ticker: ticker,
+      });
+    }
+  });
+
+  return {
+    type: context ?? '',
+    asset_count: uniqueAssets.size,
+    asset_list: JSON.stringify(Array.from(uniqueAssets.values())),
+    aggregator: aggregator ?? '',
+  };
 };

@@ -144,6 +144,9 @@ export const GovernanceStatusSelection = () => {
         submitTx: password => {
           signGovernanceTx(password);
         },
+        operations: {
+          kind: 'delegate vote',
+        },
       });
 
       setError(null);

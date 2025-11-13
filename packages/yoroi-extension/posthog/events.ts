@@ -4,6 +4,7 @@ export interface EventDefinitions {
       type: 'swap' | 'send' | 'dapp' | 'delegate' | 'undelegate' | 'withdraw rewards' | 'delegate vote';
       asset_count: number;
       asset_list: string;
+      aggregator?: string;
     },
   ];
   'Payment Urls Page Viewed': [];
