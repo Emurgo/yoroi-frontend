@@ -9,23 +9,21 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../common/constants';
-import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
-import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
-import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
 import { useStrings } from '../../common/hooks/useStrings';
 import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
+import PriceImpact from '../../common/components/PriceImpact';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
-  const { createOrder, swapForm, isCreateOrderLoading, stores } = useSwapRevamp();
+  const { createOrder, swapForm, isCreateOrderLoading } = useSwapRevamp();
   const { openModal } = useModal();
+  const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
-  const wallet = stores.wallets.selectedOrFail;
-
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
       title: `SWAP ${direction === ASSET_DIRECTION_IN ? 'FROM' : 'TO'}`,
@@ -34,39 +32,10 @@ export const AssetSwap = () => {
       width: '612px',
     });
   };
-  // @ts-ignore
-  const handleSubmitTransaction = async password => {
-    // @ts-ignore
-    const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
-      wallet,
-      swapState: swapForm,
-    });
-
-    try {
-      await stores.transactionProcessingStore.adaSendAndRefresh({
-        wallet,
-        signRequest: unisgnedTxRequest,
-        password,
-        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      });
-      showTxResultModal(TransactionResult.SUCCESS);
-    } catch (e) {
-      showTxResultModal(TransactionResult.FAIL);
-    } finally {
-      swapForm.action({ type: SwapActionType.ResetForm });
-      closeTxReviewModal();
-    }
-  };
 
   useEffect(() => {
-    if (swapForm.createTx?.cbor) {
-      openTxReviewModal({
-        modalView: 'transactionReview',
-        submitTx: passswordInput => {
-          handleSubmitTransaction(passswordInput);
-        },
-        cborTx: swapForm.createTx.cbor,
-      });
+    if (swapForm.createTx?.cbor && swapForm.reviewSwapSelected === false) {
+      navigateTo.swapReview();
     }
   }, [swapForm.createTx]);
 
@@ -83,7 +52,8 @@ export const AssetSwap = () => {
         <Stack {...atoms.pt_lg} />
         <ErrorMessage />
         <LimitInput />
-        <EstimateSummary />
+        <PriceImpact />
+        <EstimateSummary showToolTips />
       </Stack>
       <LoadingButton
         //  @ts-ignore
