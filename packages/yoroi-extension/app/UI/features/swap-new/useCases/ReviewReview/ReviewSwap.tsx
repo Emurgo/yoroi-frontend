@@ -85,7 +85,8 @@ const ReviewSwap = ({ stores }) => {
       </Stack>
       <Stack direction="row" justifyContent="center" spacing={24} mt={50}>
         <Button
-          variant="outlined"
+          //  @ts-ignore
+          variant="secondary"
           onClick={() => {
             swapForm.action({ type: SwapActionType.SwapReviewSelected, value: true });
             navigateTo.swapAssets();
