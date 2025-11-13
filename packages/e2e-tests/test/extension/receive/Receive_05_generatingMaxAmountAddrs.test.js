@@ -1,7 +1,6 @@
 import { expect } from 'chai';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
-import BasePage from '../../../pages/basepage.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import ReceiveSubTab from '../../../pages/wallet/walletTab/receiveSubTab.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
@@ -56,14 +55,11 @@ describe('Generating a max amount of addresses', function () {
     // expect(errorMsg, 'The error message is different').to.equal(MAX_ALLOWED_UNUSED_ADDRS);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });

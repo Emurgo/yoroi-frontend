@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
@@ -8,29 +7,39 @@ import SettingsTab from '../../../pages/wallet/settingsTab/settingsTab.page.js';
 import SupportSubTab from '../../../pages/wallet/settingsTab/supportSubTab.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Downloading logs for support', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SettingsTab} */
+  let settingsPage = null;
+  /** @type {SupportSubTab} */
+  let supportSubTab = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     await prepareWallet(webdriver, logger, 'testWallet1', this);
     cleanDownloads();
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    settingsPage = new SettingsTab(webdriver, logger);
+    supportSubTab = new SupportSubTab(webdriver, logger);
   });
 
   it('Go to Settings Support', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToSettingsTab();
-    const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToSupportSubMenu();
   });
 
   // Click Download logs
   it('Download logs for support', async function () {
-    const supportSubTab = new SupportSubTab(webdriver, logger);
     await supportSubTab.downloadLogs();
   });
 
@@ -47,14 +56,11 @@ describe('Downloading logs for support', function () {
     expect(fileContent, 'Support log file is empty').to.not.be.empty;
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });

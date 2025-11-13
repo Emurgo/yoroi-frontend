@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach } from '../../utils/customHooks.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -10,14 +9,23 @@ import { MockDAppWebpage } from '../../helpers/mock-dApp-webpage/mockedDApp.js';
 import { connectNonAuth } from '../../helpers/mock-dApp-webpage/dAppHelper.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
+import WalletCommonBase from '../../pages/walletCommonBase.page.js';
 
 describe('dApp, isEnabled', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {WalletCommonBase} */
+  let walletCommonPage = null;
 
   before(async function () {
     try {
@@ -29,6 +37,7 @@ describe('dApp, isEnabled', function () {
       await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      walletCommonPage = new WalletCommonBase(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
     } catch (error) {
@@ -57,15 +66,12 @@ describe('dApp, isEnabled', function () {
     expect(isEnabledReponse.retValue).to.be.true;
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+  after(async function () {
+    await walletCommonPage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

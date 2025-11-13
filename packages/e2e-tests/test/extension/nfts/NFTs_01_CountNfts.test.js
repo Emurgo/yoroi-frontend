@@ -6,7 +6,6 @@ import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
 import { oneMinute } from '../../../helpers/timeConstants.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
-import BasePage from '../../../pages/basepage.js';
 import NftGalleryTab from '../../../pages/wallet/nftGallery/nftGalleryMain.page.js';
 import { testWalletNFTsAllNfts } from '../../../helpers/nftsInfo.js';
 import WalletTab from '../../../pages/wallet/walletTab/walletTab.page.js';
@@ -17,40 +16,41 @@ describe('Counting shown NFTs', function () {
   let webdriver = null;
   /** @type {Logger} */
   let logger = null;
+  /** @type {WalletTab} */
+  let walletTab = null;
+  /** @type {NftGalleryTab} */
+  let nftsMainPage = null;
   const expectedNFTsAmount = testWalletNFTsAllNfts.length;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWalletNFTs', this);
+    walletTab = new WalletTab(webdriver, logger);
+    nftsMainPage = new NftGalleryTab(webdriver, logger);
   });
 
   it('Open NFTs Gallery', async function () {
-    const walletCommonPage = new WalletTab(webdriver, logger);
-    await walletCommonPage.goToNftsTab();
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
+    await walletTab.goToNftsTab();
     const nftsPageIsDisplayed = await nftsMainPage.isDisplayed();
     expect(nftsPageIsDisplayed, 'NFTs Gallery page is not displayed').to.be.true;
   });
 
   it('Check number in the title', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberInTitle = await nftsMainPage.getNftsAmountFromTitle();
     expect(numberInTitle, 'Different number of NFTs in title').to.equal(expectedNFTsAmount);
   });
 
   it('Check number of displayed NFTs', async function () {
-    const nftsMainPage = new NftGalleryTab(webdriver, logger);
     const numberOfDisplayedNFTs = await nftsMainPage.countShownNfts();
     expect(numberOfDisplayedNFTs, 'Different amount of NFTs is displayed').to.equal(expectedNFTsAmount);
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
   after(async function () {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+    await walletTab.closeBrowser();
   });
 });
