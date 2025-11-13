@@ -282,9 +282,19 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     tokenInfos,
   ]);
 
+  const swapForm = useMemo(
+    () => ({
+      action,
+      orders,
+      refetchOrders,
+      ...state,
+    }),
+    [action, orders, refetchOrders, state]
+  );
+
   const context: any = useMemo(
     () => ({
-      swapForm: { action, orders, refetchOrders, ...state },
+      swapForm,
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
