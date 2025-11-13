@@ -19,7 +19,7 @@ export const PriceImpactBanner = () => {
   if (swapForm.orderType === 'limit' || risk === 'none') return null;
 
   return (
-    <Stack bgcolor={background} py={12} px={16} mb={32} borderRadius={2} spacing={8}>
+    <Stack bgcolor={background} py={12} px={16} mb={32} borderRadius={1} spacing={8}>
       <Stack direction="row" alignItems="center" spacing={2} sx={{ minHeight: 24, marginBottom: '-8px' }}>
         {risk === 'moderate' && <Icon.InfoCircle fill={textColor} />}
         {risk === 'high' && <Icon.ErrorTriangle fill={textColor} />}

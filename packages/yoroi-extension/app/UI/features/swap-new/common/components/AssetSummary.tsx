@@ -17,11 +17,8 @@ export const AssetSummary = ({ tokenId, value,direction }: AssetSummaryProps) =>
   const { tokenInfos, swapForm } = useSwapRevamp();
   const tokenInfo = tokenInfos.get(tokenId);
   const effective = swapForm?.estimate?.priceImpact ?? 0;
-
   const risk = getPriceImpactRisk(effective);
   const { text: textColor } = usePriceImpactRiskThemeWeb(risk);
-
-  console.log('TOKEN INFO ROW', { tokenInfo, value });
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">

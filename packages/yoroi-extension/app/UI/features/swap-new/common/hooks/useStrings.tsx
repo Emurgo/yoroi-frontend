@@ -39,6 +39,10 @@ export const messages = Object.freeze(
       id: 'swap.feesIncluded',
       defaultMessage: '!!!Fees included:',
     },
+    feesLabel: {
+      id: 'swap.fees',
+      defaultMessage: '!!!Fees:',
+    },
     dexFee: {
       id: 'swap.dexFee',
       defaultMessage: '!!!• DEX fee',
@@ -276,6 +280,7 @@ export const useStrings = () => {
     routePath: intl.formatMessage(messages.routePath),
     dexFee: intl.formatMessage(messages.dexFee),
     feesIncluded: intl.formatMessage(messages.feesIncluded),
+    feesLabel: intl.formatMessage(messages.feesLabel),
     frontendFee: intl.formatMessage(messages.frontendFee),
     lpFee: intl.formatMessage(messages.lpFee),
     minReceived: intl.formatMessage(messages.minReceived),

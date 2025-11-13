@@ -54,7 +54,7 @@ export const AssetSwap = () => {
         <ErrorMessage />
         <LimitInput />
         <PriceImpact />
-        <EstimateSummary />
+        <EstimateSummary showToolTips />
       </Stack>
       <LoadingButton
         //  @ts-ignore

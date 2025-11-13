@@ -22,8 +22,6 @@ const ReviewSwap = ({ stores }) => {
   const tokenInInfo = swapForm['tokenInInput'];
   const tokenOutInfo = swapForm['tokenOutInput'];
 
-  console.log('TOKENSINFOO', { tokenInInfo, tokenOutInfo });
-
   useEffect(() => {
     if (swapForm.createTx?.cbor === undefined) {
       navigateTo.swapAssets();
@@ -71,7 +69,7 @@ const ReviewSwap = ({ stores }) => {
       <Stack>
         <PriceImpactBanner />
         <Typography variant="body1" mb={12}>
-         {strings.swapFromLabel}
+          {strings.swapFromLabel}
         </Typography>
         <AssetSummary tokenId={tokenInInfo.tokenId} value={tokenInInfo.value} />
         <Stack pb={20} />
@@ -82,7 +80,7 @@ const ReviewSwap = ({ stores }) => {
         <Stack pb={24} mb={24} borderBottom={`1px solid ${palette.ds.gray_200}`} />
         <Stack>
           <Typography fontWeight={500}>{strings.swapDetails}</Typography>
-          <EstimateSummary />
+          <EstimateSummary showPriceImpact />
         </Stack>
       </Stack>
       <Stack direction="row" justifyContent="center" spacing={24} mt={50}>
