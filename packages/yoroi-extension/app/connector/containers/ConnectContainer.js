@@ -8,9 +8,10 @@ import type { WalletChecksum } from '@emurgo/cip4-js';
 import { LoadingWalletStates } from '../types';
 import { genLookupOrFail } from '../../stores/stateless/tokenHelpers';
 import { connectorCreateAuthEntry, userConnectResponse } from '../../api/thunk';
-import { ampli } from '../../../ampli/index';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import type { ConnectorStoresProps } from '../stores';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../posthog';
 
 type State = {|
   isAppAuth: boolean,
@@ -42,9 +43,7 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
   componentDidMount() {
     autorun(() => {
       if (this.props.stores.connector.loadingWallets === LoadingWalletStates.SUCCESS) {
-        ampli.dappPopupConnectWalletPageViewed({
-          wallet_count: this.props.stores.connector.wallets.length,
-        });
+        captureEvent('Dapp Popup Connect Wallet Page Viewed');
       }
     });
   }
@@ -99,8 +98,6 @@ export default class ConnectContainer extends Component<ConnectorStoresProps, St
       image: chromeMessage.imgBase64Url,
     });
     await stores.connector.updateConnectorWhitelist({ whitelist });
-
-    await ampli.dappPopupConnectWalletPasswordPageViewed();
 
     userConnectResponse({
       accepted: true,

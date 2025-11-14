@@ -15,14 +15,9 @@ type ChooseDRepModallProps = {
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   const [drepId, setDrepId] = React.useState('');
   const [error, setError] = React.useState(false);
-  const { dRepIdChanged, governanceVoteChanged, ampli } = useGovernance();
+  const { dRepIdChanged, governanceVoteChanged } = useGovernance();
   const { isLoading } = useModal();
   const strings = useStrings();
-
-  React.useEffect(() => {
-    // ON MOUNT
-    ampli?.governanceChooseDrepPageViewed();
-  }, []);
 
   React.useEffect(() => {
     setError(false);

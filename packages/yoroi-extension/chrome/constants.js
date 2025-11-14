@@ -30,7 +30,8 @@ export function genCSP(request: {|
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
-  connectSrc.push('https://api2.amplitude.com');
+  connectSrc.push('https://eu.i.posthog.com');
+  connectSrc.push('https://eu-assets.i.posthog.com');
   connectSrc.push('https://api.muesliswap.com');
 
   // Resolver

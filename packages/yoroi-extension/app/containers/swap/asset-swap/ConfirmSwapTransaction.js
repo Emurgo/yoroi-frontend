@@ -3,11 +3,8 @@ import { Box, Typography } from '@mui/material';
 import { makeLimitOrder, makePossibleMarketOrder, useSwap, useSwapCreateOrder } from 'legacySwap';
 import { useEffect } from 'react';
 import { useSwapForm } from '../context/swap-form';
-import { useSwapFeeDisplay } from '../hooks';
-import { ampli } from '../../../../ampli/index';
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { PriceImpact } from '../../../components/swap/types';
-import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { SwapTxInfo } from './SwapTxInfo';
 import { observer } from 'mobx-react';
@@ -35,12 +32,8 @@ function ConfirmSwapTransaction({
   onError,
 }: Props): React$Node {
   const { orderData } = useSwap();
-  const {
-    selectedPoolCalculation: { pool },
-  } = orderData;
-  const { sellTokenInfo, buyTokenInfo, sellQuantity, buyQuantity, sellFeeAmountErrorChanged } = useSwapForm();
+  const { sellFeeAmountErrorChanged } = useSwapForm();
   const { setOrderStepValue } = swapStore;
-  const { formattedFeeQuantity } = useSwapFeeDisplay(defaultTokenInfo);
 
   const isMarketOrder = orderData.type === 'market';
 
@@ -65,16 +58,6 @@ function ConfirmSwapTransaction({
   });
   useEffect(() => {
     // MOUNT
-
-    ampli.swapOrderSelected({
-      ...tokenInfoToAnalyticsFromAndToAssets(sellTokenInfo, buyTokenInfo),
-      from_amount: sellQuantity.displayValue,
-      to_amount: buyQuantity.displayValue,
-      order_type: orderData.type,
-      pool_source: pool?.provider,
-      slippage_tolerance: orderData.slippage,
-      swap_fees: Number(formattedFeeQuantity),
-    });
 
     if (walletAddress == null) {
       alert('Wallet address is not available');

@@ -1,7 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { useEffect, useMemo, useState } from 'react';
-import { ampli } from '../../../../../../ampli/index';
+import { useMemo, useState } from 'react';
 import PortfolioHeader from '../../common/components/PortfolioHeader';
 import WelcomeBanner from '../../common/components/WelcomeBanner';
 import { useStrings } from '../../common/hooks/useStrings';
@@ -35,21 +34,6 @@ const PortfolioWallet = ({ stores }): React.ReactNode => {
       return [];
     }
   }, [keyword, showWelcomeBanner, ftAssetList]);
-
-  useEffect(() => {
-    const lowercaseKeyword = keyword.toLowerCase();
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    const sendMetrics = () => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        ampli.portfolioTokensListSearchActivated({ search_term: lowercaseKeyword });
-      }, 500); // 0.5s requirement
-    };
-
-    if (lowercaseKeyword.length > 0) sendMetrics();
-
-    return () => clearTimeout(timeout);
-  }, [keyword]);
 
   return (
     <Stack direction="column" spacing={theme.spacing(24)} sx={{ minHeight: 'calc(100vh - 220px)' }}>

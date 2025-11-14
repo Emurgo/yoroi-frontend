@@ -14,7 +14,6 @@ import Autocomplete from '../../../../common/autocomplete/Autocomplete';
 import { ReactComponent as VerifiedIcon } from '../../../../../assets/images/verify-icon-green.inline.svg';
 import { Box, Button, Fade, Stack, Typography } from '@mui/material';
 import environment from '../../../../../environment';
-import { ampli } from '../../../../../../ampli/index';
 
 const messages = defineMessages({
   title: {
@@ -216,9 +215,6 @@ export default class RestoreRecoveryPhraseForm extends Component<Props, State> {
                       fieldBind.onChange(newWord);
                       const phrase = form.values().recoveryPhrase;
                       const isValid = isValidMnemonic(phrase);
-                      if (newWord && idx === phrase.length - 1) {
-                        ampli.restoreWalletEnterPhraseStepStatus({ recovery_prhase_status: isValid });
-                      }
 
                       if (isValid && this.checkAllWordsEntered(numberOfMnemonics, phrase)) {
                         this.submit();
