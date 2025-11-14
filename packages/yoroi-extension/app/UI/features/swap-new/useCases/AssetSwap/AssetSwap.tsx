@@ -9,7 +9,7 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../common/constants';
-import { useSwapRevamp } from '../../module/SwapContextProvider';
+import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
 import { LimitInput } from '../../common/components/LimitInput';
@@ -17,13 +17,16 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
 import PriceImpact from '../../common/components/PriceImpact';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useLocation } from 'react-router';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
   const { createOrder, swapForm, isCreateOrderLoading } = useSwapRevamp();
   const { openModal } = useModal();
   const navigateTo = useNavigateTo();
+  const location = useLocation();
   const strings = useStrings();
+  
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
       title: `SWAP ${direction === ASSET_DIRECTION_IN ? 'FROM' : 'TO'}`,
@@ -34,6 +37,9 @@ export const AssetSwap = () => {
   };
 
   useEffect(() => {
+    if (location.search.includes('newWallet=true')) {
+      swapForm.action({ type: SwapActionType.ResetForm });
+    }
     if (swapForm.createTx?.cbor && swapForm.reviewSwapSelected === false) {
       navigateTo.swapReview();
     }
