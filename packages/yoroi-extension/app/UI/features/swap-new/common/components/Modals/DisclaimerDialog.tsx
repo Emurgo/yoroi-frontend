@@ -12,7 +12,7 @@ export const DisclaimerDialog = () => {
   const { openModal, closeModal } = useModal();
   const localStorage = new LocalStorageApi();
   const onAcceptDisclaimer = () => {
-    localStorage.setSwapDisclaimerModalClosed(true);
+    localStorage.setSwapDisclaimerModalClosed('true');
     closeModal();
   };
   const action = {

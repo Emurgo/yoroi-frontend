@@ -536,6 +536,7 @@
   "swap.amount": "Amount",
   "swap.swapDetails": "Swap Details",
   "swap.allAssets": "All assets",
+  "swap.assetDetails": "Asset details",
   "swap.assetPrice": "Asset price",
   "swap.assetAmount": "Asset amount",
   "swap.totalReturned": "Total returned",
