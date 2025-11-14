@@ -43,7 +43,7 @@ export const DisclaimerDialog = () => {
     };
 
     checkModalState();
-  }, []);
+  }, [disclaimerAgreed]);
 
   return <></>;
 };

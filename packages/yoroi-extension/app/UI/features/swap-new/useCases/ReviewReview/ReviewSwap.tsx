@@ -18,7 +18,7 @@ const ReviewSwap = ({ stores }) => {
   const navigateTo = useNavigateTo();
   const { palette }: any = useTheme();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
-
+  
   const tokenInInfo = swapForm['tokenInInput'];
   const tokenOutInfo = swapForm['tokenOutInput'];
 
