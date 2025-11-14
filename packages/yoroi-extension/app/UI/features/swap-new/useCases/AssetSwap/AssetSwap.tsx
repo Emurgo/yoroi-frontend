@@ -26,7 +26,7 @@ export const AssetSwap = () => {
   const navigateTo = useNavigateTo();
   const location = useLocation();
   const strings = useStrings();
-  
+
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
       title: `SWAP ${direction === ASSET_DIRECTION_IN ? 'FROM' : 'TO'}`,

@@ -109,7 +109,6 @@ const DisclaimerDialogBody = ({ action, disclaimerAgreed, setDisclaimerAgreed })
           control={
             <Checkbox
               onChange={() => {
-                console.log('Checkbox changed', { disclaimerAgreed });
                 setDisclaimerAgreed(!disclaimerAgreed);
               }}
               checked={disclaimerAgreed}
