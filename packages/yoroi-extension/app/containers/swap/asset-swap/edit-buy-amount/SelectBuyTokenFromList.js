@@ -4,8 +4,6 @@ import type { RemoteTokenInfo } from '../../../../api/ada/lib/state-fetch/types'
 import { useSwap } from 'legacySwap';
 import { useSwapForm } from '../../context/swap-form';
 import { useBuyVerifiedSwapTokens } from '../hooks';
-import { ampli } from '../../../../../ampli/index';
-import { tokenInfoToAnalyticsToAsset } from '../../swapAnalytics';
 import SelectAssetDialog from '../../../../components/swap/SelectAssetDialog';
 import SwapStore from '../../../../stores/ada/SwapStore';
 
@@ -50,7 +48,6 @@ export default function SelectBuyTokenFromList({
     if (shouldUpdateToken) {
       buyTouched(token);
       onTokenInfoChanged({ decimals: decimals ?? 0, id });
-      ampli.swapAssetToChanged(tokenInfoToAnalyticsToAsset(token));
     }
 
     onClose();

@@ -1,5 +1,5 @@
 // @flow
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
 import { Box } from '@mui/material';
 import { observer } from 'mobx-react';
@@ -12,7 +12,8 @@ import AddWalletDetailsStep from './AddWalletDetailsStep';
 import CreateWalletPageHeader from './CreateWalletPageHeader';
 import { ROUTES } from '../../../routes-config';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
-import { ampli } from '../../../../ampli/index';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../../posthog';
 
 type Props = {|
   genWalletRecoveryPhrase: void => Promise<Array<string>>,
@@ -33,18 +34,14 @@ export type ManageDialogsProps = {|
 function CreateWalletPage(props: Props): Node {
   const { genWalletRecoveryPhrase, createWallet, selectedNetwork, isDialogOpen, openDialog, closeDialog, goToRoute } = props;
   const [currentStep, setCurrentStep] = useState(CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE);
-  const setCurrentStepAndTrack = step => {
-    setCurrentStep(step);
-    if (step === CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE) {
-      ampli.createWalletLearnPhraseStepViewed();
-    } else if (step === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
-      ampli.createWalletSavePhraseStepViewed();
-    } else if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
-      ampli.createWalletVerifyPhraseStepViewed();
-    } else if (step === CREATE_WALLET_SETPS.ADD_WALLET_DETAILS) {
-      ampli.createWalletDetailsStepViewed();
+
+  useEffect(() => {
+    if (currentStep === CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE) {
+      captureEvent('Create Wallet Save Phrase Step Viewed');
+    } else if (currentStep === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
+      captureEvent('Create Wallet Verify Phrase Step Viewed');
     }
-  };
+  }, [currentStep]);
 
   const [recoveryPhrase, setRecoveryPhrase] = useState(null);
   const [isRecoveryPhraseEntered, markRecoveryPhraseAsEntered] = useState<boolean>(false);
@@ -62,7 +59,7 @@ function CreateWalletPage(props: Props): Node {
     [CREATE_WALLET_SETPS.LEARN_ABOUT_RECOVERY_PHRASE]: (
       <LearnAboutRecoveryPhrase
         nextStep={() => {
-          setCurrentStepAndTrack(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
+          setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE);
           if (recoveryPhrase === null) {
             genWalletRecoveryPhrase()
               .then(setRecoveryPhrase)
@@ -78,17 +75,7 @@ function CreateWalletPage(props: Props): Node {
       />
     ),
     [CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE]: (
-      <SaveRecoveryPhraseStep
-        setCurrentStep={step => {
-          if (step === CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE) {
-            setCurrentStepAndTrack(step);
-          } else {
-            setCurrentStep(step);
-          }
-        }}
-        recoveryPhrase={recoveryPhrase}
-        {...manageDialogsProps}
-      />
+      <SaveRecoveryPhraseStep setCurrentStep={setCurrentStep} recoveryPhrase={recoveryPhrase} {...manageDialogsProps} />
     ),
     [CREATE_WALLET_SETPS.VERIFY_RECOVERY_PHRASE]: (
       <VerifyRecoveryPhraseStep
@@ -96,7 +83,7 @@ function CreateWalletPage(props: Props): Node {
         prevStep={() => setCurrentStep(CREATE_WALLET_SETPS.SAVE_RECOVERY_PHRASE)}
         nextStep={() => {
           markRecoveryPhraseAsEntered(true);
-          setCurrentStepAndTrack(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
+          setCurrentStep(CREATE_WALLET_SETPS.ADD_WALLET_DETAILS);
         }}
         isRecoveryPhraseEntered={isRecoveryPhraseEntered}
       />
@@ -118,7 +105,7 @@ function CreateWalletPage(props: Props): Node {
             recoveryPhrase,
           });
 
-          ampli.createWalletDetailsSubmitted();
+          captureEvent('Create Wallet Details Submitted');
         }}
         {...manageDialogsProps}
       />

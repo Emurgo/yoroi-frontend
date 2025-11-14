@@ -3,7 +3,6 @@ import { Nft } from '../common/types';
 import { TabItem, Tabs } from '../../../components/tabs/Tabs';
 import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
 import { Link, useLocation } from 'react-router';
-import { ampli } from '../../../../../ampli';
 import { ROUTES } from '../../../../routes-config';
 import { IconWrapper, Icons } from '../../../components';
 import { useStrings } from '../common/hooks/useStrings';
@@ -48,13 +47,11 @@ export default function NftDetails() {
 
   const openModal = () => {
     setOpen(true);
-    ampli.nftGalleryDetailsImageViewed();
   };
 
   const handleTabChange = (tab: TabItem | undefined) => {
     if (!tab) return;
     setCurrentTab(tab);
-    ampli.nftGalleryDetailsTab({ nft_tab: tab.id === 'overview' ? 'Overview' : 'Metadata' });
   };
 
   const getTabs = useCallback(() => {

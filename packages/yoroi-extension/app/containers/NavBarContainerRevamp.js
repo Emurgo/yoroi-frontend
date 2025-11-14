@@ -12,12 +12,13 @@ import NavBarRevamp from '../components/topbar/NavBarRevamp';
 import NavWalletDetailsRevamp from '../components/topbar/NavWalletDetailsRevamp';
 import WalletListDialog from '../components/topbar/WalletListDialog';
 import BuySellAdaButton from '../components/topbar/BuySellAdaButton';
-import { ampli } from '../../ampli/index';
 import { MultiToken } from '../api/common/lib/MultiToken';
 import LocalStorageApi from '../api/localStorage/index';
 import SwitchNetworkDialogContainer from './settings/categories/SwitchNetworkDialogContainer';
 import type { StoresProps } from '../stores';
 import links from '../links';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../posthog';
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from '../UI/utils/createCurrentWalletInfo';
 
@@ -110,7 +111,6 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
           unitOfAccountSetting={profile.unitOfAccount}
           getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
           openWalletInfoDialog={() => {
-            ampli.allWalletsPageViewed();
             stores.uiDialogs.open({ dialog: WalletListDialog });
           }}
         />
@@ -161,7 +161,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
                   window.open(links.testnetFaucet, '_blank');
                 } else {
                   if (stores.routing.currentRoute.startsWith(ROUTES.WALLETS.ROOT)) {
-                    ampli.walletPageExchangeClicked();
+                    captureEvent('Wallet Page Exchange Clicked');
                   }
                   this.props.stores.uiDialogs.open({ dialog: BuySellDialog });
                 }

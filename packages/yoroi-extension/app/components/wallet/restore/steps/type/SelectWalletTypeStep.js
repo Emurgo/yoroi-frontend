@@ -1,4 +1,5 @@
 // @flow
+import { useEffect } from 'react';
 import type { Node, ComponentType } from 'react';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { defineMessages, injectIntl } from 'react-intl';
@@ -11,6 +12,8 @@ import AddWalletCard from '../../../add-wallet-revamp/AddWalletCard';
 import styles from './SelectWalletTypeStep.scss';
 import globalMessages from '../../../../../i18n/global-messages';
 import type { RestoreModeType } from '../../../../../stores/toplevel/WalletRestoreStore';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../../../../posthog';
 
 const messages: * = defineMessages({
   fifteenWords: {
@@ -33,6 +36,10 @@ type Props = {|
 |};
 
 function SelectWalletTypeStep(props: Props & Intl): Node {
+  useEffect(() => {
+    captureEvent('Restore Wallet Type Step Viewed');
+  }, []);
+
   const { onNext, goBack, intl } = props;
 
   return (

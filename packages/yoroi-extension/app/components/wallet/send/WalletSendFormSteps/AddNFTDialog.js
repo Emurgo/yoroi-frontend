@@ -14,7 +14,6 @@ import { getNFTs } from '../../../../utils/wallet';
 import { OutlinedInput, Typography } from '@mui/material';
 import { isCardanoHaskell } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { Box } from '@mui/system';
-import { ampli } from '../../../../../ampli/index';
 import MinAda from './MinAda';
 import Dialog from '../../../widgets/Dialog';
 import styles from './AddNFTDialog.scss';
@@ -128,7 +127,7 @@ export default class AddNFTDialog extends Component<Props, State> {
   onAddAll: void => void = () => {
     const amount = new BigNumber('1');
     const toRemove = [];
-    let changed = false;
+
     const tokens = this.props.plannedTxInfoMap
       .filter(({ token }) => !token.IsDefault)
       .map(({ token }) => ({ tokenId: token.TokenId }));
@@ -137,11 +136,9 @@ export default class AddNFTDialog extends Component<Props, State> {
       if (tokenIndex !== -1) {
         if (!included) {
           tokens.splice(tokenIndex, 1);
-          changed = true;
         }
       } else if (included) {
         tokens.push({ tokenId: token.TokenId });
-        changed = true;
       }
       if (!included) {
         toRemove.push(token);
@@ -155,11 +152,6 @@ export default class AddNFTDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
-    if (changed) {
-      ampli.sendSelectAssetUpdated({
-        asset_count: tokens.length,
-      });
-    }
   };
 
   render(): Node {
