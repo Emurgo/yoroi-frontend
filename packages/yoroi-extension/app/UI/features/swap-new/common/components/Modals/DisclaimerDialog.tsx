@@ -57,7 +57,6 @@ export const DisclaimerDialog = () => {
 
 const DisclaimerDialogBody = ({ action, disclaimerAgreed, setDisclaimerAgreed }) => {
   const strings = useStrings();
-  console.log('DisclaimerDialog render', { disclaimerAgreed });
 
   return (
     <Stack>
