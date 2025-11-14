@@ -18,7 +18,7 @@ const TokenInfoModal = ({ token }) => {
       </Typography>
       {!isPrimary && (
         <>
-          <DisplayInfoInRow label="Policy ID" value={truncateAddressShort(token.id)} textToCopy={token.id}  />
+          <DisplayInfoInRow label="Policy ID" value={truncateAddressShort(token.id)} textToCopy={token.id} />
           <DisplayInfoInRow label="Fingerprint" value={token.fingerprint} textToCopy={token.fingerprint} />
         </>
       )}
