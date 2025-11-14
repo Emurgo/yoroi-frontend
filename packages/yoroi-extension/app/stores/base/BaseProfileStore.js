@@ -11,14 +11,14 @@ import { unitOfAccountDisabledValue } from '../../types/unitOfAccountType';
 import type { UnitOfAccountSettingType } from '../../types/unitOfAccountType';
 import { SUPPORTED_CURRENCIES } from '../../config/unitOfAccount';
 import { CURRENT_TOS_VERSION } from '../../i18n/locales/terms-of-use/ada/index';
-import { ampli } from '../../../ampli/index';
-import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 import { noop } from '../../coreUtils';
 import type { Theme } from '../../styles/themes';
 import { THEMES } from '../../styles/themes';
 import { refreshCurrentCoinPrice } from '../../api/thunk';
 import type { NetworkRow } from '../../api/ada/lib/storage/database/primitives/tables';
 import { getNetworkById, networks } from '../../api/ada/lib/storage/database/prepackaged/networks';
+// $FlowFixMe[cannot-resolve-module]
+import { enablePosthog, disablePosthog } from '../../../posthog';
 
 interface LoadingStore {
   +registerBlockingLoadingRequest: (promise: Promise<void>, name: string) => void;
@@ -163,35 +163,8 @@ export default class BaseProfileStore<
 
   _loadWhetherAnalyticsAllowed: () => Promise<void> = async () => {
     const isAnalyticsAllowed = await this.getIsAnalyticsAllowed.execute();
-    const AMPLI_FLUSH_INTERVAL_MS = 5000;
-    if (ampli.load == null || typeof ampli.load !== 'function') {
-      throw new Error(`ampli.load is not available or not a function (${typeof ampli.load})`);
-    }
-    await ampli.load(
-      ({
-        environment: environment.isProduction() ? 'production' : 'development',
-        client: {
-          configuration: {
-            optOut: !isAnalyticsAllowed,
-            flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-            trackingOptions: {
-              ipAddress: false,
-            },
-            defaultTracking: false,
-          },
-        },
-      }: LoadOptionsWithEnvironment)
-    ).promise;
-    if (environment.isDev()) {
-      ampli.client.add({
-        name: 'info-plugin',
-        type: 'enrichment',
-        setup: () => Promise.resolve(),
-        execute: async event => {
-          console.info('[metrics]', event.event_type, event.event_properties);
-          return Promise.resolve(event);
-        },
-      });
+    if (isAnalyticsAllowed) {
+      enablePosthog();
     }
   };
 
@@ -421,7 +394,11 @@ export default class BaseProfileStore<
   onOptForAnalytics: boolean => void = isAnalyticsAllowed => {
     this.getIsAnalyticsAllowed.patch(_ => isAnalyticsAllowed);
     this.api.localStorage.saveIsAnalysticsAllowed(isAnalyticsAllowed);
-    ampli.client.setOptOut(!isAnalyticsAllowed);
+    if (isAnalyticsAllowed) {
+      enablePosthog();
+    } else {
+      disablePosthog();
+    }
   };
 
   @computed get isAnalyticsOpted(): boolean {

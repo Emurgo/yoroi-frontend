@@ -256,7 +256,7 @@ export default class NftGalleryTab extends WalletCommonBase {
   /**
    * Getting the nft card size
    * @param {number} nftIndex
-   * @returns {{height: number, width: number}}
+   * @returns {Promise<{height: number, width: number}>}
    */
   async getNftCardSize(nftIndex) {
     this.logger.info(`NftGalleryTab::getNftCardSize is called. NFT's index: ${nftIndex}`);

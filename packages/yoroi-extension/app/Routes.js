@@ -65,8 +65,6 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
-import { ampli } from '../ampli/index';
-// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
@@ -393,7 +391,6 @@ const GovernanceSubpages = ({ stores }) => {
         tokenInfo={stores.tokenInfoStore.tokenInfo}
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-        ampli={ampli}
       >
         <Suspense fallback={null}>
           <Outlet />
