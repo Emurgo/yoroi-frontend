@@ -1,19 +1,21 @@
 import { Stack, Typography, useTheme } from '@mui/material';
 import { ReactNode } from 'react';
 import { CopyButton, Icons, IconWrapper, Tooltip } from '../../../../components';
+import type { PlacesType } from 'react-tooltip';
 
 type DisplayInfoInRowProps = {
   label: string;
   tooltip?: string | ReactNode;
   value: string | ReactNode;
   textToCopy?: string;
+  tooltipPlace?: PlacesType;
 };
 
-export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy }: DisplayInfoInRowProps) => {
+export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy, tooltipPlace = 'bottom' }: DisplayInfoInRowProps) => {
   const { atoms }: any = useTheme();
   return (
-    <Stack direction="row" width="100%" justifyContent="space-between" alignItems="center">
-      <Stack direction="row" alignItems="center">
+    <Stack direction="row" width="100%" justifyContent="space-between" alignItems="start">
+      <Stack direction="row" alignItems="start">
         <Typography variant="body2" color="ds.el_gray_low" {...atoms.mr_xs}>
           {label}
         </Typography>
@@ -31,7 +33,7 @@ export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy }: DisplayI
         ) : (
           value
         )}
-        {textToCopy && <CopyButton textToCopy={textToCopy} />}
+        {textToCopy && <CopyButton textToCopy={textToCopy} place={tooltipPlace} />}
       </Stack>
     </Stack>
   );

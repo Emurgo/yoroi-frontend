@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Icons, IconWrapper } from '../icons/index';
 import { Tooltip } from '../Tooltip';
+import type { PlacesType } from 'react-tooltip';
 import { defineMessages, useIntl } from 'react-intl';
 import { Box } from '@mui/material';
 
@@ -16,14 +17,14 @@ export const messages = Object.freeze(
     },
   })
 );
-
 interface Props {
   textToCopy: string;
   disabled?: boolean;
   pathTestId?: string;
+  place?: PlacesType;
 }
 
-export const CopyButton = ({ textToCopy, disabled, pathTestId = '', ...props }: Props) => {
+export const CopyButton = ({ textToCopy, disabled, pathTestId = '', place = 'bottom', ...props }: Props) => {
   const [copied, setCopied] = useState(false);
   const intl = useIntl();
   const strings = useRef({
@@ -41,7 +42,7 @@ export const CopyButton = ({ textToCopy, disabled, pathTestId = '', ...props }: 
 
   return (
     <Box onClick={handleCopy} {...props} id={`${pathTestId}-copy-button`}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="left-start">
+      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place={place}>
         <IconWrapper
           disabled={disabled}
           buttonProps={{ sx: { padding: 0 } }}
