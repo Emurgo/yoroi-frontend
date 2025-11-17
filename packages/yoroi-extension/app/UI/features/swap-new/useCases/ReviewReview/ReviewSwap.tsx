@@ -28,7 +28,7 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
   const tokenOutInfo = swapForm['tokenOutInput'];
 
   useEffect(() => {
-    captureEvent('Swap Initiated');
+    captureEvent('Swap Review Page Viewed');
   }, []);
 
   useEffect(() => {
