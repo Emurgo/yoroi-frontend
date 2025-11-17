@@ -160,7 +160,6 @@
   "connector.connect.connectedWallets.active": "活跃",
   "connector.connect.cashback.addWallet": "添加钱包",
   "connector.connect.cashback.apply.all": "您选择的钱包将适用于所有合作伙伴网站。",
-  "connector.connect.cashback.trezor.disabled": "现金返还服务不支持Trezor钱包连接",
   "connector.connect.createWallet": "创建钱包",
   "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "不支持通过身份验证连接到硬件钱包",
   "connector.connect.info": "你的连接设置会保存在Yoroi dApp列表中",
