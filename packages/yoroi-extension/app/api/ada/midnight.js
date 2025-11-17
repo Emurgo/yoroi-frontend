@@ -50,10 +50,10 @@ export async function getAllocatedAddresses(checkEndpoint: string, wallet: Walle
   return result;
 }
 
-export async function checkClaimForAddress(claimEndpoint: string, addrBech32: string): Promise<boolean> {
+export async function checkClaimForAddress(claimEndpoint: string, addrBech32: string): Promise<number> {
   const resp = await fetch(`${claimEndpoint}/claims/cardano?address=${addrBech32}`);
   if (!resp.ok) {
-    return false;
+    return 0;
   }
   const data = await resp.json();
   /* schema:
@@ -72,7 +72,10 @@ export async function checkClaimForAddress(claimEndpoint: string, addrBech32: st
       }
     ]
   */
-  return Array.isArray(data) && data.length === 1 && (data[0].status === 'queued' || data[0].status === 'confirmed');
+  if (Array.isArray(data) && data.length === 1 && (data[0].status === 'queued' || data[0].status === 'confirmed')) {
+    return data[0].amount;
+  }
+  return 0;
 }
 
 export function getClaimMessage(value: number, destAddrBech32: string): string {
@@ -202,7 +205,7 @@ export async function scanForOriginalDestAddress(
   claimEndpoint: string,
   unusedAddr: string,
   usedAddrs: Array<string>
-): Promise<ScanResult | null> {
+): Promise<ScanResult> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
@@ -221,5 +224,8 @@ export async function scanForOriginalDestAddress(
       };
     }
   }
-  return null;
+  return {
+    success: false,
+    error: 'destination address not found in this wallet',
+  };
 }

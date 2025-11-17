@@ -317,7 +317,7 @@ export default class ConnectPage extends Component<Props> {
               {isError ? <div className={styles.errorMessage}>{error}</div> : null}
               {isLoading ? (
                 <div className={styles.loading}>
-                  <LoadingSpinner />
+                  <LoadingSpinner id="dApp" />
                 </div>
               ) : hasWallets ? (
                 <div className={styles.walletsContainer}>

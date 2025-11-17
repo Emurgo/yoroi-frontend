@@ -47,7 +47,6 @@ import {
   unsupportedTransactionError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
-import { ampli } from '../../../ampli/index';
 import { iterateLenGet, hexToBytes, noop, purify } from '../../coreUtils';
 import {
   broadcastTransaction,
@@ -174,11 +173,9 @@ export default class ConnectorStore extends Store<StoresMap> {
         if (response) {
           if (response.sign.type === 'tx/cardano') {
             this.createAdaTransaction();
-            ampli.dappPopupSignTransactionPageViewed();
           }
           if (response.sign.type === 'tx-reorg/cardano') {
             this.generateReorgTransaction();
-            ampli.dappPopupAddCollateralPageViewed();
           }
         }
       })
@@ -374,8 +371,6 @@ export default class ConnectorStore extends Store<StoresMap> {
     runInAction(() => {
       this.isSignInExecuted = true;
     });
-
-    await ampli.dappPopupSignTransactionSubmitted();
   };
 
   @action

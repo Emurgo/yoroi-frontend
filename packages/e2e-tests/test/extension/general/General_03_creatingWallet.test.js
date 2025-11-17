@@ -1,0 +1,161 @@
+import { expect } from 'chai';
+import BasePage from '../../../pages/basepage.js';
+import AddNewWallet from '../../../pages/addNewWallet.page.js';
+import CreateWalletStepOne from '../../../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
+import CreateWalletStepTwo from '../../../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
+import CreateWalletStepThree from '../../../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
+import WalletDetails from '../../../pages/newWalletPages/walletDetails.page.js';
+import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
+import driversPoolsManager from '../../../utils/driversPool.js';
+import { getPassword, getTestWalletName } from '../../../helpers/constants.js';
+import { customAfterEach } from '../../../utils/customHooks.js';
+import { getTestLogger } from '../../../utils/utils.js';
+import { oneMinute } from '../../../helpers/timeConstants.js';
+import StakingTab from '../../../pages/wallet/stakingTab/stakingTab.page.js';
+import ReceiveSubTab from '../../../pages/wallet/walletTab/receiveSubTab.page.js';
+import { pageTitle } from '../../../helpers/pageTitles.js';
+import { preloadBrowserStorage } from '../../../helpers/restoreWalletHelper.js';
+import NftGalleryTab from '../../../pages/wallet/nftGallery/nftGalleryMain.page.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+
+describe('Creating wallet _smoke_', function () {
+  this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
+  let webdriver = null;
+  /** @type {Logger} */
+  let logger = null;
+  /** @type {AddNewWallet} */
+  let addNewWalletPage = null;
+  /** @type {CreateWalletStepOne} */
+  let createWalletStepOnePage = null;
+  /** @type {CreateWalletStepTwo} */
+  let createWalletStepTwoPage = null;
+  /** @type {CreateWalletStepThree} */
+  let createWalletStepThreePage = null;
+  /** @type {WalletDetails} */
+  let walletDetailsPage = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {ReceiveSubTab} */
+  let receivePage = null;
+  /** @type {StakingTab} */
+  let stakingPage = null;
+  /** @type {NftGalleryTab} */
+  let nftsGalleryPage = null;
+
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    logger = getTestLogger(this.test.parent.title);
+    await preloadBrowserStorage(webdriver, logger);
+    addNewWalletPage = new AddNewWallet(webdriver, logger);
+    createWalletStepOnePage = new CreateWalletStepOne(webdriver, logger);
+    createWalletStepTwoPage = new CreateWalletStepTwo(webdriver, logger);
+    createWalletStepThreePage = new CreateWalletStepThree(webdriver, logger);
+    walletDetailsPage = new WalletDetails(webdriver, logger);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    receivePage = new ReceiveSubTab(webdriver, logger);
+    stakingPage = new StakingTab(webdriver, logger);
+    nftsGalleryPage = new NftGalleryTab(webdriver, logger);
+  });
+
+  it('Selecting Create wallet', async function () {
+    await addNewWalletPage.selectCreateNewWallet();
+  });
+
+  it('Remember a seed phrase', async function () {
+    await createWalletStepOnePage.continue();
+    await createWalletStepTwoPage.closeTipsModalWindow();
+    const allWordsBlurredBefore = await createWalletStepTwoPage.recoveryPhraseIsBlurred();
+    expect(allWordsBlurredBefore).to.true;
+    await createWalletStepTwoPage.toggleVisibilityOfRecoveryPhrase();
+    const allWordsBlurredAfter = await createWalletStepTwoPage.recoveryPhraseIsBlurred();
+    expect(allWordsBlurredAfter).to.false;
+    await createWalletStepTwoPage.saveRecoveryPhrase();
+    await createWalletStepTwoPage.continue();
+  });
+
+  it('Repeat the seed phrase', async function () {
+    const recoveryPhrase = await createWalletStepThreePage.getRecoveryPhraseFromStorage();
+    await createWalletStepThreePage.enterRecoveryPhrase(recoveryPhrase);
+    const phraseIsValid = await createWalletStepThreePage.recoveryPhraseIsValid();
+    expect(phraseIsValid, 'Phrase is not valid').to.true;
+    await createWalletStepThreePage.continue();
+  });
+
+  it('Enter wallet details', async function () {
+    // close info dialog
+    await walletDetailsPage.closeTipsModalWindow();
+    // enter wallet details
+    const walletName = getTestWalletName();
+    const walletPassword = getPassword();
+    await walletDetailsPage.enterWalletName(walletName);
+    await walletDetailsPage.enterWalletPassword(walletPassword);
+    await walletDetailsPage.repeatWalletPassword(walletPassword);
+
+    await walletDetailsPage.saveToLocalStorage('walletName', walletName);
+    const walletPlate = await walletDetailsPage.getWalletPlate();
+    await walletDetailsPage.saveToLocalStorage('walletPlate', walletPlate);
+
+    const noWalletNameErrors = await walletDetailsPage.checkWalletNameHasNoError();
+    expect(noWalletNameErrors, 'The wallet name has an error').to.be.true;
+    const noWalletPasswordError = await walletDetailsPage.checkWalletPaswordHasNoError();
+    expect(noWalletPasswordError, 'The wallet password has an error').to.be.true;
+    const noWalletRepeatPasswordError = await walletDetailsPage.checkWalletRepeatPasswordHasNoError();
+    expect(noWalletRepeatPasswordError, 'The wallet repeat password has an error').to.be.true;
+    await walletDetailsPage.continue();
+  });
+
+  it('Check new wallet info', async function () {
+    await transactionsPage.waitPrepareWalletBannerIsClosed();
+    const txPageIsDisplayed = await transactionsPage.isDisplayed();
+    expect(txPageIsDisplayed).to.be.true;
+    const titleIsCorrect = await transactionsPage.titleIsCorrect(pageTitle.wallet);
+    expect(titleIsCorrect, `Title is different from "${pageTitle.wallet}"`).to.be.true;
+    const walletInfo = await transactionsPage.getSelectedWalletInfo();
+    expect(walletInfo.balance, 'The wallet balance should be 0 (zero)').to.equal(0);
+    const expWalletName = await transactionsPage.getFromLocalStorage('walletName');
+    const expWalletPlate = await transactionsPage.getFromLocalStorage('walletPlate');
+    expect(walletInfo.name, `The wallet name should be "${expWalletName}"`).to.equal(expWalletName);
+    expect(walletInfo.plate, `The wallet plate should be "${expWalletPlate}"`).to.equal(expWalletPlate);
+  });
+
+  it('Check the wallet is empty', async function () {
+    const txsAmount = await transactionsPage.walletIsEmpty();
+    expect(txsAmount, 'A new wallet is not empty').to.be.true;
+  });
+
+  it('Check amount of external and internal addresses', async function () {
+    await transactionsPage.goToReceiveSubMenu();
+    await receivePage.selectBaseExtAllAddrs();
+    const extAddrsAmount = await receivePage.getAmountOfAddresses();
+    expect(extAddrsAmount, 'A wrong amount of external addresses').to.equal(1);
+    await receivePage.selectBaseInterAllAddrs();
+    const interAddrsAmount = await receivePage.getAmountOfAddresses();
+    expect(interAddrsAmount, 'A wrong amount of internal addresses').to.equal(1);
+  });
+
+  it('Check Staking page', async function () {
+    await transactionsPage.goToStakingTab();
+    const titleIsCorrect = await stakingPage.titleIsCorrect(pageTitle.staking);
+    expect(titleIsCorrect, `Title is different from "${pageTitle.staking}"`).to.be.true;
+    const emptyWalletBannerIsDisplayed = await stakingPage.walletIsEmpty();
+    expect(emptyWalletBannerIsDisplayed, `There is no the empty wallet banner on the Staking page`).to.be.true;
+  });
+
+  it('Check NFTs Gallery', async function () {
+    await stakingPage.goToNftsTab();
+    const titleIsCorrect = await nftsGalleryPage.titleIsCorrect(pageTitle.nfts);
+    expect(titleIsCorrect, `Title for NFTs Gallery is different from "${pageTitle.staking}"`).to.be.true;
+    const noNftsIsDisplayed = await nftsGalleryPage.noNftsIsDisplayed();
+    expect(noNftsIsDisplayed, `No NFTs banner should be shown`).to.be.true;
+  });
+
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
+  });
+
+  after(async function () {
+    await transactionsPage.closeBrowser();
+  });
+});
