@@ -14,7 +14,8 @@ import UpgradeTxDialogContainer from '../../transfer/UpgradeTxDialogContainer';
 import { ProgressStep } from '../../../types/HWConnectStoreTypes';
 import type { NetworkRow } from '../../../api/ada/lib/storage/database/primitives/tables';
 import type { StoresProps } from '../../../stores';
-import { ampli } from '../../../../ampli/index';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../../posthog';
 
 type LocalProps = {|
   +onClose: void => void,
@@ -52,7 +53,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             submit={() => {
               ledgerConnectStore.submitCheck();
-              ampli.connectWalletConnectPageViewed();
+              captureEvent('Connect Wallet Connect Page Viewed');
             }}
             cancel={this.cancel}
             onBack={this.props.onBack}
@@ -68,7 +69,7 @@ export default class WalletLedgerConnectDialogContainer extends Component<{| ...
             onExternalLinkClick={handleExternalLinkClick}
             goBack={() => {
               ledgerConnectStore.goBackToCheck();
-              ampli.connectWalletCheckPageViewed();
+              captureEvent('Connect Wallet Check Page Viewed');
             }}
             submit={ledgerConnectStore.submitConnect}
             cancel={this.cancel}
