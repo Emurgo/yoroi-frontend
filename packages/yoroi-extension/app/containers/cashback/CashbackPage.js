@@ -23,6 +23,7 @@ import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledger
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { IncorrectWalletPasswordError } from '../../api/common/errors';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -335,15 +336,15 @@ const CashbackPageContainer = observer((props: AllProps) => {
           const messageHex = stringToHex(msg);
           const signResult = await wrapWithFrame(trezor =>
             trezor.cardanoSignMessage({
-              path: addressing.path,
+              path: [...addressing.path],
               payload: messageHex,
               preferHexDisplay: false,
               networkId: Number(config.ChainNetworkId),
               protocolMagic: config.ByronNetworkId,
               addressParameters: {
                 addressType: CardanoAddressType.BASE,
-                path: addressing.path,
-                stakingPath: wallet.stakingAddressing.addressing.path,
+                path: [...addressing.path],
+                stakingPath: [...wallet.stakingAddressing.addressing.path],
               },
               derivationType: CardanoDerivationType.ICARUS_TREZOR,
             })
@@ -356,10 +357,10 @@ const CashbackPageContainer = observer((props: AllProps) => {
             signResult.payload.signature,
             messageHex,
             signResult.payload.pubKey,
-            true
+            false
           );
         } catch (error) {
-          throw new convertToLocalizableError(error);
+          throw new trezorConvertToLocalizableError(error);
         }
       } else {
         throw new Error('unsupported wallet type');
