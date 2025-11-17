@@ -16,7 +16,6 @@ export const messages = Object.freeze(
     },
   })
 );
-
 interface Props {
   textToCopy: string;
   disabled?: boolean;
