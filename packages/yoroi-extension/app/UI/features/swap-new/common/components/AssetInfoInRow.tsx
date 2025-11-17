@@ -58,7 +58,7 @@ export const AssetInfoInRow = React.memo(
 
     const openTokenInfo = () => {
       openModal({
-        title: 'Asset details',
+        title: strings.assetDetails,
         content: <TokenInfoModal token={token} />,
         height: '624px',
         width: '612px',

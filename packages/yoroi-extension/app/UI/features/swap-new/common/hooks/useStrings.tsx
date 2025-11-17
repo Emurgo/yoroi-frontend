@@ -264,6 +264,14 @@ export const messages = Object.freeze(
       id: 'global.labels.confirm',
       defaultMessage: '!!!Confirm',
     },
+    assetDetails: {
+      id: 'swap.assetDetails',
+      defaultMessage: '!!!Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities',
+    },
+    overviewLabel: {
+      id: 'portfolio.tokenInfo.menuLabel.overview',
+      defaultMessage: '!!!Overview',
+    },
   })
 );
 
@@ -330,6 +338,8 @@ export const useStrings = () => {
     swapDetails: intl.formatMessage(messages.swapDetails),
     backLabel: intl.formatMessage(messages.back),
     confirmLabel: intl.formatMessage(messages.confirm),
+    assetDetails: intl.formatMessage(messages.assetDetails),
+    overviewLabel: intl.formatMessage(messages.overviewLabel),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
     priceImpactSevere: intl.formatMessage(messages.priceImpactSevere, {
       strong: chunks => React.createElement('strong', null, chunks),

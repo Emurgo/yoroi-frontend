@@ -10,7 +10,6 @@ export const DisclaimerDialog = () => {
   const navigate = useNavigateTo();
   const { openModal, closeModal } = useModal();
   const localStorage = new LocalStorageApi();
-
   const onAcceptDisclaimer = () => {
     localStorage.setSwapDisclaimerModalClosed('true');
     closeModal();
@@ -102,7 +101,9 @@ const DisclaimerDialogBody = ({ action }) => {
           }
           control={
             <Checkbox
-              onChange={() => setDisclaimerAgreed(!disclaimerAgreed)}
+              onChange={() => {
+                setDisclaimerAgreed(!disclaimerAgreed);
+              }}
               checked={disclaimerAgreed}
               sx={{ marginRight: '8px' }}
             />
