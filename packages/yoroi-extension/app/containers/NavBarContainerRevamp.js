@@ -63,13 +63,18 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     // <TODO:PENDING_REMOVAL> we are not supporting non-reward wallets anymore, this check will be removed
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = routing.currentRoute === ROUTES.STAKING;
+    const isSwapPage = routing.currentRoute.startsWith(ROUTES.SWAP_REVAMP.ASSET_SWAP);
     this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet) {
       await localStorage.unsetPortfolioFiatPair(selectedWallet.networkId);
     }
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : routing.currentRoute;
-    this.props.stores.routing.goToRoute({ route });
+    if (isSwapPage) {
+      this.props.stores.routing.goToRoute({ route: ROUTES.SWAP_REVAMP.ASSET_SWAP, query: { newWallet: true } });
+    } else {
+      this.props.stores.routing.goToRoute({ route });
+    }
   };
 
   // <TODO:GENERALIZE> This is a weird function to have for governance feature only.
