@@ -117,7 +117,7 @@ const DisclaimerDialogBody = ({ action }) => {
           // @ts-ignore
           variant="primary"
           onClick={action.onClick}
-          disabled={disclaimerAgreed}
+          disabled={!disclaimerAgreed}
         >
           {action.label}
         </Button>
