@@ -160,7 +160,6 @@
   "connector.connect.connectedWallets.active": "Active",
   "connector.connect.cashback.addWallet": "Add wallet",
   "connector.connect.cashback.apply.all": "The wallet you select will be applied for all partner websites.",
-  "connector.connect.cashback.trezor.disabled": "Cashback service doesn’t support Trezor wallet connection",
   "connector.connect.createWallet": "создать кошелек",
   "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "Connecting to hardware wallet with authentication is not supported",
   "connector.connect.info": "Your connection preferences will be saved to your Yoroi dApp list.",
