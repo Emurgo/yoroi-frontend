@@ -1,27 +1,26 @@
+import { MIDNIGHT_PHASE2_URL } from '../../common/constants';
 import { useStrings } from '../../common/hooks/useStrings';
 import { BaseBanner } from './BaseBanner';
-import { MidnightBannerIllustration } from '../Dialogs/MidnightBannerIllustration';
-import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { MidnightPhase2Ilustration } from './MidnightPhase2Ilustration';
 
-export const MidnightBanner = ({ onClose }) => {
-  const { checkEligibility, claimAnnouncement, yoroiSupport } = useStrings();
-  const routes = useNavigateTo();
+export const MidnightPhase2Banner = ({ onClose }) => {
+  const { goToMidnight, claimAnnouncementPhase2, midnightDappConnect } = useStrings();
 
   const handleClose = async () => {
     onClose();
   };
 
   const handleClick = () => {
-    routes.midnightAirdropClaim();
+    window.open(MIDNIGHT_PHASE2_URL, '_blank', 'noopener,noreferrer');
     onClose();
   };
 
   return (
     <BaseBanner
       onClose={handleClose}
-      title={claimAnnouncement}
-      description={yoroiSupport}
-      buttonText={checkEligibility}
+      title={claimAnnouncementPhase2}
+      description={midnightDappConnect}
+      buttonText={goToMidnight}
       buttonProps={{
         onClick: handleClick,
         //  @ts-ignore
@@ -35,7 +34,7 @@ export const MidnightBanner = ({ onClose }) => {
         },
       }}
       displayIllustration={true}
-      illustration={<MidnightBannerIllustration />}
+      illustration={<MidnightPhase2Ilustration />}
       illustrationProps={{
         sx: {
           position: 'relative',

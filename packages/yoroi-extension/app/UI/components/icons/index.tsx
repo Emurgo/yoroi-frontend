@@ -103,6 +103,7 @@ import { WingRiders } from './WingRinders';
 import { VyfiSwap } from './VyfiSwap';
 import { SundaeSwap } from './SundaeSwap';
 import { Cswap } from './CSwap';
+import { ChatboxSupport } from './ChatboxSupport';
 
 export const Icon = {
   Assets,
@@ -208,6 +209,7 @@ export const Icon = {
   VyfiSwap,
   SundaeSwap,
   Cswap,
+  ChatboxSupport,
 };
 
 export enum Icons {
@@ -309,6 +311,7 @@ export enum Icons {
   VyfiSwap = 'VyfiSwap',
   SundaeSwap = 'SundaeSwap',
   CSwap = 'CSwap',
+  ChatboxSupport = 'ChatboxSupport',
 }
 
 interface IconWrapperProps {

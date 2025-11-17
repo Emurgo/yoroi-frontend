@@ -205,7 +205,7 @@ export async function scanForOriginalDestAddress(
   claimEndpoint: string,
   unusedAddr: string,
   usedAddrs: Array<string>
-): Promise<ScanResult | null> {
+): Promise<ScanResult> {
   for (let addr of [unusedAddr, ...usedAddrs]) {
     const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
     if (!resp.ok) {
@@ -224,5 +224,8 @@ export async function scanForOriginalDestAddress(
       };
     }
   }
-  return null;
+  return {
+    success: false,
+    error: 'destination address not found in this wallet',
+  };
 }

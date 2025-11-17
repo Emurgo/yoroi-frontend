@@ -1,4 +1,4 @@
-export const MidnightBannerIllustration = () => {
+export const MidnightPhase2Ilustration = () => {
   return (
     <svg width="204" height="138" viewBox="0 0 204 138" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path

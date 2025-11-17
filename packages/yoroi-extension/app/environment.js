@@ -4,6 +4,7 @@ import type { ConfigType, Network } from '../config/config-types';
 import { NetworkType } from '../config/config-types';
 import type { UserAgentInfo } from './utils/userAgentInfo';
 import userAgentInfo from './utils/userAgentInfo';
+import pkg from '../package.json';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -42,9 +43,7 @@ function canRegisterProtocol(): boolean {
 }
 
 function getVersion(): string {
-  const genManifest = require('../chrome/manifest.' + CONFIG.network.name);
-  const content = genManifest.default !== undefined ? genManifest.default(true) : genManifest();
-  return content.version;
+  return pkg.version;
 }
 
 export const environment = ({

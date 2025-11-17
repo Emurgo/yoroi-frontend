@@ -7,7 +7,6 @@ import environment from '../../environment';
 import { ROUTES } from '../../routes-config';
 import type { StoresMap } from '../index';
 import type { WalletsNavigation } from '../../api/localStorage';
-import { ampli } from '../../../ampli/index';
 import { subscribe } from '../../api/thunk';
 
 export default class ProfileStore extends BaseProfileStore<StoresMap> {
@@ -28,7 +27,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
           return;
         }
         this.stores.routing.goToRoute({ route });
-        ampli.createWalletLanguagePageViewed();
       },
     },
     {
@@ -39,7 +37,6 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
           return;
         }
         this.stores.routing.goToRoute({ route });
-        ampli.createWalletTermsPageViewed();
       },
     },
     {

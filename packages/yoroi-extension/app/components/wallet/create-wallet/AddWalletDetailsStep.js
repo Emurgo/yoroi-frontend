@@ -18,6 +18,8 @@ import { Stack, Typography, Box, styled } from '@mui/material';
 import { TIPS_DIALOGS, isDialogShownBefore } from './steps';
 import { ReactComponent as InfoIcon } from '../../../assets/images/info-icon-primary.inline.svg';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../../posthog';
 
 const IconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -73,6 +75,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
     if (!isDialogShownBefore(TIPS_DIALOGS.WALLET_NAME_AND_PASSWORD)) {
       this.props.openDialog(WalletNameAndPasswordTipsDialog);
     }
+    captureEvent('Restore Wallet Details Step Viewed');
   }
 
   form: ReactToolboxMobxForm = new ReactToolboxMobxForm(

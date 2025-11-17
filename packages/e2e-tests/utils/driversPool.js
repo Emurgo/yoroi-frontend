@@ -21,7 +21,7 @@ class DriversManager {
 
   /**
    * Adding a new driver to the pool of drivers
-   * @returns {{driver: ThenableWebDriver, driverId: number}}
+   * @returns {{driver: WebDriver, driverId: number}}
    */
   addNewDriverToPool() {
     const newDriver = getDriver();
@@ -53,7 +53,7 @@ class DriversManager {
 
   /**
    * Preparing an extension for tests
-   * @param {{driver: ThenableWebDriver, driverId: number}} driverObject
+   * @param {{driver: WebDriver, driverId: number}} driverObject
    * @returns
    */
   async prepareExtension(driverObject) {

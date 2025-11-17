@@ -22,7 +22,8 @@ import SidebarContainer from '../SidebarContainer';
 import AddWalletPageRevamp from './AddWalletPageRevamp';
 import type { RestoreModeType } from '../../stores/toplevel/WalletRestoreStore';
 import type { StoresProps } from '../../stores';
-import { ampli } from '../../../ampli/index';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../posthog';
 
 @observer
 export default class AddWalletPage extends Component<StoresProps> {
@@ -52,7 +53,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.trezorConnect.init();
-      ampli.connectWalletCheckPageViewed();
+      captureEvent('Connect Wallet Check Page Viewed');
     };
     const openLedgerConnectDialog = () => {
       if (selectedNetwork === undefined) {
@@ -63,7 +64,7 @@ export default class AddWalletPage extends Component<StoresProps> {
       });
       // <TODO:HW_REFACTOR>
       stores.substores.ada.ledgerConnect.init();
-      ampli.connectWalletCheckPageViewed();
+      captureEvent('Connect Wallet Check Page Viewed');
     };
 
     let activeDialog = null;
@@ -124,7 +125,10 @@ export default class AddWalletPage extends Component<StoresProps> {
           onHardwareConnect={() => {
             this.openDialogWrapper(WalletConnectHWOptionDialog);
           }}
-          onCreate={() => goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET })}
+          onCreate={() => {
+            goToRoute({ route: ROUTES.WALLETS.CREATE_NEW_WALLET });
+            captureEvent('Create Wallet Learn Phrase Step Viewed');
+          }}
           onRestore={() => goToRoute({ route: ROUTES.WALLETS.RESTORE_WALLET })}
           goToCurrentWallet={() => goToRoute({ route: ROUTES.WALLETS.TRANSACTIONS })}
           hasAnyWallets={hasAnyWallets === true}

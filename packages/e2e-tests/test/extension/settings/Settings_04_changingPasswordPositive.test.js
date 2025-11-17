@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { testWallet1 } from '../../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -15,49 +14,66 @@ import driversPoolsManager from '../../../utils/driversPool.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
 import TxReviewOverviewTab from '../../../pages/transactionReviewPages/txReviewOverviewTab.page.js';
 import TxReviewSubmit from '../../../pages/transactionReviewPages/txReviewSubmit.page.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Changing wallet password. Positive', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SettingsTab} */
+  let settingsPage = null;
+  /** @type {WalletSubTab} */
+  let settingsWalletPage = null;
+  /** @type {WalletTab} */
+  let walletPage = null;
+  /** @type {SendSubTab} */
+  let sendSubTab = null;
+  /** @type {TxReviewOverviewTab} */
+  let txReviewOverview = null;
+  /** @type {TxReviewSubmit} */
+  let txReviewSubmit = null;
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1', this);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    settingsPage = new SettingsTab(webdriver, logger);
+    settingsWalletPage = new WalletSubTab(webdriver, logger);
+    walletPage = new WalletTab(webdriver, logger);
+    sendSubTab = new SendSubTab(webdriver, logger);
+    txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
+    txReviewSubmit = new TxReviewSubmit(webdriver, logger);
   });
 
   const oldPassword = getPassword();
   const newPassword = getPassword(10, true);
 
   it('Go to Settings Wallet', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const txPageIsDisplayed = await transactionsPage.isDisplayed();
     expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     await transactionsPage.goToSettingsTab();
-    const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToWalletSubMenu();
   });
   it('Correct old password, correct new password', async function () {
-    const walletSubTabPage = new WalletSubTab(webdriver, logger);
-    await walletSubTabPage.changeWalletPassword(oldPassword, newPassword, newPassword);
+    await settingsWalletPage.changeWalletPassword(oldPassword, newPassword, newPassword);
   });
   it('Go to Send page', async function () {
-    const walletSubTabPage = new WalletSubTab(webdriver, logger);
-    await walletSubTabPage.goToWalletTab();
-    const walletPage = new WalletTab(webdriver, logger);
+    await settingsWalletPage.goToWalletTab();
     await walletPage.goToSendSubMenu();
   });
   it('Filling send info', async function () {
-    const sendSubTab = new SendSubTab(webdriver, logger);
     await sendSubTab.enterReceiverAndMemo(testWallet1.receiveAddress);
     await sendSubTab.addAssets('1');
   });
   // Checking that the old password doesn't work anymore
   it("Checking the old wallet doesn't work anymore", async function () {
-    const txReviewOverview = new TxReviewOverviewTab(webdriver, logger);
     await txReviewOverview.confirm();
-    const txReviewSubmit = new TxReviewSubmit(webdriver, logger);
     await txReviewSubmit.enterPassword(oldPassword);
     await txReviewSubmit.submit();
     const errorMessage = await txReviewSubmit.getPasswordErrorMessage();
@@ -65,12 +81,10 @@ describe('Changing wallet password. Positive', function () {
   });
 
   afterEach(async function () {
-    customAfterEach(this, webdriver, logger);
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await walletPage.closeBrowser();
   });
 });

@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
 import { getSpendableWallet } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -13,14 +12,23 @@ import { adaInLovelaces, getPassword } from '../../helpers/constants.js';
 import DAppSignTx from '../../pages/dapp/dAppSignTx.page.js';
 import { TxSignErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
 describe('dApp, signTx, intrawallet Tx', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
-  let windowManager = new WindowManager(webdriver, logger);
+  /** @type {WindowManager} */
+  let windowManager = null;
   let mockServer = null;
-  let mockedDApp = new MockDAppWebpage(webdriver, logger);
+  /** @type {MockDAppWebpage} */
+  let mockedDApp = null;
+  /** @type {DAppSignTx} */
+  let dappSingTxPage = null;
+
   let expectedFee = 0;
   let receiverAddr = '';
   const testWallet = getSpendableWallet();
@@ -36,6 +44,7 @@ describe('dApp, signTx, intrawallet Tx', function () {
       windowManager = new WindowManager(webdriver, wmLogger);
       await windowManager.init();
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappSingTxPage = new DAppSignTx(webdriver, logger);
     } catch (error) {
       await collectInfo(this, webdriver, logger);
       throw new Error(error);
@@ -197,7 +206,6 @@ describe('dApp, signTx, intrawallet Tx', function () {
 
     it('Checking Sign Tx pop-up appeared', async function () {
       // wait for the pop-up appears
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const popUpAppeared = await dappSingTxPage.popUpIsDisplayed(windowManager);
       expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
       await dappSingTxPage.waitingConnectorIsReady();
@@ -206,7 +214,6 @@ describe('dApp, signTx, intrawallet Tx', function () {
     it('Incorrect Tx, check response', async function () {
       // there should be no pop-up
       // just response with an error "Not suitable data is sent"
-      const dappSingTxPage = new DAppSignTx(webdriver, logger);
       const errorMessage = await dappSingTxPage.getErrorMessage();
       expect(errorMessage, 'Something wrong with the error message').to.equal('Unable to parse input transaction.');
 
@@ -214,15 +221,12 @@ describe('dApp, signTx, intrawallet Tx', function () {
     });
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+  after(async function () {
+    await dappSingTxPage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

@@ -20,7 +20,6 @@ import { ReactComponent as ArrowsListFromBottom } from '../../../../assets/image
 import { ReactComponent as ArrowsListFromTop } from '../../../../assets/images/assets-page/arrows-list-from-top.inline.svg';
 import { ReactComponent as ArrowsList } from '../../../../assets/images/assets-page/arrows-list.inline.svg';
 import { ReactComponent as NoItemsFoundImg } from '../../../../assets/images/assets-page/no-tokens.inline.svg';
-import { ampli } from '../../../../../ampli/index';
 import Dialog from '../../../widgets/Dialog';
 import styles from './AddTokenDialog.scss';
 import SingleTokenRow from './SingleTokenRow';
@@ -180,7 +179,6 @@ export default class AddTokenDialog extends Component<Props, State> {
 
   onAddAll: void => void = () => {
     const toRemove = [];
-    let changed = false;
     const tokens = this.props.plannedTxInfoMap
       .filter(({ token }) => !token.IsDefault)
       .map(({ token, amount }) => ({ tokenId: token.TokenId, amount }));
@@ -190,15 +188,12 @@ export default class AddTokenDialog extends Component<Props, State> {
         if (included && amount != null) {
           if (amount.toString() !== tokens[tokenIndex].amount) {
             tokens[tokenIndex].amount = amount.toString();
-            changed = true;
           }
         } else {
           tokens.splice(tokenIndex, 1);
-          changed = true;
         }
       } else if (included && amount != null) {
         tokens.push({ tokenId: token.TokenId, amount: amount.toString() });
-        changed = true;
       }
       if (!included) {
         toRemove.push(token);
@@ -215,11 +210,6 @@ export default class AddTokenDialog extends Component<Props, State> {
     }
     this.props.onRemoveTokens(toRemove);
     this.props.onClose();
-    if (changed) {
-      ampli.sendSelectAssetUpdated({
-        asset_count: tokens.length,
-      });
-    }
   };
 
   getMaxAmount: ($ReadOnly<TokenRow>) => BigNumber = tokenInfo => {
