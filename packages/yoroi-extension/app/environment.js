@@ -13,7 +13,6 @@ function isChromeProtocol(): boolean {
   return location.protocol === 'chrome-extension:';
 }
 
-
 function isExtension(): boolean {
   return isChromeProtocol();
 }
