@@ -160,7 +160,6 @@
   "connector.connect.connectedWallets.active": "有効",
   "connector.connect.cashback.addWallet": "ウォレットを追加する",
   "connector.connect.cashback.apply.all": "選択したウォレットは、すべての提携ウェブサイトに適用されます。",
-  "connector.connect.cashback.trezor.disabled": "キャッシュバックサービスはTrezorウォレット接続に対応していません",
   "connector.connect.createWallet": "ウォレットを作成",
   "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "認証付きハードウェアウォレットへの接続はサポートされていません",
   "connector.connect.info": "接続設定はヨロイdAppリストに保存されます。",
