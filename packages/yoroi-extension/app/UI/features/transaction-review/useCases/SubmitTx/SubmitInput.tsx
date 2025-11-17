@@ -5,22 +5,14 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { Ilustration } from './Ilustration';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RESTORE_WALLET_HELP_URL } from '../../../../common/constants';
-import { useTxBody } from '../../common/hooks/usetxBody';
-import { useFormattedTx } from '../../common/hooks/useFormattedTx';
 import { captureEvent } from '../../../../../../posthog';
-import { getTransactionAnalyticsPropertiesFromRaw } from '../../common/utils';
 
 export const SubmitInput = () => {
-  const { inputError, changePasswordInputValue, passswordInput, operations, setInputError, walletType, cborTx, unsignedTx } =
-    useTxReviewModal();
+  const { inputError, changePasswordInputValue, passswordInput, setInputError, walletType } = useTxReviewModal();
   const strings = useStrings();
 
-  const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
-  const formattedTx = useFormattedTx(cborTx ? txBody : txBody?.body);
-
   useEffect(() => {
-    const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
-    captureEvent('Transaction Review Modal Viewed', analyticsParams);
+    captureEvent('Transaction Review Submit Modal Viewed');
   }, []);
 
   useEffect(() => {

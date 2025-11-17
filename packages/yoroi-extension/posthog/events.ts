@@ -32,6 +32,7 @@ export interface EventDefinitions {
   'Cashback Dashboard Viewed': [];
   'Settings Page Viewed': [];
   'Transactions Page Viewed': [];
+  'Transaction Results Popup Viewed': [];
   'Transaction Review Submit Modal Viewed': [];
   'Midnight Airdrop Page Viewed': [];
   'Swap Initiated': [];

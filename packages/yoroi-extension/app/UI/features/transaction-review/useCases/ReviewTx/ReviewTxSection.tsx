@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useLocation } from 'react-router';
@@ -13,6 +13,8 @@ import { OverviewTab } from './Overview/OverviewTab';
 import { ReferenceInputsTab } from './ReferenceInputs/ReferenceInputsTab';
 import { UTxOsTab } from './UTxOs/UTxOsTab';
 import { TabItem, Tabs } from '../../../../components/tabs/Tabs';
+import { getTransactionAnalyticsPropertiesFromRaw } from '../../common/utils';
+import { captureEvent } from '../../../../../../posthog';
 
 const ScrollBox = styled(Box)({
   flex: 1,
@@ -22,7 +24,7 @@ const ScrollBox = styled(Box)({
 const pathId = 'reviewTx';
 
 export const ReviewTxSection = () => {
-  const { unsignedTx, cborTx, receiverCustomTitle } = useTxReviewModal();
+  const { unsignedTx, cborTx, receiverCustomTitle, operations } = useTxReviewModal();
 
   const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
   const formattedTx = useFormattedTx(cborTx ? txBody : txBody?.body);
@@ -33,6 +35,11 @@ export const ReviewTxSection = () => {
   });
   const location = useLocation();
   const tabSearchParam = new URLSearchParams(location.search).get('tab') || 'overview';
+
+  useEffect(() => {
+    const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
+    captureEvent('Transaction Review Modal Viewed', analyticsParams);
+  }, []);
 
   const getTabs = useCallback((): TabItem[] => {
     const tabs: TabItem[] = [
