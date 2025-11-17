@@ -7,12 +7,13 @@ type DisplayInfoInRowProps = {
   tooltip?: string | ReactNode;
   value: string | ReactNode;
   textToCopy?: string;
+  valueInSameRow?: boolean;
 };
 
-export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy }: DisplayInfoInRowProps) => {
+export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy, valueInSameRow = true }: DisplayInfoInRowProps) => {
   const { atoms }: any = useTheme();
   return (
-    <Stack direction="row" width="100%" justifyContent="space-between" alignItems="start">
+    <Stack direction={valueInSameRow ? 'row' : 'column'} width="100%" justifyContent="space-between" alignItems="start" gap={4}>
       <Stack direction="row" alignItems="start">
         <Typography variant="body2" color="ds.el_gray_low" {...atoms.mr_xs}>
           {label}
@@ -25,7 +26,7 @@ export const DisplayInfoInRow = ({ label, tooltip, value, textToCopy }: DisplayI
       </Stack>
       <Stack direction="row" alignItems="center" gap={4}>
         {typeof value === 'string' ? (
-          <Typography variant="body2" color="ds.text_gray_max">
+          <Typography variant="body1" color="ds.text_gray_max">
             {value}
           </Typography>
         ) : (

@@ -35,24 +35,25 @@ const TokenInfoModal = ({ token }) => {
         </Typography>
         <DisplayInfoInRow label="Name" value={token.name} />
         <DisplayInfoInRow label="Tiker" value={token.ticker} />
-        <DisplayInfoInRow label="Description" value={token.description || '-'} />
-        <Stack direction="column" gap={4}>
-          <Typography variant="body2" color="ds.el_gray_low">
-            {strings.detailsOn}
-          </Typography>
-          <LinkMui
-            target="_blank"
-            href={
-              isPrimary
-                ? explorer.tokenInfo.baseUrl.replace(/^(https?:\/\/[^\/]+)\/.*/, '$1')
-                : `${explorer.tokenInfo.baseUrl}${token.fingerprint}`
-            }
-            rel="noopener noreferrer"
-            sx={{ textDecoration: 'none' }}
-          >
-            {explorer.tokenInfo.name}
-          </LinkMui>
-        </Stack>
+        <DisplayInfoInRow label="Description" value={token.description || '-'} valueInSameRow={false} />
+        <DisplayInfoInRow
+          label="Details On"
+          value={
+            <LinkMui
+              target="_blank"
+              href={
+                isPrimary
+                  ? explorer.tokenInfo.baseUrl.replace(/^(https?:\/\/[^\/]+)\/.*/, '$1')
+                  : `${explorer.tokenInfo.baseUrl}${token.fingerprint}`
+              }
+              rel="noopener noreferrer"
+              sx={{ textDecoration: 'none' }}
+            >
+              {explorer.tokenInfo.name}
+            </LinkMui>
+          }
+          valueInSameRow={false}
+        />
       </Stack>
     </Stack>
   );
