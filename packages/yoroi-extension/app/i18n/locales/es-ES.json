@@ -160,7 +160,6 @@
   "connector.connect.connectedWallets.active": "Activo",
   "connector.connect.cashback.addWallet": "Añadir cartera",
   "connector.connect.cashback.apply.all": "La cartera que seleccione se aplicará a todos los sitios web asociados.",
-  "connector.connect.cashback.trezor.disabled": "Servicio de reembolso no soporta conexión a cartera Trezor",
   "connector.connect.createWallet": "crear cartera",
   "connector.connect.hardwareWalletsConnectWithAuthNotSupported": "No se admite la conexión a la cartera de hardware con autenticación",
   "connector.connect.info": "Tus preferencias de conexión se guardarán en tu lista de dApps de Yoroi.",
