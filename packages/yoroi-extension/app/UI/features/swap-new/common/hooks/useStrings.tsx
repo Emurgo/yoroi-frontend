@@ -272,6 +272,10 @@ export const messages = Object.freeze(
       id: 'portfolio.tokenInfo.menuLabel.overview',
       defaultMessage: '!!!Overview',
     },
+    detailsOn: {
+      id: 'wallet.assets.detailsOn',
+      defaultMessage: '!!!Details on',
+    },
   })
 );
 
@@ -340,6 +344,7 @@ export const useStrings = () => {
     confirmLabel: intl.formatMessage(messages.confirm),
     assetDetails: intl.formatMessage(messages.assetDetails),
     overviewLabel: intl.formatMessage(messages.overviewLabel),
+    detailsOn: intl.formatMessage(messages.detailsOn),
     numYourAssets: num => intl.formatMessage(messages.numYourAssets, { num }),
     priceImpactSevere: intl.formatMessage(messages.priceImpactSevere, {
       strong: chunks => React.createElement('strong', null, chunks),

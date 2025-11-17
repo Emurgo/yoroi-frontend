@@ -35,7 +35,7 @@ const TokenInfoModal = ({ token }) => {
         </Typography>
         <DisplayInfoInRow label="Name" value={token.name} />
         <DisplayInfoInRow label="Tiker" value={token.ticker} />
-        <DisplayInfoInRow label="Description" value={token.description || '-'} />
+        <DisplayInfoInRow label="Description" value={token.description || '-'} valueInSameRow={false} />
         <DisplayInfoInRow
           label="Details On"
           value={
@@ -52,6 +52,7 @@ const TokenInfoModal = ({ token }) => {
               {explorer.tokenInfo.name}
             </LinkMui>
           }
+          valueInSameRow={false}
         />
       </Stack>
     </Stack>

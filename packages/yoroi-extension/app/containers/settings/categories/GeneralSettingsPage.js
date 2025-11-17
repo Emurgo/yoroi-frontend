@@ -124,7 +124,7 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
             onSelect={this.onSelectBringCashbackWallet}
             isSubmitting={false}
             // $FlowFixMe this is apparently correct, flow is out of its mind
-            cardanoWallets={wallets.filter(w => w.type !== 'trezor')}
+            cardanoWallets={wallets}
             // $FlowFixMe this is apparently correct, flow is out of its mind
             currentValue={getCashbackWalletRequest.result?.publicDeriverId || ''}
             isUseSandbox={profileStore.getBringSandboxRequest.result}

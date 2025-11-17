@@ -21,6 +21,7 @@ export const AssetSummary = ({ tokenId, value, direction }: AssetSummaryProps) =
   const effective = swapForm?.estimate?.priceImpact ?? 0;
   const risk = getPriceImpactRisk(effective);
   const { text: textColor } = usePriceImpactRiskThemeWeb(risk);
+  const tokenTicker = tokenInfo?.ticker ?? tokenInfo?.name;
 
   return (
     <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -38,14 +39,14 @@ export const AssetSummary = ({ tokenId, value, direction }: AssetSummaryProps) =
             {isPrimaryToken ? primaryTokenInfo.ticker : tokenInfo?.name}
           </Typography>
           <Typography variant="body2" color="ds.text_gray_low">
-            {isPrimaryToken ? primaryTokenInfo.name : (tokenInfo?.name ?? truncateLongName(tokenInfo?.fingerprint))}
+            {isPrimaryToken ? primaryTokenInfo.name : (tokenTicker ?? truncateLongName(tokenInfo?.fingerprint))}
           </Typography>
         </Stack>
       </Stack>
       <Stack spacing={4} direction="row" alignItems="center">
         {direction === ASSET_DIRECTION_OUT && <PriceImpactIcon risk={risk} />}
         <Typography variant="body1" color={textColor}>
-          {value} {isPrimaryToken ? primaryTokenInfo.name : tokenInfo?.name}
+          {value} {isPrimaryToken ? primaryTokenInfo.name : (tokenTicker ?? truncateLongName(tokenInfo?.fingerprint))}
         </Typography>
       </Stack>
     </Stack>
