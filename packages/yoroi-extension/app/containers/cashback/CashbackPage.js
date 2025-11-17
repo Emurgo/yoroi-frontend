@@ -23,6 +23,7 @@ import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledger
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { IncorrectWalletPasswordError } from '../../api/common/errors';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -33,6 +34,8 @@ import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 import type { BringConfigType, ConfigType } from '../../../config/config-types';
 import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
+import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
+import { CardanoAddressType, CardanoDerivationType } from 'trezor-connect-flow';
 
 declare var chrome;
 
@@ -325,6 +328,39 @@ const CashbackPageContainer = observer((props: AllProps) => {
           res = await encodeHardwareWalletSignResult(addressFieldHex, signatureHex, messageHex, signingPublicKeyHex, hashPayload);
         } catch (error) {
           throw new convertToLocalizableError(error);
+        }
+      } else if (wallet.type === 'trezor') {
+        try {
+          const network = getNetworkById(wallet.networkId);
+          const config = network.BaseConfig[0];
+          const messageHex = stringToHex(msg);
+          const signResult = await wrapWithFrame(trezor =>
+            trezor.cardanoSignMessage({
+              path: [...addressing.path],
+              payload: messageHex,
+              preferHexDisplay: false,
+              networkId: Number(config.ChainNetworkId),
+              protocolMagic: config.ByronNetworkId,
+              addressParameters: {
+                addressType: CardanoAddressType.BASE,
+                path: [...addressing.path],
+                stakingPath: [...wallet.stakingAddressing.addressing.path],
+              },
+              derivationType: CardanoDerivationType.ICARUS_TREZOR,
+            })
+          );
+          if (!signResult.success) {
+            throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+          }
+          res = await encodeHardwareWalletSignResult(
+            signResult.payload.headers.protected.address,
+            signResult.payload.signature,
+            messageHex,
+            signResult.payload.pubKey,
+            false
+          );
+        } catch (error) {
+          throw new trezorConvertToLocalizableError(error);
         }
       } else {
         throw new Error('unsupported wallet type');
