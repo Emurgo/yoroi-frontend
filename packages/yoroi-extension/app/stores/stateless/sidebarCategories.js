@@ -37,7 +37,6 @@ const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
 const isDev = (): boolean => environment.isDev();
-const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
@@ -114,7 +113,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: params => isOnMainnet(params) && nonTrezorWallet(params),
+    isVisible: params => isOnMainnet(params),
   },
   {
     className: 'connected-websites',
