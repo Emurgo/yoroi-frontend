@@ -1,4 +1,4 @@
-import { balanceReplacer } from '../helpers/constants.js';
+import { balanceReplacer, WalletWordsSize } from '../helpers/constants.js';
 import { defaultWaitTimeout, fiveSeconds, halfSecond, oneMinute, oneSecond, quarterSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 
@@ -173,6 +173,20 @@ export default class WalletCommonBase extends BasePage {
     };
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo::walletInfo is ${JSON.stringify(walletInfo)}`);
     return walletInfo;
+  }
+  async walletNameIsChanged(oldName, timeout = fiveSeconds, repeatPeriod = quarterSecond) {
+    this.logger.info(`WalletCommonBase::walletNameIsChanged is called. Old name: ${oldName}`);
+    const endTime = Date.now() + timeout;
+    while (Date.now() <= endTime) {
+      const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+      const [walletName, _] = rawNameAndPlateText.split('\n');
+      this.logger.info(`WalletCommonBase::walletNameIsChanged Wallet name: ${walletName}`);
+      if (walletName !== oldName) {
+        return true;
+      }
+      await this.sleep(repeatPeriod);
+    }
+    return false;
   }
   async closeUpdatesModalWindow() {
     this.logger.info(`WalletCommonBase::closeUpdatesModalWindow is called`);

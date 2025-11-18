@@ -1,21 +1,9 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStrings } from '../../hooks/useStrings';
-import { Stack, Typography, Checkbox, FormControlLabel, Box } from '@mui/material';
+import { Stack, Typography, Checkbox, FormControlLabel, Box, Button } from '@mui/material';
 import { useModal } from '../../../../../components/modals/ModalContext';
-import { LoadingButton } from '@mui/lab';
 import LocalStorageApi from '../../../../../../api/localStorage/index';
 import { useNavigateTo } from '../../../../../common/hooks/useNavigateTo';
-
-interface IDisclaimerDialogBody {
-  disclaimerAgreed: boolean;
-  setDisclaimerAgreed: (value: boolean) => void;
-  action: {
-    onClick: () => void;
-    disabled: boolean;
-    primary: boolean;
-    label: string;
-  };
-}
 
 export const DisclaimerDialog = () => {
   const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
@@ -23,49 +11,51 @@ export const DisclaimerDialog = () => {
   const navigate = useNavigateTo();
   const { openModal, closeModal } = useModal();
   const localStorage = new LocalStorageApi();
-
   const onAcceptDisclaimer = () => {
     localStorage.setSwapDisclaimerModalClosed('true');
     closeModal();
   };
-  const action: IDisclaimerDialogBody['action'] = {
+  const action = {
     onClick: onAcceptDisclaimer,
-    disabled: !disclaimerAgreed,
     primary: true,
     label: strings.disclaimerProceed,
   };
 
-  const checkModalState = useCallback(async () => {
-    try {
-      const wasClosed = await localStorage.getSwapDisclaimerModalClosed();
-      if (wasClosed === undefined || wasClosed === 'false') {
-        openModal({
-          title: strings.disclaimerTitle,
-          content: (
-            <DisclaimerDialogBody disclaimerAgreed={disclaimerAgreed} setDisclaimerAgreed={setDisclaimerAgreed} action={action} />
-          ),
-          height: '588px',
-          width: '702px',
-          modalId: 'swapDisclaimer',
-          onClose: () => {
-            navigate.walletTransactions();
-            localStorage.setSwapDisclaimerModalClosed('false');
-          },
-        });
-      }
-    } catch (error) {
-      console.error('Error checking modal state:', error);
-    }
-  }, [disclaimerAgreed]);
-
   useEffect(() => {
+    const checkModalState = async () => {
+      try {
+        const wasClosed = await localStorage.getSwapDisclaimerModalClosed();
+        if (wasClosed === undefined || wasClosed === 'false') {
+          openModal({
+            title: strings.disclaimerTitle,
+            content: (
+              <DisclaimerDialogBody
+                action={action}
+                disclaimerAgreed={disclaimerAgreed}
+                setDisclaimerAgreed={setDisclaimerAgreed}
+              />
+            ),
+            height: '588px',
+            width: '702px',
+            modalId: 'swapDisclaimer',
+            onClose: () => {
+              navigate.walletTransactions();
+              localStorage.setSwapDisclaimerModalClosed('false');
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Error checking modal state:', error);
+      }
+    };
+
     checkModalState();
-  }, [checkModalState]);
+  }, [disclaimerAgreed]);
 
   return <></>;
 };
 
-const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action }: IDisclaimerDialogBody) => {
+const DisclaimerDialogBody = ({ action, disclaimerAgreed, setDisclaimerAgreed }) => {
   const strings = useStrings();
 
   return (
@@ -117,7 +107,9 @@ const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action }:
           }
           control={
             <Checkbox
-              onChange={() => setDisclaimerAgreed(!disclaimerAgreed)}
+              onChange={() => {
+                setDisclaimerAgreed(!disclaimerAgreed);
+              }}
               checked={disclaimerAgreed}
               sx={{ marginRight: '8px' }}
             />
@@ -127,14 +119,14 @@ const DisclaimerDialogBody = ({ disclaimerAgreed, setDisclaimerAgreed, action }:
       </Box>
 
       <Stack pt={20}>
-        <LoadingButton
+        <Button
           // @ts-ignore
           variant="primary"
           onClick={action.onClick}
-          disabled={action.disabled}
+          disabled={disclaimerAgreed ? false : true}
         >
           {action.label}
-        </LoadingButton>
+        </Button>
       </Stack>
     </Stack>
   );

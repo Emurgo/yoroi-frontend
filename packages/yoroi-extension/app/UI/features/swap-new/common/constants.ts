@@ -22,3 +22,4 @@ export const DEX_ROUTING = {
 
 export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MINSWAP | typeof DEX_ROUTING.MUESLISWAP;
 export type RoutingPref = typeof DEX_ROUTING.AUTO | Aggregator[];
+export type AssetDirection = typeof ASSET_DIRECTION_IN | typeof ASSET_DIRECTION_OUT;

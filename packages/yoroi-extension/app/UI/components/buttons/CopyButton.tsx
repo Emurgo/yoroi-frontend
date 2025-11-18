@@ -16,7 +16,6 @@ export const messages = Object.freeze(
     },
   })
 );
-
 interface Props {
   textToCopy: string;
   disabled?: boolean;
@@ -41,7 +40,7 @@ export const CopyButton = ({ textToCopy, disabled, pathTestId = '', ...props }: 
 
   return (
     <Box onClick={handleCopy} {...props} id={`${pathTestId}-copy-button`}>
-      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="bottom-start">
+      <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="left-start">
         <IconWrapper
           disabled={disabled}
           buttonProps={{ sx: { padding: 0 } }}

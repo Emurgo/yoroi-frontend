@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { testWallet1 } from '../../../utils/testWallets.js';
@@ -8,26 +7,31 @@ import { oneMinute } from '../../../helpers/timeConstants.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
 import { getSnapshotedMemo as getOldMemo, getTestString } from '../../../helpers/constants.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Editing a memo', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
   const newMemoMessage = getTestString('', 40, true);
 
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
     await prepareWallet(webdriver, logger, 'testWallet1MemoAdded', this);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
   });
 
   it('Expand tx', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.clickOnTxRow(0, 0);
   });
 
   it('Edit memo', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     expect(memoMessage).to.equal(getOldMemo());
 
@@ -45,7 +49,6 @@ describe('Editing a memo', function () {
   });
   // check the memo displayed message
   it('Check edited memo', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     const txHashId = await transactionsPage.getTxHashID(0, 0);
     expect(memoMessage).to.equal(newMemoMessage);
@@ -58,25 +61,20 @@ describe('Editing a memo', function () {
   });
   // reload the page
   it('Refresh page', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.refreshPage();
   });
   // check the memo displayed message again
   it('Check edited memo again', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.clickOnTxRow(0, 0);
     const memoMessage = await transactionsPage.getMemoMessage(0, 0);
     expect(memoMessage).to.equal(newMemoMessage);
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });

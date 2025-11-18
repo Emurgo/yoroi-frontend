@@ -1,4 +1,3 @@
-import BasePage from '../../../pages/basepage.js';
 import { customAfterEach } from '../../../utils/customHooks.js';
 import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
 import { expect } from 'chai';
@@ -8,16 +7,29 @@ import SettingsTab from '../../../pages/wallet/settingsTab/settingsTab.page.js';
 import driversPoolsManager from '../../../utils/driversPool.js';
 import GeneralSubTab from '../../../pages/wallet/settingsTab/generalSubTab.page.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
 
 describe('Changing language through the Settings', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  /** @type {SettingsTab} */
+  let settingsPage = null;
+  /** @type {GeneralSubTab} */
+  let generalSubTab = null;
 
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
     await prepareWallet(webdriver, logger, 'testWallet1', this);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+    settingsPage = new SettingsTab(webdriver, logger);
+    generalSubTab = new GeneralSubTab(webdriver, logger);
   });
 
   const testData = [
@@ -68,35 +80,28 @@ describe('Changing language through the Settings', function () {
   ];
 
   it('Open General settings', async function () {
-    const transactionsPage = new TransactionsSubTab(webdriver, logger);
     await transactionsPage.goToSettingsTab();
-    const settingsPage = new SettingsTab(webdriver, logger);
     await settingsPage.goToGeneralSubMenu();
   });
 
   for (const testDatum of testData) {
     describe(`Changing language to ${testDatum.lang}`, function () {
       it(`Selecting language ${testDatum.lang}`, async function () {
-        const generalSubTab = new GeneralSubTab(webdriver, logger);
         await generalSubTab.selectLanguage(testDatum.lang);
       });
 
       it(`Checking translation on the button ${testDatum.lang}`, async function () {
-        const settingsPage = new SettingsTab(webdriver, logger);
         const btnText = await settingsPage.getGeneralSubTabText();
         expect(btnText).to.equal(testDatum.btnTransalation);
       });
     });
   }
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
-    done();
+  after(async function () {
+    await transactionsPage.closeBrowser();
   });
 });

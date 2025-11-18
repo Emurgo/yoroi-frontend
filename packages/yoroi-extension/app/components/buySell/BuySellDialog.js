@@ -20,7 +20,6 @@ import banxaPng from '../../assets/images/banxa.png';
 import encryptusPng from '../../assets/images/encryptus.png';
 import environment from '../../environment';
 import BuySellDisclaimerDialog from './DisclaimerDialog';
-import { ampli } from '../../../ampli/index';
 import LocalStorageApi from '../../api/localStorage';
 
 declare var chrome;
@@ -202,8 +201,6 @@ export default class BuySellDialog extends Component<Props, State> {
   urlGenerationTimeout: null | TimeoutID = null;
 
   componentDidMount() {
-    ampli.exchangePageViewed();
-
     const self = this;
     async function checkAcceptanceStatus() {
       const localStorageApi = new LocalStorageApi();
@@ -298,10 +295,6 @@ export default class BuySellDialog extends Component<Props, State> {
           props.onExchangeCallback();
         }
       });
-    });
-    ampli.exchangeSubmitted({
-      ada_amount: Number(state.amountAda),
-      ramp_type: state.isBuying ? 'Buy' : 'Sell',
     });
   };
 

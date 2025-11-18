@@ -65,13 +65,13 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
-import { ampli } from '../ampli/index';
-// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
 // $FlowIgnore: suppressing this error
 import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+// $FlowIgnore: suppressing this error
+import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
 
@@ -246,6 +246,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<SwapRevampSubpages stores={stores} />}>
             <Route path={ROUTES.SWAP_REVAMP.ASSET_SWAP} element={<AssetSwapRevampPage stores={stores} />} />
             <Route path={ROUTES.SWAP_REVAMP.ORDERS} element={<SwapOrdersRevampPage stores={stores} />} />
+            <Route path={ROUTES.SWAP_REVAMP.REVIEW} element={<SwapReviewRevampPage stores={stores} />} />
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
@@ -393,7 +394,6 @@ const GovernanceSubpages = ({ stores }) => {
         tokenInfo={stores.tokenInfoStore.tokenInfo}
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-        ampli={ampli}
       >
         <Suspense fallback={null}>
           <Outlet />
