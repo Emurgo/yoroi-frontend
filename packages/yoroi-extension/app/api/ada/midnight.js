@@ -10,6 +10,11 @@ import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { CardanoDerivationType } from 'trezor-connect-flow';
+import { loadSubmittedTransactions } from '../localStorage';
+import AdaApi from './';
+import BigNumber from 'bignumber.js';
+import type { CardanoAddressedUtxo } from './transactions/types';
+import { forceNonNull } from '../../coreUtils.js';
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 
@@ -227,5 +232,71 @@ export async function scanForOriginalDestAddress(
   return {
     success: false,
     error: 'destination address not found in this wallet',
+  };
+}
+
+const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
+const MAX_COLLATERAL_COUNT: number = 3;
+
+export async function getCollateralUtxos(
+  requiredAmount: string,
+  wallet: WalletState,
+): Promise<{| utxosToUse: Array<CardanoAddressedUtxo>, reorgTargetAmount: ?string |}> {
+  const required = new BigNumber(requiredAmount);
+  const submittedTxs = (await loadSubmittedTransactions()) || [];
+  const adaApi = new AdaApi();
+  const maxViableUtxoAmount = required.plus(MAX_PER_UTXO_SURPLUS);
+  const utxos = wallet.utxos.map(utxo => ({
+    utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
+    tx_hash: utxo.output.Transaction.Hash,
+    tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+    receiver: utxo.address,
+    amount: forceNonNull(utxo.output.tokens.find(token => token.Token.Identifier === '')).TokenList.Amount,
+    assets: utxo.output.tokens.filter(token => token.Token.Identifier !== '').map(token => ({
+      amount: token.TokenList.Amount,
+      assetId: token.Token.Identifier.split('.')[1],
+      policyId: token.Token.Identifier.split('.')[0],
+      name: token.Token.Metadata.assetName,
+    })),
+    addressing: utxo.addressing,
+  }));
+  const utxosToConsider = (
+    await adaApi._addressedUtxosWithSubmittedTxs(utxos, wallet.publicDeriverId, wallet.allUtxoAddresses, submittedTxs)
+  ).filter(utxo => utxo.assets.length === 0 && new BigNumber(utxo.amount).lt(maxViableUtxoAmount));
+  utxosToConsider.sort((utxo1, utxo2) => new BigNumber(utxo1.amount).comparedTo(utxo2.amount));
+  const utxosToUse = [];
+  let sum = new BigNumber('0');
+  let enough = false;
+  for (const utxo of utxosToConsider) {
+    utxosToUse.push(utxo);
+    sum = sum.plus(utxo.amount);
+    while (utxosToUse.length > MAX_COLLATERAL_COUNT || sum.minus(utxosToUse[0].amount).gte(required)) {
+      // Removing the first (hence the smallest) utxo from the list
+      const removedUtxo = utxosToUse.shift();
+      sum = sum.minus(removedUtxo.amount);
+    }
+    if (sum.gte(required)) {
+      enough = true;
+      break;
+    }
+  }
+  if (enough) {
+    for (;;) {
+      const smallestUtxo = utxosToUse[0];
+      const potentialSum = sum.minus(smallestUtxo.amount);
+      if (potentialSum.gte(required)) {
+        // First utxo can be removed and still will be enough.
+        utxosToUse.shift();
+        sum = potentialSum;
+      } else {
+        break;
+      }
+    }
+    return { utxosToUse, reorgTargetAmount: null };
+  }
+
+  return {
+    utxosToUse,
+    reorgTargetAmount: required.minus(sum).toString(),
   };
 }
