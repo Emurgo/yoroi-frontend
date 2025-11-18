@@ -56,7 +56,6 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
     } catch (e) {
       showTxResultModal(TransactionResult.FAIL);
     } finally {
-      swapForm.action({ type: SwapActionType.ResetForm });
       closeTxReviewModal();
     }
   };

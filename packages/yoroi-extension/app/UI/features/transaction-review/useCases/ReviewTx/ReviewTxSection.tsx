@@ -35,10 +35,11 @@ export const ReviewTxSection = () => {
   });
   const location = useLocation();
   const tabSearchParam = new URLSearchParams(location.search).get('tab') || 'overview';
-
   useEffect(() => {
-    const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
-    captureEvent('Transaction Review Modal Viewed', analyticsParams);
+    if (formattedTx && (unsignedTx || cborTx)) {
+      const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
+      captureEvent('Transaction Review Modal Viewed', analyticsParams);
+    }
   }, []);
 
   const getTabs = useCallback((): TabItem[] => {

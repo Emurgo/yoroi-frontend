@@ -73,7 +73,8 @@ export const ReviewTxProvider = ({
   const handleTxResult = (result: TransactionResultType) => {
     dispatch({ type: 'stopLoading', isLoading: false });
     dispatch({ type: 'close' });
-    captureEvent('Transaction Results Popup Viewed');
+    actions.closeTxReviewModal();
+    captureEvent('Transaction Results Popup Viewed', { status: result === TransactionResult.SUCCESS ? 'Success' : 'Failure' });
     openModal({
       title: 'Transaction results',
       height: '440px',
