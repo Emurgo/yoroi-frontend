@@ -70,7 +70,7 @@ export const getTransactionAnalyticsPropertiesFromRaw = (formattedTx, context?, 
   });
 
   return {
-    type: context ?? '',
+    type: context === 'withdraw' ? 'withdraw rewards' : (context ?? ''),
     asset_count: uniqueAssets.size,
     asset_list: JSON.stringify(Array.from(uniqueAssets.values())),
     aggregator: aggregator ?? '',
