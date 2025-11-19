@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useLocation } from 'react-router';
@@ -25,6 +25,7 @@ const pathId = 'reviewTx';
 
 export const ReviewTxSection = () => {
   const { unsignedTx, cborTx, receiverCustomTitle, operations } = useTxReviewModal();
+  const hasSentAnalyticsRef = useRef<string | null>(null);
 
   const txBody: any = useTxBody({ cbor: cborTx, unsignedTx });
   const formattedTx = useFormattedTx(cborTx ? txBody : txBody?.body);
@@ -35,12 +36,28 @@ export const ReviewTxSection = () => {
   });
   const location = useLocation();
   const tabSearchParam = new URLSearchParams(location.search).get('tab') || 'overview';
+
   useEffect(() => {
-    if (formattedTx && (unsignedTx || cborTx)) {
+    // Only send analytics when transaction data is available
+    const hasTransactionData = cborTx != null || unsignedTx != null;
+    // Checking that formattedTx has actual data
+    const isFormattedTxReady = formattedTx && (formattedTx.inputs?.length > 0 || formattedTx.outputs?.length > 0);
+
+    // Create a unique identifier based on transaction data presence to prevent duplicate events
+    const transactionKey = hasTransactionData ? (cborTx ? 'has-cbor' : 'has-unsigned') : null;
+
+    // Only send analytics if we have valid data and haven't already sent for this transaction session
+    if (hasTransactionData && isFormattedTxReady && transactionKey && hasSentAnalyticsRef.current !== transactionKey) {
       const analyticsParams = getTransactionAnalyticsPropertiesFromRaw(formattedTx, operations?.kind, operations?.aggregator);
       captureEvent('Transaction Review Modal Viewed', analyticsParams);
+      hasSentAnalyticsRef.current = transactionKey;
     }
-  }, []);
+
+    // Reset the ref when transaction data is cleared (modal closing)
+    if (!hasTransactionData && hasSentAnalyticsRef.current !== null) {
+      hasSentAnalyticsRef.current = null;
+    }
+  }, [cborTx, unsignedTx, formattedTx]);
 
   const getTabs = useCallback((): TabItem[] => {
     const tabs: TabItem[] = [
