@@ -1,7 +1,7 @@
 import { amountBreakdown } from '@yoroi/portfolio';
 import { PortfolioTokenAmountRecords } from '@yoroi/types/lib/typescript/portfolio/amount';
 import { PortfolioApiTokenActivityResponse } from '@yoroi/types/lib/typescript/portfolio/api';
-import { PortfolioTokenInfo } from '@yoroi/types/src/portfolio/info';
+import { PortfolioTokenInfo } from '@yoroi/types/lib/typescript/portfolio/info';
 import BigNumber from 'bignumber.js';
 
 export const aggregatePrimaryAmount = ({

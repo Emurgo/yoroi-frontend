@@ -7,6 +7,7 @@ import { createCurrrentWalletInfo } from '../../../utils/createCurrentWalletInfo
 import { TxFail } from '../common/TransactionResult/TxFail';
 import { TxSuccess } from '../common/TransactionResult/TxSuccess';
 import { TransactionResult, TransactionResultType } from '../common/types';
+import { captureEvent } from '../../../../../posthog';
 
 type ModalState = {
   isOpen: boolean;
@@ -72,6 +73,8 @@ export const ReviewTxProvider = ({
   const handleTxResult = (result: TransactionResultType) => {
     dispatch({ type: 'stopLoading', isLoading: false });
     dispatch({ type: 'close' });
+    actions.closeTxReviewModal();
+    captureEvent('Transaction Results Popup Viewed', { status: result === TransactionResult.SUCCESS ? 'Success' : 'Failure' });
     openModal({
       title: 'Transaction results',
       height: '440px',

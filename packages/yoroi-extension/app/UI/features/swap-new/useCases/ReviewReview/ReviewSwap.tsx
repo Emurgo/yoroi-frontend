@@ -1,15 +1,13 @@
 import { Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import { useEffect } from 'react';
-
 import { PriceImpactBanner } from './PriceImpactBanner';
 import { EstimateSummary } from '../AssetSwap/EstimateSummary';
 import { AssetSummary } from '../../common/components/AssetSummary';
-
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
 import { TransactionResult } from '../../../transaction-review/common/types';
-
+import { captureEvent } from '../../../../../../posthog';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { ASSET_DIRECTION_OUT } from '../../common/constants';
@@ -28,6 +26,10 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
 
   const tokenInInfo = swapForm['tokenInInput'];
   const tokenOutInfo = swapForm['tokenOutInput'];
+
+  useEffect(() => {
+    captureEvent('Swap Review Page Viewed');
+  }, []);
 
   useEffect(() => {
     if (swapForm.createTx?.cbor === undefined) {
@@ -54,7 +56,6 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
     } catch (e) {
       showTxResultModal(TransactionResult.FAIL);
     } finally {
-      swapForm.action({ type: SwapActionType.ResetForm });
       closeTxReviewModal();
     }
   };
@@ -67,6 +68,10 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
           handleSubmitTransaction(passswordInput);
         },
         cborTx: swapForm.createTx.cbor,
+        operations: {
+          kind: 'swap',
+          aggregator: swapForm.createTx.aggregator,
+        },
       });
     }
   };
