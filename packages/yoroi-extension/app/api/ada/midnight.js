@@ -15,6 +15,9 @@ import AdaApi from './';
 import BigNumber from 'bignumber.js';
 import type { CardanoAddressedUtxo } from './transactions/types';
 import { forceNonNull } from '../../coreUtils.js';
+import { getProtocolParameters } from '../thunk';
+import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
+import { asAddressedUtxo } from './transactions/utils';
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 
@@ -299,4 +302,29 @@ export async function getCollateralUtxos(
     utxosToUse,
     reorgTargetAmount: required.minus(sum).toString(),
   };
+}
+
+export async function createReorgTransaction(
+  wallet: WalletState,
+  reorgTargetAmount: string,
+): Promise<HaskellShelleyTxSignRequest> {
+  const addressedUtxos = asAddressedUtxo(wallet.utxos);
+  const submittedTxs = wallet.submittedTransactions;
+  const firstExternalAddress = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
+  const protocolParameters = await getProtocolParameters(wallet);
+
+  const { unsignedTx } = await (new AdaApi())._createReorgTx(
+    getNetworkById(wallet.networkId),
+    wallet.balance.getDefaults(),
+    wallet.publicDeriverId,
+    wallet.allUtxoAddresses,
+    wallet.receiveAddress,
+    [],
+    reorgTargetAmount,
+    addressedUtxos,
+    submittedTxs,
+    firstExternalAddress.address,
+    protocolParameters
+  );
+  return unsignedTx;
 }
