@@ -512,6 +512,8 @@ export const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapActionType.SwapReviewSelected:
+        draft.needsNewEstimate = false;
+        draft.lastInputTouched = state.lastInputTouched;
         draft.reviewSwapSelected = action.value;
         break;
 
