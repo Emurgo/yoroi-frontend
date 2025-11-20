@@ -16,14 +16,14 @@ type UseWalletSwitchResetOptions = {
 
 /**
  * Hook to automatically reset the swap form when the wallet is switched.
- * 
+ *
  * @param options - Configuration options for the hook
  * @returns void
- * 
+ *
  * @example
  * // Basic usage - resets form on wallet switch
  * useWalletSwitchReset();
- * 
+ *
  * @example
  * // With navigation callback
  * const navigateTo = useNavigateTo();
@@ -38,13 +38,12 @@ export const useWalletSwitchReset = (options: UseWalletSwitchResetOptions = {}) 
 
   useEffect(() => {
     const currentWalletId = walletId ?? stores?.wallets?.selected?.publicDeriverId ?? null;
-    
+
     if (previousWalletIdRef.current !== null && previousWalletIdRef.current !== currentWalletId) {
       swapForm.action({ type: SwapActionType.ResetForm });
       onWalletSwitch?.();
     }
-    
+
     previousWalletIdRef.current = currentWalletId;
   }, [walletId, stores?.wallets?.selected?.publicDeriverId, swapForm.action, onWalletSwitch]);
 };
-

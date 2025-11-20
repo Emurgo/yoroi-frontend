@@ -26,7 +26,7 @@ export const AssetSwap = () => {
   const { openModal } = useModal();
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  
+
   useWalletSwitchReset();
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {

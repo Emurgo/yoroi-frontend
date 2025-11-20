@@ -24,7 +24,7 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
   const navigateTo = useNavigateTo();
   const { palette }: any = useTheme();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
-  
+
   useWalletSwitchReset({
     walletId: wallet?.publicDeriverId,
     onWalletSwitch: () => navigateTo.swapAssets(),
