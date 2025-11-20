@@ -6,6 +6,7 @@ import { EstimateSummary } from '../AssetSwap/EstimateSummary';
 import { AssetSummary } from '../../common/components/AssetSummary';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { SwapActionType, useSwapRevamp } from '../../module/SwapContextProvider';
+import { useWalletSwitchReset } from '../../common/hooks/useWalletSwitchReset';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { captureEvent } from '../../../../../../posthog';
 import { useNavigateTo } from '../../common/hooks/useNavigateTo';
@@ -24,6 +25,11 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
   const { palette }: any = useTheme();
   const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
 
+  useWalletSwitchReset({
+    walletId: wallet?.publicDeriverId,
+    onWalletSwitch: () => navigateTo.swapAssets(),
+  });
+
   const tokenInInfo = swapForm['tokenInInput'];
   const tokenOutInfo = swapForm['tokenOutInput'];
 
@@ -35,7 +41,7 @@ const ReviewSwap = ({ stores }: ReviewSwapProps) => {
     if (swapForm.createTx?.cbor === undefined) {
       navigateTo.swapAssets();
     }
-  }, [swapForm.createTx?.cbor]);
+  }, [swapForm.createTx?.cbor, navigateTo]);
 
   // @ts-ignore
   const handleSubmitTransaction = async password => {
