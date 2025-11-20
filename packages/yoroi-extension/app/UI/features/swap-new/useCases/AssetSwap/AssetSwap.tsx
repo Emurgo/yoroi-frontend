@@ -43,7 +43,7 @@ export const AssetSwap = () => {
     if (swapForm.createTx?.cbor && swapForm.reviewSwapSelected === false) {
       navigateTo.swapReview();
     }
-  }, [swapForm.createTx]);
+  }, [swapForm.createTx, location.search]);
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">

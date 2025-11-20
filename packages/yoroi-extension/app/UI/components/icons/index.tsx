@@ -104,6 +104,7 @@ import { VyfiSwap } from './VyfiSwap';
 import { SundaeSwap } from './SundaeSwap';
 import { Cswap } from './CSwap';
 import { ChatboxSupport } from './ChatboxSupport';
+import { YoroiLogo } from './YoroiLogo';
 
 export const Icon = {
   Assets,
@@ -210,6 +211,7 @@ export const Icon = {
   SundaeSwap,
   Cswap,
   ChatboxSupport,
+  YoroiLogo,
 };
 
 export enum Icons {
@@ -312,6 +314,7 @@ export enum Icons {
   SundaeSwap = 'SundaeSwap',
   CSwap = 'CSwap',
   ChatboxSupport = 'ChatboxSupport',
+  YoroiLogo = 'YoroiLogo',
 }
 
 interface IconWrapperProps {
