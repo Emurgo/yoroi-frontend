@@ -264,7 +264,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
                 duplicated: false,
               },
             ],
-            kind: 'swap-cancel',
+            kind: 'swap',
           },
         });
       }

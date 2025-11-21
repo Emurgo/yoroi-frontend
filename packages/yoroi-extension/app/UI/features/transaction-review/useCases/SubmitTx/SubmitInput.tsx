@@ -5,10 +5,15 @@ import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { Ilustration } from './Ilustration';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RESTORE_WALLET_HELP_URL } from '../../../../common/constants';
+import { captureEvent } from '../../../../../../posthog';
 
 export const SubmitInput = () => {
   const { inputError, changePasswordInputValue, passswordInput, setInputError, walletType } = useTxReviewModal();
   const strings = useStrings();
+
+  useEffect(() => {
+    captureEvent('Transaction Review Submit Modal Viewed');
+  }, []);
 
   useEffect(() => {
     setInputError({ type: 'setInputError', inputError: false });

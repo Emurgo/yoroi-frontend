@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { PRICE_IMPACT_HIGH_RISK, PRICE_IMPACT_MODERATE_RISK } from './constants';
 export const normalizeTokenId = (id?: string | null) => (id === '' ? '.' : id);
 
 type WalletUtxo = {
@@ -12,7 +13,7 @@ type WalletUtxo = {
         Identifier: string; // '.' for ADA, or `${policyId}.${assetNameHex}`
         Metadata: { ticker?: string; policyId?: string; assetName?: string };
       };
-      TokenList: { Amount: string }; // decimal string
+      TokenList: { Amount: string };
     }>;
     inlineDatumCborHex?: string;
     datumHashHex?: string;
@@ -158,4 +159,10 @@ export const toBaseUnits = (val?: string | null, decimals = 0): bigint | null =>
   if ((dp ?? 0) > decimals) return null; // too many fraction digits
   // shift to base units and floor (no rounding up), then to bigint
   return BigInt(bn.shiftedBy(decimals).integerValue(BigNumber.ROUND_DOWN).toFixed());
+};
+
+export const getPriceImpactRisk = (priceImpact: number) => {
+  if (priceImpact < PRICE_IMPACT_MODERATE_RISK || isNaN(priceImpact)) return 'none';
+  if (priceImpact > PRICE_IMPACT_HIGH_RISK) return 'high';
+  return 'moderate';
 };

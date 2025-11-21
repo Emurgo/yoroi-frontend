@@ -109,6 +109,9 @@ export const GovernanceStatusSelection = () => {
       submitTx: password => {
         signGovernanceTx(password);
       },
+      operations: {
+        kind: 'delegate vote',
+      },
     });
   };
   const handleYoroiDelegate = async () => {
@@ -143,6 +146,9 @@ export const GovernanceStatusSelection = () => {
         unsignedTx: txSignRequest.signTxRequest.unsignedTx,
         submitTx: password => {
           signGovernanceTx(password);
+        },
+        operations: {
+          kind: 'delegate vote',
         },
       });
 
