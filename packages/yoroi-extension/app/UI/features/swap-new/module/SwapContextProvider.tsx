@@ -76,7 +76,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       isPrimaryToken,
       partners,
     });
-  }, [stakingKey, walletAddresses, primaryTokenInfo, partners]);
+  }, [stakingKey, primaryTokenInfo, partners]);
 
   const { data: orders = [], refetch: refetchOrders } = useQuery({
     queryKey: ['useSwapOrders', stakingKey, swapManager.settings.routingPreference],
