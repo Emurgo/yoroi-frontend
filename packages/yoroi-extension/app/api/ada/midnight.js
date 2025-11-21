@@ -18,6 +18,9 @@ import { forceNonNull } from '../../coreUtils.js';
 import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import { asAddressedUtxo } from './transactions/utils';
+import LocalStorageApi from '../localStorage';
+
+const localStorageApi = new LocalStorageApi();
 
 const TC_HASH = '31a6bab50a84b8439adcfb786bb2020f6807e6e8fda629b424110fc7bb1c6b8b';
 
@@ -198,44 +201,48 @@ export async function makeClaim(claimEndpoint: string, params: ClaimParams): Pro
   return { claimId: respBody[0].claim_id };
 }
 
-type ScanResult =
-  | {|
-      success: true,
-      destAddr: string,
-      claimId: string,
-      amount: number,
-    |}
-  | {|
-      success: false,
-      error: string,
-    |};
 export async function scanForOriginalDestAddress(
   claimEndpoint: string,
-  unusedAddr: string,
-  usedAddrs: Array<string>
-): Promise<ScanResult> {
-  for (let addr of [unusedAddr, ...usedAddrs]) {
-    const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
-    if (!resp.ok) {
-      return {
-        success: false,
-        error: 'failed to fetch the destination address due to network error',
-      };
+  wallet: WalletState,
+): Promise<null | {| address: string, amount: string |}> {
+  const airdropClaims = await localStorageApi.getAirdropClaimResults();
+  const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
+  if (currentWalletClaim) {
+    return { address: currentWalletClaim.destAddr, amount: currentWalletClaim.amount, };
+  } else {
+    const usedAddrs = wallet.allAddresses.utxoAddresses
+          .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+    const unusedAddr1 = addressHexToBech32(
+      forceNonNull(
+        wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
+      ).address.Hash
+    );
+
+    for (let addr of [unusedAddr1, ...usedAddrs]) {
+      const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
+      if (!resp.ok) {
+        continue;
+      }
+      const json = await resp.json();
+      if (json.length === 1) {
+        airdropClaims.push({
+          publicDeriverId: wallet.publicDeriverId,
+          destAddr: addr,
+          claimId: json[0].claim_id,
+          amount: json[0].amount,
+        });
+        await localStorageApi.saveAirdropClaimResults(airdropClaims);
+
+        return {
+          address: addr,
+          amount: json[0].amount,
+        };
+      }
     }
-    const json = await resp.json();
-    if (json.length === 1) {
-      return {
-        success: true,
-        destAddr: addr,
-        claimId: json[0].claim_id,
-        amount: json[0].amount,
-      };
-    }
+    return null;
+
   }
-  return {
-    success: false,
-    error: 'destination address not found in this wallet',
-  };
 }
 
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
@@ -327,4 +334,22 @@ export async function createReorgTransaction(
     protocolParameters
   );
   return unsignedTx;
+}
+
+export async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Promise<number> {
+  try {
+    const resp = await fetch(`${thawEndpoint}/thaws/${addr}/schedule`);
+    if (!resp.ok) {
+      throw new Error('http error');
+    }
+    const data = await resp.json();
+    const thaw = data.thaws[0];
+    if (Date.now() > (new Date(thaw.thawing_period_start)).valueOf()) {
+      return thaw.amount;
+    } else {
+      return 0;
+    }
+  } catch {
+    return 0;
+  }
 }

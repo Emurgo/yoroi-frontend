@@ -15,7 +15,6 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 import { forceNonNull } from '../../coreUtils.js';
 import Zero from '../features/airdrop/useCases/Zero';
 import ClaimDone from '../features/airdrop/useCases/ClaimDone';
-import LocalStorageApi from '../../api/localStorage';
 import { useTxReviewModal } from '../features/transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../features/transaction-review/common/types';
 //import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
@@ -25,7 +24,6 @@ import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTx
 import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx';
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
 
-const localStorageApi = new LocalStorageApi();
 
 interface Props {
   stores: {
@@ -61,94 +59,57 @@ interface Props {
 const NUMBER_OF_NIGHT_DECIMALS = 6;
 const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const CLAIM_ENDPOINT_PREPROD = 'https://external-claim.gd.midnighttge.io';
+const THAW_ENDPOINT_MAINNET = '';
+const THAW_ENDPOINT_PREPROD = '';
 const COLLATERAL_AMOUNT = 2000000;
 
 export default function AirdropPage({ stores }: Readonly<Props>) {
   const intl = useIntl();
 
-  // null means querying
-  const [alloc, setAlloc] = useState<BigNumber | null>(null);
-
-  const formattedAlloc = alloc?.div(10 ** NUMBER_OF_NIGHT_DECIMALS).toFormat() ?? '';
 
   const wallet = stores.wallets.selectedOrFail;
 
-  const isMainnet = wallet.networkId === 0;
-  const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
+  const [queryingAlloc, setQueryingAlloc] = useState(true);
+  const [alloc, setAlloc] = useState(null);
 
-  const destAddrBech32 = addressHexToBech32(
-    forceNonNull(
-      wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
-    ).address.Hash
-  );
-  const [originalDestAddrBech32, setOriginalDestAddrBech32] = useState('');
-  const [destAddrError, setDestAddrError] = useState('');
-
+  const [queryingMine, setQueryingMine] = useState(true);
+  const [mineAddrs, setMineAddrs] = useState([]);
   useEffect(() => {
     (async () => {
-      const allocatedAddr = addressHexToBech32(
-        forceNonNull(wallet.allAddressesByType[CoreAddressTypes.CARDANO_BASE]?.[0]?.address)
-      );
-      const claimedAmount = await checkClaimForAddress(claimEndpoint, allocatedAddr);
-      setAlloc(new BigNumber(claimedAmount));
+      const isMainnet = wallet.networkId === 0;
+      const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
+      const result = await scanForOriginalDestAddress(claimEndpoint, wallet);
+      setAlloc(result);
+      setQueryingAlloc(false);
 
-      const airdropClaims = await localStorageApi.getAirdropClaimResults();
-      const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
-      if (currentWalletClaim) {
-        setOriginalDestAddrBech32(currentWalletClaim.destAddr);
-      } else {
-        const usedAddresses = wallet.allAddresses.utxoAddresses
-          .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
-        const unusedAddresses = wallet.allAddresses.utxoAddresses.filter(
-          a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed
-        );
-        const result = await scanForOriginalDestAddress(
-          claimEndpoint,
-          destAddrBech32,
-          [...usedAddresses, ...unusedAddresses].map(addr => addressHexToBech32(addr.address.Hash))
-        );
-        if (result.success) {
-          setOriginalDestAddrBech32(result.destAddr);
-          airdropClaims.push({
-            publicDeriverId: wallet.publicDeriverId,
-            destAddr: result.destAddr,
-            claimId: result.claimId,
-            amount: result.amount,
-          });
-          await localStorageApi.saveAirdropClaimResults(airdropClaims);
-        } else {
-          setDestAddrError(result.error);
-          setOriginalDestAddrBech32('');
-        }
-      }
+      const mineAddrs = await scanMineAddrs(thawEndpoint, wallet);
     })();
     return () => {
       // switch wallet
       setAlloc(null);
-      setOriginalDestAddrBech32('');
-      setDestAddrError('');
+      setQueryingAlloc(true);
+      setMineAddrs([]);
+      setQueryingMine(true);
     };
   }, [wallet.publicDeriverId]);
 
 
   let content;
 
-  if (!alloc) {
-    content = <LoadingSpinner />;
-  } else if (alloc.isZero()) {
-    content = <Zero />;
-  } else {
-    content = (
-      <ClaimDone
-        alloc={formattedAlloc}
-        destAddrBech32={originalDestAddrBech32}
-        destAddrError={destAddrError}
-        walletPlate={wallet.plate}
-        walletName={wallet.name}
-      />
-    );
-  }
+  content = (
+    <div>
+      <div>Airdrop allocation</div>
+      {queryingAlloc ? '...'
+        : alloc ?  (
+         <div>
+           <div>address: {alloc.address}</div>
+           <div>amount: {alloc.amount / 10**6}</div>
+         </div>
+       ) : 'no allocation'}
+      <div>scavenger mine addresses</div>
+      
+    </div>
+  );
 
   return (
     <TopBarLayout
