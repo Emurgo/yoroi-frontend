@@ -6,6 +6,31 @@ const YOROI_TYPE = '$YOROI_BUILD_TYPE_ENV$';
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
+// Helper function to check if log arguments contain yoroi-related content
+function isYoroiRelatedLog(...args) {
+  // Check all arguments for yoroi-related patterns
+  for (const arg of args) {
+    const argString =
+      typeof arg === 'string'
+        ? arg
+        : arg instanceof Error
+          ? arg.toString()
+          : typeof arg === 'object'
+            ? JSON.stringify(arg)
+            : String(arg);
+
+    // Check for yoroi-related patterns (case-insensitive)
+    if (
+      argString.toLowerCase().includes('[yoroi') ||
+      argString.toLowerCase().includes('yoroi-connector') ||
+      argString.toLowerCase().includes('yoroi_')
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
 // Helper function to create log entry and send to background
 function sendLogToBackground(level, ...args) {
   try {
@@ -67,30 +92,41 @@ function sendLogToBackground(level, ...args) {
 
   console.debug = (...args) => {
     originalConsole.debug(...args);
-    sendLogToBackground('debug', ...args);
+    // Only log if it's a yoroi-related log
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('debug', ...args);
+    }
   };
 
   console.info = (...args) => {
     originalConsole.info(...args);
-    sendLogToBackground('info', ...args);
+    // Only log if it's a yoroi-related log
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('info', ...args);
+    }
   };
 
   console.warn = (...args) => {
     originalConsole.warn(...args);
-    sendLogToBackground('warn', ...args);
+    // Only log if it's a yoroi-related log
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('warn', ...args);
+    }
   };
 
   console.error = (...args) => {
     originalConsole.error(...args);
-    sendLogToBackground('error', ...args);
+    // Only log if it's a yoroi-related log
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('error', ...args);
+    }
   };
 
   // Also intercept console.log for connector context
   console.log = (...args) => {
     originalConsole.log(...args);
     // Only log if it's a yoroi-related log
-    const firstArg = args[0];
-    if (typeof firstArg === 'string' && firstArg.includes('[yoroi')) {
+    if (isYoroiRelatedLog(...args)) {
       sendLogToBackground('info', ...args);
     }
   };

@@ -22,6 +22,16 @@ const STORAGE_KEYS = {
   connector: 'yoroi-logs-connector',
 };
 
+// Store original console methods at module load time to avoid infinite recursion
+// when console methods are overridden (e.g., in background/index.js)
+const originalConsole = {
+  log: console.log.bind(console),
+  debug: console.debug.bind(console),
+  info: console.info.bind(console),
+  warn: console.warn.bind(console),
+  error: console.error.bind(console),
+};
+
 /**
  * Get the storage API (works in both extension and web contexts)
  */
@@ -77,7 +87,8 @@ export async function storeLog(context: LogContext, entry: LogEntry): Promise<vo
     });
   } catch (error) {
     // Don't break the app if logging fails
-    console.error(`Failed to store log for context ${context}:`, error);
+    // Use original console.error to avoid infinite recursion when console methods are overridden
+    originalConsole.error(`Failed to store log for context ${context}:`, error);
   }
 }
 
@@ -104,7 +115,8 @@ export async function getLogs(context: LogContext): Promise<Array<LogEntry>> {
 
     return Array.isArray(result) ? result : [];
   } catch (error) {
-    console.error(`Failed to retrieve logs for context ${context}:`, error);
+    // Use original console.error to avoid infinite recursion when console methods are overridden
+    originalConsole.error(`Failed to retrieve logs for context ${context}:`, error);
     return [];
   }
 }
@@ -145,7 +157,8 @@ export async function clearLogs(context: LogContext): Promise<void> {
       });
     });
   } catch (error) {
-    console.error(`Failed to clear logs for context ${context}:`, error);
+    // Use original console.error to avoid infinite recursion when console methods are overridden
+    originalConsole.error(`Failed to clear logs for context ${context}:`, error);
   }
 }
 
@@ -166,7 +179,7 @@ export function formatLogEntry(entry: LogEntry): string {
 export function createLogEntry(level: 'debug' | 'info' | 'warn' | 'error', ...args: Array<any>): LogEntry {
   const timestamp = moment().format();
   let message = '';
-  let stack: string | void = '';
+  let stack: string | void = undefined;
 
   // Convert arguments to string
   const parts = args.map(arg => {
