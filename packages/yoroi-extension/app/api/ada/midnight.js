@@ -245,6 +245,28 @@ export async function scanForOriginalDestAddress(
   }
 }
 
+export async function scanForMineDestAddress(
+  thawEndpoint: string,
+  wallet: WalletState,
+): Promise<Array<{| address: string, amount: string |}>> {
+  const usedAddrs = wallet.allAddresses.utxoAddresses
+        .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+        .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+  const unusedAddr1 = addressHexToBech32(
+    forceNonNull(
+      wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
+    ).address.Hash
+  );
+  const result = [];
+  for (let address of [unusedAddr1, ...usedAddrs]) {
+    const amount = await getThawedAmountOfAddress(thawEndpoint, address);
+    if (amount > 0) {
+      result.push({ address, amount });
+    }
+  }
+  return result;
+}
+
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 const MAX_COLLATERAL_COUNT: number = 3;
 
@@ -336,7 +358,7 @@ export async function createReorgTransaction(
   return unsignedTx;
 }
 
-export async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Promise<number> {
+async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Promise<number> {
   try {
     const resp = await fetch(`${thawEndpoint}/thaws/${addr}/schedule`);
     if (!resp.ok) {

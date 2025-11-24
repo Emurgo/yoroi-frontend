@@ -6,15 +6,13 @@ import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { checkClaimForAddress, scanForOriginalDestAddress, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
+import { scanForOriginalDestAddress, scanForMineDestAddress, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 import { forceNonNull } from '../../coreUtils.js';
-import Zero from '../features/airdrop/useCases/Zero';
-import ClaimDone from '../features/airdrop/useCases/ClaimDone';
 import { useTxReviewModal } from '../features/transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../features/transaction-review/common/types';
 //import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
@@ -23,7 +21,8 @@ import { ModalManager } from '../components/modals/ModalManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx';
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
-
+import TextField from '../../components/common/TextField';
+import Redeem from '../features/airdrop/useCases/Redeem';
 
 interface Props {
   stores: {
@@ -73,7 +72,18 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
   const [alloc, setAlloc] = useState(null);
 
   const [queryingMine, setQueryingMine] = useState(true);
-  const [mineAddrs, setMineAddrs] = useState([]);
+  const [mineDestAddrs, setMineDestAddrs] = useState([]);
+
+  const [arbitraryAddr, setArbitraryAddr] = useState('');
+
+  const [redeemingAddr, setRedeemingAddr] = useState(null);
+  const startRedeem = (addr) => {
+    setRedeemingAddr(addr);
+  };
+  const closeRedeem = () => {
+    setRedeemingAddr(null);
+  };
+
   useEffect(() => {
     (async () => {
       const isMainnet = wallet.networkId === 0;
@@ -82,13 +92,16 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
       setAlloc(result);
       setQueryingAlloc(false);
 
-      const mineAddrs = await scanMineAddrs(thawEndpoint, wallet);
+      const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
+      const mineAddrs = await scanForMineDestAddress(thawEndpoint, wallet);
+      setMineDestAddrs(mineAddrs);
+      setQueryingMine(false);
     })();
     return () => {
       // switch wallet
       setAlloc(null);
       setQueryingAlloc(true);
-      setMineAddrs([]);
+      setMineDestAddrs([]);
       setQueryingMine(true);
     };
   }, [wallet.publicDeriverId]);
@@ -104,10 +117,40 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
          <div>
            <div>address: {alloc.address}</div>
            <div>amount: {alloc.amount / 10**6}</div>
+           <Button
+             variant="outlined"
+             onClick={() => { startRedeem(alloc.address); }}
+           >
+             Claim
+           </Button>
          </div>
        ) : 'no allocation'}
       <div>scavenger mine addresses</div>
-      
+      {queryingMine ? '...'
+        : (mineDestAddrs.length === 0) ? 'no scavenger mine rewards'
+        : mineDestAddrs.map(({ address, amount }) => (
+           <div>
+             <div>address: {address}</div>
+             <div>amount: {amount / 10**6}</div>
+           </div>
+        ))
+      }
+      <div>addresses from other wallets</div>
+      <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
+        <TextField
+          sx={{ width: '936px' }}
+          value={arbitraryAddr}
+          label="address"
+          onChange={e => { setArbitraryAddr(e.target.value); }}
+        />
+        <Button
+          variant="outlined"
+          style={{ height: '48px', marginTop: '12px' }}
+          onClick={() => { startRedeem(arbitraryAddr); }}
+        >
+          Check address
+        </Button>
+      </Box>
     </div>
   );
 
@@ -125,7 +168,8 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
           <ReviewTxProvider stores={stores} intl={intl}>
             <ReviewTxModal />
             <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
-            <Collateral wallet={wallet} stores={stores} />
+            {/*<Collateral wallet={wallet} stores={stores} />*/}
+            {redeemingAddr && (<Redeem address={redeemingAddr} onClose={closeRedeem} />)}
           </ReviewTxProvider>
       </ModalProvider>
     </TopBarLayout>
