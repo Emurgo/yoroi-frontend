@@ -77,7 +77,7 @@ function NavBarRevamp(props: Props) {
                       height: '6px',
                       width: '6px',
                       borderRadius: '50%',
-                      backgroundColor: "ds.sys_magenta_500",
+                      backgroundColor: 'ds.sys_magenta_500',
                       position: 'relative',
                       right: '10px',
                       top: '-8px',
