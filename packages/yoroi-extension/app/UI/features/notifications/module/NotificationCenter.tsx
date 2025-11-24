@@ -33,15 +33,11 @@ const Notification = (props: { notification: (typeof appState.notifications.all)
     if (!notification.redirection) {
       throw new Error('unexpectedly missing redirection in notification data');
     }
-    if (notification.isExternalUrl) {
-      window.open(notification.redirection, '_blank', 'noopener,noreferrer');
-      setIsNotificationCenterOpen(false);
-      call(appState.notifications.setRead, notification.fcmMessageId);
-    } else {
-      navigateTo(notification.redirection);
-      setIsNotificationCenterOpen(false);
-      call(appState.notifications.setRead, notification.fcmMessageId);
-    }
+    notification.isExternalUrl
+      ? window.open(notification.redirection, '_blank', 'noopener,noreferrer')
+      : navigateTo(notification.redirection);
+    setIsNotificationCenterOpen(false);
+    call(appState.notifications.setRead, notification.fcmMessageId);
   };
 
   const content = (
