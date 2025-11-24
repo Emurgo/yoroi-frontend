@@ -15,6 +15,7 @@ import type { ConfigType } from '../../../config/config-types';
 import { makeAccessorServer } from '../../../api/objectModel';
 // $FlowIgnore
 import appState from '../../../api/appState';
+import { storeLog, createLogEntry } from '../../../app/utils/logStorage';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
@@ -23,6 +24,44 @@ declare var CONFIG: ConfigType;
 declare var chrome;
 declare var browser;
 */
+
+// Intercept console methods to store logs
+(function setupConsoleLogging() {
+  const originalConsole = {
+    debug: console.debug.bind(console),
+    info: console.info.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+  };
+
+  console.debug = (...args: Array<any>) => {
+    originalConsole.debug(...args);
+    storeLog('background', createLogEntry('debug', ...args)).catch(() => {
+      // Ignore storage errors
+    });
+  };
+
+  console.info = (...args: Array<any>) => {
+    originalConsole.info(...args);
+    storeLog('background', createLogEntry('info', ...args)).catch(() => {
+      // Ignore storage errors
+    });
+  };
+
+  console.warn = (...args: Array<any>) => {
+    originalConsole.warn(...args);
+    storeLog('background', createLogEntry('warn', ...args)).catch(() => {
+      // Ignore storage errors
+    });
+  };
+
+  console.error = (...args: Array<any>) => {
+    originalConsole.error(...args);
+    storeLog('background', createLogEntry('error', ...args)).catch(() => {
+      // Ignore storage errors
+    });
+  };
+})();
 
 // noinspection JSIgnoredPromiseFromCall
 bringInitBackground({
@@ -50,6 +89,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   /*if (environment.isDev()) {
     console.debug(`get message ${JSON.stringify(sanitizeForLog(message))} from ${sender.tab.id}`);
   }*/
+  
+  // Handle log messages from content scripts (connector)
+  if (message.type === 'yoroi-log-entry') {
+    storeLog('connector', message.logEntry).catch(() => {
+      // Ignore storage errors
+    });
+    return false; // No response needed
+  }
+  
   const handler = getHandler(message.type);
   if (handler) {
     const deserializedMessage = {

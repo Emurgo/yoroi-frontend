@@ -6,6 +6,96 @@ const YOROI_TYPE = '$YOROI_BUILD_TYPE_ENV$';
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
+// Helper function to create log entry and send to background
+function sendLogToBackground(level, ...args) {
+  try {
+    const timestamp = new Date().toISOString();
+    let message = '';
+    let stack;
+
+    const parts = args.map(arg => {
+      if (arg instanceof Error) {
+        stack = arg.stack;
+        return arg.toString();
+      }
+      if (typeof arg === 'object') {
+        try {
+          return JSON.stringify(arg, null, 2);
+        } catch (e) {
+          return String(arg);
+        }
+      }
+      return String(arg);
+    });
+
+    message = parts.join(' ');
+
+    const logEntry = {
+      timestamp,
+      level,
+      message,
+      stack,
+    };
+
+    // Send to background service worker
+    chrome.runtime.sendMessage(
+      {
+        type: 'yoroi-log-entry',
+        logEntry,
+      },
+      () => {
+        // Ignore errors (background might not be ready)
+        if (chrome.runtime.lastError) {
+          // Silently fail - logging shouldn't break the app
+        }
+      }
+    );
+  } catch (e) {
+    // Silently fail - logging shouldn't break the app
+  }
+}
+
+// Intercept console methods to send logs to background
+(function setupConsoleLogging() {
+  const originalConsole = {
+    debug: console.debug.bind(console),
+    info: console.info.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    log: console.log.bind(console),
+  };
+
+  console.debug = (...args) => {
+    originalConsole.debug(...args);
+    sendLogToBackground('debug', ...args);
+  };
+
+  console.info = (...args) => {
+    originalConsole.info(...args);
+    sendLogToBackground('info', ...args);
+  };
+
+  console.warn = (...args) => {
+    originalConsole.warn(...args);
+    sendLogToBackground('warn', ...args);
+  };
+
+  console.error = (...args) => {
+    originalConsole.error(...args);
+    sendLogToBackground('error', ...args);
+  };
+
+  // Also intercept console.log for connector context
+  console.log = (...args) => {
+    originalConsole.log(...args);
+    // Only log if it's a yoroi-related log
+    const firstArg = args[0];
+    if (typeof firstArg === 'string' && firstArg.includes('[yoroi')) {
+      sendLogToBackground('info', ...args);
+    }
+  };
+})();
+
 function checkInjectionInDocument() {
   const el = document.getElementById(INJECTED_TYPE_TAG_ID);
   return el ? el.value : 'nothing';
