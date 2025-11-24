@@ -40,11 +40,11 @@ const Notification = (props: { notification: (typeof appState.notifications.all)
 
   const content = (
     <>
-      <Typography variant="body1" color="ds.text_gray_medium">
+      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium"  textAlign="left">
         {notification.title}
       </Typography>
       {notification.body !== notification.title && (
-        <Typography variant="body1" color="ds.text_gray_medium">
+        <Typography variant="body1" color="ds.text_gray_medium"  textAlign="left">
           {notification.body}
         </Typography>
       )}
@@ -81,18 +81,16 @@ const NotificationList = () => {
                 <Icon.Notification />
               </Box>
               <Notification notification={notification} />
-              {!notification.read && (
-                <Box
-                  sx={{
-                    height: '6px',
-                    minWidth: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
-                    marginLeft: 'auto',
-                    marginBottom: 'auto',
-                  }}
-                />
-              )}
+              <Box
+                sx={{
+                  height: '6px',
+                  minWidth: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: notification.read ? 'inherit' :'ds.sys_magenta_500',
+                  marginLeft: 'auto',
+                  marginBottom: 'auto',
+                }}
+              />
             </Box>
           ))}
         </Stack>
