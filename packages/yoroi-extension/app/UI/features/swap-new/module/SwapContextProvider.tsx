@@ -54,13 +54,14 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const strings = useStrings();
 
   useEffect(() => {
-    const stakignAddr = stores.wallets.selected.stakingAddress;
+    if (!selectedWallet) return;
+    const stakignAddr = selectedWallet.stakingAddress;
     const skey = unwrapStakingKey(stakignAddr).to_keyhash()?.to_hex();
     if (skey == null) {
       throw new Error('Cannot get staking key from the wallet!');
     }
     setStakingKey(skey);
-  }, []);
+  }, [selectedWallet?.stakingAddress, selectedWallet?.publicDeriverId]);
 
   const swapManager = useMemo(() => {
     const storage = swapStorageMaker();
