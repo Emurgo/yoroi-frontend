@@ -9,12 +9,12 @@ const { logsBufferSize } = CONFIG.app;
 declare var chrome;
 export type LogContext = 'main' | 'background' | 'connector';
 
-export type LogEntry = {
-  timestamp: string;
-  level: 'debug' | 'info' | 'warn' | 'error';
-  message: string;
-  stack?: string | void;
-};
+export type LogEntry = {|
+  timestamp: string,
+  level: 'debug' | 'info' | 'warn' | 'error',
+  message: string,
+  stack?: string | void,
+|};
 
 const STORAGE_KEYS = {
   main: 'yoroi-logs-main',
@@ -65,7 +65,9 @@ export async function storeLog(context: LogContext, entry: LogEntry): Promise<vo
     }
 
     await new Promise<void>((resolve, reject) => {
-      storage.set({ [key]: logs }, () => {
+      const storageObj: { [string]: Array<LogEntry> } = {};
+      storageObj[key] = logs;
+      storage.set(storageObj, () => {
         if (chrome.runtime && chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
           return;
@@ -110,11 +112,11 @@ export async function getLogs(context: LogContext): Promise<Array<LogEntry>> {
 /**
  * Retrieve all logs from all contexts
  */
-export async function getAllLogs(): Promise<{
-  main: Array<LogEntry>;
-  background: Array<LogEntry>;
-  connector: Array<LogEntry>;
-}> {
+export async function getAllLogs(): Promise<{|
+  main: Array<LogEntry>,
+  background: Array<LogEntry>,
+  connector: Array<LogEntry>,
+|}> {
   const [main, background, connector] = await Promise.all([getLogs('main'), getLogs('background'), getLogs('connector')]);
 
   return { main, background, connector };
@@ -132,7 +134,9 @@ export async function clearLogs(context: LogContext): Promise<void> {
   try {
     const key = STORAGE_KEYS[context];
     await new Promise<void>((resolve, reject) => {
-      storage.set({ [key]: [] }, () => {
+      const storageObj: { [string]: Array<LogEntry> } = {};
+      storageObj[key] = [];
+      storage.set(storageObj, () => {
         if (chrome.runtime && chrome.runtime.lastError) {
           reject(chrome.runtime.lastError);
           return;

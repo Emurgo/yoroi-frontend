@@ -34,6 +34,7 @@ declare var browser;
     error: console.error.bind(console),
   };
 
+  // $FlowFixMe[cannot-write] - We need to override console methods for logging
   console.debug = (...args: Array<any>) => {
     originalConsole.debug(...args);
     storeLog('background', createLogEntry('debug', ...args)).catch(() => {
@@ -41,6 +42,7 @@ declare var browser;
     });
   };
 
+  // $FlowFixMe[cannot-write] - We need to override console methods for logging
   console.info = (...args: Array<any>) => {
     originalConsole.info(...args);
     storeLog('background', createLogEntry('info', ...args)).catch(() => {
@@ -48,6 +50,7 @@ declare var browser;
     });
   };
 
+  // $FlowFixMe[cannot-write] - We need to override console methods for logging
   console.warn = (...args: Array<any>) => {
     originalConsole.warn(...args);
     storeLog('background', createLogEntry('warn', ...args)).catch(() => {
@@ -55,6 +58,7 @@ declare var browser;
     });
   };
 
+  // $FlowFixMe[cannot-write] - We need to override console methods for logging
   console.error = (...args: Array<any>) => {
     originalConsole.error(...args);
     storeLog('background', createLogEntry('error', ...args)).catch(() => {
