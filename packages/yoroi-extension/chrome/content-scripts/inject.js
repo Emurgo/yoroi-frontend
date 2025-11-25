@@ -10,14 +10,21 @@ const API_REFUSED = -3;
 function isYoroiRelatedLog(...args) {
   // Check all arguments for yoroi-related patterns
   for (const arg of args) {
-    const argString =
-      typeof arg === 'string'
-        ? arg
-        : arg instanceof Error
-          ? arg.toString()
-          : typeof arg === 'object'
-            ? JSON.stringify(arg)
-            : String(arg);
+    let argString;
+    if (typeof arg === 'string') {
+      argString = arg;
+    } else if (arg instanceof Error) {
+      argString = arg.toString();
+    } else if (typeof arg === 'object') {
+      try {
+        argString = JSON.stringify(arg);
+      } catch (e) {
+        // Fallback to String() if JSON.stringify fails (circular references, etc.)
+        argString = String(arg);
+      }
+    } else {
+      argString = String(arg);
+    }
 
     // Check for yoroi-related patterns (case-insensitive)
     if (
