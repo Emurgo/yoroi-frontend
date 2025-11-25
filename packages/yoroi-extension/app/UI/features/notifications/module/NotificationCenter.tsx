@@ -33,7 +33,9 @@ const Notification = (props: { notification: (typeof appState.notifications.all)
     if (!notification.redirection) {
       throw new Error('unexpectedly missing redirection in notification data');
     }
-    navigateTo(notification.redirection);
+    notification.isExternalUrl
+      ? window.open(notification.redirection, '_blank', 'noopener,noreferrer')
+      : navigateTo(notification.redirection);
     setIsNotificationCenterOpen(false);
     call(appState.notifications.setRead, notification.fcmMessageId);
   };
