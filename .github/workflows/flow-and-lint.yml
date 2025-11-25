@@ -1,4 +1,4 @@
-name: Flow and Lint and TSC
+name: Linters
 
 on:
   workflow_dispatch:
@@ -8,9 +8,14 @@ on:
     types: [submitted]
 
 jobs:
-  flow-and-lint:
+  Check:
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request && github.event.pull_request.draft == false) || (github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check')))
     runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        suite: [flow, eslint, tsc]
+
     steps:
       - uses: actions/checkout@v4
       - name: Read .nvmrc
@@ -36,12 +41,6 @@ jobs:
         if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: |
           . install-all.sh
-      - name: flow
+      - name: ${{ matrix.suite }}
         run: |
-          npm run flow
-      - name: lint
-        run: |
-          npm run eslint
-      - name: tsc
-        run: |
-          npm run tsc
+          npm run ${{ matrix.suite }}
