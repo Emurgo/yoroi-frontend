@@ -9,7 +9,7 @@ type Props = {|
   txSubmitErrorState: State<?Error>,
   onTryAgain: void => void,
   onSuccess: void => void,
-  onDownloadLogs: void => void,
+  onDownloadLogs: void => Promise<void>,
 |};
 
 export default function TxSubmittedStep({ txSubmitErrorState, onTryAgain, onSuccess, onDownloadLogs }: Props): React$Node {

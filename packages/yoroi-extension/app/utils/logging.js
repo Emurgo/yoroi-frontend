@@ -1,3 +1,4 @@
+//@flow
 import moment from 'moment';
 import { inspect } from 'util';
 import type { ConfigType } from '../../config/config-types';
@@ -63,7 +64,7 @@ export const silenceLogsForTesting = () => {
   Logger.warn = () => {};
 };
 
-export const downloadLogs = async (publicKey?: string) => {
+export const downloadLogs = async (publicKey?: string): Promise<void> => {
   try {
     const header = generateLogHeader(publicKey);
     const timestamp = moment().format('YYYY-MM-DDTHH-mm-ss');

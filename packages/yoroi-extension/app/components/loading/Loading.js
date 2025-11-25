@@ -23,7 +23,7 @@ type Props = {|
   +hasLoadedCurrentLocale: boolean,
   +error: ?LocalizableError,
   +onExternalLinkClick: MouseEvent => void,
-  +downloadLogs: void => void,
+  +downloadLogs: void => Promise<void>,
 |};
 
 @observer

@@ -191,6 +191,7 @@ export function createLogEntry(level: 'debug' | 'info' | 'warn' | 'error', ...ar
       try {
         return JSON.stringify(arg, null, 2);
       } catch (e) {
+        originalConsole.error('Failed to stringify object:', arg, e);
         return String(arg);
       }
     }
