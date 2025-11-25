@@ -49,15 +49,6 @@ async function compress(isCrxBuild) {
   const archiveBuffer = await crx.loadContents();
   fs.writeFileSync(`${name}.zip`, archiveBuffer);
 
-  // xpi files are used for Firefox and are simply a renaming of zip
-  fs.copyFile(
-    `${name}.zip`,
-    `${name}.xpi`,
-    0, // flag
-    err => {
-      if (err) throw err;
-    }
-  );
   if (isCrxBuild) {
     const crxBuffer = await crx.pack(archiveBuffer);
     // const updateXML = crx.generateUpdateXML();
