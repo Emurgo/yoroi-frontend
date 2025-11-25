@@ -1,4 +1,4 @@
-name: Flow and Lint and TSC
+name: Linters
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
     types: [submitted]
 
 jobs:
-  Code_checks:
+  Check:
     if: github.event_name == 'workflow_dispatch' || (github.event.pull_request && github.event.pull_request.draft == false) || (github.event.review && (github.event.review.state == 'approved' || contains(github.event.review.body, '/check') || contains(github.event.review.body, '/release-check')))
     runs-on: ubuntu-latest
     continue-on-error: true
