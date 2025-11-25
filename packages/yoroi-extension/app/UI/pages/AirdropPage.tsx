@@ -60,12 +60,10 @@ const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const CLAIM_ENDPOINT_PREPROD = 'https://external-claim.gd.midnighttge.io';
 const THAW_ENDPOINT_MAINNET = '';
 const THAW_ENDPOINT_PREPROD = '';
-const COLLATERAL_AMOUNT = 2000000;
 
-export default function AirdropPage({ stores }: Readonly<Props>) {
+
+function AirdropPage({ stores }: Readonly<Props>) {
   const intl = useIntl();
-
-
   const wallet = stores.wallets.selectedOrFail;
 
   const [queryingAlloc, setQueryingAlloc] = useState(true);
@@ -154,6 +152,54 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
     </div>
   );
 
+  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
+  const onReorg = async (signRequest: any) => {
+    await new Promise((resolve) => {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: async (password) => {
+          try {
+            startLoadingTxReview();
+
+            await stores.transactionProcessingStore.adaSendAndRefresh({
+              wallet,
+              signRequest,
+              password,
+              callback: closeTxReviewModal,
+            });
+          } catch (error) {
+            console.log('Send Sign Error', error);
+            let transactionResult;
+            if (isTxCancelledByUser(error)) {
+              transactionResult = TransactionResult.CANCEL;
+            } else if (isCardanoAppNotRunning(error)) {
+              transactionResult = TransactionResult.NO_CARDANO_RUNNING;
+            } else {
+              transactionResult = TransactionResult.FAIL;
+            }
+            showTxResultModal(transactionResult);
+          }
+          resolve();
+        },
+        operations: {
+          kind: 'send',
+        },
+        unsignedTx: signRequest.unsignedTx,
+      });
+    });
+  };
+
+  return (
+    <>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
+      {redeemingAddr && (<Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} />)}
+    </>
+  );
+}
+
+export default function AirDropPageWrap({ stores }: Readonly<Props>) {
+  const intl = useIntl();
+
   return (
     <TopBarLayout
       banner={<BannerContainer stores={stores} />}
@@ -167,60 +213,10 @@ export default function AirdropPage({ stores }: Readonly<Props>) {
         <ModalManager />
           <ReviewTxProvider stores={stores} intl={intl}>
             <ReviewTxModal />
-            <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
-            {/*<Collateral wallet={wallet} stores={stores} />*/}
-            {redeemingAddr && (<Redeem address={redeemingAddr} onClose={closeRedeem} />)}
+            <AirdropPage stores={stores}/>
           </ReviewTxProvider>
       </ModalProvider>
     </TopBarLayout>
   );
-}
 
-function Collateral({ wallet, stores }) {
-  const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
-
-  const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState(null);
-  useEffect(() => {
-    (async () => {
-      const getCollateralUtxosResult = await getCollateralUtxos(COLLATERAL_AMOUNT, wallet);
-      setGetCollateralUtxosResult(getCollateralUtxosResult);
-      const { utxosToUse, reorgTargetAmount } = getCollateralUtxosResult;
-      if (reorgTargetAmount) {
-        const signRequest = await createReorgTransaction(wallet, reorgTargetAmount);
-
-        openTxReviewModal({
-          modalView: 'transactionReview',
-          submitTx: async (password) => {
-            try {
-              startLoadingTxReview();
-
-              await stores.transactionProcessingStore.adaSendAndRefresh({
-                wallet,
-                signRequest,
-                password,
-                callback: closeTxReviewModal,
-              });
-            } catch (error) {
-              console.log('Send Sign Error', error);
-              let transactionResult;
-              if (isTxCancelledByUser(error)) {
-                transactionResult = TransactionResult.CANCEL;
-              } else if (isCardanoAppNotRunning(error)) {
-                transactionResult = TransactionResult.NO_CARDANO_RUNNING;
-              } else {
-                transactionResult = TransactionResult.FAIL;
-              }
-              showTxResultModal(transactionResult);
-            }
-          },
-          operations: {
-            kind: 'send',
-          },
-          unsignedTx: signRequest.unsignedTx,
-        });
-      }
-    })().catch(console.error);
-  }, [wallet.publicDeriverId]);
-
-  return null;
 }

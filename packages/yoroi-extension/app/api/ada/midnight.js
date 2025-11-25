@@ -19,6 +19,7 @@ import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import { asAddressedUtxo } from './transactions/utils';
 import LocalStorageApi from '../localStorage';
+import { NotEnoughMoneyToSendError } from '../common/errors';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -212,7 +213,8 @@ export async function scanForOriginalDestAddress(
   } else {
     const usedAddrs = wallet.allAddresses.utxoAddresses
           .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
+          .map(addr => addressHexToBech32(addr.address.Hash));
     const unusedAddr1 = addressHexToBech32(
       forceNonNull(
         wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
@@ -251,7 +253,8 @@ export async function scanForMineDestAddress(
 ): Promise<Array<{| address: string, amount: string |}>> {
   const usedAddrs = wallet.allAddresses.utxoAddresses
         .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-        .sort((addr1, addr2) => addr2.path[4] - addr1.path[4]);
+        .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
+        .map(addr => addressHexToBech32(addr.address.Hash));
   const unusedAddr1 = addressHexToBech32(
     forceNonNull(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
@@ -270,9 +273,9 @@ export async function scanForMineDestAddress(
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 const MAX_COLLATERAL_COUNT: number = 3;
 
-export async function getCollateralUtxos(
-  requiredAmount: string,
+async function pickCollateralUtxos(
   wallet: WalletState,
+  requiredAmount: string,
 ): Promise<{| utxosToUse: Array<CardanoAddressedUtxo>, reorgTargetAmount: ?string |}> {
   const required = new BigNumber(requiredAmount);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
@@ -333,7 +336,7 @@ export async function getCollateralUtxos(
   };
 }
 
-export async function createReorgTransaction(
+ async function createReorgTransaction(
   wallet: WalletState,
   reorgTargetAmount: string,
 ): Promise<HaskellShelleyTxSignRequest> {
@@ -356,6 +359,49 @@ export async function createReorgTransaction(
     protocolParameters
   );
   return unsignedTx;
+}
+
+type GetCollateralUtxosResponse = {|
+  state: 'exist',
+  utxos:Array<CardanoAddressedUtxo>
+|} | {|
+  state: 'need-reorg',
+  signRequest: HaskellShelleyTxSignRequest,
+|} | {|
+  state: 'not-enough'
+|} | {|
+  state: 'error',
+  message: string
+|};
+
+export async function getCollateralUtxos(
+  wallet: WalletState,
+  amount: string,
+): Promise<HaskellShelleyTxSignRequest> {
+  const getCollateralUtxosResult = await pickCollateralUtxos(wallet, amount);
+  if (getCollateralUtxosResult.utxosToUse.length > 0) {
+    return {
+      state: 'exist',
+      utxos: getCollateralUtxosResult.utxosToUse
+    };
+  }
+  try {
+    const signRequest = await createReorgTransaction(wallet, amount);
+    return {
+      state: 'need-reorg',
+      signRequest,
+    };
+  } catch (error) {
+    if (error instanceof NotEnoughMoneyToSendError) {
+      return {
+        state: 'not-enough',
+      };
+    }
+    return {
+      state: 'error',
+      message: error.message
+    };
+  }
 }
 
 async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Promise<number> {
