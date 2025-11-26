@@ -19,7 +19,7 @@ const messages = defineMessages({
   },
 });
 
-const buttonText = environment.isDev() || environment.isNightly() ? globalMessages.buySellAda : globalMessages.buyAda;
+const buttonText = environment.isDev() || environment.isNightly() || environment.isTest() ? globalMessages.buySellAda : globalMessages.buyAda;
 
 @observer
 export default class BuySellAdaButton extends Component<Props> {
@@ -37,6 +37,7 @@ export default class BuySellAdaButton extends Component<Props> {
         }}
         variant="secondary"
         onClick={() => this.props.onBuySellClick()}
+        id='topBar-buySell-button'
       >
         {intl.formatMessage(this.props.isTestnet ? messages.addTestAda : buttonText)}
       </Button>

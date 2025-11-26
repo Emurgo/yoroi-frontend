@@ -182,8 +182,10 @@ const ErrorPopoutContent = styled(Box)({
 
 const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
 const URL_GENERATION_TIMEOUT = 30 * 1000;
+const isNotProd = () => environment.isDev() || environment.isNightly() || environment.isTest();
 
-const dialogTitle = environment.isDev() || environment.isNightly() ? messages.dialogTitle : globalMessages.buyAda;
+const dialogTitle = isNotProd() ? messages.dialogTitle : globalMessages.buyAda;
+const idPathLocation = 'buySell';
 
 @observer
 export default class BuySellDialog extends Component<Props, State> {
@@ -387,6 +389,7 @@ export default class BuySellDialog extends Component<Props, State> {
           error={state.inputError !== null}
           helperText={helperText}
           autoFocus
+          id={idPathLocation + '-adaAmount-input'}
         />
 
         <ProviderRow>
@@ -394,10 +397,20 @@ export default class BuySellDialog extends Component<Props, State> {
             <img src={providerLogo} alt="" />
           </div>
           <div className="provider-name-fee">
-            <Typography variant="body2" color="ds.text_gray_medium" className="provider-name">
+            <Typography
+              variant="body2"
+              color="ds.text_gray_medium"
+              className="provider-name"
+              id={idPathLocation + '-providerName-text'}
+            >
               {providerName}
             </Typography>
-            <Typography variant="body2" color="ds.text_gray_medium" className="provider-fee">
+            <Typography
+              variant="body2"
+              color="ds.text_gray_medium"
+              className="provider-fee"
+              id={idPathLocation + '-providerFee-text'}
+            >
               {state.isBuying ? intl.formatMessage(messages.buyProviderFee) : intl.formatMessage(messages.sellProviderFee)}
             </Typography>
           </div>
@@ -429,6 +442,7 @@ export default class BuySellDialog extends Component<Props, State> {
           closeOnOverlayClick={false}
           closeButton={<DialogCloseButton />}
           onClose={abortUrlGeneration}
+          id={idPathLocation}
         >
           <ErrorPopoutContent>
             <div className="content">
@@ -453,6 +467,7 @@ export default class BuySellDialog extends Component<Props, State> {
           closeOnOverlayClick
           closeButton={<DialogCloseButton />}
           onClose={dismissUrlGenerationError}
+          id={idPathLocation}
         >
           <ErrorPopoutContent>
             <div className="content">
@@ -481,8 +496,9 @@ export default class BuySellDialog extends Component<Props, State> {
         ]}
         styleOverride={{ width: '648px' }}
         styleFlags={{ contentNoTopPadding: true }}
+        id={idPathLocation}
       >
-        {(environment.isDev() || environment.isNightly()) && (
+        {isNotProd() && (
           <Tabs
             value={state.isBuying ? 0 : 1}
             onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
@@ -494,8 +510,16 @@ export default class BuySellDialog extends Component<Props, State> {
               boxShadow: 'none',
             }}
           >
-            <STabItem disableRipple label={intl.formatMessage(globalMessages.buyAda)} />
-            <STabItem disableRipple label={intl.formatMessage(globalMessages.sellAda)} />
+            <STabItem
+              disableRipple
+              label={intl.formatMessage(globalMessages.buyAda)}
+              id={idPathLocation + '-selectBuyAda-button'}
+            />
+            <STabItem
+              disableRipple
+              label={intl.formatMessage(globalMessages.sellAda)}
+              id={idPathLocation + '-selectSellAda-button'}
+            />
           </Tabs>
         )}
         {this.renderBuySell()}
