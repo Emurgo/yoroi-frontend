@@ -99,7 +99,7 @@ class BuySell extends BasePage {
     const [name, feeRawText] = await Promise.all([providerNamePromise, providerFeePromise]);
     const fee = Number(feeRawText.split(' ')[0].slice(0, -1));
 
-    return {name, fee};
+    return { name, fee };
   }
   async selectBuyTab() {
     this.logger.info(`BuySell::selectBuyTab is called`);
