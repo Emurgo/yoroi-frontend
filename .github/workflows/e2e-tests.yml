@@ -68,7 +68,6 @@ jobs:
           name: builtApp
           path: |
             ./packages/yoroi-extension/Yoroi-test.crx
-            ./packages/yoroi-extension/Yoroi.xpi
           retention-days: 1
           overwrite: true
 

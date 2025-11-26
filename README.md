@@ -2,9 +2,9 @@
 
 ### Download
 
-| Firefox | Chrome | Edge |
-|---|----|----|
-| [<img src="https://img.icons8.com/external-those-icons-flat-those-icons/96/external-Firefox-logos-and-brands-those-icons-flat-those-icons.png" width="50">](https://addons.mozilla.org/en-US/firefox/addon/yoroi/) | [<img src="https://img.icons8.com/fluency/96/chrome.png" width="60">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb) | [<img src="https://img.icons8.com/color/64/ms-edge-new.png" width="60">](https://microsoftedge.microsoft.com/addons/detail/yoroi/akoiaibnepcedcplijmiamnaigbepmcb) |
+| Chrome | Edge |
+|----|----|
+| [<img src="https://img.icons8.com/fluency/96/chrome.png" width="60">](https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb) | [<img src="https://img.icons8.com/color/64/ms-edge-new.png" width="60">](https://microsoftedge.microsoft.com/addons/detail/yoroi/akoiaibnepcedcplijmiamnaigbepmcb) |
 
 Looking for Yoroi Mobile? See [here](https://github.com/Emurgo/yoroi-mobile)
 
