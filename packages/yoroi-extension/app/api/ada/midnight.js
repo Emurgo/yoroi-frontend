@@ -272,12 +272,14 @@ export async function scanForMineDestAddress(
 
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 const MAX_COLLATERAL_COUNT: number = 3;
+const COLLATERAL_AMOUNT = '2000000';
+const FUNDING_AMOUNT = '2000000';
 
 async function pickCollateralUtxos(
   wallet: WalletState,
-  requiredAmount: string,
-): Promise<{| utxosToUse: Array<CardanoAddressedUtxo>, reorgTargetAmount: ?string |}> {
-  const required = new BigNumber(requiredAmount);
+): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxoId: string |}> {
+  debugger
+  const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
   const maxViableUtxoAmount = required.plus(MAX_PER_UTXO_SURPLUS);
@@ -295,10 +297,23 @@ async function pickCollateralUtxos(
     })),
     addressing: utxo.addressing,
   }));
-  const utxosToConsider = (
+  let utxosToConsider = (
     await adaApi._addressedUtxosWithSubmittedTxs(utxos, wallet.publicDeriverId, wallet.allUtxoAddresses, submittedTxs)
-  ).filter(utxo => utxo.assets.length === 0 && new BigNumber(utxo.amount).lt(maxViableUtxoAmount));
+  ).filter(utxo => utxo.assets.length === 0);
   utxosToConsider.sort((utxo1, utxo2) => new BigNumber(utxo1.amount).comparedTo(utxo2.amount));
+  let fundingUtxoId = null;
+  for (let i = 0; i < utxosToConsider.length; i++) {
+    const utxo = utxosToConsider[i];
+    if (new BigNumber(utxo.amount).gte(FUNDING_AMOUNT)) {
+      fundingUtxoId = utxo.utxo_id;
+      utxosToConsider.splice(i, 1);
+      break;
+    }
+  }
+  if (!fundingUtxoId) {
+    return null;
+  }
+  utxosToConsider = utxosToConsider.filter(utxo => new BigNumber(utxo.amount).lt(maxViableUtxoAmount));
   const utxosToUse = [];
   let sum = new BigNumber('0');
   let enough = false;
@@ -327,18 +342,14 @@ async function pickCollateralUtxos(
         break;
       }
     }
-    return { utxosToUse, reorgTargetAmount: null };
+    return { utxosToUse, fundingUtxoId };
   }
 
-  return {
-    utxosToUse,
-    reorgTargetAmount: required.minus(sum).toString(),
-  };
+  return null;
 }
 
- async function createReorgTransaction(
+async function createReorgTransaction(
   wallet: WalletState,
-  reorgTargetAmount: string,
 ): Promise<HaskellShelleyTxSignRequest> {
   const addressedUtxos = asAddressedUtxo(wallet.utxos);
   const submittedTxs = wallet.submittedTransactions;
@@ -352,7 +363,7 @@ async function pickCollateralUtxos(
     wallet.allUtxoAddresses,
     wallet.receiveAddress,
     [],
-    reorgTargetAmount,
+    COLLATERAL_AMOUNT,
     addressedUtxos,
     submittedTxs,
     firstExternalAddress.address,
@@ -363,7 +374,8 @@ async function pickCollateralUtxos(
 
 type GetCollateralUtxosResponse = {|
   state: 'exist',
-  utxos:Array<CardanoAddressedUtxo>
+  collateralUtxoIds: Array<string>,
+  fundingUtxoId: string,
 |} | {|
   state: 'need-reorg',
   signRequest: HaskellShelleyTxSignRequest,
@@ -379,10 +391,11 @@ export async function getCollateralUtxos(
   amount: string,
 ): Promise<HaskellShelleyTxSignRequest> {
   const getCollateralUtxosResult = await pickCollateralUtxos(wallet, amount);
-  if (getCollateralUtxosResult.utxosToUse.length > 0) {
+  if (getCollateralUtxosResult) {
     return {
       state: 'exist',
-      utxos: getCollateralUtxosResult.utxosToUse
+      collateralUtxoIds: getCollateralUtxosResult.utxosToUse.map(utxo => utxo.utxo_id),
+      fundingUtxoId: getCollateralUtxosResult.fundingUtxoId,
     };
   }
   try {
@@ -391,6 +404,7 @@ export async function getCollateralUtxos(
       state: 'need-reorg',
       signRequest,
     };
+    // after submitting this tx, calling `getCollateralUtxos` again, `pickCollateralUtxos` should succeed
   } catch (error) {
     if (error instanceof NotEnoughMoneyToSendError) {
       return {

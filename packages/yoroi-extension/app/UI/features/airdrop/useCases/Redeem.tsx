@@ -5,15 +5,13 @@ import { useEffect, useState } from 'react';
 import globalMessages from '../../../../i18n/global-messages';
 import { getCollateralUtxos } from '../../../../api/ada/midnight';
 
-const COLLATERAL_AMOUNT = 2000000;
-
 export default function Redeem(
   props: { address: string; onClose: () => void; onReorg: (signRequest: any) => void }
 ) {
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState(null);
 
   const updateCollateralUtxos = async () => {
-    const result = await getCollateralUtxos(props.wallet, COLLATERAL_AMOUNT);
+    const result = await getCollateralUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
   };
 
@@ -26,7 +24,7 @@ export default function Redeem(
   if (getCollateralUtxosResult === null) {
     content = '...';
   } else if (getCollateralUtxosResult.state === 'exist') {
-    content = 'claim';
+    content = JSON.stringify(getCollateralUtxosResult, null, 2);
   } else if (getCollateralUtxosResult.state === 'need-reorg') {
     content = (
       <Box>
