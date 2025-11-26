@@ -38,5 +38,4 @@ export default (isDebug: boolean, shouldInjectConnector: boolean): * => buildMan
   geckoKey: '{530f7c6c-6077-4703-8f71-cb368c663e35}',
   enableProtocolHandlers: true,
   shouldInjectConnector,
-  isFirefox: false
 });
