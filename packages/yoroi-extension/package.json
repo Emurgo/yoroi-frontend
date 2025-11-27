@@ -191,7 +191,7 @@
     "firebase": "^11.9.1",
     "immer": "^10.1.1",
     "jdenticon": "3.2.0",
-    "jszip": "^3.10.1",
+    "jszip": "3.10.1",
     "legacySwap": "npm:@yoroi/swap@1.5.2",
     "lodash": "4.17.21",
     "lottie-react": "2.4.0",
