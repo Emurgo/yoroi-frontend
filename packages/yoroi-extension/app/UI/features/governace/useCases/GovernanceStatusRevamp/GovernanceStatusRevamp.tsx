@@ -4,6 +4,7 @@ import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -64,9 +65,35 @@ const TextContent = styled(Box)(() => ({
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  // For now we keep it "idle"
-  const cardState: GovernanceStatusState = GOVERNANCE_STATUS.IDLE;
 
+  const {
+    governanceStatus,
+    governanceManager,
+    governanceVoteChanged,
+    createDrepDelegationTransaction,
+    walletAdaBalance,
+    triggerBuySellAdaDialog,
+    submitedTransactions,
+    governanceVote,
+    signDelegationTransaction,
+    selectedWallet,
+    networkId,
+  } = useGovernance();
+
+  console.log('governanceStatus', governanceStatus);
+  // For now we keep it "idle"
+  const getGovernanceStatusState = () => {
+    if (governanceStatus.status === 'none' && governanceStatus.drep === null) {
+      return GOVERNANCE_STATUS.IDLE;
+    }
+    if (governanceStatus.status === 'delegate' && governanceStatus.drep !== null) {
+      return GOVERNANCE_STATUS.DELEGATED;
+    }
+    return GOVERNANCE_STATUS.IDLE; // add loading here later
+  };
+  const cardState: GovernanceStatusState = getGovernanceStatusState();
+
+  console.log('@@@cardState', cardState);
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
   };
