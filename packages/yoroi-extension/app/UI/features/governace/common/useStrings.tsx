@@ -180,7 +180,7 @@ export const messages = Object.freeze(
     },
     learnMoreLabel: {
       id: 'governance.learnMoreLabel',
-      defaultMessage: '!!!Browse additional delegation options or choose to abstain from voting',
+      defaultMessage: '!!!Learn more about delegation options',
     },
     yoroiDRep: {
       id: 'governance.yoroiDRep',
@@ -232,6 +232,10 @@ export const messages = Object.freeze(
     chooseNoConfidence: {
       id: 'governance.chooseNoConfidence',
       defaultMessage: '!!!You are expressing a lack of trust for all proposals now and in the future.',
+    },
+    changeToDrep: {
+      id: 'governance.changeToDrep',
+      defaultMessage: '!!!Change to DRep',
     },
   })
 );
@@ -297,5 +301,6 @@ export const useStrings = () => {
     designatedSomeoneElse: intl.formatMessage(messages.designatedSomeoneElse),
     chooseAbstain: intl.formatMessage(messages.chooseAbstain),
     chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
+    changeToDrep: intl.formatMessage(messages.changeToDrep),
   }).current;
 };

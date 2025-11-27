@@ -51,7 +51,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const statusVariant: 'active' | 'delegated' | 'disabled' =
     state === 'delegated' ? 'delegated' : state === 'disabled' ? 'disabled' : 'active';
 
-  const primaryButtonLabel = isDelegated ? 'CHANGE DELEGATION' : 'DELEGATE';
+  const primaryButtonLabel = isDelegated ? strings.changeToDrep : strings.delegateLabel;
 
   return (
     <Root state={state}>
