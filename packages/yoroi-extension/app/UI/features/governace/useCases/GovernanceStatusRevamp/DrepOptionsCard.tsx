@@ -40,7 +40,17 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
             <Button variant="primary" onClick={onAction} fullWidth>
               {buttonText}
             </Button>
-            {onViewDetails && <Link textAlign="center">{strings.yoroiVotingRecord}</Link>}
+            {onViewDetails && (
+              <Link
+                textAlign="center"
+                onClick={e => {
+                  e.preventDefault();
+                  onViewDetails();
+                }}
+              >
+                {strings.yoroiVotingRecord}
+              </Link>
+            )}
           </Stack>
         ) : (
           <Button variant="outlined" onClick={onAction} fullWidth>
