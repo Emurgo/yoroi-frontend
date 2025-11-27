@@ -1377,7 +1377,7 @@
   "governance.designatedSomeoneElse": "You are designating someone else to cast your vote on your behalf for all proposals now and in the future.",
   "governance.chooseAbstain": "Choose to abstain from voting while still participating in the governance process and earning rewards.",
   "governance.chooseNoConfidence": "You are expressing a lack of trust for all proposals now and in the future.",
-  "governance.changeToDrep": "change to drep",
+  "governance.changeToDrep": "Change to Drep",
   "portfolio.main.header.text": "Tokens",
   "portfolio.main.search.text": "Search by asset name or ID",
   "portfolio.common.soonAvailable": "Soon available",
