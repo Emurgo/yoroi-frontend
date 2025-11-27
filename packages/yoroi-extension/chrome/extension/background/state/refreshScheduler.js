@@ -78,7 +78,10 @@ export async function syncWallet(publicDeriver: PublicDeriver<>, logInfo: string
 async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Promise<void> {
   const publicDeriverId = publicDeriver.getPublicDeriverId();
   console.debug(
-    `Syncing wallet ID ${publicDeriverId} name "${(await publicDeriver.getParent().getFullConceptualWalletInfo()).Name}" for ${logInfo}.`
+    'Syncing wallet ID %s name "%s" for %s.',
+    publicDeriverId,
+    (await publicDeriver.getParent().getFullConceptualWalletInfo()).Name,
+    logInfo
   );
 
   const lastSyncInfo = await publicDeriver.getLastSyncInfo();
@@ -151,7 +154,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
     if (submittedTransactionsChanged) {
       persistSubmittedTransactions(submittedTransactions);
     }
-    console.debug(`Syncing wallet ID ${publicDeriverId} finished.`);
+    console.debug('Syncing wallet %s finished.', publicDeriverId);
     emitUpdate(publicDeriverId, false, (await getWalletsState(publicDeriverId))[0], newTxs);
 
     const networkId = publicDeriver.getParent().getNetworkInfo().NetworkId;
@@ -162,7 +165,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
       await updateProtocolParametersCacheFromNetwork(networkId, epoch);
     }
   } catch (error) {
-    console.error(`Syncing wallet ID ${publicDeriverId} failed: ${error}`);
+    console.error(`Syncing wallet ID ${publicDeriverId} failed:`, error);
   } finally {
     refreshingWalletIdSet.delete(publicDeriverId);
   }
