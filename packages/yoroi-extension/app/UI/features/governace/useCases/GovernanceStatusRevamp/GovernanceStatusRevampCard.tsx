@@ -1,10 +1,10 @@
 // features/governace/useCases/GovernanceStatusRevamp/GovernanceStatusCard.tsx
 import React from 'react';
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography, Button, IconButton, Link, Stack } from '@mui/material';
 import { Icon } from '../../../../components';
-
-export type GovernanceStatusState = 'idle' | 'hover' | 'delegated' | 'disabled';
+import { useStrings } from '../../common/useStrings';
+import { GovernanceStatusState } from '../../common/constants';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
@@ -20,7 +20,6 @@ interface GovernanceStatusCardProps {
 export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
   state,
   drepId,
-  votingPowerLabel = 'Voting Power',
   delegatedAmountLabel = 'Delegated Amount',
   delegatedAmountValue,
   onDelegateClick,
@@ -28,6 +27,8 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 }) => {
   const isDisabled = state === 'disabled';
   const isDelegated = state === 'delegated';
+  const strings = useStrings();
+  const theme: any = useTheme();
 
   const handleCopy = () => {
     try {
@@ -46,6 +47,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     onDetailsClick?.();
   };
 
+  // Will add this as constants later on when adding implementation with backend
   const statusVariant: 'active' | 'delegated' | 'disabled' =
     state === 'delegated' ? 'delegated' : state === 'disabled' ? 'disabled' : 'active';
 
@@ -53,32 +55,28 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 
   return (
     <Root state={state}>
-      {/* title with avatar */}
       <TitleRow>
         <Avatar state={state}>
-          <Icon.YoroiLogo fill="white" />
+          <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />
         </Avatar>
 
         <Typography variant="h5" color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
-          Yoroi DRep
+          {strings.yoroiDRep}
         </Typography>
       </TitleRow>
 
-      {/* description */}
       <Typography variant="body1" color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
-        Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.{' '}
+        {strings.yoroiDRepInfo}
       </Typography>
 
-      {/* group of items */}
       <ItemsGroup>
-        {/* Item: ID */}
         <ItemRow>
           <LeftPart>
-            <Label disabledColor={isDisabled}>ID</Label>
+            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>ID</Typography>
           </LeftPart>
 
           <RightPart>
-            <Value disabledColor={isDisabled}>{drepId}</Value>
+            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>{drepId}</Typography>
             <CopyIconButton onClick={handleCopy} disabled={isDisabled}>
               <Icon.Copy />
             </CopyIconButton>
@@ -87,25 +85,26 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 
         <ItemRow alignCenter>
           <LeftPart>
-            <Label disabledColor={isDisabled}>DRep Status</Label>
+            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.drepStatus}</Typography>
           </LeftPart>
 
           <RightPart>
             <StatusBadge variant={statusVariant}>
-              <BadgeText>{isDisabled ? 'Paused' : 'Active'}</BadgeText>
+              <Typography variant="body2" color="ds.gray_min">
+                {isDisabled ? 'Paused' : 'Active'}
+              </Typography>
             </StatusBadge>
           </RightPart>
         </ItemRow>
 
-        {/* Item: delegated amount (only shown in delegated) */}
         {isDelegated && (
           <ItemRow>
             <LeftPart>
-              <Label disabledColor={isDisabled}>{delegatedAmountLabel}</Label>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{delegatedAmountLabel}</Typography>
             </LeftPart>
 
             <RightPart>
-              <Value disabledColor={isDisabled}>{delegatedAmountValue}</Value>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>{delegatedAmountValue}</Typography>
             </RightPart>
           </ItemRow>
         )}
@@ -119,7 +118,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 
         <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
           <Link onClick={handleDetailsClick}>
-            <Typography variant="body1">See Yoroi’s voting records</Typography>
+            <Typography variant="body1">{strings.yoroiVotingRecord}</Typography>
           </Link>
         </Stack>
       </CtaSet>
@@ -179,7 +178,7 @@ const TitleRow = styled(Box)(() => ({
   height: '48px',
 }));
 
-const Avatar = styled(Box)<{ state: GovernanceStatusState }>(({ state }) => ({
+const Avatar = styled(Box)<{ state: GovernanceStatusState }>(({ state, theme }: any) => ({
   width: '48px',
   height: '48px',
   borderRadius: '1200px',
@@ -187,7 +186,7 @@ const Avatar = styled(Box)<{ state: GovernanceStatusState }>(({ state }) => ({
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  background: state === 'disabled' ? '#6B7384' : '#4B6DDE',
+  background: state === 'disabled' ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
 }));
 
 const ItemsGroup = styled(Box)(() => ({
@@ -230,37 +229,13 @@ const RightPart = styled(Box)(() => ({
   flexShrink: 0,
 }));
 
-const Label = styled(Typography)<{ disabledColor?: boolean }>(({ disabledColor }) => ({
-  fontFamily: 'Rubik',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: '16px',
-  lineHeight: '24px',
-  textAlign: 'right',
-  color: disabledColor ? '#6B7384' : '#6B7384',
-}));
-
-const Value = styled(Typography)<{ disabledColor?: boolean }>(({ disabledColor }) => ({
-  fontFamily: 'Rubik',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: '16px',
-  lineHeight: '24px',
-  textAlign: 'right',
-  color: disabledColor ? '#6B7384' : '#242838',
-  maxWidth: '505px',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-}));
-
 const CopyIconButton = styled(IconButton)(() => ({
   width: '24px',
   height: '24px',
   padding: '0px',
 }));
 
-const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant }) => ({
+const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant, theme }: any) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',
@@ -269,18 +244,12 @@ const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }
   width: '58px',
   height: '30px',
   borderRadius: '1200px',
-  background: variant === 'active' ? '#08C29D' : variant === 'delegated' ? '#6B7384' : '#6B7384',
-}));
-
-const BadgeText = styled(Typography)(() => ({
-  width: '42px',
-  height: '22px',
-  fontFamily: 'Rubik',
-  fontStyle: 'normal',
-  fontWeight: 400,
-  fontSize: '14px',
-  lineHeight: '22px',
-  color: '#FFFFFF',
+  background:
+    variant === 'active'
+      ? theme.palette.ds.secondary_600
+      : variant === 'delegated'
+        ? theme.palette.ds.gray_600
+        : theme.palette.ds.gray_400,
 }));
 
 const CtaSet = styled(Box)(() => ({
@@ -293,11 +262,11 @@ const CtaSet = styled(Box)(() => ({
   height: '72px',
 }));
 
-const PrimaryButton = styled(Button)<{ disabledVisual?: boolean }>(({ disabledVisual }) => ({
-  background: disabledVisual ? '#6B7384' : '#4B6DDE',
+const PrimaryButton = styled(Button)<{ disabledVisual?: boolean }>(({ disabledVisual, theme }: any) => ({
+  background: disabledVisual ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
   width: '100%',
   '&:hover': {
-    background: disabledVisual ? '#6B7384' : '#4B6DDE',
+    background: disabledVisual ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
     opacity: disabledVisual ? 1 : 0.9,
   },
 }));

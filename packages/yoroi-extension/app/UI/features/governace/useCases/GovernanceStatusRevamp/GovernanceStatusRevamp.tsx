@@ -1,10 +1,9 @@
-// features/governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevamp.tsx
-import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
-import { GovernanceStatusRevampCard, GovernanceStatusState } from './GovernanceStatusRevampCard';
+import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
+import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -65,8 +64,8 @@ const TextContent = styled(Box)(() => ({
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  // For now we keep it "idle"; you I can wire this from props/stores
-  const cardState: GovernanceStatusState = 'idle';
+  // For now we keep it "idle"
+  const cardState: GovernanceStatusState = GOVERNANCE_STATUS.IDLE;
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
@@ -83,7 +82,6 @@ export const GovernanceStatusRevamp = () => {
         </Typography>
       </TitleSection>
 
-      {/* Cards */}
       <CardsContainer>
         <GovernanceStatusRevampCard
           state={cardState}

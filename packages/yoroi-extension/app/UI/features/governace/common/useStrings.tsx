@@ -182,6 +182,57 @@ export const messages = Object.freeze(
       id: 'governance.learnMoreLabel',
       defaultMessage: '!!!Browse additional delegation options or choose to abstain from voting',
     },
+    yoroiDRep: {
+      id: 'governance.yoroiDRep',
+      defaultMessage: '!!!Yoroi DRep',
+    },
+    yoroiDRepInfo: {
+      id: 'governance.yoroiDRepInfo',
+      defaultMessage:
+        '!!!Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.',
+    },
+    drepStatus: {
+      id: 'governance.drepStatus',
+      defaultMessage: '!!!DRep Status',
+    },
+    yoroiVotingRecord: {
+      id: 'governance.yoroiVotingRecord',
+      defaultMessage: '!!!Yoroi Voting Record',
+    },
+    backToDashboard: {
+      id: 'governance.backToDashboard',
+      defaultMessage: '!!!Back to dashboard',
+    },
+    chooseVotingPower: {
+      id: 'governance.chooseVotingPower',
+      defaultMessage: '!!!Choose How to Use Your Voting Power',
+    },
+    letYoroiDRepVoteForYou: {
+      id: 'governance.letYoroiDRepVoteForYou',
+      defaultMessage:
+        '!!!You can let Yoroi’s DRep vote for you, pick another DRep using their ID, or choose to abstain or show no confidence.',
+    },
+    delegateLabel: {
+      id: 'global.labels.delegate',
+      defaultMessage: '!!!Delegate',
+    },
+    otherDReps: {
+      id: 'governance.otherDReps',
+      defaultMessage: '!!!Other DReps',
+    },
+    designatedSomeoneElse: {
+      id: 'governance.designatedSomeoneElse',
+      defaultMessage:
+        '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+    },
+    chooseAbstain: {
+      id: 'governance.chooseAbstain',
+      defaultMessage: '!!!Choose to abstain from voting while still participating in the governance process and earning rewards.',
+    },
+    chooseNoConfidence: {
+      id: 'governance.chooseNoConfidence',
+      defaultMessage: '!!!You are expressing a lack of trust for all proposals now and in the future.',
+    },
   })
 );
 
@@ -234,5 +285,17 @@ export const useStrings = () => {
     exploreOtherDRepsOrAbstain: intl.formatMessage(messages.exploreOtherDRepsOrAbstain),
     browseAdditionalDelegation: intl.formatMessage(messages.browseAdditionalDelegation),
     learnMoreLabel: intl.formatMessage(messages.learnMoreLabel),
+    yoroiDRep: intl.formatMessage(messages.yoroiDRep),
+    yoroiDRepInfo: intl.formatMessage(messages.yoroiDRepInfo),
+    drepStatus: intl.formatMessage(messages.drepStatus),
+    yoroiVotingRecord: intl.formatMessage(messages.yoroiVotingRecord),
+    backToDashboard: intl.formatMessage(messages.backToDashboard),
+    chooseVotingPower: intl.formatMessage(messages.chooseVotingPower),
+    letYoroiDRepVoteForYou: intl.formatMessage(messages.letYoroiDRepVoteForYou),
+    delegateLabel: intl.formatMessage(messages.delegateLabel),
+    otherDReps: intl.formatMessage(messages.otherDReps),
+    designatedSomeoneElse: intl.formatMessage(messages.designatedSomeoneElse),
+    chooseAbstain: intl.formatMessage(messages.chooseAbstain),
+    chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
   }).current;
 };
