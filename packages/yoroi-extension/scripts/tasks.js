@@ -17,15 +17,9 @@ exports.copyAssets = (type: string, env: string) => {
   cp('chrome/content-scripts/3rd-party-trezor/trezor-usb-permissions.html', `${type}/`);
 };
 
-const buildManifest = (
-  type: Network,
-  isDebug: boolean,
-  isNightly: boolean,
-  shouldInjectConnector: boolean,
-  isFirefox: boolean
-) => {
+const buildManifest = (type: Network, isDebug: boolean, isNightly: boolean, shouldInjectConnector: boolean) => {
   const genManifestContent = require(`../chrome/manifest.${type}`);
-  let manifestContent = genManifestContent(isDebug, shouldInjectConnector, isFirefox);
+  let manifestContent = genManifestContent(isDebug, shouldInjectConnector);
   if (isNightly) {
     manifestContent = overrideForNightly(manifestContent);
   }
@@ -43,8 +37,8 @@ const buildManifest = (
 };
 
 const manifestTypes = values(NetworkType);
-exports.buildManifests = (isDebug: boolean, isNightly: boolean, shouldInjectConnector: boolean, isFirefox: boolean) => {
+exports.buildManifests = (isDebug: boolean, isNightly: boolean, shouldInjectConnector: boolean) => {
   manifestTypes.forEach(type => {
-    buildManifest(type, isDebug, isNightly, shouldInjectConnector, isFirefox);
+    buildManifest(type, isDebug, isNightly, shouldInjectConnector);
   });
 };

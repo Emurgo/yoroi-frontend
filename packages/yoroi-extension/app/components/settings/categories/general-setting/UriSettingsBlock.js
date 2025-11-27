@@ -9,7 +9,6 @@ import { observable, runInAction } from 'mobx';
 
 type Props = {|
   +registerUriScheme: void => void,
-  +isFirefox: boolean,
 |};
 
 @observer
@@ -19,10 +18,6 @@ export default class UriSettingsBlock extends Component<Props> {
   static contextType: any = IntlContext;
   render(): Node {
     const intl = this.context;
-
-    // On firefox since there is no prompt,
-    // We need to give the user feedback that they pressed the button
-    const isDisabled = this.props.isFirefox && this.hasPressed;
 
     return (
       <Box
@@ -50,7 +45,6 @@ export default class UriSettingsBlock extends Component<Props> {
               this.hasPressed = true;
             });
           }}
-          disabled={isDisabled}
           sx={{
             width: 'fit-content',
             marginTop: '40px',

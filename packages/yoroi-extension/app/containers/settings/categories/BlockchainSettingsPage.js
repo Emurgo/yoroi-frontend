@@ -27,7 +27,7 @@ export default class BlockchainSettingsPage extends Component<StoresProps> {
 
     const uriSettings =
       selected.isCardanoHaskell && environment.canRegisterProtocol() ? (
-        <UriSettingsBlock registerUriScheme={() => registerProtocols()} isFirefox={environment.isFirefox()} />
+        <UriSettingsBlock registerUriScheme={() => registerProtocols()} />
       ) : null;
 
     return (

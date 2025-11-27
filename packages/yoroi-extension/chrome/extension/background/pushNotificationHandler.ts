@@ -10,8 +10,9 @@ let currentNotificationId;
 type Screen = 'wallet' | 'staking_center' | 'swap' | 'cashback' | 'governance';
 interface EventData {
   data: {
-    action?: 'open_screen';
+    action?: 'open_screen' | 'open_url';
     screen?: Screen;
+    url?: string;
   };
   notification: {
     title: string;
@@ -46,6 +47,7 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
 interface NotificationData {
   fcmMessageId: string;
   route: null | string;
+  url: null | string;
 }
 
 // missing builtin
@@ -58,7 +60,9 @@ interface NotificationEvent<DataType> {
 
 // @ts-ignore
 self.addEventListener('notificationclick', (event: NotificationEvent<NotificationData>) => {
-  if (event.notification.data.route) {
+  if (event.notification.data.url) {
+    chrome.tabs.create({ url: event.notification.data.url });
+  } else if (event.notification.data.route) {
     chrome.tabs.create({ url: `main_window.html#${event.notification.data.route}` });
   }
   event.notification.close();
@@ -79,11 +83,17 @@ async function pushHandler(eventData) {
   const locale = (await localStorageApi.getUserLocale()) ?? 'en-US';
 
   let redirectionRoute: null | string = null;
+  let externalUrl: null | string = null;
+  const isExternalUrl = eventData.data.action === 'open_url' && eventData.data.url && typeof eventData.data.url === 'string';
 
-  const redirection =
-    eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
-  if (redirection) {
-    redirectionRoute = redirection.route;
+  if (isExternalUrl) {
+    externalUrl = eventData.data.url;
+  } else {
+    const redirection =
+      eventData.data.action === 'open_screen' ? REDIRECTIONS.find(({ id }) => id === eventData.data.screen) : null;
+    if (redirection) {
+      redirectionRoute = redirection.route;
+    }
   }
 
   const title = eventData.data['title-' + locale] ?? eventData.notification.title;
@@ -98,6 +108,7 @@ async function pushHandler(eventData) {
     data: {
       fcmMessageId: eventData.fcmMessageId,
       route: redirectionRoute,
+      url: externalUrl,
     },
   });
 
@@ -107,7 +118,8 @@ async function pushHandler(eventData) {
     fcmMessageId: eventData.fcmMessageId,
     read: false,
     time: new Date().toISOString(),
-    redirection: redirectionRoute,
+    isExternalUrl: isExternalUrl,
+    redirection: isExternalUrl ? externalUrl : redirectionRoute,
   });
 
   currentNotificationId = eventData.fcmMessageId;

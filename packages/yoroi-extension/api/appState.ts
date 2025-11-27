@@ -7,6 +7,7 @@ interface NotificationData {
   title: string;
   body: string;
   time: string;
+  isExternalUrl?: boolean;
   redirection?: string | null;
 }
 interface Notification extends NotificationData {

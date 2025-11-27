@@ -6,7 +6,6 @@ import LocalStorageApi from '../../../../../../api/localStorage/index';
 import { useNavigateTo } from '../../../../../common/hooks/useNavigateTo';
 
 export const DisclaimerDialog = () => {
-  const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
   const strings = useStrings();
   const navigate = useNavigateTo();
   const { openModal, closeModal } = useModal();
@@ -28,13 +27,7 @@ export const DisclaimerDialog = () => {
         if (wasClosed === undefined || wasClosed === 'false') {
           openModal({
             title: strings.disclaimerTitle,
-            content: (
-              <DisclaimerDialogBody
-                action={action}
-                disclaimerAgreed={disclaimerAgreed}
-                setDisclaimerAgreed={setDisclaimerAgreed}
-              />
-            ),
+            content: <DisclaimerDialogBody action={action} />,
             height: '588px',
             width: '702px',
             modalId: 'swapDisclaimer',
@@ -50,12 +43,13 @@ export const DisclaimerDialog = () => {
     };
 
     checkModalState();
-  }, [disclaimerAgreed]);
+  }, []);
 
   return <></>;
 };
 
-const DisclaimerDialogBody = ({ action, disclaimerAgreed, setDisclaimerAgreed }) => {
+const DisclaimerDialogBody = ({ action }) => {
+  const [disclaimerAgreed, setDisclaimerAgreed] = useState(false);
   const strings = useStrings();
 
   return (
@@ -123,7 +117,7 @@ const DisclaimerDialogBody = ({ action, disclaimerAgreed, setDisclaimerAgreed })
           // @ts-ignore
           variant="primary"
           onClick={action.onClick}
-          disabled={disclaimerAgreed ? false : true}
+          disabled={!disclaimerAgreed}
         >
           {action.label}
         </Button>

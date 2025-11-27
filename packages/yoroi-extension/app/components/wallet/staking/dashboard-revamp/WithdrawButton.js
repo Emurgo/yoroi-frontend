@@ -36,7 +36,7 @@ export const WithdrawButton = observer(({ label, govStatusFetched, stores, isDis
             duplicated: false,
           },
         ],
-        kind: 'withdraw',
+        kind: 'withdraw rewards',
       },
       unsignedTx,
     });

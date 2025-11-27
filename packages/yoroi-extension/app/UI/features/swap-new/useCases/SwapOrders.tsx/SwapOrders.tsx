@@ -246,6 +246,10 @@ const OrderCancelation = ({ order }: { order: Swap.Order }) => {
           handleSubmitTransaction(passswordInput, response.value.data.cbor);
         },
         cborTx: response.value.data.cbor,
+        operations: {
+          kind: 'swap',
+          aggregator: order.aggregator,
+        },
       });
     }
   };
