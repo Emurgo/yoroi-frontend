@@ -105,6 +105,9 @@ import { SundaeSwap } from './SundaeSwap';
 import { Cswap } from './CSwap';
 import { ChatboxSupport } from './ChatboxSupport';
 import { YoroiLogo } from './YoroiLogo';
+import { VotingDrep } from './VotingDrep';
+import { VotingAbstain } from './VotingAbstain';
+import { VotingNoConfidence } from './VotingNoConfidence';
 
 export const Icon = {
   Assets,
@@ -212,6 +215,9 @@ export const Icon = {
   Cswap,
   ChatboxSupport,
   YoroiLogo,
+  VotingDrep,
+  VotingAbstain,
+  VotingNoConfidence,
 };
 
 export enum Icons {
@@ -315,6 +321,9 @@ export enum Icons {
   CSwap = 'CSwap',
   ChatboxSupport = 'ChatboxSupport',
   YoroiLogo = 'YoroiLogo',
+  VotingDrep = 'VotingDrep',
+  VotingAbstain = 'VotingAbstain',
+  VotingNoConfidence = 'VotingNoConfidence',
 }
 
 interface IconWrapperProps {

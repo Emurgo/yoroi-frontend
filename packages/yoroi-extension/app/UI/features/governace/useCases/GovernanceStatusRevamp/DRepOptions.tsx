@@ -195,6 +195,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ title, description, buttonText,
       <CTASet>
         {variant === 'primary' ? (
           <Stack direction="column" spacing={12} width="100%">
+            {/* @ts-ignore */}
             <Button variant="primary" onClick={onAction} fullWidth>
               {buttonText}
             </Button>
@@ -248,7 +249,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
           description="Explore the full list of registered DReps and choose one that aligns with your governance preferences."
           buttonText="BROWSE"
           variant="outlined"
-          icon={<Icon.Search />}
+          icon={<Icon.VotingDrep />}
           onAction={() => console.log('Browse DReps')}
         />
 
@@ -257,7 +258,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
           description="Choose to abstain from voting while still participating in the governance process and earning rewards."
           buttonText="ABSTAIN"
           variant="outlined"
-          icon={<Icon.CloseIcon />}
+          icon={<Icon.VotingAbstain />}
           onAction={() => console.log('Abstain')}
         />
 
@@ -266,12 +267,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
           description="Signal no confidence in the current governance system by delegating to the predefined No Confidence DRep."
           buttonText="SELECT"
           variant="outlined"
-          icon={
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="10" stroke="#000000" strokeWidth="2" />
-              <path d="M8 8L16 16M16 8L8 16" stroke="#000000" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-          }
+          icon={<Icon.VotingNoConfidence />}
           onAction={() => console.log('No Confidence')}
         />
       </CardsRow>
