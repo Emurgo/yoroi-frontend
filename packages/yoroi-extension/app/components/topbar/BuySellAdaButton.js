@@ -19,8 +19,7 @@ const messages = defineMessages({
   },
 });
 
-const buttonText =
-  environment.isDev() || environment.isNightly() || environment.isTest() ? globalMessages.buySellAda : globalMessages.buyAda;
+const buttonText = environment.isProduction() ? globalMessages.buyAda : globalMessages.buySellAda;
 
 @observer
 export default class BuySellAdaButton extends Component<Props> {
