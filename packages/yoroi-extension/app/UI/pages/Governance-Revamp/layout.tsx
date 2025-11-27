@@ -6,6 +6,7 @@ import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/
 import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 import { Link, Stack } from '@mui/material';
 import { useStrings } from '../../features/governace/common/useStrings';
+import { LEARN_MORE_LINK } from '../../features/governace/common/constants';
 
 type Props = {
   stores: any;
@@ -25,7 +26,9 @@ const GovernanceLayout = ({ stores, children }: Props): any => {
         <GovernanceExternalPackageProvider manager={governanceManager}>
           <Stack direction="column" justifyContent="space-between" alignItems="center" height="100%">
             {children}
-            <Link>{strings.learnMoreLabel}</Link>
+            <Link sx={{ cursor: 'pointer' }} href={LEARN_MORE_LINK} target="_blank" rel="noopener">
+              {strings.learnMoreLabel}
+            </Link>
           </Stack>
         </GovernanceExternalPackageProvider>
       </GeneralPageLayout>

@@ -77,7 +77,7 @@ const ActionCardContainer = styled(Box, {
   height: '320px',
 
   background: variant === 'primary' ? theme.palette.ds.bg_gradient_2 : theme.palette.ds.bg_color_max,
-  border: variant === 'outlined' ? `1px solid ${theme.palette.ds.gray_200}` : 'none',
+  border: variant === 'outlined' ? `2px solid ${theme.palette.ds.gray_200}` : 'none',
   borderRadius: '8px',
 
   flex: 'none',

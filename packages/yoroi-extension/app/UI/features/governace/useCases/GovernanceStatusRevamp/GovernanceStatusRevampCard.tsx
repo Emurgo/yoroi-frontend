@@ -4,7 +4,7 @@ import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography, Button, IconButton, Link, Stack } from '@mui/material';
 import { Icon } from '../../../../components';
 import { useStrings } from '../../common/useStrings';
-import { GovernanceStatusState } from '../../common/constants';
+import { GovernanceStatusState, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
@@ -117,7 +117,14 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
         </PrimaryButton>
 
         <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
-          <Link onClick={handleDetailsClick}>
+          <Link
+            onClick={event => event.stopPropagation()}
+            href={YOROI_VOTING_RECORD_LINK}
+            rel="noopener"
+            target="_blank"
+            underline="hover"
+            sx={{ cursor: 'pointer' }}
+          >
             <Typography variant="body1">{strings.yoroiVotingRecord}</Typography>
           </Link>
         </Stack>
