@@ -183,7 +183,7 @@ const ErrorPopoutContent = styled(Box)({
 const URL_GENERATION_LONG_LOADING_TIMEOUT = 2 * 1000;
 const URL_GENERATION_TIMEOUT = 30 * 1000;
 
-const dialogTitle = environment.isProduction() ? globalMessages.buyAda : messages.dialogTitle;
+const dialogTitle = environment.isNotProd() ? messages.dialogTitle : globalMessages.buyAda;
 const idPathLocation = 'buySell';
 
 @observer
@@ -497,7 +497,7 @@ export default class BuySellDialog extends Component<Props, State> {
         styleFlags={{ contentNoTopPadding: true }}
         id={idPathLocation}
       >
-        {!environment.isProduction() && (
+        {environment.isNotProd() && (
           <Tabs
             value={state.isBuying ? 0 : 1}
             onChange={() => this.setState({ isBuying: !state.isBuying, inputError: null })}
