@@ -5,6 +5,7 @@ import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
 import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 import { Link, Stack } from '@mui/material';
+import { useStrings } from '../../features/governace/common/useStrings';
 
 type Props = {
   stores: any;
@@ -13,6 +14,7 @@ type Props = {
 
 const GovernanceLayout = ({ stores, children }: Props): any => {
   const { governanceManager } = useGovernance();
+  const strings = useStrings();
 
   if (governanceManager)
     return (
@@ -23,7 +25,7 @@ const GovernanceLayout = ({ stores, children }: Props): any => {
         <GovernanceExternalPackageProvider manager={governanceManager}>
           <Stack direction="column" justifyContent="space-between" alignItems="center" height="100%">
             {children}
-            <Link>Learn more about Governance</Link>
+            <Link>{strings.learnMoreLabel}</Link>
           </Stack>
         </GovernanceExternalPackageProvider>
       </GeneralPageLayout>

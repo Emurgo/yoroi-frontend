@@ -4,6 +4,7 @@ import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import { GovernanceStatusRevampCard, GovernanceStatusState } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
+import { useStrings } from '../../common/useStrings';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -63,21 +64,22 @@ const TextContent = styled(Box)(() => ({
 
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
+  const strings = useStrings();
   // For now we keep it "idle"; you I can wire this from props/stores
   const cardState: GovernanceStatusState = 'idle';
 
   const onExploreMore = () => {
-    navigateTo.selectRevampOptions()
+    navigateTo.selectRevampOptions();
   };
 
   return (
     <Container>
       <TitleSection>
         <Typography variant="h5" color="ds.text_gray_medium">
-          Delegation Options
+          {strings.delegationOptions}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_low">
-          Choose to delegate your voting power to Yoroi DRep or explore other options
+          {strings.chooseDelegationOption}
         </Typography>
       </TitleSection>
 
@@ -101,10 +103,10 @@ export const GovernanceStatusRevamp = () => {
         <OtherActionsCard onClick={onExploreMore}>
           <TextContent>
             <Typography variant="body1" fontWeight={500} color="ds.gray_max">
-              Explore other DReps or Abstain
+              {strings.exploreOtherDRepsOrAbstain}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_medium">
-              Browse additional delegation options or choose to abstain from voting
+              {strings.browseAdditionalDelegation}
             </Typography>
           </TextContent>
         </OtherActionsCard>

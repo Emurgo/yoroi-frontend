@@ -159,6 +159,29 @@ export const messages = Object.freeze(
       id: 'global.labels.incorectFormat',
       defaultMessage: '!!!Incorrect format',
     },
+
+    // NEW STRINGSS
+
+    delegationOptions: {
+      id: 'governance.delegationOptions',
+      defaultMessage: '!!!Delegation Options',
+    },
+    chooseDelegationOption: {
+      id: 'governance.chooseDelegationOption',
+      defaultMessage: '!!!Choose to delegate your voting power to Yoroi DRep or explore other options',
+    },
+    exploreOtherDRepsOrAbstain: {
+      id: 'governance.exploreOtherDRepsOrAbstain',
+      defaultMessage: '!!!Explore other DReps or Abstain',
+    },
+    browseAdditionalDelegation: {
+      id: 'governance.browseAdditionalDelegation',
+      defaultMessage: '!!!Browse additional delegation options or choose to abstain from voting',
+    },
+    learnMoreLabel: {
+      id: 'governance.learnMoreLabel',
+      defaultMessage: '!!!Browse additional delegation options or choose to abstain from voting',
+    },
   })
 );
 
@@ -205,5 +228,11 @@ export const useStrings = () => {
     notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
     delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
     yoroiVotingRecordLink: intl.formatMessage(messages.yoroiVotingRecordLink),
+    // New Strings
+    delegationOptions: intl.formatMessage(messages.delegationOptions),
+    chooseDelegationOption: intl.formatMessage(messages.chooseDelegationOption),
+    exploreOtherDRepsOrAbstain: intl.formatMessage(messages.exploreOtherDRepsOrAbstain),
+    browseAdditionalDelegation: intl.formatMessage(messages.browseAdditionalDelegation),
+    learnMoreLabel: intl.formatMessage(messages.learnMoreLabel),
   }).current;
 };

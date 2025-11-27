@@ -245,9 +245,9 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
         />
 
         <ActionCard
-          title="Browse DReps"
+          title="Other DReps"
           description="Explore the full list of registered DReps and choose one that aligns with your governance preferences."
-          buttonText="BROWSE"
+          buttonText="Delegate"
           variant="outlined"
           icon={<Icon.VotingDrep />}
           onAction={() => console.log('Browse DReps')}
@@ -256,7 +256,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
         <ActionCard
           title="Abstain"
           description="Choose to abstain from voting while still participating in the governance process and earning rewards."
-          buttonText="ABSTAIN"
+          buttonText="Delegate"
           variant="outlined"
           icon={<Icon.VotingAbstain />}
           onAction={() => console.log('Abstain')}
@@ -265,7 +265,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
         <ActionCard
           title="No Confidence"
           description="Signal no confidence in the current governance system by delegating to the predefined No Confidence DRep."
-          buttonText="SELECT"
+          buttonText="Delegate"
           variant="outlined"
           icon={<Icon.VotingNoConfidence />}
           onAction={() => console.log('No Confidence')}
