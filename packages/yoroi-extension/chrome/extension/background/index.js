@@ -26,19 +26,12 @@ declare var browser;
 // Intercept console methods to store logs
 (function setupConsoleLogging() {
   const originalConsole = {
-    debug: console.debug.bind(console),
     info: console.info.bind(console),
     warn: console.warn.bind(console),
     error: console.error.bind(console),
   };
 
-  // $FlowFixMe[cannot-write] - We need to override console methods for logging
-  console.debug = (...args: Array<any>) => {
-    originalConsole.debug(...args);
-    storeLog('background', createLogEntry('debug', ...args)).catch(() => {
-      // Ignore storage errors
-    });
-  };
+ 
 
   // $FlowFixMe[cannot-write] - We need to override console methods for logging
   console.info = (...args: Array<any>) => {

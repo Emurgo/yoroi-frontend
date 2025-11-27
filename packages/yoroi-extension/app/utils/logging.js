@@ -22,10 +22,6 @@ function pushError(s: string): void {
 export const Logger = {
   debug: (...args: any[]) => {
     logger.debug(...args);
-    // Store in chrome.storage for main window context
-    storeLog('main', createLogEntry('debug', ...args)).catch(() => {
-      // Ignore storage errors
-    });
   },
 
   info: (...args: any[]) => {

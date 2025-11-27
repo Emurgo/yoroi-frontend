@@ -90,24 +90,15 @@ function sendLogToBackground(level, ...args) {
 // Intercept console methods to send logs to background
 (function setupConsoleLogging() {
   const originalConsole = {
-    debug: console.debug.bind(console),
     info: console.info.bind(console),
     warn: console.warn.bind(console),
     error: console.error.bind(console),
     log: console.log.bind(console),
   };
 
-  console.debug = (...args) => {
-    originalConsole.debug(...args);
-    // Only log if it's a yoroi-related log
-    if (isYoroiRelatedLog(...args)) {
-      sendLogToBackground('debug', ...args);
-    }
-  };
-
   console.info = (...args) => {
     originalConsole.info(...args);
-    // Only log if it's a yoroi-related log
+
     if (isYoroiRelatedLog(...args)) {
       sendLogToBackground('info', ...args);
     }
@@ -115,7 +106,7 @@ function sendLogToBackground(level, ...args) {
 
   console.warn = (...args) => {
     originalConsole.warn(...args);
-    // Only log if it's a yoroi-related log
+
     if (isYoroiRelatedLog(...args)) {
       sendLogToBackground('warn', ...args);
     }
@@ -123,7 +114,7 @@ function sendLogToBackground(level, ...args) {
 
   console.error = (...args) => {
     originalConsole.error(...args);
-    // Only log if it's a yoroi-related log
+
     if (isYoroiRelatedLog(...args)) {
       sendLogToBackground('error', ...args);
     }
@@ -132,7 +123,7 @@ function sendLogToBackground(level, ...args) {
   // Also intercept console.log for connector context
   console.log = (...args) => {
     originalConsole.log(...args);
-    // Only log if it's a yoroi-related log
+
     if (isYoroiRelatedLog(...args)) {
       sendLogToBackground('info', ...args);
     }

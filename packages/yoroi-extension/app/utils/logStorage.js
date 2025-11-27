@@ -11,7 +11,7 @@ export type LogContext = 'main' | 'background' | 'connector';
 
 export type LogEntry = {|
   timestamp: string,
-  level: 'debug' | 'info' | 'warn' | 'error',
+  level: 'info' | 'warn' | 'error',
   message: string,
   stack?: string | void,
 |};
@@ -26,7 +26,6 @@ const STORAGE_KEYS = {
 // when console methods are overridden (e.g., in background/index.js)
 const originalConsole = {
   log: console.log.bind(console),
-  debug: console.debug.bind(console),
   info: console.info.bind(console),
   warn: console.warn.bind(console),
   error: console.error.bind(console),
@@ -176,7 +175,7 @@ export function formatLogEntry(entry: LogEntry): string {
 /**
  * Create a log entry from console arguments
  */
-export function createLogEntry(level: 'debug' | 'info' | 'warn' | 'error', ...args: Array<any>): LogEntry {
+export function createLogEntry(level: 'info' | 'warn' | 'error', ...args: Array<any>): LogEntry {
   const timestamp = moment().format();
   let message = '';
   let stack: string | void = undefined;
