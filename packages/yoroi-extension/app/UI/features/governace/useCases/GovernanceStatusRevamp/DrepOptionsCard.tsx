@@ -54,7 +54,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
             )}
           </Stack>
         ) : (
-          <Button variant="outlined" onClick={onAction} fullWidth sx={{ borderWidth: '2px' }}>
+          <Button variant="outlined" onClick={onAction} fullWidth sx={{ borderWidth: '2px', '&:hover': { borderWidth: '2px' } }}>
             {buttonText}
           </Button>
         )}
