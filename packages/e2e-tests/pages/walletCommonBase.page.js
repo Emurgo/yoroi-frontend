@@ -1,6 +1,7 @@
 import { balanceReplacer, WalletWordsSize } from '../helpers/constants.js';
 import { defaultWaitTimeout, fiveSeconds, halfSecond, oneMinute, oneSecond, quarterSecond } from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
+import { ElementLocator } from './locator.js';
 
 export default class WalletCommonBase extends BasePage {
   // locators
@@ -44,6 +45,13 @@ export default class WalletCommonBase extends BasePage {
   };
   navBarPageTitleLocator = {
     locator: 'topBar-pageTitle-text',
+    method: 'id',
+  };
+  /**
+   * @type {ElementLocator}
+   */
+  buySellBtnLocator = {
+    locator: 'topBar-buySell-button',
     method: 'id',
   };
   // selected wallet panel
@@ -145,6 +153,10 @@ export default class WalletCommonBase extends BasePage {
   };
   //
   // functions
+  async openBuySellDialog() {
+    this.logger.info(`WalletCommonBase::openBuySellDialog is called`);
+    await this.click(this.buySellBtnLocator);
+  }
   /**
    * Getting the selected wallet info from the top-right corner of the app
    * @returns {Promise<{name: string, plate: string, balance: number, fiatBalance: number, fiatCurrency: string}>}
@@ -238,7 +250,6 @@ export default class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::goToStakingTab is called`);
     await this.click(this.stakingTabButtonLocator);
   }
-  // TODO Portfolio should be here
   async goToPortfolioTab() {
     this.logger.info(`WalletCommonBase::goToPortfolioTab is called`);
     await this.click(this.portfolioTabButtonLocator);
