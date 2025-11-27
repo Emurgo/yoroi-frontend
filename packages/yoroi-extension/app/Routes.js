@@ -406,7 +406,6 @@ const GovernanceSubpages = ({ stores }) => {
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        ;
       </GovernanceContextProvider>
     </CurrencyProvider>
   );
@@ -434,7 +433,6 @@ const GovernanceRevampSubpages = ({ stores }) => {
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        ;
       </GovernanceContextProvider>
     </CurrencyProvider>
   );

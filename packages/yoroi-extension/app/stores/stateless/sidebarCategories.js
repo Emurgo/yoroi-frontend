@@ -137,7 +137,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
-    className: 'governance',
+    className: 'governance-revamp',
     route: '/governance-status',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
