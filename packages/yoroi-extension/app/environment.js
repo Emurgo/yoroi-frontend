@@ -68,6 +68,7 @@ export const environment = ({
   isMainnet: () => environment.getNetworkName() === NetworkType.MAINNET,
   /** Environment used during webpack build */
   isProduction: () => process.env.NODE_ENV === 'production',
+  isNotProd: () => environment.isDev() || environment.isE2EBuild() || environment.isNightly(),
   getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
   getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
   userAgentInfo,
@@ -87,6 +88,7 @@ export const environment = ({
   isE2EBuild: void => boolean,
   isMainnet: void => boolean,
   isProduction: void => boolean,
+  isNotProd: void => boolean,
   getWalletRefreshInterval: void => number,
   getServerStatusRefreshInterval: void => number,
   userAgentInfo: UserAgentInfo,
