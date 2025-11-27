@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Stack, Link } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '../../../../components';
 import { useNavigateTo } from '../../common/useNavigateTo';
