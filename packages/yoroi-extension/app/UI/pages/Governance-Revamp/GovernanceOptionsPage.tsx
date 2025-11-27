@@ -9,7 +9,7 @@ type Props = {
 const GovernanceOptionsPage = (props: Props): any => {
   return (
     <GovernanceLayout {...props}>
-        <DRepOptions />
+      <DRepOptions />
     </GovernanceLayout>
   );
 };

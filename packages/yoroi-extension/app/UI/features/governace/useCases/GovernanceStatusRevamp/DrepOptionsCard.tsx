@@ -12,7 +12,15 @@ interface ActionCardProps {
   onViewDetails?: () => void;
 }
 
-export const DrepOptionsCard: React.FC<ActionCardProps> = ({ title, description, buttonText, variant, icon, onAction, onViewDetails }) => {
+export const DrepOptionsCard: React.FC<ActionCardProps> = ({
+  title,
+  description,
+  buttonText,
+  variant,
+  icon,
+  onAction,
+  onViewDetails,
+}) => {
   const strings = useStrings();
   return (
     <ActionCardContainer variant={variant}>

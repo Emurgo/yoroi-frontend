@@ -437,4 +437,3 @@ const GovernanceRevampSubpages = ({ stores }) => {
     </CurrencyProvider>
   );
 };
-
