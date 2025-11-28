@@ -2,9 +2,12 @@ import { Box, Typography, Stack } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '../../../../components';
 import { useNavigateTo } from '../../common/useNavigateTo';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { useTheme } from '@mui/material/styles';
 import { DrepOptionsCard } from './DrepOptionsCard';
+import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 
 interface DRepOptionsScreenProps {}
 
@@ -12,6 +15,14 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const theme: any = useTheme();
+
+  const { submitedTransactions } = useGovernance();
+  const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+  const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+
+  const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
+
+  console.log('governanceStatus', { governanceStatus, cardState });
 
   const onBack = () => {
     navigateTo.selectRevampStatus();
@@ -27,6 +38,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       icon: <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />,
       onAction: () => console.log('Delegate to Yoroi'),
       onViewDetails: () => console.log('View Yoroi details'),
+      status: governanceStatus,
     },
     {
       key: 'others',
@@ -36,6 +48,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingDrep />,
       onAction: () => console.log('Browse DReps'),
+      status: governanceStatus,
     },
     {
       key: 'abstain',
@@ -45,6 +58,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingAbstain />,
       onAction: () => console.log('Abstain'),
+      status: governanceStatus,
     },
     {
       key: 'noConfidence',
@@ -54,6 +68,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingNoConfidence />,
       onAction: () => console.log('No Confidence'),
+      status: governanceStatus,
     },
   ];
 
@@ -84,6 +99,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
             icon={option.icon}
             onAction={option.onAction}
             onViewDetails={option.onViewDetails}
+            status={option.status}
           />
         ))}
       </CardsRow>

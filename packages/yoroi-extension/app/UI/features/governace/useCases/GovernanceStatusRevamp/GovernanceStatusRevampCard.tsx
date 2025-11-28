@@ -1,29 +1,28 @@
 // features/governace/useCases/GovernanceStatusRevamp/GovernanceStatusCard.tsx
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Typography, Button, IconButton, Link, Stack } from '@mui/material';
+import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
 import { Icon } from '../../../../components';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { GovernanceStatusState } from '../../common/constants';
+import { LoadingButton } from '@mui/lab';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
   drepId: string;
   votingPowerLabel?: string;
   votingPowerValue?: string;
-  delegatedAmountLabel?: string;
-  delegatedAmountValue?: string;
   onDelegateClick?: () => void;
   onDetailsClick?: () => void;
+  btnLoading?: boolean;
 }
 
 export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
   state,
   drepId,
-  delegatedAmountLabel = 'Delegated Amount',
-  delegatedAmountValue,
   onDelegateClick,
   onDetailsClick,
+  btnLoading,
 }) => {
   const isDisabled = state === 'disabled';
   const isDelegated = state === 'delegated';
@@ -51,6 +50,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const statusVariant: 'active' | 'delegated' | 'disabled' =
     state === 'delegated' ? 'delegated' : state === 'disabled' ? 'disabled' : 'active';
 
+  console.log('GovernanceStatusRevampCard render', { state, statusVariant });
   const primaryButtonLabel = isDelegated ? strings.changeToDrep : strings.delegateLabel;
 
   return (
@@ -96,7 +96,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             </StatusBadge>
           </RightPart>
         </ItemRow>
-
+        {/* 
         {isDelegated && (
           <ItemRow>
             <LeftPart>
@@ -107,14 +107,23 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>{delegatedAmountValue}</Typography>
             </RightPart>
           </ItemRow>
-        )}
+        )} */}
       </ItemsGroup>
 
       <CtaSet>
-        {/* @ts-ignore */}
-        <PrimaryButton variant="primary" disabledVisual={isDisabled} disabled={isDisabled} onClick={handleDelegateClick}>
-          {primaryButtonLabel}
-        </PrimaryButton>
+        {statusVariant === 'active' && (
+          <LoadingButton
+            fullWidth
+            loading={btnLoading}
+            /* @ts-ignore */
+            variant="primary"
+            disabledVisual={isDisabled}
+            disabled={isDisabled}
+            onClick={handleDelegateClick}
+          >
+            {primaryButtonLabel}
+          </LoadingButton>
+        )}
 
         <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
           <Link onClick={handleDetailsClick}>
@@ -154,17 +163,13 @@ const Root = styled(Box, {
     };
   }
 
-  if (state === 'hover') {
-    return {
-      ...base,
-      backgroundImage: theme.palette.ds.bg_gradient_2,
-    };
-  }
-
   // idle
   return {
     ...base,
     backgroundImage: theme.palette.ds.bg_gradient_1,
+    '&:hover': {
+      backgroundImage: theme.palette.ds.bg_gradient_2,
+    },
   };
 });
 
@@ -245,9 +250,9 @@ const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }
   height: '30px',
   borderRadius: '1200px',
   background:
-    variant === 'active'
+    variant === 'active' || variant === 'delegated'
       ? theme.palette.ds.secondary_600
-      : variant === 'delegated'
+      : variant === 'disabled'
         ? theme.palette.ds.gray_600
         : theme.palette.ds.gray_400,
 }));
@@ -259,14 +264,5 @@ const CtaSet = styled(Box)(() => ({
   padding: '0px',
   gap: '8px',
   width: '580px',
-  height: '72px',
-}));
-
-const PrimaryButton = styled(Button)<{ disabledVisual?: boolean }>(({ disabledVisual, theme }: any) => ({
-  background: disabledVisual ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
-  width: '100%',
-  '&:hover': {
-    background: disabledVisual ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
-    opacity: disabledVisual ? 1 : 0.9,
-  },
+  height: 'auto',
 }));

@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
+import globalMessages from '../../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({

@@ -1,6 +1,7 @@
 import { Box, Typography, Button, Stack, Link } from '@mui/material';
 import { styled } from '@mui/system';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
+import { GovernanceStatusState } from '../../common/constants';
 
 interface ActionCardProps {
   title: string;
@@ -10,6 +11,7 @@ interface ActionCardProps {
   icon?: React.ReactNode;
   onAction: () => void;
   onViewDetails?: () => void;
+  status: GovernanceStatusState;
 }
 
 export const DrepOptionsCard: React.FC<ActionCardProps> = ({
@@ -20,10 +22,11 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   icon,
   onAction,
   onViewDetails,
+  status,
 }) => {
   const strings = useStrings();
   return (
-    <ActionCardContainer variant={variant}>
+    <ActionCardContainer variant={variant} status={status}>
       <CardWrapper>
         <CardTitleRow>
           <CardIcon variant={variant}>{icon}</CardIcon>
@@ -62,28 +65,73 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   );
 };
 
-const ActionCardContainer = styled(Box, {
-  shouldForwardProp: prop => prop !== 'variant',
-})<{ variant: 'primary' | 'outlined' }>(({ theme, variant }) => ({
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'flex-start',
-  padding: '16px',
-  gap: variant === 'primary' ? '16px' : '12px',
+type ActionCardVariant = 'primary' | 'outlined';
 
-  width: '294px',
-  height: '320px',
+interface ActionCardContainerProps {
+  variant: ActionCardVariant;
+  status: GovernanceStatusState;
+}
 
-  background: variant === 'primary' ? theme.palette.ds.bg_gradient_2 : theme.palette.ds.bg_color_max,
-  border: variant === 'outlined' ? `1px solid ${theme.palette.ds.gray_200}` : 'none',
-  borderRadius: '8px',
+export const ActionCardContainer = styled(Box, {
+  shouldForwardProp: prop => prop !== 'variant' && prop !== 'status',
+})<ActionCardContainerProps>(({ theme, variant, status }) => {
+  console.log('status', { variant, status });
+  const base: React.CSSProperties = {
+    boxSizing: 'border-box',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    padding: '16px',
+    gap: variant === 'primary' ? '16px' : '12px',
 
-  flex: 'none',
-  alignSelf: 'stretch',
-  flexGrow: 1,
-}));
+    width: '294px',
+    height: '320px',
+
+    borderRadius: '8px',
+    flex: 'none',
+    alignSelf: 'stretch',
+    flexGrow: 1,
+
+    cursor: status === 'disabled' ? 'default' : 'pointer',
+    opacity: status === 'disabled' ? 0.6 : 1,
+  };
+
+  // 1. Disabled state (regardless of variant)
+  if (status === 'disabled') {
+    return {
+      ...base,
+      background: theme.palette.ds.gray_100,
+      border: `1px solid ${theme.palette.ds.gray_200}`,
+      pointerEvents: 'none',
+    };
+  }
+  if (variant === 'primary') {
+    return {
+      ...base,
+      backgroundImage: theme.palette.ds.bg_gradient_1,
+      '&:hover': {
+        backgroundImage: theme.palette.ds.bg_gradient_2,
+      },
+    };
+  }
+
+  if (status === 'delegated') {
+    return {
+      ...base,
+      background: theme.palette.ds.bg_color_max,
+      border: `1px solid ${theme.palette.ds.primary_500}`,
+    };
+  }
+  return {
+    ...base,
+    background: theme.palette.ds.bg_color_max,
+    border: `1px solid ${theme.palette.ds.gray_200}`,
+    '&:hover': {
+      borderColor: theme.palette.ds.primary_500,
+    },
+  };
+});
 
 const CardWrapper = styled(Box)(() => ({
   display: 'flex',

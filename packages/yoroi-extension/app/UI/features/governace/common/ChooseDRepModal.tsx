@@ -6,7 +6,7 @@ import { dRepToMaybeCredentialHex } from '../../../../api/ada/lib/cardanoCrypto/
 import { TextInput } from '../../../components/Input/TextInput';
 import { useModal } from '../../../components/modals/ModalContext';
 import { useGovernance } from '../module/GovernanceContextProvider';
-import { useStrings } from './useStrings';
+import { useStrings } from './hooks/useStrings';
 
 type ChooseDRepModallProps = {
   onSubmit?: (drepId: string, drepCredential: string) => void;
