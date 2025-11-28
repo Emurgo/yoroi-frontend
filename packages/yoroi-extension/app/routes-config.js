@@ -89,6 +89,10 @@ export const ROUTES = {
     SUBMITTED: '/governance/submitted',
     FAIL: '/governance/failed',
   },
+  GOVERNANCE_REVAMP: {
+    ROOT: '/governance-status',
+    OPTIONS: '/governance-status/options',
+  },
   PORTFOLIO: {
     ROOT: '/portfolio',
     DAPPS: '/portfolio/dapps',
