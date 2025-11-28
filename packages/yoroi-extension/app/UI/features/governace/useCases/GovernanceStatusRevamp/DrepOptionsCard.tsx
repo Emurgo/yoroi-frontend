@@ -1,8 +1,11 @@
-import { Box, Typography, Button, Stack, Link } from '@mui/material';
+import { Box, Typography, Button, Stack, Link, IconButton } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GovernanceStatusState } from '../../common/constants';
+import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 import { YOROI_VOTING_RECORD_LINK } from '../../common/constants';
+import { LoadingButton } from '@mui/lab';
+import { Icon } from '../../../../components';
+import { truncateFormatter } from '../../../../../utils/formatters';
 
 interface ActionCardProps {
   title: string;
@@ -13,6 +16,7 @@ interface ActionCardProps {
   onAction: () => void;
   onViewDetails?: () => void;
   status: GovernanceStatusState;
+  drepId?: string;
 }
 
 export const DrepOptionsCard: React.FC<ActionCardProps> = ({
@@ -24,10 +28,18 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   onAction,
   onViewDetails,
   status,
-  // @ts-ignore || it will be used later
-  key,
+  drepId,
 }) => {
   const strings = useStrings();
+  console.log('DrepOptionsCard render', { title, status, variant, drepId });
+  const handleCopy = () => {
+    try {
+      navigator.clipboard.writeText(drepId || '');
+    } catch {
+      // no-op
+    }
+  };
+
   return (
     <ActionCardContainer variant={variant} status={status}>
       <CardWrapper>
@@ -39,13 +51,53 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
         <Typography variant="body1">{description}</Typography>
       </CardWrapper>
 
+      {GOVERNANCE_STATUS.DELEGATED === status && (
+        <ItemsGroup>
+          <ItemRow>
+            <LeftPart>
+              <Typography color="ds.text_gray_low" variant="body2">
+                ID
+              </Typography>
+            </LeftPart>
+
+            <RightPart>
+              <Typography color="ds.text_gray_medium" variant="body2">
+                {truncateFormatter(drepId, 15)}
+              </Typography>
+              <CopyIconButton onClick={handleCopy}>
+                <Icon.Copy />
+              </CopyIconButton>
+            </RightPart>
+          </ItemRow>
+
+          <ItemRow>
+            <LeftPart>
+              <Typography color="ds.text_gray_low" variant="body2">
+                {strings.drepStatus}
+              </Typography>
+            </LeftPart>
+
+            <RightPart>
+              <StatusBadge variant={status}>
+                <Typography variant="body2" color="ds.gray_min">
+                  {'Active'}
+                </Typography>
+              </StatusBadge>
+            </RightPart>
+          </ItemRow>
+        </ItemsGroup>
+      )}
+
       <CTASet>
         {variant === 'primary' ? (
           <Stack direction="column" spacing={12} width="100%">
-            {/* @ts-ignore */}
-            <Button variant="primary" onClick={onAction} fullWidth>
-              {buttonText}
-            </Button>
+            {status === GOVERNANCE_STATUS.IDLE && (
+              // @ts-ignore
+              <LoadingButton variant="primary" onClick={onAction} fullWidth>
+                {buttonText}
+              </LoadingButton>
+            )}
+
             {onViewDetails && (
               <Link
                 textAlign="center"
@@ -187,8 +239,71 @@ const CardIcon = styled(Box, {
   flexGrow: 0,
 }));
 
+const ItemsGroup = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  padding: '0px',
+  gap: '12px',
+  width: '100%',
+}));
+
+const ItemRow = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '0px',
+  gap: '24px',
+  width: '100%',
+}));
+
+const LeftPart = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  padding: '0px',
+  gap: '4px',
+  height: '24px',
+}));
+
+const RightPart = styled(Box)(() => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  padding: '0px',
+  gap: '4px',
+  height: '24px',
+  flexShrink: 0,
+}));
+
+const CopyIconButton = styled(IconButton)(() => ({
+  width: '24px',
+  height: '24px',
+  padding: '0px',
+}));
+
+const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant, theme }: any) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'flex-start',
+  padding: '4px 8px',
+  gap: '2px',
+  width: '58px',
+  height: '30px',
+  borderRadius: '1200px',
+  background:
+    variant === 'active' || variant === 'delegated'
+      ? theme.palette.ds.secondary_600
+      : variant === 'disabled'
+        ? theme.palette.ds.gray_600
+        : theme.palette.ds.gray_400,
+}));
+
 const CTASet = styled(Box)(() => ({
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
+  marginTop: '16px',
 }));

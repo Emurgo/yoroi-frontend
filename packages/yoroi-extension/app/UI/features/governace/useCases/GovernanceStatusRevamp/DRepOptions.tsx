@@ -8,6 +8,7 @@ import { DrepOptionsCard } from './DrepOptionsCard';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
+import { YOROI_DREP_ID } from '../../common/constants';
 
 interface DRepOptionsScreenProps {}
 
@@ -21,9 +22,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
   const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-
-  console.log('governanceStatus', { governanceStatus, cardState });
-
   const onBack = () => {
     navigateTo.selectRevampStatus();
   };
@@ -36,9 +34,9 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       buttonText: strings.delegateLabel,
       variant: 'primary' as const,
       icon: <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />,
-      onAction: () => console.log('Delegate to Yoroi'),
+      onAction: () => delegateToDrep(YOROI_DREP_ID),
       onViewDetails: () => console.log('View Yoroi details'),
-      status: governanceStatus,
+      status: cardState,
     },
     {
       key: 'others',
@@ -48,7 +46,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingDrep />,
       onAction: () => console.log('Browse DReps'),
-      status: governanceStatus,
+      status: cardState,
     },
     {
       key: 'abstain',
@@ -58,7 +56,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingAbstain />,
       onAction: () => console.log('Abstain'),
-      status: governanceStatus,
+      status: cardState,
     },
     {
       key: 'noConfidence',
@@ -68,7 +66,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'outlined' as const,
       icon: <Icon.VotingNoConfidence />,
       onAction: () => console.log('No Confidence'),
-      status: governanceStatus,
+      status: cardState,
     },
   ];
 
@@ -100,6 +98,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
             onAction={option.onAction}
             onViewDetails={option.onViewDetails}
             status={option.status}
+            drepId={governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID}
           />
         ))}
       </CardsRow>

@@ -226,8 +226,8 @@ export const messages = Object.freeze(
         '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
     },
     chooseAbstain: {
-      id: 'governance.chooseAbstain',
-      defaultMessage: '!!!Choose to abstain from voting while still participating in the governance process and earning rewards.',
+      id: 'governance.abstainInfo',
+      defaultMessage: '!!!You are choosing not to cast a vote on all proposals now and in the future.',
     },
     chooseNoConfidence: {
       id: 'governance.chooseNoConfidence',

@@ -10,12 +10,8 @@ import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatus
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-
   const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
-
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-
-  console.log('governanceStatus', { governanceStatus, cardState });
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
@@ -44,9 +40,6 @@ export const GovernanceStatusRevamp = () => {
           state={cardState}
           drepId={governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID}
           onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
-          onDetailsClick={() => {
-            // later: open governance docs / modal
-          }}
           btnLoading={loadingUnsignTx}
         />
 
