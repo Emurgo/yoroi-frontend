@@ -6,13 +6,28 @@ import globalMessages from '../../../../i18n/global-messages';
 import { getCollateralUtxos } from '../../../../api/ada/midnight';
 
 export default function Redeem(
-  props: { address: string; onClose: () => void; onReorg: (signRequest: any) => void }
+  props: {
+    address: string;
+    onClose: () => void;
+    onReorg: (signRequest: any) => void;
+    onRedeem: async (unsignedTxHex: string) => void;
+  }
 ) {
+  const [error, setError] = useState(null);
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState(null);
+  const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState(null);
 
   const updateCollateralUtxos = async () => {
     const result = await getCollateralUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
+    if (result.state === 'exist') {
+      try {
+        const resp = await getRedemptionTransaction();
+      } catch (error) {
+        setError(error.message);
+      }
+      setRedemptionTxBuildingResponse(resp);
+    }
   };
 
   useEffect(() => {
@@ -24,7 +39,25 @@ export default function Redeem(
   if (getCollateralUtxosResult === null) {
     content = '...';
   } else if (getCollateralUtxosResult.state === 'exist') {
-    content = JSON.stringify(getCollateralUtxosResult, null, 2);
+    if (!redemptionTxBuildingResponse) {
+      content = '...';
+    }
+    content = (
+      <Box>
+        <Typography>
+          {redemptionTxBuildingResponse.redeemedAmount}
+        </Typography>
+      </Box>
+      <Button
+        onClick={async () => {
+          await props.onRedeem(redemptionTxBuildingResponse.transaction);
+          // todo: error handling
+          props.onClose();
+        }}
+      />
+        Redeem
+      </Button>
+    );
   } else if (getCollateralUtxosResult.state === 'need-reorg') {
     content = (
       <Box>

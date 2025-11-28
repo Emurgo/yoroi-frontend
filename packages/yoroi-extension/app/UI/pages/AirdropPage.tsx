@@ -23,6 +23,8 @@ import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx'
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
 import TextField from '../../components/common/TextField';
 import Redeem from '../features/airdrop/useCases/Redeem';
+import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
+import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 
 interface Props {
   stores: {
@@ -189,10 +191,97 @@ function AirdropPage({ stores }: Readonly<Props>) {
     });
   };
 
+  const onRedeem = async (unsignedTxHex: string) => {
+    // todo: validate the transaction
+    const protocolParameters = await getProtocolParameters(wallet);
+    const tx = RustModule.WalletV4.Transaction.from_hex(unsignedTxHex);
+    const senderUtxos = [];
+    const inputs = tx.body().inputs();
+    for (let i = 0; i < inputs.len(); i++) {
+      const input = inputs.get(i);
+      for (const utxo of wallet.utxos) {
+        if (
+          utxo.output.Transaction.Hash === input.transaction_id().to_hex() &&
+          utxo.output.UtxoTransactionOutput.OutputIndex === input.index()
+        ) {
+          senderUtxos.push({
+            utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
+            tx_hash: utxo.output.Transaction.Hash,
+            tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+            receiver: utxo.address,
+            amount: '0', // not used
+            assets: [], // not used
+            addressing: utxo.addressing,
+          });
+          break;
+        }
+      }
+    }
+    const signRequest = new HaskellShelleyTxSignRequest({
+      senderUtxos,
+      // $FlowIgnore: by type definition RustModule.WalletV4.TransactionBuilder is expected here but we can get away with what will actually be used
+      unsignedTx: {
+        build_tx() {
+          return tx;
+        },
+      },
+      changeAddr: [], // no used
+      metadata: tx.auxiliary_data(),
+      networkSettingSnapshot: {
+        ChainNetworkId: 0, // incorrect, but unused
+        KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
+        PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
+        NetworkId: wallet.networkId,
+      },
+    });
+
+    await new Promise((resolve) => {
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: async (password) => {
+          try {
+            startLoadingTxReview();
+
+            await stores.transactionProcessingStore.adaSendAndRefresh({
+              wallet,
+              signRequest,
+              password,
+              callback: closeTxReviewModal,
+            });
+          } catch (error) {
+            console.log('Send Sign Error', error);
+            let transactionResult;
+            if (isTxCancelledByUser(error)) {
+              transactionResult = TransactionResult.CANCEL;
+            } else if (isCardanoAppNotRunning(error)) {
+              transactionResult = TransactionResult.NO_CARDANO_RUNNING;
+            } else {
+              transactionResult = TransactionResult.FAIL;
+            }
+            showTxResultModal(transactionResult);
+          }
+          resolve();
+        },
+        operations: {
+          kind: 'send',
+        },
+        unsignedTx: signRequest.unsignedTx,
+      });
+    });
+  }
+
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
-      {redeemingAddr && (<Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} />)}
+      {redeemingAddr && (
+        <Redeem
+          address={redeemingAddr}
+          wallet={wallet}
+          onClose={closeRedeem}
+          onReorg={onReorg}
+          onRedeem={onRedeem}
+        />
+      )}
     </>
   );
 }

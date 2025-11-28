@@ -278,7 +278,6 @@ const FUNDING_AMOUNT = '2000000';
 async function pickCollateralUtxos(
   wallet: WalletState,
 ): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxoId: string |}> {
-  debugger
   const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
@@ -434,4 +433,24 @@ async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Pro
   } catch {
     return 0;
   }
+}
+
+export function getRedemptionTransaction(
+  destAddr: string,
+  thawEndpoint: string,
+  changeAddr: string,
+  collateralUtxoIds: Array<string>,
+  fundingUtxos: Array<string>
+) {
+  const resp = awat fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`);
+  if (!resp.ok) {
+    throw new Error('error when querying the redemption transaction building endpoint');
+  }
+  const respBody = await resp.json();
+  return {
+    redeemedAmount: respBody.redeemed_amount,
+    requireThawingExtraSignature: respBody.require_thawing_extra_signature,
+    transaction: respBody.transaction,
+    transactionId: respBody.transationId,
+  };
 }
