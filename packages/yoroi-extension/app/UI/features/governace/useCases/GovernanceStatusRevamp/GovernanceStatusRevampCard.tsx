@@ -43,6 +43,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     onDelegateClick?.();
   };
 
+  // @ts-ignore || it will be used later
   const handleDetailsClick = () => {
     onDetailsClick?.();
   };

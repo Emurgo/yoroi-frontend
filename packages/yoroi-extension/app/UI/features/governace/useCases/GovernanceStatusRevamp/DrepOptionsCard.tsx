@@ -21,6 +21,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   icon,
   onAction,
   onViewDetails,
+  // @ts-ignore || it will be used later
   key,
 }) => {
   const strings = useStrings();
