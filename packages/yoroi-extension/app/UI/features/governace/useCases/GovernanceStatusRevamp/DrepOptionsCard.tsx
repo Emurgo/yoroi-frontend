@@ -2,6 +2,7 @@ import { Box, Typography, Button, Stack, Link } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GovernanceStatusState } from '../../common/constants';
+import { YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 
 interface ActionCardProps {
   title: string;
@@ -23,6 +24,8 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   onAction,
   onViewDetails,
   status,
+  // @ts-ignore || it will be used later
+  key,
 }) => {
   const strings = useStrings();
   return (
@@ -47,16 +50,22 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
               <Link
                 textAlign="center"
                 onClick={e => {
-                  e.preventDefault();
+                  e.stopPropagation();
                   onViewDetails();
                 }}
+                href={YOROI_VOTING_RECORD_LINK}
+                rel="noopener"
+                target="_blank"
+                underline="hover"
+                sx={{ cursor: 'pointer' }}
               >
                 {strings.yoroiVotingRecord}
               </Link>
             )}
           </Stack>
         ) : (
-          <Button variant="outlined" onClick={onAction} fullWidth>
+          // @ts-ignore
+          <Button variant="secondary" onClick={onAction} fullWidth>
             {buttonText}
           </Button>
         )}
