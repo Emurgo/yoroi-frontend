@@ -17,3 +17,12 @@ export const drepNames = {
   [YOROI_DREP_ID]: 'Yoroi W₳llet',
   [EMURGO_DREP_ID]: 'EMURGO',
 };
+
+export const GOVERNANCE_STATUS = {
+  IDLE: 'idle',
+  HOVER: 'hover',
+  DELEGATED: 'delegated',
+  DISABLED: 'disabled',
+} as const;
+
+export type GovernanceStatusState = (typeof GOVERNANCE_STATUS)[keyof typeof GOVERNANCE_STATUS];
