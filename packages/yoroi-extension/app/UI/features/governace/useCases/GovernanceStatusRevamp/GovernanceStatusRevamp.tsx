@@ -3,7 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/useStrings';
-import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
+import { GOVERNANCE_STATUS, GovernanceStatusState, YOROI_DREP_ID } from '../../common/constants';
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -85,7 +85,7 @@ export const GovernanceStatusRevamp = () => {
       <CardsContainer>
         <GovernanceStatusRevampCard
           state={cardState}
-          drepId="drep1qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwerty"
+          drepId={YOROI_DREP_ID}
           votingPowerValue="—"
           delegatedAmountValue="—"
           onDelegateClick={() => {
