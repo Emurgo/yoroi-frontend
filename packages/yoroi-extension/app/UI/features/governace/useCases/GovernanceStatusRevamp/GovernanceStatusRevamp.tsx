@@ -2,9 +2,68 @@ import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
 import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
-import { useStrings } from '../../common/useStrings';
-import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
-import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useStrings } from '../../common/hooks/useStrings';
+import { YOROI_DREP_ID } from '../../common/constants';
+import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
+
+export const GovernanceStatusRevamp = () => {
+  const navigateTo = useNavigateTo();
+  const strings = useStrings();
+
+  const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+
+  const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
+
+  console.log('governanceStatus', { governanceStatus, cardState });
+
+  const onExploreMore = () => {
+    navigateTo.selectRevampOptions();
+  };
+
+  return (
+    <Container>
+      <TitleSection>
+        <Typography variant="h5" color="ds.text_gray_medium">
+          {strings.delegationOptions}
+        </Typography>
+        <Typography variant="body1" color="ds.text_gray_low">
+          {strings.chooseDelegationOption}
+        </Typography>
+      </TitleSection>
+
+      {/* Optionally render error */}
+      {error != null && (
+        <Typography variant="body2" color="error">
+          {error}
+        </Typography>
+      )}
+
+      <CardsContainer>
+        <GovernanceStatusRevampCard
+          state={cardState}
+          drepId={governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID}
+          onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
+          onDetailsClick={() => {
+            // later: open governance docs / modal
+          }}
+          btnLoading={loadingUnsignTx}
+        />
+
+        <OtherActionsCard onClick={onExploreMore}>
+          <TextContent>
+            <Typography variant="body1" fontWeight={500} color="ds.gray_max">
+              {strings.exploreOtherDRepsOrAbstain}
+            </Typography>
+            <Typography variant="body2" color="ds.text_gray_medium">
+              {strings.browseAdditionalDelegation}
+            </Typography>
+          </TextContent>
+        </OtherActionsCard>
+      </CardsContainer>
+    </Container>
+  );
+};
 
 const Container = styled(Box)(() => ({
   display: 'flex',
@@ -61,81 +120,3 @@ const TextContent = styled(Box)(() => ({
   gap: '4px',
   width: '580px',
 }));
-
-export const GovernanceStatusRevamp = () => {
-  const navigateTo = useNavigateTo();
-  const strings = useStrings();
-
-  const {
-    governanceStatus,
-    governanceManager,
-    governanceVoteChanged,
-    createDrepDelegationTransaction,
-    walletAdaBalance,
-    triggerBuySellAdaDialog,
-    submitedTransactions,
-    governanceVote,
-    signDelegationTransaction,
-    selectedWallet,
-    networkId,
-  } = useGovernance();
-
-  console.log('governanceStatus', governanceStatus);
-  // For now we keep it "idle"
-  const getGovernanceStatusState = () => {
-    if (governanceStatus.status === 'none' && governanceStatus.drep === null) {
-      return GOVERNANCE_STATUS.IDLE;
-    }
-    if (governanceStatus.status === 'delegate' && governanceStatus.drep !== null) {
-      return GOVERNANCE_STATUS.DELEGATED;
-    }
-    return GOVERNANCE_STATUS.IDLE; // add loading here later
-  };
-  const cardState: GovernanceStatusState = getGovernanceStatusState();
-
-  console.log('@@@cardState', cardState);
-  const onExploreMore = () => {
-    navigateTo.selectRevampOptions();
-  };
-
-  return (
-    <Container>
-      <TitleSection>
-        <Typography variant="h5" color="ds.text_gray_medium">
-          {strings.delegationOptions}
-        </Typography>
-        <Typography variant="body1" color="ds.text_gray_low">
-          {strings.chooseDelegationOption}
-        </Typography>
-      </TitleSection>
-
-      <CardsContainer>
-        <GovernanceStatusRevampCard
-          state={cardState}
-          drepId="drep1qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwerty"
-          votingPowerValue="—"
-          delegatedAmountValue="—"
-          onDelegateClick={() => {
-            // later: route to delegation flow
-            // console.log('Delegate clicked')
-          }}
-          onDetailsClick={() => {
-            // later: open governance docs / modal
-            // console.log('View governance details')
-          }}
-        />
-
-        <OtherActionsCard onClick={onExploreMore}>
-          <TextContent>
-            <Typography variant="body1" fontWeight={500} color="ds.gray_max">
-              {strings.exploreOtherDRepsOrAbstain}
-            </Typography>
-            <Typography variant="body2" color="ds.text_gray_medium">
-              {strings.browseAdditionalDelegation}
-            </Typography>
-          </TextContent>
-        </OtherActionsCard>
-      </CardsContainer>
-    </Container>
-  );
-};
