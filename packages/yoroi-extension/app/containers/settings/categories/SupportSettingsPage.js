@@ -19,7 +19,7 @@ export default class SupportSettingsPage extends Component<StoresProps> {
     return selected.publicKey;
   };
 
-  handleDownloadLogs: () => void = () => {
+  handleDownloadLogs: () => Promise<void> = () => {
     return downloadLogs();
   };
 
