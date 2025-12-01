@@ -6,7 +6,7 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';
 
 export const NotAllowedInGovernance = () => {
-  const { walletAdaBalance, triggerBuySellAdaDialog, networkId } = useGovernance();
+  const { triggerBuySellAdaDialog, networkId } = useGovernance();
   const strings = useStrings();
 
   const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
