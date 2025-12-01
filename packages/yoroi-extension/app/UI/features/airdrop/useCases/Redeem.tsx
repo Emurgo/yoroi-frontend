@@ -10,7 +10,7 @@ export default function Redeem(
     address: string;
     onClose: () => void;
     onReorg: (signRequest: any) => void;
-    onRedeem: async (unsignedTxHex: string) => void;
+    onRedeem: (unsignedTxHex: string) => Promise<void>;
   }
 ) {
   const [error, setError] = useState(null);
@@ -43,20 +43,22 @@ export default function Redeem(
       content = '...';
     }
     content = (
-      <Box>
-        <Typography>
-          {redemptionTxBuildingResponse.redeemedAmount}
-        </Typography>
-      </Box>
-      <Button
-        onClick={async () => {
-          await props.onRedeem(redemptionTxBuildingResponse.transaction);
-          // todo: error handling
-          props.onClose();
-        }}
-      />
-        Redeem
-      </Button>
+      <>
+        <Box>
+          <Typography>
+            {redemptionTxBuildingResponse.redeemedAmount}
+          </Typography>
+        </Box>
+        <Button
+          onClick={async () => {
+            await props.onRedeem(redemptionTxBuildingResponse.transaction);
+            // todo: error handling
+            props.onClose();
+          }}
+        >
+          Redeem
+        </Button>
+      </>
     );
   } else if (getCollateralUtxosResult.state === 'need-reorg') {
     content = (

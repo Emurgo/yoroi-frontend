@@ -435,14 +435,14 @@ async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Pro
   }
 }
 
-export function getRedemptionTransaction(
+export async function getRedemptionTransaction(
   destAddr: string,
   thawEndpoint: string,
   changeAddr: string,
   collateralUtxoIds: Array<string>,
   fundingUtxos: Array<string>
 ) {
-  const resp = awat fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`);
+  const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`);
   if (!resp.ok) {
     throw new Error('error when querying the redemption transaction building endpoint');
   }
