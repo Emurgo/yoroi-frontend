@@ -121,12 +121,12 @@ export const getFileContent = (fileName, fileDir) => {
 export const getDownloadedFileContent = async fileName => {
   const fullPath = path.resolve(getDownloadsDir(), fileName);
   const isZipFile = fileName.toLowerCase().endsWith('.zip');
-  
+
   if (isZipFile) {
     const zipBuffer = fs.readFileSync(fullPath);
     const zip = await JSZip.loadAsync(zipBuffer);
     const result = {};
-    
+
     for (const [filePath, file] of Object.entries(zip.files)) {
       if (!file.dir) {
         const content = await file.async('string');
@@ -134,7 +134,7 @@ export const getDownloadedFileContent = async fileName => {
         result[extractedFileName] = content;
       }
     }
-    
+
     return result;
   } else {
     const data = fs.readFileSync(fullPath, 'utf8');
