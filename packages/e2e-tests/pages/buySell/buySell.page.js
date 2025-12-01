@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, halfSecond, quarterSecond, twoSeconds } from '../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, halfSecond, quarterSecond, twoSeconds } from '../../helpers/timeConstants.js';
 import BasePage from '../basepage.js';
 import { ElementLocator } from '../locator.js';
 
@@ -83,6 +83,13 @@ class BuySell extends BasePage {
     const states = await Promise.all([modalWindowPromise, titlePromise, closeBtnPromise]);
 
     return states.every(state => state === true);
+  }
+  async closeModal() {
+    this.logger.info(`BuySell::closeModal is called`);
+    await this.click(this.closeModalBtnLocator);
+    const isClosed = await this.customWaitIsNotPresented(this.modalWindowLocator, fiveSeconds, quarterSecond);
+    this.logger.info(`BuySell::closeModal. Modal is closed: ${isClosed}`);
+    return isClosed
   }
   async enterAdaAmount(amount) {
     this.logger.info(`BuySell::enterAdaAmount is called. Amount ${amount}`);
