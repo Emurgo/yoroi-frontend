@@ -276,12 +276,14 @@ class BasePage {
   /**
    * Gets the value of an attribute for an element by locator.
    * @param {ElementLocator} locator
-   * @param {string} property
+   * @param {string} attribute
    * @returns {Promise<*>}
    */
-  async getAttribute(locator, property) {
-    this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, property: ${property}`);
-    return await this.driver.findElement(getByLocator(locator)).getAttribute(property);
+  async getAttribute(locator, attribute) {
+    this.logger.info(`BasePage::getAttribute is called. Locator: ${JSON.stringify(locator)}, Attribute: ${attribute}`);
+    const result = await this.driver.findElement(getByLocator(locator)).getAttribute(attribute);
+    this.logger.info(`BasePage::getAttribute. Attribute: ${attribute}, value: ${result}`);
+    return result;
   }
   /**
    * Gets the value of an attribute for a WebElement.
@@ -557,22 +559,45 @@ class BasePage {
     return this.driver.wait(condition);
   }
   /**
-   * Returns a boolean indicating if a button is enabled by checking the 'disabled' attribute.
+   * Returns a boolean indicating if a button is enabled or disabled by checking the 'disabled' attribute.
    * @param {ElementLocator} locator
+   * @param {string?} checkValue
    * @returns {Promise<boolean>}
    */
-  async buttonIsEnabled(locator) {
-    this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
+  async _buttonState(locator, checkValue) {
+    this.logger.info(`BasePage::_buttonState is called. Locator: ${JSON.stringify(locator)}. Value to check: ${checkValue}`);
     const buttonIsEnabled = await this.customWaiter(
       async () => {
         const buttonlIsEnabled = await this.getAttribute(locator, 'disabled');
-        return buttonlIsEnabled === null;
+        return buttonlIsEnabled === checkValue;
       },
       fiveSeconds,
       quarterSecond
     );
 
     return buttonIsEnabled;
+  }
+  /**
+   * Returns a boolean indicating if a button is enabled by checking the 'disabled' attribute.
+   * @param {ElementLocator} locator
+   * @returns {Promise<boolean>}
+   */
+  async buttonIsEnabled(locator) {
+    this.logger.info(`BasePage::buttonIsEnabled is called. Value: ${JSON.stringify(locator)}`);
+    const isEnabled = await this._buttonState(locator, null);
+    this.logger.info(`BasePage::buttonIsEnabled. Button is enabled: ${isEnabled}`);
+    return isEnabled;
+  }
+  /**
+   * Returns a boolean indicating if a button is disabled by checking the 'disabled' attribute.
+   * @param {ElementLocator} locator
+   * @returns {Promise<boolean>}
+   */
+  async buttonIsDisabled(locator) {
+    this.logger.info(`BasePage::buttonIsDisabled is called. Value: ${JSON.stringify(locator)}`);
+    const isDisabled = await this._buttonState(locator, 'true');
+    this.logger.info(`BasePage::buttonIsDisabled. Button is disabled: ${isDisabled}`);
+    return isDisabled;
   }
   /**
    * Waits for an element at the given locator to become disabled.
