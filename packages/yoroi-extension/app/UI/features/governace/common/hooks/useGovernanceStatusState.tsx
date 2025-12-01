@@ -1,6 +1,6 @@
 import * as React from 'react';
-import {useGovernance} from '../../module/GovernanceContextProvider';
-import {GOVERNANCE_STATUS, GovernanceStatusState} from '../../common/constants';
+import { useGovernance } from '../../module/GovernanceContextProvider';
+import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 
 type UseGovernanceStatusStateResult = {
   governanceStatusState: GovernanceStatusState;
@@ -9,10 +9,9 @@ type UseGovernanceStatusStateResult = {
 };
 
 export const useGovernanceStatusState = (): UseGovernanceStatusStateResult => {
-  const {governanceStatus, submitedTransactions} = useGovernance();
+  const { governanceStatus, submitedTransactions } = useGovernance();
 
-  const isPendingDrepDelegationTx =
-    submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+  const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const governanceStatusState: GovernanceStatusState = React.useMemo(() => {
     if (governanceStatus.status === 'none' && governanceStatus.drep === null) {
