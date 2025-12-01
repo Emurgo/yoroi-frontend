@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, quarterSecond } from '../../helpers/timeConstants.js';
+import { defaultWaitTimeout, halfSecond, quarterSecond, twoSeconds } from '../../helpers/timeConstants.js';
 import BasePage from '../basepage.js';
 import { ElementLocator } from '../locator.js';
 
@@ -104,14 +104,18 @@ class BuySell extends BasePage {
   async selectBuyTab() {
     this.logger.info(`BuySell::selectBuyTab is called`);
     await this.click(this.buyTabBtnLocator);
+    await this.customWaiter(async () => {
+      const btnIsSelected = await this.getAttribute(this.buyTabBtnLocator, 'aria-selected');
+      return btnIsSelected === 'true';
+    });
   }
   async selectSellTab() {
     this.logger.info(`BuySell::selectSellTab is called`);
     await this.click(this.sellTabBtnLocator);
   }
-  async isProceedBtnEnabled() {
-    this.logger.info(`BuySell::isProceedActive is called`);
-    return await this.buttonIsEnabled(this.proceedBtnLocator);
+  async isProceedBtnDisabled() {
+    this.logger.info(`BuySell::isProceedBtnDisabled is called`);
+    return await this.buttonIsDisabled(this.proceedBtnLocator, twoSeconds, halfSecond);
   }
   async proceed() {
     this.logger.info(`BuySell::proceed is called`);
