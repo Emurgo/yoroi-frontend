@@ -5,7 +5,7 @@ import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants
 import { YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { LoadingButton } from '@mui/lab';
 import { Icon } from '../../../../components';
-import { truncateFormatter } from '../../../../../utils/formatters';
+import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 interface ActionCardProps {
   title: string;
@@ -16,7 +16,9 @@ interface ActionCardProps {
   onAction: () => void;
   onViewDetails?: () => void;
   status: GovernanceStatusState;
-  drepId?: string;
+  drepId: string | null;
+  isDelegated: boolean;
+  pending?: boolean;
 }
 
 export const DrepOptionsCard: React.FC<ActionCardProps> = ({
@@ -29,19 +31,13 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   onViewDetails,
   status,
   drepId,
+  isDelegated,
+  pending = false,
 }) => {
   const strings = useStrings();
-  console.log('DrepOptionsCard render', { title, status, variant, drepId });
-  const handleCopy = () => {
-    try {
-      navigator.clipboard.writeText(drepId || '');
-    } catch {
-      // no-op
-    }
-  };
 
   return (
-    <ActionCardContainer variant={variant} status={status}>
+    <ActionCardContainer variant={variant} status={status} isCardDelegated={isDelegated} pending={pending}>
       <CardWrapper>
         <CardTitleRow>
           <CardIcon variant={variant}>{icon}</CardIcon>
@@ -49,51 +45,16 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
         </CardTitleRow>
 
         <Typography variant="body1">{description}</Typography>
+        {GOVERNANCE_STATUS.DELEGATED === status && drepId && isDelegated && <DelegatedInfo drepId={drepId} status={status} />}
+        {GOVERNANCE_STATUS.IDLE === status && drepId === null && isDelegated && <AbstainOrNoConfidenceInfo />}
       </CardWrapper>
-
-      {GOVERNANCE_STATUS.DELEGATED === status && (
-        <ItemsGroup>
-          <ItemRow>
-            <LeftPart>
-              <Typography color="ds.text_gray_low" variant="body2">
-                ID
-              </Typography>
-            </LeftPart>
-
-            <RightPart>
-              <Typography color="ds.text_gray_medium" variant="body2">
-                {truncateFormatter(drepId, 15)}
-              </Typography>
-              <CopyIconButton onClick={handleCopy}>
-                <Icon.Copy />
-              </CopyIconButton>
-            </RightPart>
-          </ItemRow>
-
-          <ItemRow>
-            <LeftPart>
-              <Typography color="ds.text_gray_low" variant="body2">
-                {strings.drepStatus}
-              </Typography>
-            </LeftPart>
-
-            <RightPart>
-              <StatusBadge variant={status}>
-                <Typography variant="body2" color="ds.gray_min">
-                  {'Active'}
-                </Typography>
-              </StatusBadge>
-            </RightPart>
-          </ItemRow>
-        </ItemsGroup>
-      )}
 
       <CTASet>
         {variant === 'primary' ? (
           <Stack direction="column" spacing={12} width="100%">
-            {status === GOVERNANCE_STATUS.IDLE && (
+            {(status === GOVERNANCE_STATUS.DELEGATED || drepId === null) && !isDelegated && (
               // @ts-ignore
-              <LoadingButton variant="primary" onClick={onAction} fullWidth>
+              <LoadingButton variant="primary" onClick={onAction} fullWidth height="40px">
                 {buttonText}
               </LoadingButton>
             )}
@@ -117,7 +78,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
           </Stack>
         ) : (
           // @ts-ignore
-          <Button variant="secondary" onClick={onAction} fullWidth>
+          <Button height="40px" variant="secondary" onClick={onAction} fullWidth sx={{ padding: '13px 10px !important' }}>
             {buttonText}
           </Button>
         )}
@@ -126,17 +87,88 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   );
 };
 
+const DelegatedInfo = ({ drepId, status }) => {
+  const strings = useStrings();
+
+  const handleCopy = () => {
+    try {
+      navigator.clipboard.writeText(drepId || '');
+    } catch {
+      // no-op
+    }
+  };
+  return (
+    <ItemsGroup>
+      <ItemRow>
+        <LeftPart>
+          <Typography color="ds.text_gray_low" variant="body2">
+            ID
+          </Typography>
+        </LeftPart>
+
+        <RightPart>
+          <Typography color="ds.text_gray_medium" variant="body2">
+            {truncateFormatter(drepId, 15)}
+          </Typography>
+          <CopyIconButton onClick={handleCopy}>
+            <Icon.Copy />
+          </CopyIconButton>
+        </RightPart>
+      </ItemRow>
+
+      <ItemRow>
+        <LeftPart>
+          <Typography color="ds.text_gray_low" variant="body2">
+            {strings.drepStatus}
+          </Typography>
+        </LeftPart>
+
+        <RightPart>
+          <StatusBadge variant={status}>
+            <Typography variant="body2" color="ds.gray_min">
+              {'Active'}
+            </Typography>
+          </StatusBadge>
+        </RightPart>
+      </ItemRow>
+    </ItemsGroup>
+  );
+};
+
+const AbstainOrNoConfidenceInfo = () => {
+  const strings = useStrings();
+
+  return (
+    <ItemsGroup>
+      <ItemRow>
+        <LeftPart>
+          <Typography color="ds.text_gray_low" variant="body2">
+            {strings.delegationStatus}
+          </Typography>
+        </LeftPart>
+
+        <RightPart>
+          <Typography color="ds.text_gray_medium" variant="body2">
+            {strings.delegateLabel}
+          </Typography>
+        </RightPart>
+      </ItemRow>
+    </ItemsGroup>
+  );
+};
+
 type ActionCardVariant = 'primary' | 'outlined';
 
 interface ActionCardContainerProps {
   variant: ActionCardVariant;
   status: GovernanceStatusState;
+  isCardDelegated?: boolean;
+  pending?: boolean;
 }
 
 export const ActionCardContainer = styled(Box, {
-  shouldForwardProp: prop => prop !== 'variant' && prop !== 'status',
-})<ActionCardContainerProps>(({ theme, variant, status }) => {
-  console.log('status', { variant, status });
+  shouldForwardProp: prop => prop !== 'variant' && prop !== 'status' && prop !== 'isCardDelegated' && prop !== 'pending',
+})<ActionCardContainerProps>(({ pending, theme, variant, status, isCardDelegated }: any) => {
   const base: React.CSSProperties = {
     boxSizing: 'border-box',
     display: 'flex',
@@ -159,12 +191,26 @@ export const ActionCardContainer = styled(Box, {
   };
 
   // 1. Disabled state (regardless of variant)
-  if (status === 'disabled') {
+  if (status === 'disabled' || pending) {
     return {
       ...base,
       background: theme.palette.ds.gray_100,
       border: `1px solid ${theme.palette.ds.gray_200}`,
       pointerEvents: 'none',
+    };
+  }
+  if (isCardDelegated) {
+    return {
+      ...base,
+      background: theme.palette.ds.bg_gradient_2,
+    };
+  }
+
+  if (isCardDelegated && variant === 'primary') {
+    return {
+      ...base,
+      background: theme.palette.ds.bg_gradient_2,
+      // border: `1px solid ${theme.palette.ds.primary_500}`,
     };
   }
   if (variant === 'primary') {
@@ -177,19 +223,12 @@ export const ActionCardContainer = styled(Box, {
     };
   }
 
-  if (status === 'delegated') {
-    return {
-      ...base,
-      background: theme.palette.ds.bg_color_max,
-      border: `1px solid ${theme.palette.ds.primary_500}`,
-    };
-  }
   return {
     ...base,
     background: theme.palette.ds.bg_color_max,
     border: `1px solid ${theme.palette.ds.gray_200}`,
     '&:hover': {
-      borderColor: theme.palette.ds.primary_500,
+      borderColor: theme.palette.ds.el_gray_min,
     },
   };
 });
@@ -216,7 +255,6 @@ const CardTitleRow = styled(Box)(() => ({
   padding: '0px',
   gap: '12px',
   width: '262px',
-  height: '48px',
   flex: 'none',
   order: 0,
   alignSelf: 'stretch',
@@ -233,10 +271,6 @@ const CardIcon = styled(Box, {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  flexShrink: 0,
-  flex: 'none',
-  order: 0,
-  flexGrow: 0,
 }));
 
 const ItemsGroup = styled(Box)(() => ({

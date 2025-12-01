@@ -3,19 +3,26 @@ import { Box, Typography, Button } from '@mui/material';
 import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { YOROI_DREP_ID } from '../../common/constants';
+import { GOVERNANCE_STATUS, YOROI_DREP_ID } from '../../common/constants';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
+import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
+import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
+  const { isNotAllowed } = useIsGovernanceAllowed();
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
   };
+
+  if (isNotAllowed) {
+    return <NotAllowedInGovernance />;
+  }
 
   return (
     <Container>
@@ -23,8 +30,8 @@ export const GovernanceStatusRevamp = () => {
         <Typography variant="h5" color="ds.text_gray_medium">
           {strings.delegationOptions}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_low">
-          {strings.chooseDelegationOption}
+        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'}>
+          {governanceStatus?.status === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
         </Typography>
       </TitleSection>
 
@@ -38,8 +45,9 @@ export const GovernanceStatusRevamp = () => {
       <CardsContainer>
         <GovernanceStatusRevampCard
           state={cardState}
-          drepId={governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID}
+          governanceStatus={governanceStatus}
           onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
+          onDetailsClick={() => YOROI_DREP_ID}
           btnLoading={loadingUnsignTx}
         />
 

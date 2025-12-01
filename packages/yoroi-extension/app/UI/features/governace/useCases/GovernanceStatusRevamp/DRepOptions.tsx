@@ -8,7 +8,7 @@ import { DrepOptionsCard } from './DrepOptionsCard';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
-import { YOROI_DREP_ID } from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, GOVERNANCE_STATUS, YOROI_DREP_ID } from '../../common/constants';
 
 interface DRepOptionsScreenProps {}
 
@@ -18,13 +18,21 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
   const theme: any = useTheme();
 
   const { submitedTransactions } = useGovernance();
-  const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
-  const isPendindDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+  const { loadingUnsignTx, delegateToDrep, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
+    useGovernanceDelegationToYoroiDrep();
+  const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const onBack = () => {
     navigateTo.selectRevampStatus();
   };
+
+  const drepID = governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID;
+  const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
+  const isDelegatingToYoroiDrep = isDelegated && drepID === YOROI_DREP_ID;
+  const isDelegationToOtherDrep = isDelegated && drepID !== YOROI_DREP_ID;
+  const isAbstain = drepID === null || governanceStatus.status === DREP_ALWAYS_ABSTAIN;
+  const isNoConfidence = drepID === null || governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE;
 
   const drepOptionsConfig = [
     {
@@ -37,36 +45,44 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       onAction: () => delegateToDrep(YOROI_DREP_ID),
       onViewDetails: () => console.log('View Yoroi details'),
       status: cardState,
+      drepId: governanceStatus.drep,
+      isDelegated: isDelegatingToYoroiDrep,
     },
     {
       key: 'others',
       title: strings.otherDReps,
       description: strings.designatingSomeoneElse,
-      buttonText: strings.delegateLabel,
+      buttonText: isDelegationToOtherDrep ? strings.delegateToOtherDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingDrep />,
-      onAction: () => console.log('Browse DReps'),
+      onAction: () => openDelegateModalForCustomDrep(),
       status: cardState,
+      drepId: governanceStatus.drep,
+      isDelegated: isDelegationToOtherDrep,
     },
     {
       key: 'abstain',
       title: strings.abstain,
       description: strings.chooseAbstain,
-      buttonText: strings.delegateLabel,
+      buttonText: isAbstain ? strings.changeToDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingAbstain />,
-      onAction: () => console.log('Abstain'),
+      onAction: () => (isAbstain ? openDelegateModalForCustomDrep() : delegateToAbstain()),
       status: cardState,
+      drepId: null,
+      isDelegated: isAbstain,
     },
     {
       key: 'noConfidence',
       title: strings.noConfidence,
       description: strings.chooseNoConfidence,
-      buttonText: strings.delegateLabel,
+      buttonText: isNoConfidence ? strings.changeToDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingNoConfidence />,
-      onAction: () => console.log('No Confidence'),
+      onAction: () => (isNoConfidence ? openDelegateModalForCustomDrep() : delegateToNoConfidence()),
       status: cardState,
+      drepId: null,
+      isDelegated: isNoConfidence,
     },
   ];
 
@@ -98,7 +114,9 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
             onAction={option.onAction}
             onViewDetails={option.onViewDetails}
             status={option.status}
-            drepId={governanceStatus.drep ? governanceStatus.drep : YOROI_DREP_ID}
+            drepId={option.drepId}
+            isDelegated={option.isDelegated}
+            pending={isPendingDrepDelegationTx || loadingUnsignTx}
           />
         ))}
       </CardsRow>
@@ -120,25 +138,12 @@ const TitleSection = styled(Box)(() => ({
   alignItems: 'center',
   padding: '0px',
   gap: '8px',
-  width: '1248px',
-  height: '58px',
-  flex: 'none',
-  order: 0,
-  alignSelf: 'stretch',
-  flexGrow: 0,
 }));
 
 const CardsRow = styled(Box)(() => ({
   display: 'flex',
   flexDirection: 'row',
-  alignItems: 'center',
   flexWrap: 'wrap',
   padding: '0px',
   gap: '24px',
-  width: '1248px',
-  height: '320px',
-  flex: 'none',
-  order: 1,
-  alignSelf: 'stretch',
-  flexGrow: 0,
 }));

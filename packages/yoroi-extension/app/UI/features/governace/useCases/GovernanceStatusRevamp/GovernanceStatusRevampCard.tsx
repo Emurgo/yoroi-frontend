@@ -5,33 +5,48 @@ import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
 import { Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';
-import { GovernanceStatusState, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
+import {
+  DREP_ALWAYS_ABSTAIN,
+  DREP_ALWAYS_NO_CONFIDENCE,
+  GOVERNANCE_STATUS,
+  GovernanceStatusState,
+  YOROI_DREP_ID,
+  YOROI_VOTING_RECORD_LINK,
+} from '../../common/constants';
+import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
-  drepId: string;
-  votingPowerLabel?: string;
-  votingPowerValue?: string;
   onDelegateClick?: () => void;
   onDetailsClick?: () => void;
   btnLoading?: boolean;
+  forModal?: boolean;
+  governanceStatus?: any;
 }
 
 export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
   state,
-  drepId,
+  governanceStatus,
   onDelegateClick,
   onDetailsClick,
   btnLoading,
+  forModal = false,
 }) => {
-  const isDisabled = state === 'disabled';
-  const isDelegated = state === 'delegated';
+  const isDisabled = state === GOVERNANCE_STATUS.DISABLED;
+  const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
   const strings = useStrings();
   const theme: any = useTheme();
 
+  const drepID = governanceStatus?.drep ? governanceStatus?.drep : YOROI_DREP_ID;
+  const isDelegationToYoroiDrep = isDelegated && drepID === YOROI_DREP_ID;
+  const isDelegationToOtherDrep = isDelegated && drepID !== YOROI_DREP_ID;
+  const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
+  const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
+  const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
+
   const handleCopy = () => {
     try {
-      navigator.clipboard.writeText(drepId);
+      navigator.clipboard.writeText(drepID);
     } catch {
       // no-op
     }
@@ -47,72 +62,102 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     onDetailsClick?.();
   };
 
-  // Will add this as constants later on when adding implementation with backend
-  const statusVariant: 'active' | 'delegated' | 'disabled' =
-    state === 'delegated' ? 'delegated' : state === 'disabled' ? 'disabled' : 'active';
-
-  console.log('GovernanceStatusRevampCard render', { state, statusVariant });
-  const primaryButtonLabel = isDelegated ? strings.changeToDrep : strings.delegateLabel;
+  const handleCardInfo = () => {
+    if (isDelegationToYoroiDrep) {
+      return {
+        icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
+        title: strings.yoroiDRep,
+        description: strings.yoroiDRepInfo,
+      };
+    }
+    if (isDelegationToOtherDrep) {
+      return {
+        icon: <Icon.VotingDrep width={24} height={24} fill={theme.palette.ds.gray_max} />,
+        title: strings.otherDReps,
+        description: strings.designatedSomeoneElse,
+      };
+    }
+    if (isAbstain) {
+      return {
+        icon: <Icon.VotingAbstain width={24} height={24} fill={theme.palette.ds.gray_max} />,
+        title: strings.abstain,
+        description: strings.abstainInfo,
+      };
+    }
+    if (isNoConfidence) {
+      return {
+        icon: <Icon.VotingNoConfidence width={24} height={24} fill={theme.palette.ds.gray_max} />,
+        title: strings.noConfidence,
+        description: strings.noConfidenceInfo,
+      };
+    }
+    return { icon: <Icon.VotingAbstain width={24} height={24} fill={theme.palette.ds.gray_max} />, title: strings.abstain };
+  };
 
   return (
-    <Root state={state}>
+    <Root state={state} forModal={forModal}>
       <TitleRow>
-        <Avatar state={state}>
-          <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />
+        <Avatar state={state} isDelegationToYoroiDrep={isDelegationToYoroiDrep}>
+          {handleCardInfo().icon}
         </Avatar>
 
-        <Typography variant="h5" color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
-          {strings.yoroiDRep}
+        <Typography maxWidth={'600px'} variant={forModal ? 'body1' : 'h5'} color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
+          {handleCardInfo().title}
         </Typography>
       </TitleRow>
-
       <Typography variant="body1" color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
-        {strings.yoroiDRepInfo}
+        {handleCardInfo().description}
       </Typography>
 
       <ItemsGroup>
-        <ItemRow>
-          <LeftPart>
-            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>ID</Typography>
-          </LeftPart>
-
-          <RightPart>
-            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>{drepId}</Typography>
-            <CopyIconButton onClick={handleCopy} disabled={isDisabled}>
-              <Icon.Copy />
-            </CopyIconButton>
-          </RightPart>
-        </ItemRow>
-
-        <ItemRow alignCenter>
-          <LeftPart>
-            <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.drepStatus}</Typography>
-          </LeftPart>
-
-          <RightPart>
-            <StatusBadge variant={statusVariant}>
-              <Typography variant="body2" color="ds.gray_min">
-                {isDisabled ? 'Paused' : 'Active'}
-              </Typography>
-            </StatusBadge>
-          </RightPart>
-        </ItemRow>
-        {/* 
-        {isDelegated && (
+        {(isDelegationToOtherDrep || isDelegationToYoroiDrep) && (
           <ItemRow>
             <LeftPart>
-              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{delegatedAmountLabel}</Typography>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>ID</Typography>
             </LeftPart>
 
             <RightPart>
-              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>{delegatedAmountValue}</Typography>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
+                {forModal ? truncateFormatter(drepID, 15) : drepID}
+              </Typography>
+              <CopyIconButton onClick={handleCopy} disabled={isDisabled}>
+                <Icon.Copy />
+              </CopyIconButton>
             </RightPart>
           </ItemRow>
-        )} */}
-      </ItemsGroup>
+        )}
 
+        {(isDelegationToOtherDrep || isDelegationToYoroiDrep) && (
+          <ItemRow alignCenter>
+            <LeftPart>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.drepStatus}</Typography>
+            </LeftPart>
+
+            <RightPart>
+              <StatusBadge variant={state}>
+                <Typography variant="body2" color="ds.gray_min">
+                  {isDisabled ? 'Paused' : 'Active'}
+                </Typography>
+              </StatusBadge>
+            </RightPart>
+          </ItemRow>
+        )}
+        {governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && (
+          <ItemRow alignCenter>
+            <LeftPart>
+              <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.delegationStatus}</Typography>
+            </LeftPart>
+
+            <RightPart>
+              <Typography variant="body2" color="ds.text_gray_medium">
+                {strings.delegateLabel}
+              </Typography>
+            </RightPart>
+          </ItemRow>
+        )}
+      </ItemsGroup>
       <CtaSet>
-        {statusVariant === 'active' && (
+        {governanceStatus?.status === GOVERNANCE_STATUS.IDLE && (
           <LoadingButton
             fullWidth
             loading={btnLoading}
@@ -125,37 +170,46 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             {primaryButtonLabel}
           </LoadingButton>
         )}
-
-        <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
-          <Link
-            onClick={event => event.stopPropagation()}
-            href={YOROI_VOTING_RECORD_LINK}
-            rel="noopener"
-            target="_blank"
-            underline="hover"
-            sx={{ cursor: 'pointer' }}
-          >
-            <Typography variant="body1">{strings.yoroiVotingRecord}</Typography>
-          </Link>
-        </Stack>
+        {onDetailsClick && (
+          <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
+            <Link
+              onClick={event => event.stopPropagation()}
+              href={YOROI_VOTING_RECORD_LINK}
+              rel="noopener"
+              target="_blank"
+              underline="hover"
+              sx={{ cursor: 'pointer' }}
+            >
+              <Typography variant="body1">{strings.yoroiVotingRecord}</Typography>
+            </Link>
+          </Stack>
+        )}
       </CtaSet>
     </Root>
   );
 };
 
 const Root = styled(Box, {
-  shouldForwardProp: prop => prop !== 'state',
-})<{ state: GovernanceStatusState }>(({ state, theme }: any) => {
+  shouldForwardProp: prop => prop !== 'state' && prop !== 'forModal',
+})<{ state: GovernanceStatusState; forModal: boolean }>(({ state, forModal, theme }: any) => {
   const base: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
     padding: '16px',
     gap: '16px',
-    width: '612px',
+    width: forModal ? '100%' : '612px',
     boxSizing: 'border-box',
     borderRadius: '8px',
   };
+
+  if (forModal) {
+    return {
+      ...base,
+      background: theme.palette.ds.bg_color_max,
+      border: `1px solid ${theme.palette.ds.gray_200}`,
+    };
+  }
 
   if (state === 'disabled') {
     return {
@@ -187,20 +241,22 @@ const TitleRow = styled(Box)(() => ({
   alignItems: 'center',
   padding: '0px',
   gap: '12px',
-  width: '580px',
+  width: '100%',
   height: '48px',
 }));
 
-const Avatar = styled(Box)<{ state: GovernanceStatusState }>(({ state, theme }: any) => ({
-  width: '48px',
-  height: '48px',
-  borderRadius: '1200px',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  background: state === 'disabled' ? theme.palette.ds.gray_600 : theme.palette.ds.primary_500,
-}));
+const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDrep: boolean }>(
+  ({ isDelegationToYoroiDrep, theme }: any) => ({
+    width: '48px',
+    height: '48px',
+    borderRadius: '1200px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    background: isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200, // maybe disable theme.palette.ds.gray_600
+  })
+);
 
 const ItemsGroup = styled(Box)(() => ({
   display: 'flex',
@@ -208,7 +264,7 @@ const ItemsGroup = styled(Box)(() => ({
   alignItems: 'flex-start',
   padding: '0px',
   gap: '8px',
-  width: '580px',
+  width: '100%',
 }));
 
 const ItemRow = styled(Box)<{ alignCenter?: boolean }>(({ alignCenter }) => ({
@@ -248,7 +304,7 @@ const CopyIconButton = styled(IconButton)(() => ({
   padding: '0px',
 }));
 
-const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant, theme }: any) => ({
+const StatusBadge = styled(Box)<{ variant: GovernanceStatusState }>(({ variant, theme }: any) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',
@@ -258,9 +314,9 @@ const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }
   height: '30px',
   borderRadius: '1200px',
   background:
-    variant === 'active' || variant === 'delegated'
+    variant === GOVERNANCE_STATUS.IDLE || variant === GOVERNANCE_STATUS.DELEGATED
       ? theme.palette.ds.secondary_600
-      : variant === 'disabled'
+      : variant === GOVERNANCE_STATUS.DISABLED
         ? theme.palette.ds.gray_600
         : theme.palette.ds.gray_400,
 }));
@@ -271,6 +327,6 @@ const CtaSet = styled(Box)(() => ({
   alignItems: 'flex-start',
   padding: '0px',
   gap: '8px',
-  width: '580px',
+  width: '100%',
   height: 'auto',
 }));
