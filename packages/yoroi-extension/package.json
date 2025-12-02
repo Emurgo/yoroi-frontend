@@ -164,7 +164,7 @@
     "@yoroi/exchange": "2.0.1",
     "@yoroi/explorers": "^1.0.2",
     "@yoroi/portfolio": "1.0.3",
-    "@yoroi/resolver": "6.0.1",
+    "@yoroi/resolver": "6.0.2",
     "@yoroi/staking": "^1.6.0",
     "@yoroi/swap": "7.2.0",
     "@yoroi/types": "6.1.0",
