@@ -8,13 +8,16 @@ import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovern
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { loadingUnsignTx, error, delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+  const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
+  const { submitedTransactions } = useGovernance();
   const { isNotAllowed } = useIsGovernanceAllowed();
+  const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
@@ -49,6 +52,8 @@ export const GovernanceStatusRevamp = () => {
           onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
           onDetailsClick={() => YOROI_DREP_ID}
           btnLoading={loadingUnsignTx}
+          openDelegateModalForCustomDrep={openDelegateModalForCustomDrep}
+          pending={isPendingDrepDelegationTx}
         />
 
         <OtherActionsCard onClick={onExploreMore}>

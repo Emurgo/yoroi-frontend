@@ -22,6 +22,8 @@ interface GovernanceStatusCardProps {
   btnLoading?: boolean;
   forModal?: boolean;
   governanceStatus?: any;
+  openDelegateModalForCustomDrep?: () => void;
+  pending?: boolean;
 }
 
 export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
@@ -31,8 +33,10 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   onDetailsClick,
   btnLoading,
   forModal = false,
+  openDelegateModalForCustomDrep,
+  pending = false,
 }) => {
-  const isDisabled = state === GOVERNANCE_STATUS.DISABLED;
+  const isDisabled = state === GOVERNANCE_STATUS.DISABLED || pending;
   const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
   const strings = useStrings();
   const theme: any = useTheme();
@@ -99,7 +103,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   };
 
   return (
-    <Root state={state} forModal={forModal}>
+    <Root state={state} forModal={forModal} isAbstain={isAbstain} isNoConfidence={isNoConfidence}>
       <TitleRow>
         <Avatar state={state} isDelegationToYoroiDrep={isDelegationToYoroiDrep}>
           {handleCardInfo().icon}
@@ -154,13 +158,25 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 
             <RightPart>
               <Typography variant="body2" color="ds.text_gray_medium">
-                {strings.delegateLabel}
+                {strings.delegatingLabel}
               </Typography>
             </RightPart>
           </ItemRow>
         )}
       </ItemsGroup>
       <CtaSet>
+        {(isAbstain || isNoConfidence) && (
+          <LoadingButton
+            fullWidth
+            loading={btnLoading}
+            /* @ts-ignore */
+            variant="secondary"
+            disabled={isDisabled}
+            onClick={openDelegateModalForCustomDrep}
+          >
+            {strings.changeToDrep}
+          </LoadingButton>
+        )}
         {governanceStatus?.status === GOVERNANCE_STATUS.IDLE && (
           <LoadingButton
             fullWidth
@@ -194,8 +210,14 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 };
 
 const Root = styled(Box, {
-  shouldForwardProp: prop => prop !== 'state' && prop !== 'forModal',
-})<{ state: GovernanceStatusState; forModal: boolean }>(({ state, forModal, theme }: any) => {
+  shouldForwardProp: prop => prop !== 'state' && prop !== 'forModal' && prop !== 'isAbstain' && prop !== 'isNoConfidence',
+})<{ state: GovernanceStatusState; forModal: boolean; isAbstain: boolean; isNoConfidence: boolean }>(({
+  state,
+  forModal,
+  theme,
+  isAbstain,
+  isNoConfidence,
+}: any) => {
   const base: React.CSSProperties = {
     display: 'flex',
     flexDirection: 'column',
@@ -206,6 +228,13 @@ const Root = styled(Box, {
     boxSizing: 'border-box',
     borderRadius: '8px',
   };
+
+  if (isAbstain || isNoConfidence) {
+    return {
+      ...base,
+      backgroundImage: theme.palette.ds.bg_gradient_2,
+    };
+  }
 
   if (forModal) {
     return {

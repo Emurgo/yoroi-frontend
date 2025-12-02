@@ -40,7 +40,9 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
     <ActionCardContainer variant={variant} status={status} isCardDelegated={isDelegated} pending={pending}>
       <CardWrapper>
         <CardTitleRow>
-          <CardIcon variant={variant}>{icon}</CardIcon>
+          <CardIcon variant={variant} isDelegated={isDelegated}>
+            {icon}
+          </CardIcon>
           <Typography variant="h5">{title}</Typography>
         </CardTitleRow>
 
@@ -149,7 +151,7 @@ const AbstainOrNoConfidenceInfo = () => {
 
         <RightPart>
           <Typography color="ds.text_gray_medium" variant="body2">
-            {strings.delegateLabel}
+            {strings.delegatingLabel}
           </Typography>
         </RightPart>
       </ItemRow>
@@ -262,11 +264,16 @@ const CardTitleRow = styled(Box)(() => ({
 }));
 
 const CardIcon = styled(Box, {
-  shouldForwardProp: prop => prop !== 'variant',
-})<{ variant: 'primary' | 'outlined' }>(({ variant, theme }: any) => ({
+  shouldForwardProp: prop => prop !== 'variant' && prop !== 'isDelegated',
+})<{ variant: 'primary' | 'outlined'; isDelegated?: boolean }>(({ variant, isDelegated, theme }: any) => ({
   width: '48px',
   height: '48px',
-  background: variant === 'primary' ? theme.palette.ds.primary_500 : theme.palette.ds.gray_100,
+  background:
+    variant === 'primary'
+      ? theme.palette.ds.primary_500
+      : isDelegated
+        ? theme.palette.ds.secondary_200
+        : theme.palette.ds.gray_100,
   borderRadius: '1200px',
   display: 'flex',
   alignItems: 'center',
