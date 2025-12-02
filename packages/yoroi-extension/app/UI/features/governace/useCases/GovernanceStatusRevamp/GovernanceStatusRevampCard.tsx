@@ -151,7 +151,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             </RightPart>
           </ItemRow>
         )}
-        {governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && !isDelegated && (
+        {((governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && !isDelegated) || isDelegationToOtherDrep) && (
           <ItemRow alignCenter>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.delegationStatus}</Typography>
@@ -191,7 +191,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             {primaryButtonLabel}
           </LoadingButton>
         )}
-        {showOnDetailsLink && (
+        {showOnDetailsLink && !isDelegationToOtherDrep && (
           <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
             <Link
               onClick={event => event.stopPropagation()}
