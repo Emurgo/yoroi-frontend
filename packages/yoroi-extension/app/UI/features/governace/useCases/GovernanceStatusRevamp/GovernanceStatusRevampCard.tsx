@@ -47,6 +47,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
   const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
+  const showOnDetailsLink = onDetailsClick && !isAbstain && !isNoConfidence;
 
   const handleCopy = () => {
     try {
@@ -190,7 +191,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             {primaryButtonLabel}
           </LoadingButton>
         )}
-        {onDetailsClick && (
+        {showOnDetailsLink && (
           <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
             <Link
               onClick={event => event.stopPropagation()}

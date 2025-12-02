@@ -5,7 +5,7 @@ import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCryp
 import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID, YOROI_VOTING_RECORD_LINK } from '../../../governace/common/constants';
+import { GOVERNANCE_STATUS, YOROI_DREP_ID, FIND_DREPS_LINK } from '../../../governace/common/constants';
 import { GovernanceStatusRevampCard } from '../../../governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevampCard';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
 
@@ -58,7 +58,7 @@ export const ChooseOtherDrepId = () => {
             <Typography variant="body1" color="ds.text_gray_medium">
               {strings.dontHaveId}
             </Typography>
-            <Link href={YOROI_VOTING_RECORD_LINK} rel="noopener" target="_blank" underline="hover">
+            <Link href={FIND_DREPS_LINK} rel="noopener" target="_blank" underline="hover">
               {strings.findDrepHere}
             </Link>
           </Stack>
