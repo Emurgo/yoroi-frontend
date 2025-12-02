@@ -1,4 +1,3 @@
-// features/governace/useCases/GovernanceStatusRevamp/GovernanceStatusCard.tsx
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
@@ -14,6 +13,7 @@ import {
   YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
+import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
@@ -38,6 +38,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 }) => {
   const isDisabled = state === GOVERNANCE_STATUS.DISABLED || pending;
   const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
+  const { isParticipating } = useIsGovernanceAllowed();
   const strings = useStrings();
   const theme: any = useTheme();
 
@@ -48,6 +49,12 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
   const showOnDetailsLink = onDetailsClick && !isAbstain && !isNoConfidence;
+  const showDrepStatus = isDelegationToOtherDrep || isDelegationToYoroiDrep || !isParticipating;
+  const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
+  const showDelegatingLabel = isParticipating;
+  const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
+  const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE;
+  const showVotingRecordLink = showOnDetailsLink && !isDelegationToOtherDrep;
 
   const handleCopy = () => {
     try {
@@ -106,7 +113,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   return (
     <Root state={state} forModal={forModal} isAbstain={isAbstain} isNoConfidence={isNoConfidence}>
       <TitleRow>
-        <Avatar state={state} isDelegationToYoroiDrep={isDelegationToYoroiDrep}>
+        <Avatar state={state} isDelegationToYoroiDrep={isDelegationToYoroiDrep} isParticipating={isParticipating}>
           {handleCardInfo().icon}
         </Avatar>
 
@@ -119,7 +126,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
       </Typography>
 
       <ItemsGroup>
-        {(isDelegationToOtherDrep || isDelegationToYoroiDrep) && (
+        {showDrepId && (
           <ItemRow>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>ID</Typography>
@@ -136,7 +143,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
           </ItemRow>
         )}
 
-        {isDelegationToOtherDrep && (
+        {showDrepStatus && (
           <ItemRow alignCenter>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.drepStatus}</Typography>
@@ -151,7 +158,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             </RightPart>
           </ItemRow>
         )}
-        {((governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && !isDelegated) || isDelegationToOtherDrep) && (
+        {showDelegatingLabel && (
           <ItemRow alignCenter>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.delegationStatus}</Typography>
@@ -166,7 +173,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
         )}
       </ItemsGroup>
       <CtaSet>
-        {(isAbstain || isNoConfidence) && (
+        {showDelegateToOtherDrepButton && (
           <LoadingButton
             fullWidth
             loading={btnLoading}
@@ -178,7 +185,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             {strings.changeToDrep}
           </LoadingButton>
         )}
-        {governanceStatus?.status === GOVERNANCE_STATUS.IDLE && (
+        {showDelegateToYoroiDrepButton && (
           <LoadingButton
             fullWidth
             loading={btnLoading}
@@ -191,7 +198,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             {primaryButtonLabel}
           </LoadingButton>
         )}
-        {showOnDetailsLink && !isDelegationToOtherDrep && (
+        {showVotingRecordLink && (
           <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
             <Link
               onClick={event => event.stopPropagation()}
@@ -279,8 +286,8 @@ const TitleRow = styled(Box)(() => ({
   height: '48px',
 }));
 
-const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDrep: boolean }>(
-  ({ isDelegationToYoroiDrep, theme, state }: any) => ({
+const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDrep: boolean; isParticipating: boolean }>(
+  ({ isDelegationToYoroiDrep, theme, isParticipating }: any) => ({
     width: '48px',
     height: '48px',
     borderRadius: '1200px',
@@ -288,10 +295,7 @@ const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDr
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    background:
-      state === (GOVERNANCE_STATUS.IDLE || isDelegationToYoroiDrep)
-        ? theme.palette.ds.primary_500
-        : theme.palette.ds.secondary_200,
+    background: !isParticipating || isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200,
   })
 );
 
