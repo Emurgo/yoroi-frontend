@@ -91,7 +91,11 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
         description: strings.noConfidenceInfo,
       };
     }
-    return { icon: <Icon.VotingAbstain width={24} height={24} fill={theme.palette.ds.gray_max} />, title: strings.abstain };
+    return {
+      icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
+      title: strings.yoroiDRep,
+      description: strings.yoroiDRepInfo,
+    };
   };
 
   return (

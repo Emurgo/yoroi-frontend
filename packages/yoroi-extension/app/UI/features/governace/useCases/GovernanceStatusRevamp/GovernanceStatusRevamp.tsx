@@ -31,7 +31,7 @@ export const GovernanceStatusRevamp = () => {
           {strings.delegationOptions}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'}>
-          {governanceStatus?.status === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
+          {cardState === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
         </Typography>
       </TitleSection>
 
