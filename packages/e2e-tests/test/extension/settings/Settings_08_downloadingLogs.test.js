@@ -50,10 +50,14 @@ describe('Downloading logs for support', function () {
     expect(allDownloadedFiles.length).to.equal(1);
     // check file name
     const fileName = allDownloadedFiles[0];
-    expect(fileName).to.match(/(\d+.?)+yoroi\.log/gi);
+    expect(fileName).to.match(/\d{4}(-\d{2}){2}T\d{2}(-\d{2}){2}-yoroi-logs\.zip/gi);
     // check downloaded file is not empty
-    const fileContent = getDownloadedFileContent(fileName);
-    expect(fileContent, 'Support log file is empty').to.not.be.empty;
+    const fileContent = await getDownloadedFileContent(fileName);
+    expect(Object.keys(fileContent).length, 'Support log archive contains no files').to.be.greaterThan(0);
+    for (const key in fileContent) {
+      const content = fileContent[key];
+      expect(content, `Support log file "${key}" is empty`).to.not.be.empty;
+    }
   });
 
   afterEach(async function () {
