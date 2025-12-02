@@ -53,7 +53,7 @@ export const formattedAmountToNaturalUnits: (string, number) => string = (amount
   return cleanedAmount === '' ? '0' : cleanedAmount;
 };
 
-function truncateFormatter(addr: string, cutoff: number): string {
+export function truncateFormatter(addr: string, cutoff: number): string {
   const shortener = '...';
   if (addr.length - shortener.length <= cutoff) {
     return addr;
