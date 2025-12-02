@@ -5,16 +5,20 @@ import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCryp
 import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID, FIND_DREPS_LINK } from '../../../governace/common/constants';
+import { GOVERNANCE_STATUS, YOROI_DREP_ID, FIND_DREPS_LINK, FIND_DREPS_LINK_TESTNET } from '../../../governace/common/constants';
 import { GovernanceStatusRevampCard } from '../../../governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevampCard';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernance } from '../../../governace/module/GovernanceContextProvider';
 
 export const ChooseOtherDrepId = () => {
   const { drepId, isLoading, changeModalView, createUnsignedTx, setDrepId } = useTxReviewModal();
   const { delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+  const { isTestnet } = useGovernance();
   const strings = useStrings();
   const [error, setError] = React.useState(false);
   const [drepIdInput, setDrepValueId] = React.useState('');
+
+  const findDrepLink = isTestnet ? FIND_DREPS_LINK_TESTNET : FIND_DREPS_LINK;
 
   useEffect(() => {
     setError(false);
@@ -58,7 +62,7 @@ export const ChooseOtherDrepId = () => {
             <Typography variant="body1" color="ds.text_gray_medium">
               {strings.dontHaveId}
             </Typography>
-            <Link href={FIND_DREPS_LINK} rel="noopener" target="_blank" underline="hover">
+            <Link href={findDrepLink} rel="noopener" target="_blank" underline="hover">
               {strings.findDrepHere}
             </Link>
           </Stack>

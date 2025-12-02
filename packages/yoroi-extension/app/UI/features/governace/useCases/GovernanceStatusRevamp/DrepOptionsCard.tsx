@@ -48,7 +48,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
 
         <Typography variant="body1">{description}</Typography>
         {GOVERNANCE_STATUS.DELEGATED === status && drepId && isDelegated && <DelegatedInfo drepId={drepId} status={status} />}
-        {GOVERNANCE_STATUS.IDLE === status && drepId === null && isDelegated && <AbstainOrNoConfidenceInfo />}
+        {isDelegated && <DelegatingLabel />}
       </CardWrapper>
 
       <CTASet>
@@ -137,7 +137,7 @@ const DelegatedInfo = ({ drepId, status }) => {
   );
 };
 
-const AbstainOrNoConfidenceInfo = () => {
+const DelegatingLabel = () => {
   const strings = useStrings();
 
   return (
@@ -346,5 +346,4 @@ const CTASet = styled(Box)(() => ({
   display: 'flex',
   justifyContent: 'center',
   width: '100%',
-  marginTop: '16px',
 }));

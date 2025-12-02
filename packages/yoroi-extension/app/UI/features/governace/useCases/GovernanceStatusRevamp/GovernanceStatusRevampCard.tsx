@@ -136,7 +136,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
           </ItemRow>
         )}
 
-        {(isDelegationToOtherDrep || isDelegationToYoroiDrep) && (
+        {isDelegationToOtherDrep && (
           <ItemRow alignCenter>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.drepStatus}</Typography>
@@ -151,7 +151,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             </RightPart>
           </ItemRow>
         )}
-        {governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && (
+        {governanceStatus?.status !== GOVERNANCE_STATUS.IDLE && !isDelegated && (
           <ItemRow alignCenter>
             <LeftPart>
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_700'}>{strings.delegationStatus}</Typography>
@@ -280,7 +280,7 @@ const TitleRow = styled(Box)(() => ({
 }));
 
 const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDrep: boolean }>(
-  ({ isDelegationToYoroiDrep, theme }: any) => ({
+  ({ isDelegationToYoroiDrep, theme, state }: any) => ({
     width: '48px',
     height: '48px',
     borderRadius: '1200px',
@@ -288,7 +288,10 @@ const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDr
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
-    background: isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200, // maybe disable theme.palette.ds.gray_600
+    background:
+      state === (GOVERNANCE_STATUS.IDLE || isDelegationToYoroiDrep)
+        ? theme.palette.ds.primary_500
+        : theme.palette.ds.secondary_200,
   })
 );
 
