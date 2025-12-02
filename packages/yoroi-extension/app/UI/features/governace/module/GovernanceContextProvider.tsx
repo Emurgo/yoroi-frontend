@@ -33,6 +33,7 @@ const initialGovernanceProvider = {
   recentTransactions: [],
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
   networkId: null,
+  isTestnet: false,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -166,6 +167,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
+    isTestnet: selectedWallet.isTestnet,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

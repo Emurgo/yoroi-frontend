@@ -19,7 +19,7 @@ import {
   YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
 import { DRepIlustration } from '../../common/ilustrations/DRepIlustration';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { Vote } from '../../module/state';
 import { networks } from '../../../../../api/ada/lib/storage/database/prepackaged/networks';

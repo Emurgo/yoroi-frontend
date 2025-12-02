@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
+import globalMessages from '../../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -226,8 +226,8 @@ export const messages = Object.freeze(
         '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
     },
     chooseAbstain: {
-      id: 'governance.chooseAbstain',
-      defaultMessage: '!!!Choose to abstain from voting while still participating in the governance process and earning rewards.',
+      id: 'governance.abstainInfo',
+      defaultMessage: '!!!You are choosing not to cast a vote on all proposals now and in the future.',
     },
     chooseNoConfidence: {
       id: 'governance.chooseNoConfidence',
@@ -236,6 +236,23 @@ export const messages = Object.freeze(
     changeToDrep: {
       id: 'governance.changeToDrep',
       defaultMessage: '!!!Change to DRep',
+    },
+    delegateToOtherDrep: {
+      id: 'governance.delegateToOtherDrep',
+      defaultMessage: '!!!Delegate to other DRep',
+    },
+    delegatingLabel: {
+      id: 'governance.delegatingLabel',
+      defaultMessage: '!!!Delegateing',
+    },
+    delegationStatus: {
+      id: 'governance.delegationStatus',
+      defaultMessage: '!!!Delegation status',
+    },
+    votingPowerInfo: {
+      id: 'governance.votingPowerInfo',
+      defaultMessage:
+        '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
     },
   })
 );
@@ -302,5 +319,9 @@ export const useStrings = () => {
     chooseAbstain: intl.formatMessage(messages.chooseAbstain),
     chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
     changeToDrep: intl.formatMessage(messages.changeToDrep),
+    delegateToOtherDrep: intl.formatMessage(messages.delegateToOtherDrep),
+    delegatingLabel: intl.formatMessage(messages.delegatingLabel),
+    delegationStatus: intl.formatMessage(messages.delegationStatus),
+    votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
   }).current;
 };
