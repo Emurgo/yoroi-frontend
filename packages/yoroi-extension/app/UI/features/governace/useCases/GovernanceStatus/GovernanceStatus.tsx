@@ -1,5 +1,7 @@
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
+import { useLocation } from 'react-router';
 import { GovernanceStatusCard } from './GovernanceStatusCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
@@ -14,12 +16,19 @@ import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 export const GovernanceStatus = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
+  const location = useLocation();
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const { submitedTransactions, isTestnet } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
   const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+
+  React.useEffect(() => {
+    if (location.search.includes('delegateToYoroiDrep=true')) {
+      delegateToDrep(yoroiDrepId);
+    }
+  }, [useLocation]);
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();

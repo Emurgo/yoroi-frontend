@@ -40,8 +40,8 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
   const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
   const isDelegatingToYoroiDrep = isDelegated && drepID === drepYoroiId;
   const isDelegationToOtherDrep = isDelegated && drepID !== drepYoroiId;
-  const isAbstain = drepID === null || governanceStatus.status === DREP_ALWAYS_ABSTAIN;
-  const isNoConfidence = drepID === null || governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE;
+  const isAbstain = governanceStatus.status === DREP_ALWAYS_ABSTAIN;
+  const isNoConfidence = governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE;
 
   const drepOptionsConfig = [
     {
