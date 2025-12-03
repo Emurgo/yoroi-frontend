@@ -5,7 +5,13 @@ import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCryp
 import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID, FIND_DREPS_LINK, FIND_DREPS_LINK_TESTNET } from '../../../governace/common/constants';
+import {
+  GOVERNANCE_STATUS,
+  YOROI_DREP_ID,
+  FIND_DREPS_LINK,
+  FIND_DREPS_LINK_TESTNET,
+  YOROI_DREP_ID_TESTNET,
+} from '../../../governace/common/constants';
 import { GovernanceStatusRevampCard } from '../../../governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevampCard';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernance } from '../../../governace/module/GovernanceContextProvider';
@@ -19,6 +25,7 @@ export const ChooseOtherDrepId = () => {
   const [drepIdInput, setDrepValueId] = React.useState('');
 
   const findDrepLink = isTestnet ? FIND_DREPS_LINK_TESTNET : FIND_DREPS_LINK;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
   useEffect(() => {
     setError(false);
@@ -73,9 +80,9 @@ export const ChooseOtherDrepId = () => {
         <Stack p={24}>
           <GovernanceStatusRevampCard
             state={GOVERNANCE_STATUS.DELEGATED}
-            governanceStatus={{ status: GOVERNANCE_STATUS.IDLE, drep: YOROI_DREP_ID }}
+            governanceStatus={{ status: GOVERNANCE_STATUS.IDLE, drep: yoroiDrepId }}
             forModal
-            onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
+            onDelegateClick={() => delegateToDrep(yoroiDrepId)}
           />
         </Stack>
       </Stack>

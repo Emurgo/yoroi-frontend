@@ -10,10 +10,12 @@ import {
   GOVERNANCE_STATUS,
   GovernanceStatusState,
   YOROI_DREP_ID,
+  YOROI_DREP_ID_TESTNET,
   YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
@@ -38,13 +40,16 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
 }) => {
   const isDisabled = state === GOVERNANCE_STATUS.DISABLED || pending;
   const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
+
   const { isParticipating } = useIsGovernanceAllowed();
+  const { isTestnet } = useGovernance();
   const strings = useStrings();
   const theme: any = useTheme();
 
-  const drepID = governanceStatus?.drep ? governanceStatus?.drep : YOROI_DREP_ID;
-  const isDelegationToYoroiDrep = isDelegated && drepID === YOROI_DREP_ID;
-  const isDelegationToOtherDrep = isDelegated && drepID !== YOROI_DREP_ID;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+  const drepID = governanceStatus?.drep ? governanceStatus?.drep : yoroiDrepId;
+  const isDelegationToYoroiDrep = isDelegated && drepID === yoroiDrepId;
+  const isDelegationToOtherDrep = isDelegated && drepID !== yoroiDrepId;
   const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
   const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
@@ -53,7 +58,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
   const showDelegatingLabel = isParticipating;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
-  const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE;
+  const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated;
   const showVotingRecordLink = showOnDetailsLink && !isDelegationToOtherDrep;
 
   const handleCopy = () => {
@@ -78,7 +83,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     if (isDelegationToYoroiDrep) {
       return {
         icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
-        title: strings.yoroiDRep,
+        title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
         description: strings.yoroiDRepInfo,
       };
     }
@@ -105,7 +110,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     }
     return {
       icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
-      title: strings.yoroiDRep,
+      title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
       description: strings.yoroiDRepInfo,
     };
   };

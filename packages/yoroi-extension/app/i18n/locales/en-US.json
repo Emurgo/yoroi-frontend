@@ -1367,6 +1367,7 @@
   "governance.browseAdditionalDelegation": "Browse additional delegation options or choose to abstain from voting",
   "governance.learnMoreLabel": "Learn more About Governance",
   "governance.yoroiDRep": "Yoroi DRep",
+  "governance.yoroiTestnetDRep": "Testnet DRep",
   "governance.yoroiDRepInfo": "Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.",
   "governance.drepStatus": "DRep Status",
   "governance.yoroiVotingRecord": "See Yoroi’s voting records",

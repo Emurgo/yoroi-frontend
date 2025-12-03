@@ -186,6 +186,10 @@ export const messages = Object.freeze(
       id: 'governance.yoroiDRep',
       defaultMessage: '!!!Yoroi DRep',
     },
+    yoroiTestnetDRep: {
+      id: 'governance.yoroiTestnetDRep',
+      defaultMessage: '!!!Testnet DRep',
+    },
     yoroiDRepInfo: {
       id: 'governance.yoroiDRepInfo',
       defaultMessage:
@@ -323,5 +327,6 @@ export const useStrings = () => {
     delegatingLabel: intl.formatMessage(messages.delegatingLabel),
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
+    yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
   }).current;
 };

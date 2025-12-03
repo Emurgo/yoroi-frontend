@@ -10,6 +10,7 @@ export const YOROI_VOTING_RECORD_LINK =
 export const FIND_DREPS_LINK = 'https://beta.cexplorer.io/drep?tab=list';
 export const FIND_DREPS_LINK_TESTNET = 'https://preprod.cexplorer.io/drep?tab=list';
 export const YOROI_DREP_ID = 'drep1ygr9tuapcanc3kpeyy4dc3vmrz9cfe5q7v9wj3x9j0ap3tswtre9j';
+export const YOROI_DREP_ID_TESTNET = 'drep1y23nc498g205wtvp9esysyxam0n7msusm5d734xqlzhvkgq3pn5r7';
 export const EMURGO_DREP_ID = 'drep1ytvlwvyjmzfyn56n0zz4f6lj94wxhmsl5zky6knnzrf4jygpyahug';
 
 export const DREP_ALWAYS_ABSTAIN = API_ABSTAIN;

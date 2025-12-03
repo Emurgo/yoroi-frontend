@@ -3,21 +3,23 @@ import { Box, Typography, Button } from '@mui/material';
 import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID } from '../../common/constants';
+import { GOVERNANCE_STATUS, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { StatusSkeletonScreen } from './SkeletonCardLoaders';
 
 export const GovernanceStatusRevamp = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-  const { submitedTransactions } = useGovernance();
+  const { submitedTransactions, isTestnet } = useGovernance();
   const { isNotAllowed } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
@@ -25,6 +27,10 @@ export const GovernanceStatusRevamp = () => {
 
   if (isNotAllowed) {
     return <NotAllowedInGovernance />;
+  }
+
+  if (governanceStatus.status === null) {
+    return <StatusSkeletonScreen />;
   }
 
   return (
@@ -38,7 +44,6 @@ export const GovernanceStatusRevamp = () => {
         </Typography>
       </TitleSection>
 
-      {/* Optionally render error */}
       {error != null && (
         <Typography variant="body2" color="error">
           {error}
@@ -49,8 +54,8 @@ export const GovernanceStatusRevamp = () => {
         <GovernanceStatusRevampCard
           state={cardState}
           governanceStatus={governanceStatus}
-          onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
-          onDetailsClick={() => YOROI_DREP_ID}
+          onDelegateClick={() => delegateToDrep(yoroiDrepId)}
+          onDetailsClick={() => yoroiDrepId}
           btnLoading={loadingUnsignTx}
           openDelegateModalForCustomDrep={openDelegateModalForCustomDrep}
           pending={isPendingDrepDelegationTx}
