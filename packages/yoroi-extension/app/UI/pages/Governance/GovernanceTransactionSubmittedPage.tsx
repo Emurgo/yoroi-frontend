@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { TransactionSubmitted } from '../../components';
-import { useStrings } from '../../features/governace/common/useStrings';
+import { useStrings } from '../../features/governace/common/hooks/useStrings';
 import GovernanceLayout from './layout';
 
 type Props = {

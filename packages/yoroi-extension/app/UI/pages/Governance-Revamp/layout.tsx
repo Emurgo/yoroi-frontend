@@ -5,7 +5,7 @@ import NavBarTitle from '../../../components/topbar/NavBarTitle';
 import { GovernanceProvider as GovernanceExternalPackageProvider } from '@yoroi/staking';
 import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 import { Link, Stack } from '@mui/material';
-import { useStrings } from '../../features/governace/common/useStrings';
+import { useStrings } from '../../features/governace/common/hooks/useStrings';
 import { LEARN_MORE_LINK } from '../../features/governace/common/constants';
 
 type Props = {

@@ -12,6 +12,7 @@ import { SubmitInput } from '../useCases/SubmitTx/SubmitInput';
 import { WalletInfoSection } from '../useCases/WalletInfo/WalletInfoSection';
 import { useTxReviewModal } from './ReviewTxProvider';
 import { useStrings } from '../common/hooks/useStrings';
+import { ChooseOtherDrepId } from '../useCases/ChooseDrepId/ChooseOtherDrepId';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
@@ -65,6 +66,7 @@ export const ReviewTxManager = () => {
       {modalView === 'walletInfo' && <WalletInfoSection />}
       {modalView === 'submitTx' && <SubmitInput />}
       {modalView === 'chooseDrepId' && <ChooseDrepId />}
+      {modalView === 'chooseOtherDrepId' && <ChooseOtherDrepId />}
       {modalView === 'operations' && <Operations />}
       {modalView === 'extraDetails' && <ExtraDetails />}
       {modalView === 'collateralCreation' && <CollateralCreation />}
