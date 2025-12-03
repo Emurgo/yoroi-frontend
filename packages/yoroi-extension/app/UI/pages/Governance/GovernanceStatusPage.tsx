@@ -1,5 +1,5 @@
-import { GovernanceStatusSelection } from '../../features/governace/useCases/SelectGovernanceStatus/GovernanceStatusSelection';
 import GovernanceLayout from './layout';
+import { GovernanceStatusRevamp } from '../../features/governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevamp';
 
 type Props = {
   stores: any;
@@ -9,7 +9,7 @@ type Props = {
 const GovernanceStatusPage = (props: Props): any => {
   return (
     <GovernanceLayout {...props}>
-      <GovernanceStatusSelection />
+      <GovernanceStatusRevamp />
     </GovernanceLayout>
   );
 };
