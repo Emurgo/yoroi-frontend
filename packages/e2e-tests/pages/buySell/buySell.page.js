@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, fiveSeconds, halfSecond, quarterSecond, twoSeconds } from '../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, halfSecond, quarterSecond, threeSeconds, twoSeconds } from '../../helpers/timeConstants.js';
 import BasePage from '../basepage.js';
 import { ElementLocator } from '../locator.js';
 
@@ -97,7 +97,18 @@ class BuySell extends BasePage {
   }
   async getHelperText() {
     this.logger.info(`BuySell::getHelperText is called`);
-    return await this.getText(this.adaAmountHelperTextLocator);
+    const messageAppeared = await this.customWaiter(
+      async () => {
+        const currentText = await this.getText(this.adaAmountHelperTextLocator);
+        return currentText !== '';
+      },
+      threeSeconds,
+      quarterSecond
+    );
+    if (messageAppeared) {
+      return await this.getText(this.adaAmountHelperTextLocator);
+    }
+    return '';
   }
   async getProviderInfo() {
     this.logger.info(`BuySell::getProviderInfo is called`);
@@ -123,6 +134,10 @@ class BuySell extends BasePage {
   async isProceedBtnDisabled() {
     this.logger.info(`BuySell::isProceedBtnDisabled is called`);
     return await this.buttonIsDisabled(this.proceedBtnLocator, twoSeconds, halfSecond);
+  }
+  async isProceedBtnEnabled() {
+    this.logger.info(`BuySell::isProceedBtnEnabled is called`);
+    return await this.buttonIsEnabled(this.proceedBtnLocator, twoSeconds, halfSecond);
   }
   async proceed() {
     this.logger.info(`BuySell::proceed is called`);
