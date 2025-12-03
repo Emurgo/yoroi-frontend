@@ -16,3 +16,4 @@ export const CASHBACK_SWITCH_WALLET = 'Switch wallet to access your rewards or s
 export const PORTFOLIO_NO_RESULTS = 'No results for this search';
 export const PROVIDER_BUY = 'Banxa';
 export const PROVIDER_SELL = 'Encryptus';
+export const BUY_MINIMUM = 'Minimum 100 ADA required';
