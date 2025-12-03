@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
-import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
+import { GovernanceStatusCard } from './GovernanceStatusCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
@@ -9,9 +9,9 @@ import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatus
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { StatusSkeletonScreen } from './SkeletonCardLoaders';
+import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 
-export const GovernanceStatusRevamp = () => {
+export const GovernanceStatus = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
@@ -51,11 +51,10 @@ export const GovernanceStatusRevamp = () => {
       )}
 
       <CardsContainer>
-        <GovernanceStatusRevampCard
+        <GovernanceStatusCard
           state={cardState}
           governanceStatus={governanceStatus}
           onDelegateClick={() => delegateToDrep(yoroiDrepId)}
-          onDetailsClick={() => yoroiDrepId}
           btnLoading={loadingUnsignTx}
           openDelegateModalForCustomDrep={openDelegateModalForCustomDrep}
           pending={isPendingDrepDelegationTx}

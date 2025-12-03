@@ -20,7 +20,6 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
   onDelegateClick?: () => void;
-  onDetailsClick?: () => void;
   btnLoading?: boolean;
   forModal?: boolean;
   governanceStatus?: any;
@@ -28,11 +27,10 @@ interface GovernanceStatusCardProps {
   pending?: boolean;
 }
 
-export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
+export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   state,
   governanceStatus,
   onDelegateClick,
-  onDetailsClick,
   btnLoading,
   forModal = false,
   openDelegateModalForCustomDrep,
@@ -53,13 +51,12 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
   const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
-  const showOnDetailsLink = onDetailsClick && !isAbstain && !isNoConfidence;
   const showDrepStatus = isDelegationToOtherDrep || isDelegationToYoroiDrep || !isParticipating;
   const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
   const showDelegatingLabel = isParticipating;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
   const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated;
-  const showVotingRecordLink = showOnDetailsLink && !isDelegationToOtherDrep;
+  const showVotingRecordLink = !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
 
   const handleCopy = () => {
     try {
@@ -72,11 +69,6 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const handleDelegateClick = () => {
     if (isDisabled) return;
     onDelegateClick?.();
-  };
-
-  // @ts-ignore || it will be used later
-  const handleDetailsClick = () => {
-    onDetailsClick?.();
   };
 
   const handleCardInfo = () => {

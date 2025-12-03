@@ -124,7 +124,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'governance',
-    route: '/governance-status',
+    route: '/governance',
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
     isVisible: () => environment.isDev(),

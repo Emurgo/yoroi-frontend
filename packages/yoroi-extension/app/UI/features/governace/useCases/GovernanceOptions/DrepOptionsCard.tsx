@@ -200,13 +200,6 @@ export const ActionCardContainer = styled(Box, {
       background: theme.palette.ds.bg_gradient_2,
     };
   }
-
-  if (isCardDelegated && variant === 'primary') {
-    return {
-      ...base,
-      background: theme.palette.ds.bg_gradient_2,
-    };
-  }
   if (variant === 'primary') {
     return {
       ...base,

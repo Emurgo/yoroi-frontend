@@ -86,7 +86,6 @@ export const ROUTES = {
   GOVERNANCE: {
     ROOT: '/governance',
     OPTIONS: '/governance/options',
-    FAIL: '/governance/failed',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

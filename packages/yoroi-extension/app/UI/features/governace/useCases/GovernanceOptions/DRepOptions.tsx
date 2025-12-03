@@ -16,7 +16,7 @@ import {
   YOROI_DREP_ID_TESTNET,
   YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
-import { OptionsSkeletonScreen } from './SkeletonCardLoaders';
+import { OptionsSkeletonScreen } from '../../common/SkeletonCardLoaders';
 
 interface DRepOptionsScreenProps {}
 

@@ -12,7 +12,7 @@ import {
   FIND_DREPS_LINK_TESTNET,
   YOROI_DREP_ID_TESTNET,
 } from '../../../governace/common/constants';
-import { GovernanceStatusRevampCard } from '../../../governace/useCases/GovernanceStatusRevamp/GovernanceStatusRevampCard';
+import { GovernanceStatusCard } from '../../../governace/useCases/GovernanceStatus/GovernanceStatusCard';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernance } from '../../../governace/module/GovernanceContextProvider';
 
@@ -78,7 +78,7 @@ export const ChooseOtherDrepId = () => {
           </Typography>
         </Stack>
         <Stack p={24}>
-          <GovernanceStatusRevampCard
+          <GovernanceStatusCard
             state={GOVERNANCE_STATUS.DELEGATED}
             governanceStatus={{ status: GOVERNANCE_STATUS.IDLE, drep: yoroiDrepId }}
             forModal
