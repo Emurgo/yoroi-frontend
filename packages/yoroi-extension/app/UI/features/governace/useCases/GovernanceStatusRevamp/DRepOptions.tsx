@@ -50,7 +50,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       buttonText: strings.delegateLabel,
       variant: 'primary' as const,
       icon: <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />,
-      onAction: () => delegateToDrep(YOROI_DREP_ID),
+      onAction: () => delegateToDrep(drepYoroiId),
       onViewDetails: () => console.log('View Yoroi details'),
       status: cardState,
       drepId: governanceStatus.drep,
