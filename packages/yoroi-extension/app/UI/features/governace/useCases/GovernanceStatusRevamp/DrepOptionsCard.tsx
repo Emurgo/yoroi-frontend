@@ -2,7 +2,6 @@ import { Box, Typography, Button, Stack, Link, IconButton } from '@mui/material'
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
-import { YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { LoadingButton } from '@mui/lab';
 import { Icon } from '../../../../components';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
@@ -68,9 +67,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
                   e.stopPropagation();
                   onViewDetails();
                 }}
-                href={YOROI_VOTING_RECORD_LINK}
                 rel="noopener"
-                target="_blank"
                 underline="hover"
                 sx={{ cursor: 'pointer' }}
               >

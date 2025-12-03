@@ -14,6 +14,7 @@ import {
   GOVERNANCE_STATUS,
   YOROI_DREP_ID,
   YOROI_DREP_ID_TESTNET,
+  YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
 import { OptionsSkeletonScreen } from './SkeletonCardLoaders';
 
@@ -51,7 +52,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       variant: 'primary' as const,
       icon: <Icon.YoroiLogo fill={theme.palette.ds.gray_min} />,
       onAction: () => delegateToDrep(drepYoroiId),
-      onViewDetails: () => console.log('View Yoroi details'),
+      onViewDetails: () => window.open(YOROI_VOTING_RECORD_LINK, '_blank'),
       status: cardState,
       drepId: governanceStatus.drep,
       isDelegated: isDelegatingToYoroiDrep,
