@@ -17,7 +17,7 @@ export const GovernanceStatusRevamp = () => {
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const { submitedTransactions, isTestnet } = useGovernance();
-  const { isNotAllowed } = useIsGovernanceAllowed();
+  const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
   const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
@@ -37,7 +37,7 @@ export const GovernanceStatusRevamp = () => {
     <Container>
       <TitleSection>
         <Typography variant="h5" color="ds.text_gray_medium">
-          {strings.delegationOptions}
+          {isParticipating ? strings.delegatingInGovernance : strings.delegationOptions}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'}>
           {cardState === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}

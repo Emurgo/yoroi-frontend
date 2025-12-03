@@ -1321,6 +1321,7 @@
   "gouvernace.participateDialog.buttonText": "Participate on governance",
   "gouvernace.statusSelected": "You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow",
   "gouvernace.registerGovernance": "Register in Governance",
+  "gouvernace.delegatingInGovernance": "Delegating in Governance",
   "gouvernace.chooseDrep": "chooseDrep",
   "gouvernace.reviewSelection": "Review the selections carefully to assign yourself a Governance Status",
   "gouvernace.operations": "Operations",

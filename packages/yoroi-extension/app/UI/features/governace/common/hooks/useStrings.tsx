@@ -258,6 +258,10 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
     },
+    delegatingInGovernance: {
+      id: 'gouvernace.delegatingInGovernance',
+      defaultMessage: '!!!Delegating in Governance',
+    },
   })
 );
 
@@ -328,5 +332,6 @@ export const useStrings = () => {
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
     yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
+    delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
   }).current;
 };
