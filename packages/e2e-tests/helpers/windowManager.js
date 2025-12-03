@@ -1,5 +1,5 @@
 import { WebDriver } from 'selenium-webdriver';
-import { defaultRepeatPeriod, defaultWaitTimeout } from './timeConstants.js';
+import { defaultRepeatPeriod, defaultWaitTimeout, halfMinute, halfSecond, oneSecond } from './timeConstants.js';
 import { Logger } from 'simple-node-logger';
 
 class WindowManagerError extends Error {}
@@ -11,6 +11,7 @@ export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
 export const ledgerConnectTabName = 'Ledger Connect | Yoroi';
+export const banxaTabName = 'Banxa – Buy Crypto';
 export const backgroungTabName = 'background';
 export const serviceWorkersTabName = 'chrome://serviceworker-internals';
 export const serviceWorkersLink = 'chrome://serviceworker-internals';
@@ -40,14 +41,36 @@ export class WindowManager {
     this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
   }
 
-  async _waitWindowTitle(timeoutMs = defaultWaitTimeout, repeatPeriodMs = defaultRepeatPeriod) {
+  async _waitWindowTitle(expectedTitle = null, timeoutMs = defaultWaitTimeout, repeatPeriodMs = defaultRepeatPeriod) {
     this.logger.info(`WindowManager::_waitWindowTitle Waiting for the window title`);
     const endTime = Date.now() + timeoutMs;
 
     while (endTime >= Date.now()) {
-      const windowTitle = await this.driver.getTitle();
-      if (windowTitle !== '') return windowTitle;
-      await this.driver.sleep(repeatPeriodMs);
+      try {
+        const windowTitle = await Promise.race([
+          this.driver.getTitle(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout getting title')), repeatPeriodMs)),
+        ]);
+        if (windowTitle === '') {
+          this.logger.error(`WindowManager::_waitWindowTitle The window has the empty title`);
+          continue;
+        }
+        if (!expectedTitle) {
+          this.logger.info(`WindowManager::_waitWindowTitle The window title is "${windowTitle}"`);
+          return windowTitle;
+        }
+        if (windowTitle === expectedTitle) {
+          this.logger.info(`WindowManager::_waitWindowTitle The window title is "${windowTitle}" as expected`);
+          return windowTitle;
+        } else {
+          this.logger.info(
+            `WindowManager::_waitWindowTitle The window title is "${windowTitle}" but expected is "${expectedTitle}"`
+          );
+          continue;
+        }
+      } catch (error) {
+        this.logger.error(`WindowManager::_waitWindowTitle Error getting window title: ${error.message}`);
+      }
     }
     this.logger.error(`WindowManager::_waitWindowTitle The window has the empty title`);
     throw new WindowManagerError(`The window has the empty title`);
@@ -191,20 +214,20 @@ export class WindowManager {
     this.logger.info(
       `WindowManager::findNewWindowAndSwitchTo Finding a new window and switching to it and set the title "${newWindowTitle}" to it`
     );
-    const popupWindowHandleArr = await this.findNewWindows();
-    if (popupWindowHandleArr.length !== 1) {
+    const windowHandleArr = await this.findNewWindows();
+    if (windowHandleArr.length !== 1) {
       this.logger.error(`WindowManager::findNewWindowAndSwitchTo Can not find the popup window`);
-      throw new WindowManagerError('Can not find the popup window');
+      throw new WindowManagerError('Can not find the new window');
     }
-    const popupWindowHandle = popupWindowHandleArr[0];
-    const popUpCustomHandle = { title: newWindowTitle, handle: popupWindowHandle };
-    this.windowHandles.push(popUpCustomHandle);
+    const windowHandle = windowHandleArr[0];
+    const customHandle = { title: newWindowTitle, handle: windowHandle };
+    this.windowHandles.push(customHandle);
 
-    await this.driver.switchTo().window(popupWindowHandle);
-    this.logger.info(`WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
+    await this.driver.switchTo().window(windowHandle);
+    this.logger.info(`WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(customHandle)}`);
     await this._waitWindowTitle();
 
-    return popUpCustomHandle;
+    return customHandle;
   }
 
   async isClosed(title) {
