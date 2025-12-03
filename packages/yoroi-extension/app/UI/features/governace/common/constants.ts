@@ -19,7 +19,7 @@ export const DREP_ALWAYS_NO_CONFIDENCE = API_NO_CONFIDENCE;
 export const drepNames = {
   [YOROI_DREP_ID]: 'Yoroi W₳llet',
   [EMURGO_DREP_ID]: 'EMURGO',
-  [YOROI_DREP_ID_TESTNET]: 'Testnet Yoroi W₳llet',
+  [YOROI_DREP_ID_TESTNET]: 'Testnet DRep',
 };
 
 export const GOVERNANCE_STATUS = {
