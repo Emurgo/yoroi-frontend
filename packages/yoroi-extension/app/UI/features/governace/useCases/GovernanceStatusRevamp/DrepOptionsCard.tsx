@@ -176,20 +176,16 @@ export const ActionCardContainer = styled(Box, {
     alignItems: 'flex-start',
     padding: '16px',
     gap: variant === 'primary' ? '16px' : '12px',
-
     width: '294px',
     height: '320px',
-
     borderRadius: '8px',
     flex: 'none',
     alignSelf: 'stretch',
     flexGrow: 1,
-
     cursor: status === 'disabled' ? 'default' : 'pointer',
     opacity: status === 'disabled' ? 0.6 : 1,
   };
 
-  // 1. Disabled state (regardless of variant)
   if (status === 'disabled' || pending) {
     return {
       ...base,
@@ -209,7 +205,6 @@ export const ActionCardContainer = styled(Box, {
     return {
       ...base,
       background: theme.palette.ds.bg_gradient_2,
-      // border: `1px solid ${theme.palette.ds.primary_500}`,
     };
   }
   if (variant === 'primary') {

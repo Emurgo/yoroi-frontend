@@ -52,18 +52,25 @@ export const OptionsSkeletonScreen = () => {
   return (
     <CardsRow>
       {[...Array(4)].map((_, idx) => (
-        <Skeleton key={idx} animation="wave" variant="rounded" width={294} height={320}>
-          <Stack direction="column">
-            <Stack direction="row" spacing={2}>
-              <Skeleton variant="rounded" height={48} width={48} />
-              <Skeleton variant="text" height={26} width={200} />
-            </Stack>
+        <Stack
+          width={294}
+          height={320}
+          key={idx}
+          sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px', padding: '16px', boxSizing: 'border-box' }}
+        >
+          <Stack direction="column" justifyContent={'space-between'} height={'100%'}>
+            <Stack direction={'column'}>
+              <Stack direction="row" spacing={2} alignItems={'center'}>
+                <Skeleton variant="circular" height={48} width={48} />
+                <Skeleton variant="text" height={26} width={200} />
+              </Stack>
 
-            <Skeleton variant="text" height={96} width={260} />
+              <Skeleton variant="text" height={146} width={260} />
+            </Stack>
 
             <Skeleton variant="rounded" height={40} width={260} />
           </Stack>
-        </Skeleton>
+        </Stack>
       ))}
     </CardsRow>
   );
