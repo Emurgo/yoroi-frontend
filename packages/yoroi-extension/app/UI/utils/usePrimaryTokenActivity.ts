@@ -1,5 +1,5 @@
 import { fetchData, isRight } from '@yoroi/common';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 
 import { CurrencySymbol, PriceMultipleResponse } from '../types/other';
 import { time } from './constants';
@@ -15,6 +15,7 @@ type PrimaryTokenActivity = {
   close: number;
   open: number;
 };
+
 const defaultPrimaryTokenActivity: PrimaryTokenActivity = {
   ts: 0,
   close: 1,
@@ -31,9 +32,9 @@ export const usePrimaryTokenActivity = ({
   const query = useQuery({
     enabled: to !== ptTicker,
     staleTime: time.oneMinute,
-    cacheTime: time.fiveMinutes,
+    gcTime: time.fiveMinutes, // v5: cacheTime -> gcTime
     retryDelay: time.oneSecond,
-    optimisticResults: true,
+    // optimisticResults: true, // v3-only / internal; remove in v5
     refetchInterval: time.oneMinute,
     queryKey: [queryInfo.keyToPersist, 'usePrimaryTokenActivity', to],
     ...options,
