@@ -67,7 +67,7 @@ class RestoreWalletStepTwo extends AddWalletBase {
     for (let wordIndex = 0; wordIndex < wordsAmount; wordIndex++) {
       const phraseWord = phraseTemplate[wordIndex];
       const inputElement = allInputs[wordIndex];
-      await this.inputElem(inputElement, phraseWord + Key.RETURN, true);
+      await this.inputElem(inputElement, phraseWord + Key.RETURN, true, 15);
     }
   };
   enterRecoveryPhrase15Words = async recoveryPhrase => {
@@ -96,10 +96,7 @@ class RestoreWalletStepTwo extends AddWalletBase {
   clearAllInputsManually = async () => {
     const allInputs = await this.getAllRecoveryPhrasesInputs();
     for (const seedInput of allInputs) {
-      const wordInputLength = (await this.getAttributeElement(seedInput, 'value')).length;
-      for (let charIndex = 0; charIndex < wordInputLength; charIndex++) {
-        await this.inputElem(seedInput, Key.BACK_SPACE);
-      }
+      await this.clearInputAllElem(seedInput);
     }
   };
   allInputsAreEmpty = async () => {
