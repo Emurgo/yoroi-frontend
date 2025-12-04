@@ -55,8 +55,8 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
   const showDelegatingLabel = isParticipating;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
-  const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated;
-  const showVotingRecordLink = !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
+  const showDelegateToYoroiDrepButton = forModal || (governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated);
+  const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
 
   const handleCopy = () => {
     try {
