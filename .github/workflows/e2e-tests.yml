@@ -235,7 +235,7 @@ jobs:
             -p 9002:9002 \
             -p 21326:21326 \
             -p 127.0.0.1:21325:21326 \
-            -d ghcr.io/trezor/trezor-user-env
+            -d ghcr.io/trezor/trezor-user-env:4c194889610c3f21f1da3799e7ddb82004fd4e91
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
