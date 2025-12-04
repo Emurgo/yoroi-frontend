@@ -20,7 +20,3 @@ Yoroi Nightly builds are published automatically for any commit that bumps the v
 Upload the signed build to the [chrome webstore](https://chrome.google.com/webstore/).
 
 Extension will [update automatically](https://developer.chrome.com/extensions/autoupdate) for users once uploaded.
-
-## (Firefox) Signed build (XPI)
-
-The same steps as Chrome also produce an `xpi` file. You can upload this directly to the [EMURGO AMO account](https://addons.mozilla.org/en-US/firefox/user/14971548/). Extension will update automatically for users once uploaded.

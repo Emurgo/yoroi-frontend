@@ -47,7 +47,7 @@ const messages = defineMessages({
 
 type Props = {|
   +onExternalLinkClick: MouseEvent => void,
-  +onDownloadLogs: void => void,
+  +onDownloadLogs: void => Promise<void>,
   +onPaperWalletTransfer: void => void,
 |};
 
@@ -70,7 +70,7 @@ export default class SupportSettings extends Component<Props> {
 
     const supportRequestLink = (
       <Link
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
+        href="https://help.yoroi-wallet.com/en/"
         onClick={event => onExternalLinkClick(event)}
         id="settings:support-requestSupport-link"
       >

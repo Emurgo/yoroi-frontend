@@ -6,7 +6,7 @@ import { dRepToMaybeCredentialHex } from '../../../../api/ada/lib/cardanoCrypto/
 import { TextInput } from '../../../components/Input/TextInput';
 import { useModal } from '../../../components/modals/ModalContext';
 import { useGovernance } from '../module/GovernanceContextProvider';
-import { useStrings } from './useStrings';
+import { useStrings } from './hooks/useStrings';
 
 type ChooseDRepModallProps = {
   onSubmit?: (drepId: string, drepCredential: string) => void;
@@ -15,14 +15,9 @@ type ChooseDRepModallProps = {
 export const ChooseDRepModal = ({ onSubmit }: ChooseDRepModallProps) => {
   const [drepId, setDrepId] = React.useState('');
   const [error, setError] = React.useState(false);
-  const { dRepIdChanged, governanceVoteChanged, ampli } = useGovernance();
+  const { dRepIdChanged, governanceVoteChanged } = useGovernance();
   const { isLoading } = useModal();
   const strings = useStrings();
-
-  React.useEffect(() => {
-    // ON MOUNT
-    ampli?.governanceChooseDrepPageViewed();
-  }, []);
 
   React.useEffect(() => {
     setError(false);

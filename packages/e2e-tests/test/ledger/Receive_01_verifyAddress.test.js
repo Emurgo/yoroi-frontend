@@ -3,7 +3,6 @@ import { customAfterEach } from '../../utils/customHooks.js';
 import { getTestLogger } from '../../utils/utils.js';
 import { WindowManager, extensionTabName, ledgerConnectTabName } from '../../helpers/windowManager.js';
 import { testWalletLedger } from '../../utils/testWallets.js';
-import BasePage from '../../pages/basepage.js';
 import AddNewWallet from '../../pages/addNewWallet.page.js';
 import TransactionsSubTab from '../../pages/wallet/walletTab/walletTransactions.page.js';
 import ReceiveSubTab from '../../pages/wallet/walletTab/receiveSubTab.page.js';
@@ -30,6 +29,14 @@ for (const model in LedgerModels) {
     let ledgerController = null;
     /** @type {WindowManager} */
     let windowManager = null;
+    /** @type {AddNewWallet} */
+    let addNewWalletPage = null;
+    /** @type {LedgerConnect} */
+    let ledgerConnectPage = null;
+    /** @type {TransactionsSubTab} */
+    let transactionsPage = null;
+    /** @type {ReceiveSubTab} */
+    let receivePage = null;
 
     before(async function () {
       const speculosDockerLogger = getTestLogger('speculosDocker', this.test.parent.title);
@@ -52,6 +59,10 @@ for (const model in LedgerModels) {
       await preloadBrowserStorage(webdriver, logger, null, true, {
         'test-CURRENT_NETWORK_ID': '0',
       });
+      addNewWalletPage = new AddNewWallet(webdriver, logger);
+      ledgerConnectPage = new LedgerConnect(webdriver, logger);
+      transactionsPage = new TransactionsSubTab(webdriver, logger);
+      receivePage = new ReceiveSubTab(webdriver, logger);
     });
 
     it('Ledger is ready', async function () {
@@ -60,7 +71,6 @@ for (const model in LedgerModels) {
     });
 
     it('Selecting Connect HW wallet', async function () {
-      const addNewWalletPage = new AddNewWallet(webdriver, logger);
       await addNewWalletPage.selectConnectHW();
       await addNewWalletPage.selectLedgerHW();
       await addNewWalletPage.confirmChecking();
@@ -69,7 +79,6 @@ for (const model in LedgerModels) {
 
     it('Approve connection', async function () {
       await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
-      const ledgerConnectPage = new LedgerConnect(webdriver, logger);
       if (ledgerController.isLedgerX()) {
         await ledgerConnectPage.selectNanoX();
       } else {
@@ -82,29 +91,24 @@ for (const model in LedgerModels) {
     });
 
     it('Enter wallet details', async function () {
-      const addNewWalletPage = new AddNewWallet(webdriver, logger);
       await addNewWalletPage.enterHWWalletName(testWalletLedger.name);
       await addNewWalletPage.saveHWInfo();
     });
 
     it('Wait the wallet is loaded', async function () {
-      const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.waitPrepareWalletBannerIsClosed();
       const txPageIsDisplayed = await transactionsPage.isDisplayed();
       expect(txPageIsDisplayed, 'The transactions page is not displayed').to.be.true;
     });
 
     it('Go to the Receive tab', async function () {
-      const transactionsPage = new TransactionsSubTab(webdriver, logger);
       await transactionsPage.goToReceiveSubMenu();
-      const receivePage = new ReceiveSubTab(webdriver, logger);
       await receivePage.selectBaseExtAllAddrs();
       const extAddrsAmount = await receivePage.getAmountOfAddresses();
       expect(extAddrsAmount, 'A wrong amount of external addresses').to.be.at.least(1);
     });
 
     it('Verify address', async function () {
-      const receivePage = new ReceiveSubTab(webdriver, logger);
       const verifyAddressModal = await receivePage.callVerifyAddress(0);
       const verifyModalIsDisplayed = await verifyAddressModal.isDisplayed();
       expect(verifyModalIsDisplayed, 'The Verify Address modal is not displayed').to.be.true;
@@ -113,7 +117,6 @@ for (const model in LedgerModels) {
       // call verification on HW
       await verifyAddressModal.clickVerifyOnHWW();
       await windowManager.findNewWindowAndSwitchTo(ledgerConnectTabName);
-      const ledgerConnectPage = new LedgerConnect(webdriver, logger);
       await ledgerConnectPage.continue();
       const ledgerIsReady = await ledgerController.isReadyForAction(fiveSeconds, quarterSecond);
       expect(ledgerIsReady, `Ledger isn't ready after ${fiveSeconds / 1000} seconds`).to.be.true;
@@ -127,14 +130,12 @@ for (const model in LedgerModels) {
       expect(cleanedLedgerData.addressDerivationPath, 'Derivation path is different').to.equal(verifyModalInfo.derivationPath);
     });
 
-    afterEach(function (done) {
-      customAfterEach(this, webdriver, logger);
-      done();
+    afterEach(async function () {
+      await customAfterEach(this, webdriver, logger);
     });
 
     after(async function () {
-      const basePage = new BasePage(webdriver, logger);
-      basePage.closeBrowser();
+      await transactionsPage.closeBrowser();
       await speculosDockerController.killAndRemove();
     });
   });

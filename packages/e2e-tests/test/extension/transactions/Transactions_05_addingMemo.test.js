@@ -1,0 +1,79 @@
+import { customAfterEach } from '../../../utils/customHooks.js';
+import TransactionsSubTab from '../../../pages/wallet/walletTab/walletTransactions.page.js';
+import { testWallet1 } from '../../../utils/testWallets.js';
+import { expect } from 'chai';
+import { getTestLogger } from '../../../utils/utils.js';
+import { oneMinute } from '../../../helpers/timeConstants.js';
+import driversPoolsManager from '../../../utils/driversPool.js';
+import { getTestString } from '../../../helpers/constants.js';
+import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
+import { WebDriver } from 'selenium-webdriver';
+import { Logger } from 'simple-node-logger';
+
+describe('Adding a memo to a completed Tx', function () {
+  this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
+  let webdriver = null;
+  /** @type {Logger} */
+  let logger = null;
+  /** @type {TransactionsSubTab} */
+  let transactionsPage = null;
+  const testMemoMessage = getTestString('', 40, true);
+
+  before(async function () {
+    webdriver = await driversPoolsManager.getDriverFromPool();
+    logger = getTestLogger(this.test.parent.title);
+    await prepareWallet(webdriver, logger, 'testWallet1', this);
+    transactionsPage = new TransactionsSubTab(webdriver, logger);
+  });
+
+  // open the latests tx
+  it('Expand tx', async function () {
+    await transactionsPage.clickOnTxRow(0, 0);
+  });
+  // click the memo button
+  // enter the memo
+  // confirm saving the memo
+  it('Add memo', async function () {
+    const memoWarningModal = await transactionsPage.clickAddMemo(0, 0);
+    const warningIsDisplayed = await memoWarningModal.isDisplayed();
+    expect(warningIsDisplayed, 'Add memo warning is not shown').to.be.true;
+    const addMemoModal = await memoWarningModal.understandAdding();
+    const addMemoModalIsDisplayed = await addMemoModal.isDisplayed();
+    expect(addMemoModalIsDisplayed, 'Add memo modal is not displayed').to.be.true;
+    await addMemoModal.enterMemo(testMemoMessage);
+    await addMemoModal.pressAdd();
+    const addMemoModalIsClosed = await addMemoModal.modalIsClosed();
+    expect(addMemoModalIsClosed, 'Add memo modal is still displayed').to.be.true;
+  });
+  // check the memo displayed message
+  it('Check added memo', async function () {
+    const memoMessage = await transactionsPage.getMemoMessage(0, 0);
+    const txHashId = await transactionsPage.getTxHashID(0, 0);
+    expect(memoMessage).to.equal(testMemoMessage);
+    const memosInDB = await transactionsPage.getInfoFromIndexedDB('TxMemo');
+    expect(memosInDB.length).to.equal(1);
+    const txMemoinDB = memosInDB[0].value;
+    expect(txMemoinDB.Content).to.equal(testMemoMessage);
+    expect(txMemoinDB.TransactionHash).to.equal(txHashId);
+    expect(txMemoinDB.WalletId).to.equal(testWallet1.plate);
+  });
+  // reload the page
+  it('Refresh page', async function () {
+    await transactionsPage.refreshPage();
+  });
+  // check the memo displayed message again
+  it('Check added memo again', async function () {
+    await transactionsPage.clickOnTxRow(0, 0);
+    const memoMessage = await transactionsPage.getMemoMessage(0, 0);
+    expect(memoMessage).to.equal(testMemoMessage);
+  });
+
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
+  });
+
+  after(async function () {
+    await transactionsPage.closeBrowser();
+  });
+});

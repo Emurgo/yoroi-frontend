@@ -181,7 +181,7 @@ function getOutlinedStyles(variant: 'primary' | 'secondary', themePalette: Objec
     ':hover': {
       border: '2px solid',
       color: themePalette.text_primary_max,
-      backgroundColor: themePalette.primary_100,
+      backgroundColor: 'transparent',
       borderColor: themePalette.el_primary_max,
     },
     ':pressed': {

@@ -1,9 +1,10 @@
 import { By } from 'selenium-webdriver';
-import { dbSnapshotsDir, handlesEndpoints, TargetBrowser, testRunDir } from '../helpers/constants.js';
+import { dbSnapshotsDir, handlesEndpoints, testRunDir } from '../helpers/constants.js';
 import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
 import axios from 'axios';
+import JSZip from 'jszip';
 const { createSimpleFileLogger } = pkg;
 
 export function getMethod(locatorMethod) {
@@ -37,12 +38,6 @@ export function getMethod(locatorMethod) {
 
 export const getByLocator = locator => getMethod(locator.method)(locator.locator);
 
-export const getTargetBrowser = () => process.env.TARGETBROWSER;
-
-export const isFirefox = () => getTargetBrowser() === TargetBrowser.FF;
-export const isChrome = () => getTargetBrowser() === TargetBrowser.Chrome;
-export const isBrave = () => getTargetBrowser() === TargetBrowser.Brave;
-
 export const getCurrentOS = () => process.platform;
 export const isLinux = () => getCurrentOS() === 'linux';
 export const isMacOS = () => getCurrentOS() === 'darwin';
@@ -53,8 +48,7 @@ export const isTrezorTests = () => process.env.IS_TREZOR === 'true';
 
 export const createTestRunDataDir = testSuiteName => {
   const clearedTestSuiteName = testSuiteName.replace(/[ |,]/gi, '_');
-  const testsDataDir = testRunDir(getTargetBrowser());
-  const fullPath = path.resolve(testsDataDir, clearedTestSuiteName);
+  const fullPath = path.resolve(testRunDir, clearedTestSuiteName);
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
   }
@@ -103,8 +97,7 @@ export const getCircularReplacer = () => {
 };
 
 export const getDownloadsDir = () => {
-  const testRunDataDir = testRunDir(getTargetBrowser());
-  const fullPath = path.resolve(testRunDataDir, 'downloads');
+  const fullPath = path.resolve(testRunDir, 'downloads');
   if (!fs.existsSync(fullPath)) {
     fs.mkdirSync(fullPath, { recursive: true });
   }
@@ -125,11 +118,28 @@ export const getFileContent = (fileName, fileDir) => {
   return data;
 };
 
-export const getDownloadedFileContent = fileName => {
+export const getDownloadedFileContent = async fileName => {
   const fullPath = path.resolve(getDownloadsDir(), fileName);
-  const data = fs.readFileSync(fullPath, 'utf8');
+  const isZipFile = fileName.toLowerCase().endsWith('.zip');
 
-  return data;
+  if (isZipFile) {
+    const zipBuffer = fs.readFileSync(fullPath);
+    const zip = await JSZip.loadAsync(zipBuffer);
+    const result = {};
+
+    for (const [filePath, file] of Object.entries(zip.files)) {
+      if (!file.dir) {
+        const content = await file.async('string');
+        const extractedFileName = path.basename(filePath);
+        result[extractedFileName] = content;
+      }
+    }
+
+    return result;
+  } else {
+    const data = fs.readFileSync(fullPath, 'utf8');
+    return data;
+  }
 };
 
 export const cleanDownloads = () => {

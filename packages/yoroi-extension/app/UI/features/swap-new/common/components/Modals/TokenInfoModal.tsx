@@ -4,10 +4,12 @@ import { DisplayInfoInRow } from '../DisplayInfoInRow';
 import { isPrimaryToken } from '@yoroi/portfolio';
 import { truncateAddressShort } from '../../../../../../utils/formatters';
 import { useSwapRevamp } from '../../../module/SwapContextProvider';
+import { useStrings } from '../../hooks/useStrings';
 
 const TokenInfoModal = ({ token }) => {
   const isPrimary = isPrimaryToken(token.id);
   const { explorer } = useSwapRevamp();
+  const strings = useStrings();
   return (
     <Stack direction="column" gap={16} justifyContent="center" alignItems="center">
       <TokenInfoIcon info={{ id: token.id }} />
@@ -29,11 +31,11 @@ const TokenInfoModal = ({ token }) => {
           bgcolor="ds.gray_200"
           sx={{ borderRadius: '8px', alignSelf: 'flex-start' }}
         >
-          Overview
+          {strings.overviewLabel}
         </Typography>
         <DisplayInfoInRow label="Name" value={token.name} />
         <DisplayInfoInRow label="Tiker" value={token.ticker} />
-        <DisplayInfoInRow label="Description" value={token.description || '-'} />
+        <DisplayInfoInRow label="Description" value={token.description || '-'} valueInSameRow={false} />
         <DisplayInfoInRow
           label="Details On"
           value={
@@ -50,6 +52,7 @@ const TokenInfoModal = ({ token }) => {
               {explorer.tokenInfo.name}
             </LinkMui>
           }
+          valueInSameRow={false}
         />
       </Stack>
     </Stack>

@@ -1,4 +1,3 @@
-import BasePage from '../../pages/basepage.js';
 import { customAfterEach, customBeforeNestedDAppTest } from '../../utils/customHooks.js';
 import { testWallet1 } from '../../utils/testWallets.js';
 import { expect } from 'chai';
@@ -13,14 +12,22 @@ import { getPassword } from '../../helpers/constants.js';
 import { DataSignErrorCode } from '../../helpers/mock-dApp-webpage/cip30Errors.js';
 import driversPoolsManager from '../../utils/driversPool.js';
 import { collectInfo, preloadDBAndStorage, waitTxPage } from '../../helpers/restoreWalletHelper.js';
+import { Logger } from 'simple-node-logger';
+import { WebDriver } from 'selenium-webdriver';
 
 describe('dApp, signData', function () {
   this.timeout(2 * oneMinute);
+  /** @type {WebDriver} */
   let webdriver = null;
+  /** @type {Logger} */
   let logger = null;
+  /** @type {WindowManager} */
   let windowManager = null;
   let mockServer = null;
+  /** @type {MockDAppWebpage} */
   let mockedDApp = null;
+  /** @type {DAppSignData} */
+  let dappSignDataPage = null;
 
   before(async function () {
     try {
@@ -32,6 +39,7 @@ describe('dApp, signData', function () {
       await windowManager.init();
       const dappLogger = getTestLogger('dApp', this.test.parent.title);
       mockedDApp = new MockDAppWebpage(webdriver, dappLogger);
+      dappSignDataPage = new DAppSignData(webdriver, logger);
       await preloadDBAndStorage(webdriver, logger, 'testWallet1');
       await waitTxPage(webdriver, logger);
     } catch (error) {
@@ -57,9 +65,7 @@ describe('dApp, signData', function () {
       const testMessage = 'test message sign data';
       await mockedDApp.requestUsedAddresses();
       await mockedDApp.requestSigningData(testMessage);
-      // wait for window
-      const dappSignDataPage = new DAppSignData(webdriver, logger);
-      // the window focus is switched to the pop-up here
+      // wait for window, the window focus is switched to the pop-up here
       const popUpAppeared = await dappSignDataPage.popUpIsDisplayed(windowManager);
       expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
       await dappSignDataPage.waitingConnectorIsReady();
@@ -94,9 +100,7 @@ describe('dApp, signData', function () {
       const testMessage = 'test message sign data';
       await mockedDApp.requestUsedAddresses();
       await mockedDApp.requestSigningData(testMessage);
-      // wait for window
-      const dappSignDataPage = new DAppSignData(webdriver, logger);
-      // the window focus is switched to the pop-up here
+      // wait for window, the window focus is switched to the pop-up here
       const popUpAppeared = await dappSignDataPage.popUpIsDisplayed(windowManager);
       expect(popUpAppeared, 'The connector pop-up is not displayed').to.be.true;
       await dappSignDataPage.waitingConnectorIsReady();
@@ -106,7 +110,6 @@ describe('dApp, signData', function () {
     });
 
     it('Cancel signing data and check response', async function () {
-      const dappSignDataPage = new DAppSignData(webdriver, logger);
       await dappSignDataPage.cancelSigning();
       // wait pop-up window is closed
       const result = await windowManager.isClosed(popupConnectorName);
@@ -119,15 +122,12 @@ describe('dApp, signData', function () {
     });
   });
 
-  afterEach(function (done) {
-    customAfterEach(this, webdriver, logger);
-    done();
+  afterEach(async function () {
+    await customAfterEach(this, webdriver, logger);
   });
 
-  after(function (done) {
-    const basePage = new BasePage(webdriver, logger);
-    basePage.closeBrowser();
+  after(async function () {
+    await dappSignDataPage.closeBrowser();
     mockServer.close();
-    done();
   });
 });

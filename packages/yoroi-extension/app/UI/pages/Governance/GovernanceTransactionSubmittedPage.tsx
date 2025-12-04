@@ -1,10 +1,8 @@
-import React from 'react';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../routes-config';
 import { TransactionSubmitted } from '../../components';
-import { useStrings } from '../../features/governace/common/useStrings';
+import { useStrings } from '../../features/governace/common/hooks/useStrings';
 import GovernanceLayout from './layout';
-import { useGovernance } from '../../features/governace/module/GovernanceContextProvider';
 
 type Props = {
   stores: any;
@@ -22,12 +20,6 @@ const GovernanceTransactionSubmittedPage = (props: Props): any => {
 const TransactionSubmittedWrapper = () => {
   const navigate = useNavigate();
   const strings = useStrings();
-
-  const { ampli } = useGovernance();
-  React.useEffect(() => {
-    // ON MOUNT
-    ampli?.governanceTransactionSuccessPageViewed();
-  }, []);
 
   return (
     <TransactionSubmitted

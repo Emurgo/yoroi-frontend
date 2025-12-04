@@ -23,7 +23,7 @@ type Props = {|
   +hasLoadedCurrentLocale: boolean,
   +error: ?LocalizableError,
   +onExternalLinkClick: MouseEvent => void,
-  +downloadLogs: void => void,
+  +downloadLogs: void => Promise<void>,
 |};
 
 @observer
@@ -77,11 +77,7 @@ export default class Loading extends Component<Props> {
     );
 
     const supportRequestLink = (
-      <a
-        className={styles.link}
-        href="https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335"
-        onClick={event => onExternalLinkClick(event)}
-      >
+      <a className={styles.link} href="https://help.yoroi-wallet.com/en/" onClick={event => onExternalLinkClick(event)}>
         {intl.formatMessage(globalMessages.contactSupport)}
       </a>
     );

@@ -11,7 +11,7 @@ import { PasswordInput } from '../../../../components/Input/PasswordInput';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../../common/constants';
 import { dRepNormalize, dRepToPreCip129 } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useNavigateTo } from '../../common/useNavigateTo';
-import { useStrings } from '../../common/useStrings';
+import { useStrings } from '../../common/hooks/useStrings';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { mapStatus } from '../SelectGovernanceStatus/GovernanceStatusSelection';
 import { maybe } from '../../../../../coreUtils';

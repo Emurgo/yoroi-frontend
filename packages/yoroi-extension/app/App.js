@@ -16,17 +16,18 @@ import ThemeManager from './ThemeManager';
 import environment from './environment';
 import MaintenancePage from './containers/MaintenancePage';
 import CrashPage from './containers/CrashPage';
-import Support from './components/widgets/Support';
+// $FlowIgnore: suppressing this error
+import { SupportChatbox } from './UI/components/widgets/CrispChatbox/SupportChatbox';
 // $FlowIgnore: suppressing this error
 import NotificationsProvider from './UI/features/notifications/module/NotificationsProvider';
 // $FlowIgnore: suppressing this error
 import NotificationsManager from './UI/features/notifications/common/NotificationsManager';
-import { ampli } from '../ampli/index';
 import { ROUTES } from './routes-config';
-import { pathToRegexp } from 'path-to-regexp';
 import 'react-tooltip/dist/react-tooltip.css';
 import { IntlProvider } from 'react-intl';
 import { filterByValues } from './coreUtils';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../posthog';
 
 type Props = {|
   +stores: StoresMap,
@@ -49,36 +50,30 @@ function RoutingHelper(props: Props) {
       props.stores.routing.currentRoute = pathname;
     });
 
-    if (pathname === ROUTES.ASSETS.ROOT) {
-      ampli.assetsPageViewed();
-    } else if (pathname === ROUTES.TRANSFER) {
-      ampli.claimAdaPageViewed();
-    } else if (pathname === ROUTES.PROFILE.LANGUAGE_SELECTION) {
-      ampli.createWalletLanguagePageViewed();
-    } else if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
-      ampli.connectorPageViewed();
+    if (pathname === ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES) {
+      captureEvent('Connector Page Viewed');
     } else if (pathname === ROUTES.WALLETS.ADD) {
-      ampli.createWalletSelectMethodPageViewed();
+      captureEvent('Create Wallet Select Method Page Viewed');
     } else if (pathname === ROUTES.WALLETS.RECEIVE.ROOT) {
-      ampli.receivePageViewed();
+      captureEvent('Receive Page Viewed');
     } else if (pathname === ROUTES.SETTINGS.ROOT) {
-      ampli.settingsPageViewed();
+      captureEvent('Settings Page Viewed');
     } else if (pathname === ROUTES.REVAMP.CATALYST_VOTING) {
-      ampli.votingPageViewed();
-    } else if (pathname === ROUTES.WALLETS.TRANSACTIONS) {
-      ampli.transactionsPageViewed();
+      captureEvent('Voting Page Viewed');
     } else if (pathname === ROUTES.STAKING) {
-      ampli.stakingCenterPageViewed();
+      captureEvent('Staking Center Page Viewed');
     } else if (pathname === ROUTES.WALLETS.ROOT) {
-      ampli.walletPageViewed();
+      captureEvent('Transactions Page Viewed');
     } else if (pathname === ROUTES.Governance.ROOT) {
-      ampli.governanceDashboardPageViewed();
+      captureEvent('Governance Dashboard Page Viewed');
     } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
-      const TAB = 'Wallet Token';
-      ampli.portfolioTokensListPageViewed({ tokens_tab: TAB });
-    } else if (pathToRegexp(ROUTES.PORTFOLIO.DETAILS).test(pathname)) {
-      const TAB = 'Overview';
-      ampli.portfolioTokenDetails({ token_details_tab: TAB });
+      captureEvent('Portfolio Dashboard Page Viewed');
+    } else if (pathname === ROUTES.PROFILE.URI_PROMPT) {
+      captureEvent('Payment Urls Page Viewed');
+    } else if (pathname === ROUTES.CASHBACK.ROOT) {
+      captureEvent('Cashback Dashboard Viewed');
+    } else if (pathname === ROUTES.AIRDROP) {
+      captureEvent('Midnight Airdrop Page Viewed');
     }
   }, [location]);
 
@@ -178,7 +173,7 @@ class App extends Component<Props, State> {
       >
         <NotificationsManager />
         <div style={{ height: '100%' }}>
-          <Support />
+          <SupportChatbox />
           {YoroiRoutes(stores)}
           <RoutingHelper stores={stores} />
         </div>

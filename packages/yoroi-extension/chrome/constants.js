@@ -30,7 +30,8 @@ export function genCSP(request: {|
 
   // Analytics
   connectSrc.push('https://analytics.emurgo-rnd.com/');
-  connectSrc.push('https://api2.amplitude.com');
+  connectSrc.push('https://eu.i.posthog.com');
+  connectSrc.push('https://eu-assets.i.posthog.com');
   connectSrc.push('https://api.muesliswap.com');
 
   // Resolver
@@ -46,6 +47,7 @@ export function genCSP(request: {|
   connectSrc.push('https://aggregator.muesliswap.com/');
   connectSrc.push('https://onchain2.muesliswap.com/');
   connectSrc.push('https://aggregator-v2.muesliswap.com/');
+  connectSrc.push('https://agg-api.minswap.org');
   connectSrc.push('https://daehx1qv45z7c.cloudfront.net/');
   connectSrc.push('https://api-us.dexhunterv3.app/');
   connectSrc.push('https://mainnet.processed-media.yoroiwallet.com/');
@@ -62,7 +64,7 @@ export function genCSP(request: {|
   connectSrc.push('https://mainnet.prod.gd.midnighttge.io');
   connectSrc.push('https://proof.provtree-midnight.com');
   connectSrc.push('https://proof-staging.provtree-midnight.com');
-  connectSrc.push('https://preprod.gd.midnighttge.io');
+  connectSrc.push('https://external-claim.gd.midnighttge.io');
 
   // FCM
   connectSrc.push('https://firebaseinstallations.googleapis.com');

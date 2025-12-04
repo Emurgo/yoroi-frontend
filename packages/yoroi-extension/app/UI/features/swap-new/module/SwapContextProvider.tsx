@@ -21,8 +21,9 @@ import { produce } from 'immer';
 import { tokenManagers } from '../../portfolio/common/helpers/build-token-manager';
 import { useSyncedTokenInfos } from '../common/hooks/useTokensInfo';
 import { isLeft, isRight } from '@yoroi/common';
-import { useGetInputs } from '../common/helpers';
+import { toBaseUnits, useGetInputs } from '../common/helpers';
 import { ASSET_DIRECTION_IN, USDA_TOKEN_ID } from '../common/constants';
+import { useStrings } from '../common/hooks/useStrings';
 
 export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
@@ -50,15 +51,17 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
 
   const { getInputs } = useGetInputs(selectedWallet?.utxos || []);
   const [state, action] = useReducer(swapReducer, defaultState);
+  const strings = useStrings();
 
   useEffect(() => {
-    const stakignAddr = stores.wallets.selected.stakingAddress;
+    if (!selectedWallet) return;
+    const stakignAddr = selectedWallet.stakingAddress;
     const skey = unwrapStakingKey(stakignAddr).to_keyhash()?.to_hex();
     if (skey == null) {
       throw new Error('Cannot get staking key from the wallet!');
     }
     setStakingKey(skey);
-  }, []);
+  }, [selectedWallet?.stakingAddress, selectedWallet?.publicDeriverId]);
 
   const swapManager = useMemo(() => {
     const storage = swapStorageMaker();
@@ -160,17 +163,16 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   ]);
 
   useEffect(() => {
-    const normalizeId = (id?: string | null) => (id === '.' ? '' : id);
+    const normalizeId = (id?: string | null) => (id === '.' ? '' : (id ?? ''));
 
-    const tokenAmount = ftAssetList.find(asset => asset.info.id === normalizeId(state.tokenInInput.tokenId));
+    const asset = ftAssetList.find(a => a.info.id === normalizeId(state.tokenInInput.tokenId));
+    const balance = asset ? BigInt(asset.quantity) : BigInt(0);
+    const decimals = asset?.info.numberOfDecimals ?? 0;
+    const needed = toBaseUnits(state.tokenInInput.value, decimals);
 
-    const hasEnoughBalance = Number(tokenAmount?.formatedAmount) >= Number(state.tokenInInput.value);
+    const error = asset && needed !== null && balance < needed ? strings.notEnoughBalance : null;
 
-    if (!hasEnoughBalance) {
-      action({ type: 'TokenInErrorChanged', value: 'Not enogh balance' });
-    } else {
-      action({ type: 'TokenInErrorChanged', value: null });
-    }
+    action({ type: 'TokenInErrorChanged', value: error });
   }, [ftAssetList, state.tokenInInput.tokenId, state.tokenInInput.value]);
 
   useEffect(() => {
@@ -258,6 +260,8 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       })
       .then(response => {
         setIsCreateOrderLoading(false);
+        action({ type: SwapActionType.SwapReviewSelected, value: false });
+
         if (isLeft(response)) {
           action({ type: SwapActionType.CreateError, value: response.error });
         } else {
@@ -279,9 +283,19 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
     tokenInfos,
   ]);
 
+  const swapForm = useMemo(
+    () => ({
+      action,
+      orders,
+      refetchOrders,
+      ...state,
+    }),
+    [action, orders, refetchOrders, state]
+  );
+
   const context: any = useMemo(
     () => ({
-      swapForm: { action, orders, refetchOrders, ...state },
+      swapForm,
       tokenInfos,
       tokenInfoList,
       tokenInInputRef,
@@ -498,6 +512,12 @@ export const swapReducer = (state: SwapState, action: SwapAction) => {
         draft.canSwap = false;
         break;
 
+      case SwapActionType.SwapReviewSelected:
+        draft.needsNewEstimate = false;
+        draft.lastInputTouched = state.lastInputTouched;
+        draft.reviewSwapSelected = action.value;
+        break;
+
       default:
         throw new Error(`swapReducer invalid action`);
     }
@@ -526,6 +546,7 @@ export const SwapActionType = {
   EstimateError: 'EstimateError',
   CreateResponse: 'CreateResponse',
   CreateError: 'CreateError',
+  SwapReviewSelected: 'SwapReviewSelected',
 } as const;
 
 type SwapAction =
@@ -552,7 +573,8 @@ type SwapAction =
   | { type: typeof SwapActionType.EstimateResponse; value: Swap.EstimateResponse }
   | { type: typeof SwapActionType.EstimateError; value: Api.ResponseError }
   | { type: typeof SwapActionType.CreateResponse; value: Swap.CreateResponse }
-  | { type: typeof SwapActionType.CreateError; value: Api.ResponseError };
+  | { type: typeof SwapActionType.CreateError; value: Api.ResponseError }
+  | { type: typeof SwapActionType.SwapReviewSelected; value: boolean };
 
 type SwapState = {
   needsNewEstimate: boolean;
@@ -581,6 +603,7 @@ type SwapState = {
   };
   wantedPrice: string;
   canSwap: boolean;
+  reviewSwapSelected: boolean;
   estimate?: Swap.EstimateResponse;
   createTx?: Swap.CreateResponse;
 };
@@ -612,6 +635,7 @@ const defaultState: SwapState = Object.freeze({
   },
   wantedPrice: '',
   canSwap: false,
+  reviewSwapSelected: false,
   estimate: undefined,
   createTx: undefined,
   cancelTx: undefined,
@@ -643,6 +667,7 @@ export type SwapContext = SwapState & {
   isLimitOptionsLoading: boolean;
   explorer: { tokenInfo: { name: string; baseUrl: string } };
   swapManager: any;
+  reviewSwapSelected: boolean;
 };
 
 const SwapContext = createContext<SwapContext>({
@@ -670,6 +695,7 @@ const SwapContext = createContext<SwapContext>({
   isLimitOptionsLoading: false,
   explorer: { tokenInfo: { name: '', baseUrl: '' } },
   swapManager: {},
+  reviewSwapSelected: false,
 });
 
 const parseNumber = (text: string) =>

@@ -26,6 +26,6 @@
     "noImplicitAny": false,
     "types": ["chrome"]
   },
-  "include": ["app/UI/**/*", ".d.ts", "api/", "chrome/extension/background/**/*.ts"],
+  "include": ["app/UI/**/*", ".d.ts", "api/", "chrome/extension/background/**/*.ts", "posthog/*"],
   "exclude": ["**/*.js", "**/*.flow.js"]
 }

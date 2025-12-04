@@ -12,7 +12,7 @@ import { expect } from 'chai';
 import CreateWalletStepOne from '../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
-import { isChrome, walletNameShortener } from '../utils/utils.js';
+import { walletNameShortener } from '../utils/utils.js';
 import { extensionTabName, serviceWorkersLink, serviceWorkersTabName, WindowManager } from './windowManager.js';
 import { quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
@@ -132,11 +132,7 @@ export const preloadDBAndStorage = async (webdriver, logger, templateName, useGe
   expect(state, 'The Add new wallet page is not displayed').to.be.true;
   await addWalletPage.prepareDBAndStorage(templateName, useGeneralStorageInfo);
   // It is necessary to re-run the service worker after loading info into the indexedDB
-  if (isChrome()) {
-    await restartServiceWorker(webdriver, logger);
-  } else {
-    await addWalletPage.refreshPage();
-  }
+  await restartServiceWorker(webdriver, logger);
   logger.info(`--------------------- preloadDBAndStorage END ---------------------`);
 };
 
@@ -173,18 +169,23 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
-    locator: 'div.worker-controls > button:nth-child(1)',
+    locator: 'div.worker-controls > cr-button:nth-child(1)',
     method: 'css',
   };
   const startBtnLocator = {
-    locator: 'div.registration-controls > button:nth-child(2)',
+    locator: 'div.registration-controls > cr-button:nth-child(2)',
     method: 'css',
   };
 
-  await basepage.click(stopBtnLocator);
-  await basepage.sleep(500);
-  await basepage.click(startBtnLocator);
-  await basepage.sleep(500);
+  await basepage.waitPresentedAndAct(stopBtnLocator, async () => {
+    await basepage.click(stopBtnLocator);
+    await basepage.sleep(500);
+  });
+
+  await basepage.waitPresentedAndAct(startBtnLocator, async () => {
+    await basepage.click(startBtnLocator);
+    await basepage.sleep(500);
+  });
 
   await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);
   await basepage.refreshPage();

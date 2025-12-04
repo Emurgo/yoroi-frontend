@@ -335,7 +335,7 @@ const globalMessages: * = defineMessages({
   },
   faqLinkUrl: {
     id: 'settings.support.faq.faqLinkURL',
-    defaultMessage: '!!!https://yoroi-wallet.com/faq/',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/',
   },
   walletSendConfirmationDialogTitle: {
     id: 'wallet.send.confirmationDialog.title',
@@ -1107,6 +1107,10 @@ const globalMessages: * = defineMessages({
   airdrop: {
     id: 'airdrop.label',
     defaultMessage: '!!!Airdrop',
+  },
+  goToMidnightApp: {
+    id: 'airdrop.goToMidnightApp',
+    defaultMessage: '!!!Go to Midnight App',
   }
 });
 export default globalMessages;

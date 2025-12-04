@@ -47,6 +47,10 @@ import { DappCenterContextProvider } from './UI/features/dapp-center/module/Dapp
 // $FlowIgnore: suppressing this error
 import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
 // $FlowIgnore: suppressing this error
+import GovernanceRevampStatusPage from './UI/pages/Governance-Revamp/GovernanceRevampStatusPage';
+// $FlowIgnore: suppressing this error
+import GovernanceOptionsPage from './UI/pages/Governance-Revamp/GovernanceOptionsPage';
+// $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
 // $FlowIgnore: suppressing this error
 import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
@@ -65,13 +69,13 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
-import { ampli } from '../ampli/index';
-// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
 // $FlowIgnore: suppressing this error
 import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+// $FlowIgnore: suppressing this error
+import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
 
@@ -246,6 +250,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<SwapRevampSubpages stores={stores} />}>
             <Route path={ROUTES.SWAP_REVAMP.ASSET_SWAP} element={<AssetSwapRevampPage stores={stores} />} />
             <Route path={ROUTES.SWAP_REVAMP.ORDERS} element={<SwapOrdersRevampPage stores={stores} />} />
+            <Route path={ROUTES.SWAP_REVAMP.REVIEW} element={<SwapReviewRevampPage stores={stores} />} />
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
@@ -253,6 +258,10 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.Governance.DELEGATE} element={<GovernanceDelegationFormPage stores={stores} />} />
             <Route path={ROUTES.Governance.SUBMITTED} element={<GovernanceTransactionSubmittedPage stores={stores} />} />
             <Route path={ROUTES.Governance.FAIL} element={<GovernanceTransactionFailedPage stores={stores} />} />
+          </Route>
+          <Route element={<GovernanceRevampSubpages stores={stores} />}>
+            <Route path={ROUTES.GOVERNANCE_REVAMP.ROOT} element={<GovernanceRevampStatusPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE_REVAMP.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
@@ -393,12 +402,37 @@ const GovernanceSubpages = ({ stores }) => {
         tokenInfo={stores.tokenInfoStore.tokenInfo}
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-        ampli={ampli}
       >
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        ;
+      </GovernanceContextProvider>
+    </CurrencyProvider>
+  );
+};
+
+const GovernanceRevampSubpages = ({ stores }) => {
+  const { unitOfAccount } = stores.profile;
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+  const { delegationTransaction } = stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  return (
+    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
+      <GovernanceContextProvider
+        currentWallet={currentWalletInfo}
+        createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+        signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+        txDelegationResult={delegationTxResult}
+        txDelegationError={delegationTxError}
+        tokenInfo={stores.tokenInfoStore.tokenInfo}
+        triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+        getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
+      >
+        <Suspense fallback={null}>
+          <Outlet />
+        </Suspense>
       </GovernanceContextProvider>
     </CurrencyProvider>
   );

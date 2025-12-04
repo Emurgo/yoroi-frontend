@@ -13,12 +13,6 @@ import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defa
 type drepDelegation = { status: string | null; drep: string | null };
 type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
 
-type GovernanceAnalytics = {
-  governanceChooseDrepPageViewed: () => void;
-  governanceConfirmTransactionPageViewed: () => void;
-  governanceTransactionSuccessPageViewed: () => void;
-};
-
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
   ...defaultGovernanceActions,
@@ -38,8 +32,8 @@ const initialGovernanceProvider = {
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
-  ampli: null as GovernanceAnalytics | null,
   networkId: null,
+  isTestnet: false,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -54,7 +48,6 @@ type GovernanceProviderProps = {
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
   getCurrentPrice: GetCurrentPrice;
-  ampli: GovernanceAnalytics;
 };
 
 export const GovernanceContextProvider = ({
@@ -67,7 +60,6 @@ export const GovernanceContextProvider = ({
   tokenInfo,
   triggerBuySellAdaDialog,
   getCurrentPrice,
-  ampli,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -175,7 +167,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
-    ampli,
+    isTestnet: selectedWallet.isTestnet,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

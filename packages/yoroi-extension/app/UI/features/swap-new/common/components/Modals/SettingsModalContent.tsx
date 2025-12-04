@@ -106,7 +106,7 @@ const SlipageOptions = ({ setIsManualSlippage, setSelectedSlippage, isManualSlip
   );
 };
 
-const ALL: Aggregator[] = [DEX_ROUTING.DEXHUNTER, DEX_ROUTING.MUESLISWAP]; // remove MINSWAP for now DEX_ROUTING.MINSWAP
+const ALL: Aggregator[] = [DEX_ROUTING.DEXHUNTER, DEX_ROUTING.MINSWAP, DEX_ROUTING.MUESLISWAP];
 
 export const seedAllManual = (): Aggregator[] => [...ALL];
 
@@ -158,12 +158,12 @@ export const RoutingPreference: React.FC<Props> = ({ routingPreference, setRouti
             <Switch checked={list.includes(DEX_ROUTING.MUESLISWAP)} onChange={() => onToggle(DEX_ROUTING.MUESLISWAP)} />
           </Stack>
 
-          {/* <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" gap={14}>
             <Typography variant="body1" color="ds.text_gray_medium" fontWeight={500}>
               Minswap
             </Typography>
             <Switch checked={list.includes(DEX_ROUTING.MINSWAP)} onChange={() => onToggle(DEX_ROUTING.MINSWAP)} />
-          </Stack> */}
+          </Stack>
         </>
       )}
     </Stack>

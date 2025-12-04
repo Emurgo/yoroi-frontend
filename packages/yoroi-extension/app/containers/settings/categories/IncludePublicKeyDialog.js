@@ -10,8 +10,8 @@ import type { StoresProps } from '../../../stores';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
 
 type Props = {|
-  +downloadIncludingKey: void => void,
-  +downloadExcludingKey: void => void,
+  +downloadIncludingKey: void => Promise<void>,
+  +downloadExcludingKey: void => Promise<void>,
 |};
 
 const dialogMessages = defineMessages({

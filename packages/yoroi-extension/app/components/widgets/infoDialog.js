@@ -17,7 +17,7 @@ export const messages: Object = defineMessages({
   },
   learnMore: {
     id: 'wallet.infoDialog.learnMore',
-    defaultMessage: '!!!Learn more on Yoroi Zendesk',
+    defaultMessage: '!!!Learn more on Yoroi Knowledge Base',
   },
 });
 
@@ -116,7 +116,7 @@ function InfoDialog(props: Props & Intl): Node {
           {children}
         </Box>
         <Link
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi-"
+          href="https://help.yoroi-wallet.com/en/"
           target="_blank"
           rel="noreferrer noopener"
           sx={{

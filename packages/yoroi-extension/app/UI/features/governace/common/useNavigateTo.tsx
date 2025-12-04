@@ -10,5 +10,7 @@ export const useNavigateTo = () => {
     delegationForm: () => navigate(ROUTES.Governance.DELEGATE),
     transactionSubmited: () => navigate(ROUTES.Governance.SUBMITTED),
     transactionFail: () => navigate(ROUTES.Governance.FAIL),
+    selectRevampStatus: () => navigate(ROUTES.GOVERNANCE_REVAMP.ROOT),
+    selectRevampOptions: () => navigate(ROUTES.GOVERNANCE_REVAMP.OPTIONS),
   }).current;
 };

@@ -19,7 +19,6 @@ import styles from './ConnectBlock.scss';
 
 type Props = {|
   isWebAuthn: boolean,
-  isFirefox: boolean,
   progressState: ProgressStateType,
   currentOperationName: OperationNameType,
   executeAction: executeActionFunc,
@@ -41,7 +40,6 @@ export default class ConnectBlock extends React.Component<Props> {
   render(): Node {
     const {
       isWebAuthn,
-      isFirefox,
       progressState,
       currentOperationName,
       executeAction,
@@ -101,7 +99,7 @@ export default class ConnectBlock extends React.Component<Props> {
 
     return (
       <div className={styles.component}>
-        <WebAuthnTopBlock showWebAuthnTop={showWebAuthnTop} isFirefox={isFirefox} />
+        <WebAuthnTopBlock showWebAuthnTop={showWebAuthnTop} />
         <TitleBlock currentOperationName={currentOperationName} />
         {content}
       </div>

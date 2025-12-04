@@ -11,10 +11,9 @@ import { translations } from '../../../app/i18n/translations';
 import App from '../../../app/connector/App';
 import BigNumber from 'bignumber.js';
 import { addCloseListener, TabIdKeys } from '../../../app/utils/tabManager';
-import environment from '../../../app/environment';
-import { ampli } from '../../../ampli/index';
-import type { LoadOptionsWithEnvironment } from '../../../ampli/index';
 import LocalStorageApi from '../../../app/api/localStorage';
+// $FlowFixMe[cannot-resolve-module]
+import { enablePosthog } from '../../../posthog';
 
 // run MobX in strict mode
 configure({ enforceActions: 'always' });
@@ -39,24 +38,10 @@ const initializeDappConnector: void => Promise<void> = async () => {
   if (container == null) {
     throw new Error('Root element not found.');
   }
-  const AMPLI_FLUSH_INTERVAL_MS = 5000;
-  const isAnalyticsAllowd = new LocalStorageApi().loadIsAnalyticsAllowed();
-  await ampli.load(
-    ({
-      environment: environment.isProduction() ? 'production' : 'development',
-      client: {
-        configuration: {
-          optOut: !isAnalyticsAllowd,
-          flushIntervalMillis: AMPLI_FLUSH_INTERVAL_MS,
-          trackingOptions: {
-            ipAddress: false,
-          },
-          defaultTracking: false,
-        },
-      },
-    }: LoadOptionsWithEnvironment)
-  ).promise;
-
+  const isAnalyticsAllowd: ?boolean = await new LocalStorageApi().loadIsAnalyticsAllowed();
+  if (isAnalyticsAllowd) {
+    enablePosthog();
+  }
   const root = createRoot(container);
   root.render(<App stores={stores} />);
 };

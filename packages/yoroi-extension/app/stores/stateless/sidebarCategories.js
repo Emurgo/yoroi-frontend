@@ -37,7 +37,6 @@ const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
 const isDev = (): boolean => environment.isDev();
-const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
@@ -72,14 +71,14 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.SWAP.ROOT,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: isOnMainnet,
+    isVisible: isDev,
   },
   {
     className: 'swap2',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
-    isVisible: isDev,
+    isVisible: isOnMainnet,
   },
   {
     className: 'portfolio',
@@ -114,7 +113,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: params => isOnMainnet(params) && nonTrezorWallet(params),
+    isVisible: params => isOnMainnet(params),
   },
   {
     className: 'connected-websites',
@@ -136,6 +135,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
     isVisible: existsSelectedWallet,
+  },
+  {
+    className: 'governance-revamp',
+    route: '/governance-status',
+    icon: governanceIcon,
+    label: globalMessages.sidebarGovernance,
+    isVisible: () => environment.isDev(),
   },
   {
     className: 'settings',

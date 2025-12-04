@@ -7,8 +7,15 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import { DexRouteTable } from '../../common/components/Modals/DexRouteTable';
 import { LimitDexRouteTable } from '../../common/components/Modals/LimitDexRouteTable';
 import { ProtocolAvatar } from '../../common/components/ProtocolAvatar/ProtocolAvatar';
+import PriceImpact from '../../common/components/PriceImpact';
+import { getPriceImpactRisk } from '../../common/helpers';
 
-export const EstimateSummary = () => {
+type EstimateSummaryProps = {
+  showPriceImpact?: boolean;
+  showToolTips?: boolean;
+};
+
+export const EstimateSummary = ({ showPriceImpact, showToolTips }: EstimateSummaryProps) => {
   const strings = useStrings();
   const { atoms }: any = useTheme();
   const { swapForm, tokenInfos, primaryTokenInfo, isEstimateOrderLoading, isLimitOptionsLoading } = useSwapRevamp();
@@ -19,6 +26,8 @@ export const EstimateSummary = () => {
   const tokenInTicker = tokenInInfo?.ticker ?? tokenInInfo?.name ?? '-';
   const tokenOutTicker = tokenOutInfo?.ticker ?? tokenOutInfo?.name ?? '-';
   const isLimitOrder = swapForm.orderType === 'limit';
+  const effective = swapForm?.estimate?.priceImpact ?? 0;
+  const risk = getPriceImpactRisk(effective);
 
   if (isEstimateOrderLoading || isLimitOptionsLoading) {
     return (
@@ -33,9 +42,7 @@ export const EstimateSummary = () => {
   if (swapForm.estimate === undefined) return null;
 
   const protocol = swapForm.estimate?.splits[0]?.protocol;
-  const netPrice = swapForm.estimate.netPrice;
-  const roundedPrice = netPrice.toFixed(tokenOutInfo?.decimals ?? 0).replace(/\.0+$/, '');
-  const price = roundedPrice !== '0' ? roundedPrice : netPrice.toFixed(6);
+  const pickTokenTicker = (t?: string) => (t && t !== '-' ? t : primaryTokenInfo.ticker);
 
   const openRouteModal = () => {
     openModal({
@@ -54,7 +61,7 @@ export const EstimateSummary = () => {
     <Stack direction="column" {...atoms.gap_md} width="503px" {...atoms.mt_lg}>
       <DisplayInfoInRow
         label={strings.routeLabel}
-        tooltip={strings.routePath}
+        tooltip={showToolTips ? strings.routePath : undefined}
         value={
           <Typography sx={{ cursor: 'pointer' }}>
             <Link onClick={openRouteModal}>
@@ -65,35 +72,38 @@ export const EstimateSummary = () => {
       />
       <DisplayInfoInRow
         label={strings.priceLabel}
-        tooltip="Asset Price"
-        value={`1 ${tokenInTicker === '-' ? primaryTokenInfo.ticker : tokenInTicker} = ${price} ${tokenOutTicker}`}
+        tooltip={showToolTips ? strings.assetPrice : undefined}
+        value={`1 ${pickTokenTicker(tokenInTicker)} = ${swapForm.estimate?.netPrice ?? 0} ${pickTokenTicker(tokenOutTicker)}`}
       />
       <DisplayInfoInRow
-        label="Fees"
+        label={strings.feesLabel}
         tooltip={
-          <>
-            <Typography variant="body2" color="ds.gray_min">
-              {strings.feesIncluded}
-            </Typography>
-            <Typography variant="body2" color="ds.gray_min">
-              {strings.dexFee}
-            </Typography>
-            <Typography variant="body2" color="ds.gray_min">
-              {strings.frontendFee}
-            </Typography>
-          </>
+          showToolTips ? (
+            <>
+              <Typography variant="body2" color="ds.gray_min">
+                {strings.feesIncluded}
+              </Typography>
+              <Typography variant="body2" color="ds.gray_min">
+                {strings.dexFee}
+              </Typography>
+              <Typography variant="body2" color="ds.gray_min">
+                {strings.frontendFee}
+              </Typography>
+            </>
+          ) : undefined
         }
         value={`${swapForm.estimate?.totalFee} ${primaryTokenInfo.ticker}`}
       />
+      {showPriceImpact && risk !== 'none' && <DisplayInfoInRow label={strings.priceImpact} value={<PriceImpact />} />}
       <DisplayInfoInRow
         label={strings.minReceived}
-        tooltip={strings.guaranteedMin}
-        value={`${swapForm.estimate?.totalOutput} ${tokenOutTicker}`}
+        tooltip={showToolTips ? strings.guaranteedMin : undefined}
+        value={`${swapForm.estimate?.totalOutput} ${pickTokenTicker(tokenOutTicker)}`}
       />
       {!isLimitOrder && (
         <DisplayInfoInRow
           label={strings.slippageLabel}
-          tooltip={strings.slippageInfo}
+          tooltip={showToolTips ? strings.slippageInfo : undefined}
           value={`${swapForm.slippageInput.value} %`}
         />
       )}

@@ -79,6 +79,7 @@ export const ROUTES = {
   SWAP_REVAMP: {
     ASSET_SWAP: '/swap-revamp',
     ORDERS: '/swap-revamp/orders',
+    REVIEW: '/swap-revamp/review',
     // $FlowIgnore
     ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
   },
@@ -87,6 +88,10 @@ export const ROUTES = {
     DELEGATE: '/governance/delagation',
     SUBMITTED: '/governance/submitted',
     FAIL: '/governance/failed',
+  },
+  GOVERNANCE_REVAMP: {
+    ROOT: '/governance-status',
+    OPTIONS: '/governance-status/options',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

@@ -17,9 +17,9 @@ export const DEX_ROUTING = {
   AUTO: 'auto',
   DEXHUNTER: 'dexhunter',
   MUESLISWAP: 'muesliswap',
-  // MINSWAP: 'minswap',
+  MINSWAP: 'minswap',
 } as const;
 
-export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MUESLISWAP;
-// | typeof DEX_ROUTING.MINSWAP;
+export type Aggregator = typeof DEX_ROUTING.DEXHUNTER | typeof DEX_ROUTING.MINSWAP | typeof DEX_ROUTING.MUESLISWAP;
 export type RoutingPref = typeof DEX_ROUTING.AUTO | Aggregator[];
+export type AssetDirection = typeof ASSET_DIRECTION_IN | typeof ASSET_DIRECTION_OUT;

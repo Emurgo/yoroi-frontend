@@ -6,7 +6,6 @@ import { NotificationTypes } from '../../../types/notifications';
 import { createToast } from '../../../components/notifications/NotificationToast';
 import { useNavigate, useLocation } from 'react-router';
 import { ROUTES } from '../../../../routes-config';
-import { ampli } from '../../../../../ampli/index';
 import { getNetworkById, getCardanoHaskellBaseConfig } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import LocalStorageApi from '../../../../api/localStorage';
 import TimeUtils from '../../../../api/ada/lib/storage/bridge/timeUtils';
@@ -185,10 +184,6 @@ export default function NotificationsProvider({
       toast.update(props.toastId, { data: { event: 'closed' } });
       toast.dismiss(props.toastId);
 
-      // analytics for close event
-      const { data } = props;
-      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-      ampli.inAppNotificationClosed({ type: analyticsTypeValue });
       if (centerMsgId) {
         call(appState.notifications.setRead, centerMsgId);
       }
@@ -199,10 +194,6 @@ export default function NotificationsProvider({
       toast.dismiss(props.toastId);
 
       const { data } = props;
-      // analytics for click event
-      const analyticsTypeValue = data.type === NotificationTypes.Rewards ? 'staking_rewards' : 'tx_received';
-      ampli.inAppNotificationOpened({ type: analyticsTypeValue });
-      // redirect after analytics
       const redirectTo = data.type === NotificationTypes.Rewards ? ROUTES.STAKING : ROUTES.WALLETS.TRANSACTIONS;
       navigate(redirectTo);
       if (centerMsgId) {
@@ -273,7 +264,6 @@ export default function NotificationsProvider({
     }
 
     if (props.status === 'added') {
-      ampli.inAppNotificationViewed();
       // Remove the oldest toast if more than 3 exist
       toastQueue.length >= 3 && toast.dismiss(toastQueue[0]);
       // Update toast queue

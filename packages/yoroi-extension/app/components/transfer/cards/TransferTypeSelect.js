@@ -6,7 +6,6 @@ import { observer } from 'mobx-react';
 import TransferCards from './TransferCards';
 import { handleExternalLinkClick } from '../../../utils/routing';
 import { Box, Link, Typography } from '@mui/material';
-import globalMessages from '../../../i18n/global-messages';
 
 type Props = {|
   +onByron: void => void,
@@ -35,7 +34,7 @@ export default class TransferTypeSelect extends Component<Props> {
     const intl = this.context;
     const faqLink = (
       <Link
-        href={intl.formatMessage(globalMessages.faqLinkUrl)}
+        href="https://help.yoroi-wallet.com/en/article/how-to-claim-a-byron-era-wallet-in-yoroi-qdxql3/"
         onClick={event => handleExternalLinkClick(event)}
         id="settings:support-faq-link"
       >

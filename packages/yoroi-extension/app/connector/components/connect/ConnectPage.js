@@ -88,10 +88,6 @@ const messages = defineMessages({
     id: 'connector.connect.cashback.apply.all',
     defaultMessage: '!!!The wallet you select will be applied for all partner websites.',
   },
-  cashbackDisabledTrezor: {
-    id: 'connector.connect.cashback.trezor.disabled',
-    defaultMessage: '!!!Cashback service doesn’t support Trezor wallet connection',
-  },
   addWallet: {
     id: 'connector.connect.cashback.addWallet',
     defaultMessage: '!!!Add wallet',
@@ -321,7 +317,7 @@ export default class ConnectPage extends Component<Props> {
               {isError ? <div className={styles.errorMessage}>{error}</div> : null}
               {isLoading ? (
                 <div className={styles.loading}>
-                  <LoadingSpinner />
+                  <LoadingSpinner id="dApp" />
                 </div>
               ) : hasWallets ? (
                 <div className={styles.walletsContainer}>
@@ -350,8 +346,6 @@ export default class ConnectPage extends Component<Props> {
 
                   <ul className={styles.list}>
                     {publicDerivers.map((wallet, idx) => {
-                      const isTrezor = isSelectingCashbackWallet && wallet.type === 'trezor';
-                      const Btn = isTrezor ? DisabledWalletButton : WalletButton;
                       return (
                         <Box
                           component="li"
@@ -360,16 +354,16 @@ export default class ConnectPage extends Component<Props> {
                             border: '1px solid',
                             borderColor: 'transparent',
                             borderRadius: '8px',
-                            ...(!isTrezor && {
-                              '&:hover': {
-                                borderColor: 'ds.gray_300',
-                              },
-                            }),
+                            '&:hover': {
+                              borderColor: 'ds.gray_300',
+                            },
                           }}
                         >
-                          <Btn onClick={() => onSelectWallet(wallet, wallet.plate)} id="connector:connect-walletItem-button">
+                          <WalletButton
+                            onClick={() => onSelectWallet(wallet, wallet.plate)}
+                            id="connector:connect-walletItem-button"
+                          >
                             <ConnectedWallet
-                              disabledForReason={isTrezor ? intl.formatMessage(messages.cashbackDisabledTrezor) : null}
                               publicDeriver={wallet}
                               walletBalance={
                                 <Box
@@ -391,7 +385,7 @@ export default class ConnectPage extends Component<Props> {
                                 </Box>
                               }
                             />
-                          </Btn>
+                          </WalletButton>
                         </Box>
                       );
                     })}
@@ -446,9 +440,6 @@ const WalletButton = styled('button')({
   width: '100%',
   fontSize: '1rem',
   padding: '16px',
-});
-const DisabledWalletButton = styled(WalletButton)({
-  cursor: 'default',
 });
 
 const TestnetWarningBox = styled(Box)(({ theme }) => ({
