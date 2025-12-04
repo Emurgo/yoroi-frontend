@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
-import { Icon } from '../../../../components';
+import { CopyButton, Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -57,14 +57,6 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
   const showDelegateToYoroiDrepButton = forModal || (governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated);
   const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
-
-  const handleCopy = () => {
-    try {
-      navigator.clipboard.writeText(drepID);
-    } catch {
-      // no-op
-    }
-  };
 
   const handleDelegateClick = () => {
     if (isDisabled) return;
@@ -133,9 +125,7 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
                 {forModal ? truncateFormatter(drepID, 15) : drepID}
               </Typography>
-              <CopyIconButton onClick={handleCopy} disabled={isDisabled}>
-                <Icon.Copy />
-              </CopyIconButton>
+              <CopyButton textToCopy={drepID} />
             </RightPart>
           </ItemRow>
         )}
@@ -334,12 +324,6 @@ const RightPart = styled(Box)(() => ({
   gap: '4px',
   height: '24px',
   flexShrink: 0,
-}));
-
-const CopyIconButton = styled(IconButton)(() => ({
-  width: '24px',
-  height: '24px',
-  padding: '0px',
 }));
 
 const StatusBadge = styled(Box)<{ variant: GovernanceStatusState }>(({ variant, theme }: any) => ({

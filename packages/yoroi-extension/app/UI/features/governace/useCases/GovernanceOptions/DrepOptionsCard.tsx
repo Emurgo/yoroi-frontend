@@ -3,7 +3,7 @@ import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 import { LoadingButton } from '@mui/lab';
-import { Icon } from '../../../../components';
+import { CopyButton, Icon } from '../../../../components';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 interface ActionCardProps {
@@ -89,13 +89,6 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
 const DelegatedInfo = ({ drepId, status }) => {
   const strings = useStrings();
 
-  const handleCopy = () => {
-    try {
-      navigator.clipboard.writeText(drepId || '');
-    } catch {
-      // no-op
-    }
-  };
   return (
     <ItemsGroup>
       <ItemRow>
@@ -109,9 +102,7 @@ const DelegatedInfo = ({ drepId, status }) => {
           <Typography color="ds.text_gray_medium" variant="body2">
             {truncateFormatter(drepId, 15)}
           </Typography>
-          <CopyIconButton onClick={handleCopy}>
-            <Icon.Copy />
-          </CopyIconButton>
+          <CopyButton textToCopy={drepId} />
         </RightPart>
       </ItemRow>
 
@@ -302,12 +293,6 @@ const RightPart = styled(Box)(() => ({
   gap: '4px',
   height: '24px',
   flexShrink: 0,
-}));
-
-const CopyIconButton = styled(IconButton)(() => ({
-  width: '24px',
-  height: '24px',
-  padding: '0px',
 }));
 
 const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant, theme }: any) => ({
