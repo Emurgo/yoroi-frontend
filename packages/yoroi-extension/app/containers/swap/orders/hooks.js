@@ -73,7 +73,6 @@ export function useRichOrders(
    * Fetch verified tokens list converted to map
    */
   const { data: tokensMap } = useQuery({
-    suspense: true,
     queryKey: ['useSwapTokensOnlyVerifiedMap'],
     useErrorBoundary: false,
     queryFn: () =>
