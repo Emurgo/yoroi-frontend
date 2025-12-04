@@ -368,6 +368,8 @@ class BasePage {
    */
   async inputElem(webElement, value, hideInLog = false, delayBetweenChars = 5) {
     this.logger.info(`BasePage::inputElem is called. Value: ${hideInLog ? '******' : value}`);
+    await webElement.click();
+    await this.sleep(50, false);
     for (let index = 0; index < value.length; index++) {
       await webElement.sendKeys(value[index]);
       await this.sleep(delayBetweenChars, false);
