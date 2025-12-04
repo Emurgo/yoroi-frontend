@@ -1,6 +1,6 @@
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
+import { Box, Typography, Link, Stack } from '@mui/material';
 import { CopyButton, Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';

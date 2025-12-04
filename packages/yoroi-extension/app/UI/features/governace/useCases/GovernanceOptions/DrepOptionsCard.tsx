@@ -1,9 +1,9 @@
-import { Box, Typography, Button, Stack, Link, IconButton } from '@mui/material';
+import { Box, Typography, Button, Stack, Link } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 import { LoadingButton } from '@mui/lab';
-import { CopyButton, Icon } from '../../../../components';
+import { CopyButton } from '../../../../components';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 interface ActionCardProps {
