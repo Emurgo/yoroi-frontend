@@ -1343,7 +1343,7 @@
   "governance.statusSelected": "You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow",
   "governance.statusPending": "You have chosen your governance status, this process may take a while.",
   "governance.registerGovernance": "Register in Governance",
-  "governance.chooseDrep": "Choose your Drep",
+  "governance.chooseDrep": "Enter drep id manually",
   "governance.reviewSelection": "Your delegation helps shape Cardano's future.\nYou may change your governance status at any time",
   "governance.banner.title": "New to Governance? Start here",
   "governance.banner.text": "Your ADA can make a difference. Delegate to a DRep to represent your vote and participate in Cardano governance.",
