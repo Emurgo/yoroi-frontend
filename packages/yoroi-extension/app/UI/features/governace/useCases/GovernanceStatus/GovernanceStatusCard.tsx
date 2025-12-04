@@ -100,7 +100,13 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   };
 
   return (
-    <Root state={state} forModal={forModal} isAbstain={isAbstain} isNoConfidence={isNoConfidence}>
+    <Root
+      state={state}
+      forModal={forModal}
+      isAbstain={isAbstain}
+      isNoConfidence={isNoConfidence}
+      id="governance-delegationStatus-button"
+    >
       <TitleRow>
         <Avatar
           forModal={forModal}

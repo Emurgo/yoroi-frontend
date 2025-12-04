@@ -26,7 +26,7 @@ const GovernanceLayout = ({ stores, children }: Props): any => {
         <GovernanceExternalPackageProvider manager={governanceManager}>
           <Stack direction="column" justifyContent="space-between" alignItems="center" height="100%">
             {children}
-            <Link sx={{ cursor: 'pointer' }} href={LEARN_MORE_LINK} target="_blank" rel="noopener">
+            <Link sx={{ cursor: 'pointer' }} href={LEARN_MORE_LINK} target="_blank" rel="noopener" id="governance-learnMore-link">
               {strings.learnMoreLabel}
             </Link>
           </Stack>

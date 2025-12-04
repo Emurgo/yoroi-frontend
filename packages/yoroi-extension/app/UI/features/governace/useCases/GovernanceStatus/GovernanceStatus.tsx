@@ -45,10 +45,10 @@ export const GovernanceStatus = () => {
   return (
     <Container>
       <TitleSection>
-        <Typography variant="h5" color="ds.text_gray_medium">
+        <Typography variant="h5" color="ds.text_gray_medium" id="governance-title-text">
           {isParticipating ? strings.delegatingInGovernance : strings.delegationOptions}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'}>
+        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'} id="governance-description-text">
           {cardState === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
         </Typography>
       </TitleSection>
@@ -69,7 +69,7 @@ export const GovernanceStatus = () => {
           pending={isPendingDrepDelegationTx}
         />
 
-        <OtherActionsCard onClick={onExploreMore}>
+        <OtherActionsCard onClick={onExploreMore} id="governance-otherOptions-button">
           <TextContent>
             <Typography variant="body1" fontWeight={500} color="ds.gray_max">
               {strings.exploreOtherDRepsOrAbstain}

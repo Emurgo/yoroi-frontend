@@ -35,6 +35,7 @@ export const StatusSkeletonScreen = () => {
           width={612}
           height={294}
           sx={{ marginBottom: '22px', backgroundColor: 'ds.gray_100' }}
+          id="governance-delegationStatusSkeleton-component"
         />
         <Skeleton
           animation="wave"
@@ -42,6 +43,7 @@ export const StatusSkeletonScreen = () => {
           width={612}
           height={82}
           sx={{ marginBottom: '12px', backgroundColor: 'ds.gray_100' }}
+          id="governance-otherOptionsSkeleton-component"
         />
       </Stack>
     </StyledCard>
