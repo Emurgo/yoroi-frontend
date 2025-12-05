@@ -1,10 +1,9 @@
-import { Box, Typography, Button, Stack, Link, IconButton } from '@mui/material';
+import { Box, Typography, Button, Stack, Link } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
-import { YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { LoadingButton } from '@mui/lab';
-import { Icon } from '../../../../components';
+import { CopyButton } from '../../../../components';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 interface ActionCardProps {
@@ -68,9 +67,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
                   e.stopPropagation();
                   onViewDetails();
                 }}
-                href={YOROI_VOTING_RECORD_LINK}
                 rel="noopener"
-                target="_blank"
                 underline="hover"
                 sx={{ cursor: 'pointer' }}
               >
@@ -92,13 +89,6 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
 const DelegatedInfo = ({ drepId, status }) => {
   const strings = useStrings();
 
-  const handleCopy = () => {
-    try {
-      navigator.clipboard.writeText(drepId || '');
-    } catch {
-      // no-op
-    }
-  };
   return (
     <ItemsGroup>
       <ItemRow>
@@ -112,9 +102,7 @@ const DelegatedInfo = ({ drepId, status }) => {
           <Typography color="ds.text_gray_medium" variant="body2">
             {truncateFormatter(drepId, 15)}
           </Typography>
-          <CopyIconButton onClick={handleCopy}>
-            <Icon.Copy />
-          </CopyIconButton>
+          <CopyButton textToCopy={drepId} />
         </RightPart>
       </ItemRow>
 
@@ -179,20 +167,16 @@ export const ActionCardContainer = styled(Box, {
     alignItems: 'flex-start',
     padding: '16px',
     gap: variant === 'primary' ? '16px' : '12px',
-
     width: '294px',
     height: '320px',
-
     borderRadius: '8px',
     flex: 'none',
     alignSelf: 'stretch',
     flexGrow: 1,
-
     cursor: status === 'disabled' ? 'default' : 'pointer',
     opacity: status === 'disabled' ? 0.6 : 1,
   };
 
-  // 1. Disabled state (regardless of variant)
   if (status === 'disabled' || pending) {
     return {
       ...base,
@@ -205,14 +189,6 @@ export const ActionCardContainer = styled(Box, {
     return {
       ...base,
       background: theme.palette.ds.bg_gradient_2,
-    };
-  }
-
-  if (isCardDelegated && variant === 'primary') {
-    return {
-      ...base,
-      background: theme.palette.ds.bg_gradient_2,
-      // border: `1px solid ${theme.palette.ds.primary_500}`,
     };
   }
   if (variant === 'primary') {
@@ -317,12 +293,6 @@ const RightPart = styled(Box)(() => ({
   gap: '4px',
   height: '24px',
   flexShrink: 0,
-}));
-
-const CopyIconButton = styled(IconButton)(() => ({
-  width: '24px',
-  height: '24px',
-  padding: '0px',
 }));
 
 const StatusBadge = styled(Box)<{ variant: 'active' | 'delegated' | 'disabled' }>(({ variant, theme }: any) => ({

@@ -52,7 +52,7 @@ export const GovernanceParticipateDialog = ({ onClose, stores }: AllProps): Reac
         onClick={() => {
           onClose();
           stores.routing.goToRoute({
-            route: ROUTES.Governance.ROOT,
+            route: ROUTES.GOVERNANCE.ROOT,
           });
         }}
         sx={{ marginTop: '12px' }}
