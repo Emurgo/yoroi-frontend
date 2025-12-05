@@ -186,6 +186,10 @@ export const messages = Object.freeze(
       id: 'governance.yoroiDRep',
       defaultMessage: '!!!Yoroi DRep',
     },
+    yoroiTestnetDRep: {
+      id: 'governance.yoroiTestnetDRep',
+      defaultMessage: '!!!Testnet DRep',
+    },
     yoroiDRepInfo: {
       id: 'governance.yoroiDRepInfo',
       defaultMessage:
@@ -253,6 +257,10 @@ export const messages = Object.freeze(
       id: 'governance.votingPowerInfo',
       defaultMessage:
         '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
+    },
+    delegatingInGovernance: {
+      id: 'gouvernace.delegatingInGovernance',
+      defaultMessage: '!!!Delegating in Governance',
     },
   })
 );
@@ -323,5 +331,7 @@ export const useStrings = () => {
     delegatingLabel: intl.formatMessage(messages.delegatingLabel),
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
+    yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
+    delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
   }).current;
 };

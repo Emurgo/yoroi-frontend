@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Typography, IconButton, Link, Stack } from '@mui/material';
-import { Icon } from '../../../../components';
+import { Box, Typography, Link, Stack } from '@mui/material';
+import { CopyButton, Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';
 import {
@@ -10,15 +10,16 @@ import {
   GOVERNANCE_STATUS,
   GovernanceStatusState,
   YOROI_DREP_ID,
+  YOROI_DREP_ID_TESTNET,
   YOROI_VOTING_RECORD_LINK,
 } from '../../common/constants';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
+import { useGovernance } from '../../module/GovernanceContextProvider';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
   onDelegateClick?: () => void;
-  onDetailsClick?: () => void;
   btnLoading?: boolean;
   forModal?: boolean;
   governanceStatus?: any;
@@ -26,11 +27,10 @@ interface GovernanceStatusCardProps {
   pending?: boolean;
 }
 
-export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = ({
+export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   state,
   governanceStatus,
   onDelegateClick,
-  onDetailsClick,
   btnLoading,
   forModal = false,
   openDelegateModalForCustomDrep,
@@ -39,46 +39,35 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
   const isDisabled = state === GOVERNANCE_STATUS.DISABLED || pending;
   const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
   const { isParticipating } = useIsGovernanceAllowed();
+  const { isTestnet } = useGovernance();
   const strings = useStrings();
   const theme: any = useTheme();
 
-  const drepID = governanceStatus?.drep ? governanceStatus?.drep : YOROI_DREP_ID;
-  const isDelegationToYoroiDrep = isDelegated && drepID === YOROI_DREP_ID;
-  const isDelegationToOtherDrep = isDelegated && drepID !== YOROI_DREP_ID;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+  const drepID = governanceStatus?.drep ? governanceStatus?.drep : yoroiDrepId;
+  const isDelegationToYoroiDrep = isDelegated && drepID === yoroiDrepId;
+  const isDelegationToOtherDrep = isDelegated && drepID !== yoroiDrepId;
   const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
   const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
-  const showOnDetailsLink = onDetailsClick && !isAbstain && !isNoConfidence;
   const showDrepStatus = isDelegationToOtherDrep || isDelegationToYoroiDrep || !isParticipating;
   const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
-  const showDelegatingLabel = isParticipating;
+  const showDelegatingLabel = isParticipating && !forModal;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
-  const showDelegateToYoroiDrepButton = governanceStatus?.status === GOVERNANCE_STATUS.IDLE;
-  const showVotingRecordLink = showOnDetailsLink && !isDelegationToOtherDrep;
-
-  const handleCopy = () => {
-    try {
-      navigator.clipboard.writeText(drepID);
-    } catch {
-      // no-op
-    }
-  };
+  const showDelegateToYoroiDrepButton =
+    !isParticipating || forModal || (governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated);
+  const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
 
   const handleDelegateClick = () => {
     if (isDisabled) return;
     onDelegateClick?.();
   };
 
-  // @ts-ignore || it will be used later
-  const handleDetailsClick = () => {
-    onDetailsClick?.();
-  };
-
   const handleCardInfo = () => {
     if (isDelegationToYoroiDrep) {
       return {
-        icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
-        title: strings.yoroiDRep,
+        icon: <Icon.YoroiLogo width={forModal ? 16 : 24} height={forModal ? 16 : 24} fill={theme.palette.ds.gray_min} />,
+        title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
         description: strings.yoroiDRepInfo,
       };
     }
@@ -105,19 +94,35 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
     }
     return {
       icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
-      title: strings.yoroiDRep,
+      title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
       description: strings.yoroiDRepInfo,
     };
   };
 
   return (
-    <Root state={state} forModal={forModal} isAbstain={isAbstain} isNoConfidence={isNoConfidence}>
+    <Root
+      state={state}
+      forModal={forModal}
+      isAbstain={isAbstain}
+      isNoConfidence={isNoConfidence}
+      id="governance-delegationStatus-button"
+    >
       <TitleRow>
-        <Avatar state={state} isDelegationToYoroiDrep={isDelegationToYoroiDrep} isParticipating={isParticipating}>
+        <Avatar
+          forModal={forModal}
+          state={state}
+          isDelegationToYoroiDrep={isDelegationToYoroiDrep}
+          isParticipating={isParticipating}
+        >
           {handleCardInfo().icon}
         </Avatar>
 
-        <Typography maxWidth={'600px'} variant={forModal ? 'body1' : 'h5'} color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
+        <Typography
+          maxWidth={'600px'}
+          fontWeight={500}
+          variant={forModal ? 'body1' : 'h5'}
+          color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}
+        >
           {handleCardInfo().title}
         </Typography>
       </TitleRow>
@@ -136,9 +141,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
               <Typography color={isDisabled ? 'ds.gray_600' : 'ds.gray_900'}>
                 {forModal ? truncateFormatter(drepID, 15) : drepID}
               </Typography>
-              <CopyIconButton onClick={handleCopy} disabled={isDisabled}>
-                <Icon.Copy />
-              </CopyIconButton>
+              <CopyButton textToCopy={drepID} />
             </RightPart>
           </ItemRow>
         )}
@@ -190,7 +193,7 @@ export const GovernanceStatusRevampCard: React.FC<GovernanceStatusCardProps> = (
             fullWidth
             loading={btnLoading}
             /* @ts-ignore */
-            variant="primary"
+            variant={forModal ? 'secondary' : 'primary'}
             disabledVisual={isDisabled}
             disabled={isDisabled}
             onClick={handleDelegateClick}
@@ -286,18 +289,21 @@ const TitleRow = styled(Box)(() => ({
   height: '48px',
 }));
 
-const Avatar = styled(Box)<{ state: GovernanceStatusState; isDelegationToYoroiDrep: boolean; isParticipating: boolean }>(
-  ({ isDelegationToYoroiDrep, theme, isParticipating }: any) => ({
-    width: '48px',
-    height: '48px',
-    borderRadius: '1200px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexShrink: 0,
-    background: !isParticipating || isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200,
-  })
-);
+const Avatar = styled(Box)<{
+  forModal: boolean;
+  state: GovernanceStatusState;
+  isDelegationToYoroiDrep: boolean;
+  isParticipating: boolean;
+}>(({ isDelegationToYoroiDrep, forModal, theme, isParticipating }: any) => ({
+  width: forModal ? '24px' : '48px',
+  height: forModal ? '24px' : '48px',
+  borderRadius: '1200px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  background: !isParticipating || isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200,
+}));
 
 const ItemsGroup = styled(Box)(() => ({
   display: 'flex',
@@ -337,12 +343,6 @@ const RightPart = styled(Box)(() => ({
   gap: '4px',
   height: '24px',
   flexShrink: 0,
-}));
-
-const CopyIconButton = styled(IconButton)(() => ({
-  width: '24px',
-  height: '24px',
-  padding: '0px',
 }));
 
 const StatusBadge = styled(Box)<{ variant: GovernanceStatusState }>(({ variant, theme }: any) => ({

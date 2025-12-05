@@ -40,7 +40,7 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
   },
   {
     id: 'governance',
-    route: ROUTES.Governance.ROOT,
+    route: ROUTES.GOVERNANCE.ROOT,
   },
 ];
 
