@@ -366,11 +366,13 @@ class BasePage {
    * @param {boolean} [hideInLog=false]
    * @returns {Promise<void>}
    */
-  async inputElem(webElement, value, hideInLog = false) {
+  async inputElem(webElement, value, hideInLog = false, delayBetweenChars = 5) {
     this.logger.info(`BasePage::inputElem is called. Value: ${hideInLog ? '******' : value}`);
+    await webElement.click();
+    await this.sleep(50, false);
     for (let index = 0; index < value.length; index++) {
       await webElement.sendKeys(value[index]);
-      await this.sleep(5, false);
+      await this.sleep(delayBetweenChars, false);
     }
   }
   /**
@@ -421,6 +423,20 @@ class BasePage {
     await this.sleep(500);
     await input.sendKeys(Key.NULL);
     await input.sendKeys(Key.BACK_SPACE);
+  }
+  /**
+   * Clears the value in an input WebElement.
+   * @param {WebElement} inputWebElement
+   * @returns {Promise<void>}
+   */
+  async clearInputAllElem(inputWebElement) {
+    this.logger.info(`BasePage::clearInputAllElem is called.`);
+    await inputWebElement.click();
+    await this.sleep(250);
+    await inputWebElement.sendKeys(Key.chord(isMacOS() ? Key.COMMAND : Key.CONTROL, 'a'));
+    await this.sleep(500);
+    await inputWebElement.sendKeys(Key.NULL);
+    await inputWebElement.sendKeys(Key.BACK_SPACE);
   }
   /**
    * Sets the implicit wait timeout for driver commands.
