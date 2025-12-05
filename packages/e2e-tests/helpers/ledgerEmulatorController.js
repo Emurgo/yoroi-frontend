@@ -2,6 +2,7 @@ import { sleep } from '../utils/utils.js';
 import { hostname } from 'os';
 import { LedgerModels } from './ledgerHelper.js';
 import { quarterSecond, threeSeconds } from './timeConstants.js';
+import { isLocalRun } from '../utils/utils.js';
 
 class LedgerEmulatorControllerError extends Error {}
 
@@ -15,7 +16,7 @@ export class LedgerEmulatorController {
   constructor(logger, model) {
     this.logger = logger;
     this.model = model;
-    this.speculosEndpoint = `http://${hostname()}:5001`;
+    this.speculosEndpoint = `http://${isLocalRun() ? '127.0.0.1' : hostname()}:5001`;
     this.logger.info(`LedgerEmulator::constructor speculos endpoint: ${this.speculosEndpoint}`);
   }
 

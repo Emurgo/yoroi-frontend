@@ -16,7 +16,7 @@ export class SpeculosDockerController {
 
   getContainerOptions = (model, seedPhrase, appFile) => {
     return {
-      Image: 'ghcr.io/ledgerhq/speculos',
+      Image: 'ghcr.io/ledgerhq/speculos:0.25.9',
       ExposedPorts: {
         '5001/tcp': {},
       },
