@@ -70,6 +70,9 @@ import {
 import AdaApi, { findPath } from '../../api/ada';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { CardanoDerivationType } from 'trezor-connect-flow';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../posthog';
+import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -257,6 +260,7 @@ export default class ConnectorStore extends Store<StoresMap> {
           password,
         });
       }
+      captureEvent('Dapp Connector Transaction Signed');
     } else if (signingMessage.sign.type === 'data') {
       const { payload } = signingMessage.sign;
 
@@ -785,6 +789,31 @@ export default class ConnectorStore extends Store<StoresMap> {
         amount,
         cip95Info,
       };
+    });
+
+    const getTokenInfo = genLookupOrNull(this.stores.tokenInfoStore.tokenInfo);
+    const assetList = [
+      {
+        policy_id: '',
+        asset_name: '',
+        asset_ticker: 'ADA',
+      },
+      ...amount.nonDefaultEntries().map(({ identifier }) => {
+        const tokenInfo = getTokenInfo({
+          identifier,
+          networkId: amount.getDefaultEntry().networkId,
+        });
+        const [policyId, assetName] = identifier.split('.');
+        return {
+          asset_ticker: tokenInfo?.Metadata.ticker,
+          policy_id: policyId,
+          asset_name: assetName,
+        };
+      }),
+    ];
+    captureEvent('Dapp Connector Transaction Review Page Reviewed', {
+      asset_count: assetList.length,
+      asset_list: assetList,
     });
   };
 

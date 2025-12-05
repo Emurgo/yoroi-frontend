@@ -41,4 +41,15 @@ export interface EventDefinitions {
   'Midnight Airdrop Page Viewed': [];
   'Swap Initiated': [];
   'Swap Review Page Viewed': [];
+  'Dapp Connector Transaction Review Page Reviewed': [
+    {
+      asset_count: number;
+      asset_list: {
+        policy_id: string;
+        asset_name: string;
+        asset_ticker: string;
+      };
+    },
+  ];
+  'Dapp Connector Transaction Signed': [];
 }

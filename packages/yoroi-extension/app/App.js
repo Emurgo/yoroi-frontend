@@ -64,7 +64,7 @@ function RoutingHelper(props: Props) {
       captureEvent('Staking Center Page Viewed');
     } else if (pathname === ROUTES.WALLETS.ROOT) {
       captureEvent('Transactions Page Viewed');
-    } else if (pathname === ROUTES.Governance.ROOT) {
+    } else if (pathname === ROUTES.GOVERNANCE.ROOT) {
       captureEvent('Governance Dashboard Page Viewed');
     } else if (pathname === ROUTES.PORTFOLIO.ROOT) {
       captureEvent('Portfolio Dashboard Page Viewed');
