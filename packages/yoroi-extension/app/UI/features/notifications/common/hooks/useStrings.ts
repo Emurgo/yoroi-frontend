@@ -40,6 +40,10 @@ export const messages = Object.freeze(
       id: 'notifications.center.noNotification',
       defaultMessage: '!!!No notification yet',
     },
+    permissionDenied: {
+      id: 'notifications.center.permissionDenied',
+      defaultMessage: '!!!Notifications permission is denied. Please allow the permission in Chrome settings',
+    },
   })
 );
 
@@ -56,5 +60,6 @@ export const useStrings = () => {
     notificationCenterTitle: intl.formatMessage(messages.notificationCenterTitle),
     readAll: intl.formatMessage(messages.readAll),
     noNotification: intl.formatMessage(messages.noNotification),
+    permissionDenied: intl.formatMessage(messages.permissionDenied),
   }).current;
 };
