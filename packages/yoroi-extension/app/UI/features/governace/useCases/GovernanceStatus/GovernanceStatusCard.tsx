@@ -4,17 +4,10 @@ import { Box, Typography, Link, Stack } from '@mui/material';
 import { CopyButton, Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';
-import {
-  DREP_ALWAYS_ABSTAIN,
-  DREP_ALWAYS_NO_CONFIDENCE,
-  GOVERNANCE_STATUS,
-  GovernanceStatusState,
-  YOROI_DREP_ID,
-  YOROI_DREP_ID_TESTNET,
-  YOROI_VOTING_RECORD_LINK,
-} from '../../common/constants';
+import { GOVERNANCE_STATUS, GovernanceStatusState, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
+import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 
 interface GovernanceStatusCardProps {
@@ -43,20 +36,17 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   const strings = useStrings();
   const theme: any = useTheme();
 
-  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
-  const drepID = governanceStatus?.drep ? governanceStatus?.drep : yoroiDrepId;
-  const isDelegationToYoroiDrep = isDelegated && drepID === yoroiDrepId;
-  const isDelegationToOtherDrep = isDelegated && drepID !== yoroiDrepId;
-  const isAbstain = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
-  const isNoConfidence = governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
+  const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep, drepID } = useGovernanceDelegationStatus({
+    governanceStatus,
+    isDelegated,
+  });
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
   const showDrepStatus = isDelegationToOtherDrep || isDelegationToYoroiDrep || !isParticipating;
   const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
   const showDelegatingLabel = isParticipating && !forModal;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
-  const showDelegateToYoroiDrepButton =
-    !isParticipating || forModal || (governanceStatus?.status === GOVERNANCE_STATUS.IDLE && !isDelegated);
-  const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep;
+  const showDelegateToYoroiDrepButton = !isParticipating || forModal || (state === GOVERNANCE_STATUS.IDLE && !isDelegated);
+  const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep && !isTestnet;
 
   const handleDelegateClick = () => {
     if (isDisabled) return;
