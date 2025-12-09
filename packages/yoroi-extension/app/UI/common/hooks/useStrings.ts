@@ -103,18 +103,6 @@ export const messages = Object.freeze(
       id: 'banners.midnight.goToMidnight',
       defaultMessage: '!!!Go to midnight',
     },
-    surveyTitle: {
-      id: 'survey.title',
-      defaultMessage: '!!!We’d love your feedback!',
-    },
-    surveyDescription: {
-      id: 'survey,description',
-      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
-    },
-    surveyButton: {
-      id: 'survey.button',
-      defaultMessage: '!!!take survey',
-    },
     assetReceived: {
       id: 'notification.assetReceived',
       defaultMessage: '!!!{ asset } received',
@@ -164,9 +152,6 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
-    surveyTitle: intl.formatMessage(messages.surveyTitle),
-    surveyDescription: intl.formatMessage(messages.surveyDescription),
-    surveyButton: intl.formatMessage(messages.surveyButton),
     assetReceived: (asset: string) => intl.formatMessage(messages.assetReceived, { asset }),
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),

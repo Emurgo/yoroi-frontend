@@ -78,7 +78,7 @@ export const ModalManager = () => {
         borderColor="ds.el_gray_max"
         asButton
         buttonProps={{
-          onClick: closeModal,
+          onClick: modalOnClose,
           sx: {
             position: 'absolute',
             right: 18,
