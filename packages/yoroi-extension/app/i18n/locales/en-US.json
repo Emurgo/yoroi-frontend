@@ -332,7 +332,7 @@
   "notification.multiplesAssetSent": "Multiple assets sent",
   "notifications.center.markAllAsRead": "mark all as read",
   "notifications.center.noNotification": "No notification yet",
-  "notifications.center.permissionDenied": "Notifications permission is denied. Please allow the permission in Chrome settings",
+  "notifications.center.permissionDenied": "Notifications permission is denied. Please allow the permission in browser settings",
   "notifications.center.title": "notifications",
   "notprod.label.message": "WARNING: this is a non-production build. If something unusual occurs, double-check Yoroi's installation.",
   "notifications.description.clickToView": "Click to view",

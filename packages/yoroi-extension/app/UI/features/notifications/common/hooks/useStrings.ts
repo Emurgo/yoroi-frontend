@@ -42,7 +42,7 @@ export const messages = Object.freeze(
     },
     permissionDenied: {
       id: 'notifications.center.permissionDenied',
-      defaultMessage: '!!!Notifications permission is denied. Please allow the permission in Chrome settings',
+      defaultMessage: '!!!Notifications permission is denied. Please allow the permission in browser settings',
     },
   })
 );
