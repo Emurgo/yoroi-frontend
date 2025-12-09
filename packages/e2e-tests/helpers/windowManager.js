@@ -1,5 +1,5 @@
 import { WebDriver } from 'selenium-webdriver';
-import { defaultRepeatPeriod, defaultWaitTimeout, halfMinute, halfSecond, oneSecond } from './timeConstants.js';
+import { defaultRepeatPeriod, defaultWaitTimeout } from './timeConstants.js';
 import { Logger } from 'simple-node-logger';
 
 class WindowManagerError extends Error {}
@@ -41,36 +41,16 @@ export class WindowManager {
     this.windowHandles.push({ title: windowTitle, handle: mainWindowHandle });
   }
 
-  async _waitWindowTitle(expectedTitle = null, timeoutMs = defaultWaitTimeout, repeatPeriodMs = defaultRepeatPeriod) {
+  async _waitWindowTitle(timeoutMs = defaultWaitTimeout, repeatPeriodMs = defaultRepeatPeriod) {
     this.logger.info(`WindowManager::_waitWindowTitle Waiting for the window title`);
     const endTime = Date.now() + timeoutMs;
 
     while (endTime >= Date.now()) {
-      try {
-        const windowTitle = await Promise.race([
-          this.driver.getTitle(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout getting title')), repeatPeriodMs)),
-        ]);
-        if (windowTitle === '') {
-          this.logger.error(`WindowManager::_waitWindowTitle The window has the empty title`);
-          continue;
-        }
-        if (!expectedTitle) {
-          this.logger.info(`WindowManager::_waitWindowTitle The window title is "${windowTitle}"`);
-          return windowTitle;
-        }
-        if (windowTitle === expectedTitle) {
-          this.logger.info(`WindowManager::_waitWindowTitle The window title is "${windowTitle}" as expected`);
-          return windowTitle;
-        } else {
-          this.logger.info(
-            `WindowManager::_waitWindowTitle The window title is "${windowTitle}" but expected is "${expectedTitle}"`
-          );
-          continue;
-        }
-      } catch (error) {
-        this.logger.error(`WindowManager::_waitWindowTitle Error getting window title: ${error.message}`);
+      const windowTitle = await this.driver.getTitle();
+      if (windowTitle !== '') {
+        return windowTitle;
       }
+      await this.driver.sleep(repeatPeriodMs);
     }
     this.logger.error(`WindowManager::_waitWindowTitle The window has the empty title`);
     throw new WindowManagerError(`The window has the empty title`);
@@ -147,6 +127,20 @@ export class WindowManager {
     }
     this.logger.error(`WindowManager::_openNewWithCheck The handle with the title ${windowName} already exists`);
     throw new WindowManagerError(`The handle with the title ${windowName} already exists`);
+  }
+
+  async getCurrentPageTitle() {
+    this.logger.info('WindowManager::getCurrentPageTitle is called');
+    const title = await this.driver.getTitle();
+    this.logger.info(`WindowManager::getCurrentPageTitle. Result: ${title}`);
+    return title;
+  }
+
+  async getCurrentUrl() {
+    this.logger.info('WindowManager::getCurrentUrl is called');
+    const url = await this.driver.getCurrentUrl();
+    this.logger.info(`WindowManager::getCurrentUrl. Result: ${url}`);
+    return url;
   }
 
   async openNewTab(tabTitle, url) {
