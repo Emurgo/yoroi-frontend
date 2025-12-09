@@ -26,6 +26,8 @@ describe('Checking Buy workflow redirection', function () {
   /** @type {WindowManager} */
   let windowManager = null;
 
+  const adaAmount = '100';
+
   before(async function () {
     logger = getTestLogger(this.test.parent.title);
     webdriver = await driversPoolsManager.getDriverFromPool();
@@ -45,14 +47,19 @@ describe('Checking Buy workflow redirection', function () {
   });
 
   it('Check correct amount entered', async function () {
-    await buySellPage.enterAdaAmount('100');
+    await buySellPage.enterAdaAmount(adaAmount);
     const btnEnabled = await buySellPage.isProceedBtnEnabled();
     expect(btnEnabled, 'The proceed button is disabled').to.be.true;
   });
 
   it('Check the Buy provider page', async function () {
-    await buySellPage.proceed()
+    await buySellPage.proceed();
     await windowManager.findNewWindowAndSwitchTo(banxaTabName);
+    const title = await windowManager.getCurrentPageTitle();
+    expect(title, 'The Buy provider page is not opened').to.be.equal(banxaTabName);
+    const pageUrl = await windowManager.getCurrentUrl();
+    const expectedUrlPart = `https://yoroi.banxa.com/?orderType=buy&fiatType=USD&coinType=ADA&coinAmount=${adaAmount}`;
+    expect(pageUrl, 'The page URL is not correct').to.contain(expectedUrlPart);
   });
 
   afterEach(async function () {
