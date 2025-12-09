@@ -1,6 +1,6 @@
 import { createUnknownTokenInfo, isPrimaryToken } from '@yoroi/portfolio';
 import { Portfolio } from '@yoroi/types';
-import { useQuery, UseQueryOptions } from 'react-query';
+import { useQuery, UseQueryOptions } from '@tanstack/react-query';
 import React from 'react';
 
 export const usePortfolioTokenInfos = (
@@ -9,12 +9,17 @@ export const usePortfolioTokenInfos = (
     wallet,
     tokenIds,
     sourceId = 'useTokenInfos',
-  }: { tokenManager: any; wallet: any; tokenIds: ReadonlyArray<Portfolio.Token.Id>; sourceId?: string },
-  options: UseQueryOptions<Map<`${string}.${string}`, Portfolio.Token.Info>, Error> = {}
+  }: {
+    tokenManager: any;
+    wallet: any;
+    tokenIds: ReadonlyArray<Portfolio.Token.Id>;
+    sourceId?: string;
+  },
+  options: Omit<UseQueryOptions<Map<`${string}.${string}`, Portfolio.Token.Info>, Error>, 'queryKey' | 'queryFn'> = {}
 ) => {
   const stableTokenIds = React.useMemo(() => tokenIds, [JSON.stringify(tokenIds)]);
 
-  const query = useQuery({
+  const query = useQuery<Map<`${string}.${string}`, Portfolio.Token.Info>, Error>({
     queryKey: [wallet.networkId, sourceId, stableTokenIds],
     enabled: tokenIds.length > 0,
     ...options,
@@ -36,7 +41,6 @@ export const usePortfolioTokenInfos = (
 
   return {
     ...query,
-
     tokenInfos: query.data,
   };
 };

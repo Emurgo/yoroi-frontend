@@ -1,8 +1,9 @@
 import { freeze } from 'immer';
-import { QueryClient } from 'react-query';
+import { QueryClient } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 const keyToPersist = 'persist';
+
 /*
 const queryPersistorStorageKey = 'react-query-persistor'
 const queryPersistorStorage: Persistor = {
@@ -45,4 +46,5 @@ persistQueryClient({
   maxAge: 24 * 60 * 60 * 1000, // Optional, set the maximum age of persisted queries (in milliseconds)
 })
 */
+
 export const queryInfo = freeze({ keyToPersist, queryClient });

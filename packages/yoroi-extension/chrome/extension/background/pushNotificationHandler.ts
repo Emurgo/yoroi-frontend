@@ -32,7 +32,7 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
   },
   {
     id: 'swap',
-    route: ROUTES.SWAP.ROOT,
+    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
   },
   {
     id: 'cashback',
