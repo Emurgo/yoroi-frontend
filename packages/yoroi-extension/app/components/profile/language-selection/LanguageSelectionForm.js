@@ -26,7 +26,6 @@ type Props = {|
   +error?: ?LocalizableError,
   +localizedTermsOfUse: string,
   +localizedPrivacyNotice: string,
-  +externalPrivacyPolicyURL: ?string,
 |};
 
 type State = {|
@@ -77,13 +76,7 @@ export default class LanguageSelectionForm extends Component<Props, State> {
     if (target.id === 'tosLink') {
       this.setState({ showing: 'tos' });
     } else if (target.id === 'privacyLink') {
-      const externalURL = this.props.externalPrivacyPolicyURL;
-      if (externalURL != null) {
-        window.open(externalURL, '_blank');
-        event.preventDefault();
-      } else {
-        this.setState({ showing: 'privacy' });
-      }
+      this.setState({ showing: 'privacy' });
     }
 
     return undefined;

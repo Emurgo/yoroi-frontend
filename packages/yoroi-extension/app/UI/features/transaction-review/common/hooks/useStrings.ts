@@ -196,6 +196,22 @@ export const messages = Object.freeze(
       id: 'global.labels.close',
       defaultMessage: '!!!Close',
     },
+    findPreferredDrep: {
+      id: 'governance.findPreferredDrep',
+      defaultMessage: '!!!Find your preferred DRep and enter their ID below to delegate your vote:',
+    },
+    dontHaveId: {
+      id: 'transaction.review.dontHaveId',
+      defaultMessage: '!!!Don’t have an ID?',
+    },
+    findDrepHere: {
+      id: 'transaction.review.findDrepHere',
+      defaultMessage: '!!!Find a DRep here',
+    },
+    delegateToYoroi: {
+      id: 'transaction.review.delegateToYoroi',
+      defaultMessage: '!!!Delegate to Yoroi DRep below',
+    },
   })
 );
 
@@ -249,5 +265,9 @@ export const useStrings = () => {
     successTitle: intl.formatMessage(messages.successTitle),
     successDescription: intl.formatMessage(messages.successDescription),
     successClose: intl.formatMessage(messages.successClose),
+    findPreferredDrep: intl.formatMessage(messages.findPreferredDrep),
+    dontHaveId: intl.formatMessage(messages.dontHaveId),
+    findDrepHere: intl.formatMessage(messages.findDrepHere),
+    delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
   }).current;
 };

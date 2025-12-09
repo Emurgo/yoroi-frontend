@@ -68,7 +68,6 @@ jobs:
           name: builtApp
           path: |
             ./packages/yoroi-extension/Yoroi-test.crx
-            ./packages/yoroi-extension/Yoroi.xpi
           retention-days: 1
           overwrite: true
 
@@ -236,7 +235,7 @@ jobs:
             -p 9002:9002 \
             -p 21326:21326 \
             -p 127.0.0.1:21325:21326 \
-            -d ghcr.io/trezor/trezor-user-env
+            -d ghcr.io/trezor/trezor-user-env:4c194889610c3f21f1da3799e7ddb82004fd4e91
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome
@@ -304,7 +303,7 @@ jobs:
     needs: [Build-Extension]
     steps:
       - name: Pull Speculos Docker image
-        run: docker pull ghcr.io/ledgerhq/speculos
+        run: docker pull ghcr.io/ledgerhq/speculos:0.25.9
 
       - uses: browser-actions/setup-chrome@v2
         id: setup-chrome

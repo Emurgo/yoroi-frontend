@@ -4,6 +4,7 @@ import * as fs from 'node:fs';
 import path from 'path';
 import pkg from 'simple-node-logger';
 import axios from 'axios';
+import JSZip from 'jszip';
 const { createSimpleFileLogger } = pkg;
 
 export function getMethod(locatorMethod) {
@@ -117,11 +118,28 @@ export const getFileContent = (fileName, fileDir) => {
   return data;
 };
 
-export const getDownloadedFileContent = fileName => {
+export const getDownloadedFileContent = async fileName => {
   const fullPath = path.resolve(getDownloadsDir(), fileName);
-  const data = fs.readFileSync(fullPath, 'utf8');
+  const isZipFile = fileName.toLowerCase().endsWith('.zip');
 
-  return data;
+  if (isZipFile) {
+    const zipBuffer = fs.readFileSync(fullPath);
+    const zip = await JSZip.loadAsync(zipBuffer);
+    const result = {};
+
+    for (const [filePath, file] of Object.entries(zip.files)) {
+      if (!file.dir) {
+        const content = await file.async('string');
+        const extractedFileName = path.basename(filePath);
+        result[extractedFileName] = content;
+      }
+    }
+
+    return result;
+  } else {
+    const data = fs.readFileSync(fullPath, 'utf8');
+    return data;
+  }
 };
 
 export const cleanDownloads = () => {

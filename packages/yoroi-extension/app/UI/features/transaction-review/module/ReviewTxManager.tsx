@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Drawer, styled } from '@mui/material';
 import { BottomActions } from '../common/BottomActions/BottomActions';
 import { TopActions } from '../common/TopActionSection/TopActions';
-import { ChooseDrepId } from '../useCases/ChooseDrepId/ChooseDrepId';
 import { CollateralCreation } from '../useCases/CollateralCreation/CollateralCreation';
 import { ExtraDetails } from '../useCases/ExtraDetails/ExtraDetails';
 import { Operations } from '../useCases/Operations/Operations';
@@ -12,6 +11,7 @@ import { SubmitInput } from '../useCases/SubmitTx/SubmitInput';
 import { WalletInfoSection } from '../useCases/WalletInfo/WalletInfoSection';
 import { useTxReviewModal } from './ReviewTxProvider';
 import { useStrings } from '../common/hooks/useStrings';
+import { ChooseOtherDrepId } from '../useCases/ChooseDrepId/ChooseOtherDrepId';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
@@ -64,7 +64,7 @@ export const ReviewTxManager = () => {
       {modalView === 'transactionReview' && <ReviewTxSection />}
       {modalView === 'walletInfo' && <WalletInfoSection />}
       {modalView === 'submitTx' && <SubmitInput />}
-      {modalView === 'chooseDrepId' && <ChooseDrepId />}
+      {modalView === 'chooseOtherDrepId' && <ChooseOtherDrepId />}
       {modalView === 'operations' && <Operations />}
       {modalView === 'extraDetails' && <ExtraDetails />}
       {modalView === 'collateralCreation' && <CollateralCreation />}

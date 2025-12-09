@@ -76,10 +76,7 @@ export type ConnectedSite = {|
 
 const STORAGE_KEY_PREFIX = 'background-';
 
-const STORAGE_API =
-  chrome.storage.session || // chrome mv3
-  window.browser?.storage.local || // firefox mv2
-  chrome.storage.local; // chrome mv2
+const STORAGE_API = chrome.storage.session;
 
 async function setInStorage(key: string, value: any): Promise<void> {
   await STORAGE_API.set({ [STORAGE_KEY_PREFIX + key]: value });
@@ -88,8 +85,6 @@ async function setInStorage(key: string, value: any): Promise<void> {
 export async function getFromStorage(key: string): Promise<any> {
   const storageKey = STORAGE_KEY_PREFIX + key;
   return new Promise(resolve => {
-    // the chrome mv3 and firefox mv2 API also support returning the result as a promise
-    // but the chrome v2 API only support callback, so we use the universally supported interface
     STORAGE_API.get(storageKey, result => {
       if (result === undefined) {
         resolve(undefined);

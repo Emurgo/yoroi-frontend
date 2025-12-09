@@ -83,11 +83,9 @@ export const ROUTES = {
     // $FlowIgnore
     ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
   },
-  Governance: {
+  GOVERNANCE: {
     ROOT: '/governance',
-    DELEGATE: '/governance/delagation',
-    SUBMITTED: '/governance/submitted',
-    FAIL: '/governance/failed',
+    OPTIONS: '/governance/options',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

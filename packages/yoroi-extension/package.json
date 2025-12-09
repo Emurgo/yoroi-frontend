@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.18.1",
+  "version": "5.19.0",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:main": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev main --env mainnet",
@@ -8,7 +8,6 @@
     "dev:bring": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev bring  --env mainnet",
     "dev:stable": "rimraf dev/ && concurrently -c auto -n extension,background,bring \"npm run dev:main\"  \"npm run dev:background\" \"npm run dev:bring\"",
     "dev:nightly": "rimraf dev/ && concurrently -c auto -n extension,background,bring \"npm run dev:main --nightly\"  \"npm run dev:background --nightly\" \"npm run dev:bring --nightly \"",
-    "prod:build-ff": "rimraf build/ && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production babel-node scripts/build --platform=ff",
     "prod:build": "rimraf build/ && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production babel-node scripts/build",
     "prod:build:light": "rimraf build/ && NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production babel-node scripts/build --dontInjectConnector",
     "prod:build-win": "rimraf build/ && SET NODE_ENV=production && babel-node scripts/build",
@@ -18,7 +17,6 @@
     "prod:nightly": "npm run prod:build -- --env 'mainnet' --nightly && npm run -s prod:compress -- --env 'mainnet' --app-id 'yoroi-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-nightly-extension.crx' --key \"'${YOROI_NIGHTLY_PEM:-./nightly-key.pem}'\"",
     "prod:nightly:light": "npm run prod:build:light -- --env 'mainnet' --nightly && npm run -s prod:compress -- --env 'mainnet' --app-id 'yoroi-nightly' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-nightly-extension.crx' --key \"'${YOROI_NIGHTLY_PEM:-./nightly-key.pem}'\"",
     "prod:stable": "npm run prod:build -- --env 'mainnet' && npm run prod:compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
-    "prod:stable-ff": "npm run prod:build-ff -- --env 'mainnet' && npm run prod:compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "prod:stable:light": "npm run prod:build:light -- --env 'mainnet' && npm run prod:compress -- --env 'mainnet' --app-id 'yoroi' --zip-only --codebase 'https://yoroiwallet.com/dw/yoroi-extension.crx' --key ./production-key.pem",
     "prod:nightly-win": "npm run prod:build-win -- --env=mainnet --nightly && npm run -s prod:compress -- --env=mainnet --app-id=yoroi-nightly --zip-only --codebase=https://yoroiwallet.com/dw/yoroi-nightly-extension.crx --key=\"${YOROI_NIGHTLY_PEM:-./nightly-key.pem}\"",
     "prod:stable-win": "npm run prod:build-win -- --env=mainnet && npm run prod:compress -- --env=mainnet --app-id=yoroi --zip-only --codebase=https://yoroiwallet.com/dw/yoroi-extension.crx --key=./production-key.pem",
@@ -193,6 +191,7 @@
     "firebase": "^11.9.1",
     "immer": "^10.1.1",
     "jdenticon": "3.2.0",
+    "jszip": "3.10.1",
     "legacySwap": "npm:@yoroi/swap@1.5.2",
     "lodash": "4.17.21",
     "lottie-react": "2.4.0",

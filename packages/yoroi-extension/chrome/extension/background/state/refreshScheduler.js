@@ -165,7 +165,7 @@ async function _syncWallet(publicDeriver: PublicDeriver<>, logInfo: string): Pro
       await updateProtocolParametersCacheFromNetwork(networkId, epoch);
     }
   } catch (error) {
-    console.error('Syncing wallet %s failed:', publicDeriverId, error);
+    console.error(`Syncing wallet ID ${publicDeriverId} failed:`, error);
   } finally {
     refreshingWalletIdSet.delete(publicDeriverId);
   }

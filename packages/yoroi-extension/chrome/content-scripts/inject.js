@@ -6,6 +6,130 @@ const YOROI_TYPE = '$YOROI_BUILD_TYPE_ENV$';
 const API_INTERNAL_ERROR = -2;
 const API_REFUSED = -3;
 
+// Helper function to check if log arguments contain yoroi-related content
+function isYoroiRelatedLog(...args) {
+  // Check all arguments for yoroi-related patterns
+  for (const arg of args) {
+    let argString;
+    if (typeof arg === 'string') {
+      argString = arg;
+    } else if (arg instanceof Error) {
+      argString = arg.toString();
+    } else if (typeof arg === 'object') {
+      try {
+        argString = JSON.stringify(arg);
+      } catch (e) {
+        // Fallback to String() if JSON.stringify fails (circular references, etc.)
+        argString = String(arg);
+      }
+    } else {
+      argString = String(arg);
+    }
+
+    // Check for yoroi-related patterns (case-insensitive)
+    if (
+      argString.toLowerCase().includes('[yoroi') ||
+      argString.toLowerCase().includes('yoroi-connector') ||
+      argString.toLowerCase().includes('yoroi_')
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Helper function to create log entry and send to background
+function sendLogToBackground(level, ...args) {
+  try {
+    const timestamp = new Date().toISOString();
+    let message = '';
+    let stack;
+
+    const parts = args.map(arg => {
+      if (arg instanceof Error) {
+        stack = arg.stack;
+        return arg.toString();
+      }
+      if (typeof arg === 'object') {
+        try {
+          return JSON.stringify(arg, null, 2);
+        } catch (e) {
+          return String(arg);
+        }
+      }
+      return String(arg);
+    });
+
+    message = parts.join(' ');
+
+    const logEntry = {
+      timestamp,
+      level,
+      message,
+      stack,
+    };
+
+    // Send to background service worker
+    chrome.runtime.sendMessage(
+      {
+        type: 'yoroi-log-entry',
+        logEntry,
+      },
+      () => {
+        // Ignore errors (background might not be ready)
+        if (chrome.runtime.lastError) {
+          // Silently fail - logging shouldn't break the app
+        }
+      }
+    );
+  } catch (e) {
+    // Silently fail - logging shouldn't break the app
+  }
+}
+
+// Intercept console methods to send logs to background
+(function setupConsoleLogging() {
+  const originalConsole = {
+    info: console.info.bind(console),
+    warn: console.warn.bind(console),
+    error: console.error.bind(console),
+    log: console.log.bind(console),
+  };
+
+  console.info = (...args) => {
+    originalConsole.info(...args);
+
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('info', ...args);
+    }
+  };
+
+  console.warn = (...args) => {
+    originalConsole.warn(...args);
+
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('warn', ...args);
+    }
+  };
+
+  console.error = (...args) => {
+    originalConsole.error(...args);
+
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('error', ...args);
+    }
+  };
+
+  // Also intercept console.log for connector context
+  console.log = (...args) => {
+    originalConsole.log(...args);
+
+    if (isYoroiRelatedLog(...args)) {
+      sendLogToBackground('info', ...args);
+    }
+  };
+})();
+
 function checkInjectionInDocument() {
   const el = document.getElementById(INJECTED_TYPE_TAG_ID);
   return el ? el.value : 'nothing';

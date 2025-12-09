@@ -16,7 +16,7 @@ const messages = defineMessages({
 });
 
 type Props = {|
-  +onDownloadLogs: void => void,
+  +onDownloadLogs: void => Promise<void>,
 |};
 
 @observer
