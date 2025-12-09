@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 import { TransactionBody } from '../types';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
@@ -17,6 +17,7 @@ export const formatUnsignedTxMetadata = async (unsignedTx: any, txBody: Transact
     console.error('Error parsing metadata');
   }
 };
+
 type FormattedMetadata = { hash: string | null; metadata: unknown | null };
 
 export const formatCborMetadata = (cbor: string, txBody: TransactionBody): FormattedMetadata => {
@@ -60,7 +61,7 @@ export const parseMetadata = (metadata: Record<string, string>) => {
       }
     }
 
-    const mergedObject = jsonFragments.reduce((acc, obj) => ({ ...acc, ...obj }), {});
+    const mergedObject = jsonFragments.reduce((acc, obj) => ({ ...acc, ...obj }), {} as any);
 
     Object.keys(mergedObject).forEach(key => {
       if (mergedObject[key] === '') {
@@ -90,7 +91,7 @@ export const useFormattedMetadata = ({
   const { data } = useQuery({
     queryKey: ['useFormattedMetadata', hasCbor ? cbor : unsignedTx, txBody?.auxiliary_data_hash],
     enabled: hasCbor || canUnsigned,
-    useErrorBoundary: true,
+    throwOnError: true,
     queryFn: () => (hasCbor && cbor ? formatCborMetadata(cbor, txBody) : formatUnsignedTxMetadata(unsignedTx, txBody)),
   });
 

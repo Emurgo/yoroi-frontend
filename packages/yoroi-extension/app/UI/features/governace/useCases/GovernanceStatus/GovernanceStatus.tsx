@@ -1,23 +1,34 @@
+import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Button } from '@mui/material';
-import { GovernanceStatusRevampCard } from './GovernanceStatusRevampCard';
+import { useLocation } from 'react-router';
+import { GovernanceStatusCard } from './GovernanceStatusCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID } from '../../common/constants';
+import { GOVERNANCE_STATUS, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 
-export const GovernanceStatusRevamp = () => {
+export const GovernanceStatus = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
+  const location = useLocation();
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-  const { submitedTransactions } = useGovernance();
-  const { isNotAllowed } = useIsGovernanceAllowed();
+  const { submitedTransactions, isTestnet } = useGovernance();
+  const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+
+  React.useEffect(() => {
+    if (location.search.includes('delegateToYoroiDrep=true')) {
+      delegateToDrep(yoroiDrepId);
+    }
+  }, [useLocation]);
 
   const onExploreMore = () => {
     navigateTo.selectRevampOptions();
@@ -27,18 +38,21 @@ export const GovernanceStatusRevamp = () => {
     return <NotAllowedInGovernance />;
   }
 
+  if (governanceStatus.status === null) {
+    return <StatusSkeletonScreen />;
+  }
+
   return (
     <Container>
       <TitleSection>
-        <Typography variant="h5" color="ds.text_gray_medium">
-          {strings.delegationOptions}
+        <Typography variant="h5" color="ds.text_gray_medium" id="governance-title-text">
+          {isParticipating ? strings.delegatingInGovernance : strings.delegationOptions}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'}>
+        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'} id="governance-description-text">
           {cardState === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
         </Typography>
       </TitleSection>
 
-      {/* Optionally render error */}
       {error != null && (
         <Typography variant="body2" color="error">
           {error}
@@ -46,17 +60,16 @@ export const GovernanceStatusRevamp = () => {
       )}
 
       <CardsContainer>
-        <GovernanceStatusRevampCard
+        <GovernanceStatusCard
           state={cardState}
           governanceStatus={governanceStatus}
-          onDelegateClick={() => delegateToDrep(YOROI_DREP_ID)}
-          onDetailsClick={() => YOROI_DREP_ID}
+          onDelegateClick={() => delegateToDrep(yoroiDrepId)}
           btnLoading={loadingUnsignTx}
           openDelegateModalForCustomDrep={openDelegateModalForCustomDrep}
           pending={isPendingDrepDelegationTx}
         />
 
-        <OtherActionsCard onClick={onExploreMore}>
+        <OtherActionsCard onClick={onExploreMore} id="governance-otherOptions-button">
           <TextContent>
             <Typography variant="body1" fontWeight={500} color="ds.gray_max">
               {strings.exploreOtherDRepsOrAbstain}

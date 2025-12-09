@@ -1,5 +1,5 @@
 import GovernanceLayout from './layout';
-import { DRepOptions } from '../../features/governace/useCases/GovernanceStatusRevamp/DRepOptions';
+import { DRepOptions } from '../../features/governace/useCases/GovernanceOptions/DRepOptions';
 
 type Props = {
   stores: any;

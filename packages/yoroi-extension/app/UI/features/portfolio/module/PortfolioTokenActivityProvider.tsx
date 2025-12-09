@@ -2,7 +2,7 @@ import { invalid } from '@yoroi/common';
 import { Portfolio } from '@yoroi/types';
 import { freeze, produce } from 'immer';
 import React, { useEffect, useReducer, useRef } from 'react';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { queryInfo } from '../../../utils/query-client';
 import { useMultiTokenActivity } from '../../../utils/useMultiTokenActivity';
@@ -62,7 +62,9 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       .map(item => `${item.info?.policyId}.${item.assetName}`);
 
     actions.secondaryTokenIdsChanged(listForActivity);
-    queryClient.invalidateQueries(queryKey);
+
+    // v5: invalidateQueries expects an options object
+    queryClient.invalidateQueries({ queryKey });
   }, [actions, ftAssetList, queryClient]);
 
   // Use `useQuery` hooks to fetch and cache the token activity data for each interval
@@ -71,11 +73,13 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
     isLoading: loading24h,
     error: data24hError,
   } = useMultiTokenActivity(state.secondaryTokenIds, '24h', backendServiceZero);
+
   const {
     data: data7d,
     isLoading: loading7d,
     error: data7dError,
   } = useMultiTokenActivity(state.secondaryTokenIds, '7d', backendServiceZero);
+
   const {
     data: data30d,
     isLoading: loading30d,
@@ -91,7 +95,7 @@ export const PortfolioTokenActivityProvider = ({ children }: Props) => {
       };
       actions.tokenActivityChanged(combinedData);
     }
-  }, [data24h, data7d, data30d, actions]);
+  }, [data24h, data7d, data30d, data24hError, data7dError, data30dError, actions]);
 
   const value = React.useMemo(
     () => ({

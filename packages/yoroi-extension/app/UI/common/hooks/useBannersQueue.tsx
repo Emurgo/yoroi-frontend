@@ -1,8 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
+import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
-
-const surveyDismissed = createStorageFlag('SURVEY_DISMISSED', false);
 
 export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
   const localStorage = new LocalStorageApi();
@@ -15,9 +13,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
       bannersRemoteConfig?.midnightPhase2Announcement.display === true
     ) {
       return BannerType.MidnightPhase2;
-    }
-    if (!(await surveyDismissed.get())) {
-      return BannerType.Survey;
     }
     if (walletBalance === 0) {
       return BannerType.BuyAda;
@@ -38,11 +33,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
       case BannerType.MidnightPhase2:
         setVisible(null);
         await localStorage.setMidnightBannerPhase2Closed('true');
-        setEvaluationKey(prev => prev + 1);
-        break;
-      case BannerType.Survey:
-        surveyDismissed.set(true);
-        setVisible(null);
         setEvaluationKey(prev => prev + 1);
         break;
       case BannerType.BuyAda:

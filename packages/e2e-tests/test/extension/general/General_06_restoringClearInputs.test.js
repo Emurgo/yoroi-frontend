@@ -62,13 +62,15 @@ describe('Restoring 15-wallet, clear input and restore other 15-wallet', functio
     expect(walletPlate, 'Wallet plate is different from expected').to.equal(testWallet1.plate);
   });
 
-  it('Clear all inputs and restore the second wallet', async function () {
+  it('Back to the previous step and clear all inputs', async function () {
     await walletDetailsPage.backOnPreviousStep();
     await restoreWalletStepTwoPage.clearAllInputsManually();
 
     const inputsAreEmpty = await restoreWalletStepTwoPage.allInputsAreEmpty();
     expect(inputsAreEmpty, 'Seed phrase inputs are not empty').to.be.true;
+  });
 
+  it('Enter the wallet seed phrase of second wallet', async function () {
     await restoreWalletStepTwoPage.enterRecoveryPhrase15Words(testWallet2.mnemonic);
     const phraseIsVerified = await restoreWalletStepTwoPage.recoveryPhraseIsVerified();
     expect(phraseIsVerified, 'The recovery phrase is not verified').to.be.true;

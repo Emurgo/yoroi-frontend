@@ -3,7 +3,6 @@ import * as React from 'react';
 import { Drawer, styled } from '@mui/material';
 import { BottomActions } from '../common/BottomActions/BottomActions';
 import { TopActions } from '../common/TopActionSection/TopActions';
-import { ChooseDrepId } from '../useCases/ChooseDrepId/ChooseDrepId';
 import { CollateralCreation } from '../useCases/CollateralCreation/CollateralCreation';
 import { ExtraDetails } from '../useCases/ExtraDetails/ExtraDetails';
 import { Operations } from '../useCases/Operations/Operations';
@@ -65,7 +64,6 @@ export const ReviewTxManager = () => {
       {modalView === 'transactionReview' && <ReviewTxSection />}
       {modalView === 'walletInfo' && <WalletInfoSection />}
       {modalView === 'submitTx' && <SubmitInput />}
-      {modalView === 'chooseDrepId' && <ChooseDrepId />}
       {modalView === 'chooseOtherDrepId' && <ChooseOtherDrepId />}
       {modalView === 'operations' && <Operations />}
       {modalView === 'extraDetails' && <ExtraDetails />}
