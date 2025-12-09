@@ -172,11 +172,11 @@ export const messages = Object.freeze(
     },
     exploreOtherDRepsOrAbstain: {
       id: 'governance.exploreOtherDRepsOrAbstain',
-      defaultMessage: '!!!Explore other DReps or Abstain',
+      defaultMessage: '!!!Explore other governance options',
     },
     browseAdditionalDelegation: {
       id: 'governance.browseAdditionalDelegation',
-      defaultMessage: '!!!Browse additional delegation options or choose to abstain from voting',
+      defaultMessage: '!!!Pick another DRep, abstain from voting, or show no confidence',
     },
     learnMoreLabel: {
       id: 'governance.learnMoreLabel',
