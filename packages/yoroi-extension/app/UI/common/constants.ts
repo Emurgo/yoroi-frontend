@@ -7,7 +7,6 @@ export const RESTORE_WALLET_HELP_URL =
 
 export enum BannerType {
   MidnightPhase2 = 'midnightPhase2Banner',
-  Survey = 'surveyBanner',
   DRep = 'drepBanner',
   BuyAda = 'buyAdaBanner',
   Bring = 'bringBanner',
