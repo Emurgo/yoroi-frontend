@@ -2,7 +2,7 @@ import type { AssetAmount } from '../../../components/swap/types';
 import { useSwapTokensOnlyVerified } from 'legacySwap';
 import { useMemo } from 'react';
 import { comparatorByGetter } from '../../../coreUtils';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useSellVerifiedSwapTokens(assets: Array<AssetAmount>): {|
   walletVerifiedAssets: Array<any>,

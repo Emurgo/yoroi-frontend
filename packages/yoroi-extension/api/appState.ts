@@ -1,7 +1,7 @@
 import { lazy, mutateFunc, makeAccessor } from './objectModel';
 import Dexie, { type EntityTable } from 'dexie';
 
-interface NotificationData {
+export interface NotificationData {
   fcmMessageId: string;
   read: boolean;
   title: string;

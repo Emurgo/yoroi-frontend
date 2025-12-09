@@ -198,7 +198,7 @@ export const messages = Object.freeze(
     },
     findPreferredDrep: {
       id: 'governance.findPreferredDrep',
-      defaultMessage: '!!!Find your preferred DRep and enter their ID or ADA handle below to delegate your vote:',
+      defaultMessage: '!!!Find your preferred DRep and enter their ID below to delegate your vote:',
     },
     dontHaveId: {
       id: 'transaction.review.dontHaveId',
