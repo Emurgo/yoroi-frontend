@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
+import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE, GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 
 type UseGovernanceStatusStateResult = {
   governanceStatusState: GovernanceStatusState;
@@ -18,6 +18,12 @@ export const useGovernanceStatusState = (): UseGovernanceStatusStateResult => {
       return GOVERNANCE_STATUS.IDLE;
     }
     if (governanceStatus.status === 'delegate' && governanceStatus.drep !== null) {
+      return GOVERNANCE_STATUS.DELEGATED;
+    }
+    if (
+      (governanceStatus.status === DREP_ALWAYS_ABSTAIN || governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE) &&
+      governanceStatus.drep === null
+    ) {
       return GOVERNANCE_STATUS.DELEGATED;
     }
     if (isPendingDrepDelegationTx) {
