@@ -9,7 +9,7 @@ export const useNavigateTo = () => {
     portfolio: () => navigate(ROUTES.PORTFOLIO.ROOT),
     portfolioDapps: () => navigate(ROUTES.PORTFOLIO.DAPPS),
     portfolioDetail: (tokenId: string) => navigate(`${ROUTES.PORTFOLIO.ROOT}/details/${tokenId}`),
-    swapPage: (tokenId?: string) => navigate(`${ROUTES.SWAP.ROOT}?tokenId=${tokenId}`),
+    swapPage: (tokenId?: string) => navigate(`${ROUTES.SWAP_REVAMP.ASSET_SWAP}?tokenId=${tokenId}`),
     sendPage: () => navigate(ROUTES.WALLETS.SEND),
     receivePage: () => navigate(ROUTES.WALLETS.RECEIVE.ROOT),
   }).current;
