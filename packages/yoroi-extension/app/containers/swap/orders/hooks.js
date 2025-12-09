@@ -2,7 +2,7 @@
 import type { RemoteTokenInfo } from '../../../api/ada/lib/state-fetch/types';
 import type { FormattedTokenValue, OrderAsset } from './util';
 import { useSwap } from 'legacySwap';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { Quantities } from '../../../utils/quantities';
 import { PRICE_PRECISION } from '../../../components/swap/common';
@@ -73,7 +73,6 @@ export function useRichOrders(
    * Fetch verified tokens list converted to map
    */
   const { data: tokensMap } = useQuery({
-    suspense: true,
     queryKey: ['useSwapTokensOnlyVerifiedMap'],
     useErrorBoundary: false,
     queryFn: () =>

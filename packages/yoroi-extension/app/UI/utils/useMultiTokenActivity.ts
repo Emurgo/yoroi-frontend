@@ -1,5 +1,5 @@
 import { Portfolio } from '@yoroi/types';
-import { useQuery, UseQueryResult } from 'react-query';
+import { useQuery, UseQueryResult } from '@tanstack/react-query';
 
 interface ApiError {
   message: string;
@@ -20,9 +20,11 @@ export const useMultiTokenActivity = (
         Accept: 'application/json',
       },
     });
+
     if (response.ok) {
       return await response.json();
     }
+
     let errorMessage: string;
     try {
       const errorData = await response.json();
@@ -37,10 +39,12 @@ export const useMultiTokenActivity = (
     };
   };
 
-  return useQuery<Portfolio.Api.TokenActivityResponse, ApiError>(['multiTokenActivity', tokenIds, interval], fetchTokenActivity, {
+  return useQuery<Portfolio.Api.TokenActivityResponse, ApiError>({
+    queryKey: ['multiTokenActivity', tokenIds, interval],
+    queryFn: fetchTokenActivity,
     enabled: tokenIds.length > 0, // Fetch only if there are token IDs provided
-    staleTime: 60000, // Cache remains fresh for 1 minute
-    cacheTime: 300000, // Cache remains in memory for 5 minutes
+    staleTime: 60_000, // Cache remains fresh for 1 minute
+    gcTime: 300_000, // v5: cacheTime -> gcTime (5 minutes)
     refetchOnWindowFocus: false, // Prevents refetching when the window gains focus
   });
 };
