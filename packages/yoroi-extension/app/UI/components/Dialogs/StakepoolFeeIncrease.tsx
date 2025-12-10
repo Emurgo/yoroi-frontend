@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import { StakePoolFeeIlustration } from './StakePoolFeeIlustration';
 import LocalStorageApi from '../../../api/localStorage/index';
 import { useStrings } from '../../common/hooks/useStrings';
-import { CARDANO_CARD_URL } from '../../common/constants';
+import { STAKEPOOL_MARGIN_FEE_URL } from '../../common/constants';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 import { RustModule } from '../../../api/ada/lib/cardanoCrypto/rustLoader';
 
@@ -80,14 +80,14 @@ const CardanoCardContent = ({ onClose }) => {
       </Stack>
 
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 28 }}>
-        <Link href={CARDANO_CARD_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
-          <CustomButton variant="contained" color="primary">
-            {strings.skip}
+        <Link href={STAKEPOOL_MARGIN_FEE_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
+          {/* @ts-ignore */}
+          <CustomButton variant="primary" color="primary">
+            {strings.learnMore}
           </CustomButton>
         </Link>
-
         <CustomButton variant="text" onClick={onClose} sx={{ marginTop: '8px' }}>
-          {strings.learnMore}
+          {strings.skip}
         </CustomButton>
       </Grid>
     </Stack>
