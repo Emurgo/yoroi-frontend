@@ -55,8 +55,8 @@ describe('Checking Buy workflow redirection', function () {
   it('Check the Buy provider page', async function () {
     await buySellPage.proceed();
     await windowManager.findNewWindowAndSwitchTo(buyTabName);
-    const title = await windowManager.getCurrentPageTitle();
-    expect(title, 'The Buy provider page is not opened').to.be.equal(buyTabName);
+    const titleIsCorrect = await windowManager.waitTitleEquals(buyTabName);
+    expect(titleIsCorrect, 'The Buy provider page title is not correct').to.be.true;
     const pageUrl = await windowManager.getCurrentUrl();
     const expectedUrlPart = `https://yoroi.banxa.com/?orderType=buy&fiatType=USD&coinType=ADA&coinAmount=${adaAmount}`;
     expect(pageUrl, 'The page URL is not correct')

@@ -60,8 +60,8 @@ describe('Checking Sell workflow redirection', function () {
   it('Check the Sell provider page', async function () {
     await buySellPage.proceed();
     await windowManager.findNewWindowAndSwitchTo(sellTabName);
-    const title = await windowManager.getCurrentPageTitle();
-    expect(title, 'The Sell provider page is not opened').to.be.equal(sellTabName);
+    const titleIsCorrect = await windowManager.waitTitleEquals(sellTabName);
+    expect(titleIsCorrect, 'The Buy provider page title is not correct').to.be.true;
     const pageUrl = await windowManager.getCurrentUrl();
     const expectedUrlPart = `https://hub.encryptus.co/pw/?orderType=sell&fiatType=USD&coinType=ADA&coinAmount=${adaAmount}`;
     expect(pageUrl, 'The page URL is not correct')

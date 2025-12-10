@@ -137,6 +137,22 @@ export class WindowManager {
     return title;
   }
 
+  async waitTitleEquals(expectedTitle, timeoutMs = defaultWaitTimeout, repeatPeriodMs = defaultRepeatPeriod) {
+    this.logger.info(`WindowManager::waitTitleEquals Waiting for the title to be equal to "${expectedTitle}"`);
+    const endTime = Date.now() + timeoutMs;
+
+    while (endTime >= Date.now()) {
+      const windowTitle = await this.driver.getTitle();
+      if (windowTitle === expectedTitle) {
+        this.logger.info(`WindowManager::waitTitleEquals The title is equal to "${expectedTitle}"`);
+        return true;
+      }
+      await this.driver.sleep(repeatPeriodMs);
+    }
+    this.logger.error(`WindowManager::waitTitleEquals The title is not equal to "${expectedTitle}" after ${timeoutMs} ms`);
+    return false;
+  }
+
   async getCurrentUrl() {
     this.logger.info('WindowManager::getCurrentUrl is called');
     const url = await this.driver.getCurrentUrl();
