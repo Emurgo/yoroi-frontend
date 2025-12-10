@@ -40,11 +40,11 @@ class StakingPage extends Component<StoresProps> {
           <NavBarContainerRevamp
             stores={stores}
             title={<NavBarTitle title={this.context.formatMessage(globalMessages.stakingDashboard)} />}
-            pageBanner={
-              <PoolTransitionBanner
-                showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
-              />
-            }
+            // pageBanner={
+            //   <PoolTransitionBanner
+            //     showBanner={stores.delegation.getPoolTransitionInfo(selectedWallet)?.shouldShowTransitionFunnel}
+            //   />
+            // }
           />
         }
         showInContainer

@@ -41,8 +41,9 @@ export const ROUTES = {
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
   },
-  // revamp
   STAKING: '/staking',
+  // revamp
+  STAKING_REVAMP: '/staking-revamp',
   ASSETS: {
     ROOT: '/assets',
     DETAILS: '/assets/tokens/:tokenId',
