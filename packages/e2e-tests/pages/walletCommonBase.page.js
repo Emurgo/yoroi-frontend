@@ -1,5 +1,13 @@
 import { balanceReplacer, WalletWordsSize } from '../helpers/constants.js';
-import { defaultWaitTimeout, fiveSeconds, halfSecond, oneMinute, oneSecond, quarterSecond } from '../helpers/timeConstants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+  threeSeconds,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
 import { ElementLocator } from './locator.js';
 
@@ -377,7 +385,13 @@ export default class WalletCommonBase extends BasePage {
    */
   async titleIsCorrect(expectedPageTitle) {
     this.logger.info(`WalletCommonBase::titleIsCorrect is called`);
-    const displayedTitle = await this.getPageTitle();
-    return displayedTitle === expectedPageTitle;
+    return await this.customWaiter(
+      async () => {
+        const displayedTitle = await this.getPageTitle();
+        return displayedTitle === expectedPageTitle;
+      },
+      threeSeconds,
+      quarterSecond
+    );
   }
 }
