@@ -37,7 +37,8 @@ describe('Checking BuySell dialog', function () {
   });
 
   it('Check components on Buy tab', async function () {
-    await buySellPage.selectBuyTab();
+    const tabIsSelected = await buySellPage.selectBuyTab();
+    expect(tabIsSelected, 'The Buy tab is not selected').to.be.true;
     const proceedBtnDisabled = await buySellPage.isProceedBtnDisabled();
     expect(proceedBtnDisabled, 'The Proceed button should be disabled by default').to.be.true;
     const providerInfo = await buySellPage.getProviderInfo();
@@ -46,7 +47,8 @@ describe('Checking BuySell dialog', function () {
   });
 
   it('Check components on Sell tab', async function () {
-    await buySellPage.selectSellTab();
+    const tabIsSelected = await buySellPage.selectSellTab();
+    expect(tabIsSelected, 'The Sell tab is not selected').to.be.true;
     const proceedBtnDisabled = await buySellPage.isProceedBtnDisabled();
     expect(proceedBtnDisabled, 'The Proceed button should be disabled by default').to.be.true;
     const providerInfo = await buySellPage.getProviderInfo();

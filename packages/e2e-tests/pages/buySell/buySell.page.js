@@ -121,16 +121,16 @@ class BuySell extends BasePage {
   }
   async selectBuyTab() {
     this.logger.info(`BuySell::selectBuyTab is called`);
-    await this.selectTab(this.buyTabBtnLocator);
+    return await this.selectTab(this.buyTabBtnLocator);
   }
   async selectSellTab() {
     this.logger.info(`BuySell::selectSellTab is called`);
-    await this.selectTab(this.sellTabBtnLocator);
+    return await this.selectTab(this.sellTabBtnLocator);
   }
   async selectTab(tabBtnLocator) {
     this.logger.info(`BuySell::selectTab is called. Locator: ${JSON.stringify(tabBtnLocator)}`);
     await this.click(tabBtnLocator);
-    await this.customWaiter(async () => {
+    return await this.customWaiter(async () => {
       const btnIsSelected = await this.getAttribute(tabBtnLocator, 'aria-selected');
       return btnIsSelected === 'true';
     });
