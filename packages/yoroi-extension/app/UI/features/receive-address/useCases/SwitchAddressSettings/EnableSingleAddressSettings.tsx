@@ -2,31 +2,17 @@ import { Box, FormControlLabel } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { RevampSwitch } from '../../../../../components/widgets/Switch';
 import { InfoTooltip } from '../../../../../components/widgets/InfoTooltip';
-import { useEffect, useState } from 'react';
-import LocalStorageApi from '../../../../../api/localStorage/index';
 
-export default function EnableSingleAddressSettings({ selectedWalletId }: { selectedWalletId: number }) {
+type Props = {
+  isSingleAddress: boolean,
+  updateSingleAddressMode: (mode: boolean) => void,
+};
+
+export default function EnableSingleAddressSettings({ isSingleAddress, updateSingleAddressMode }: Props) {
   const strings = useStrings();
-  const [isEnabled, setIsEnabled] = useState(true);
-  const localStorageApi = new LocalStorageApi();
-
-  useEffect(() => {
-    const fetchMode = async () => {
-      const mode = await localStorageApi.getSingleAddressMode();
-      const parsedAddressMode = JSON.parse(mode || '{}');
-      const isSingleAddressWallet = parsedAddressMode[selectedWalletId];
-      if (isSingleAddressWallet || isSingleAddressWallet === undefined) {
-        setIsEnabled(true);
-      } else {
-        setIsEnabled(false);
-      }
-    };
-    fetchMode();
-  }, [isEnabled, selectedWalletId]);
 
   const toggle = async (event): Promise<void> => {
-    setIsEnabled(event.target.checked);
-    await localStorageApi.setSingleAddressMode(JSON.stringify({ [selectedWalletId]: event.target.checked }));
+    updateSingleAddressMode(event.target.checked);
   };
 
   return (
@@ -38,7 +24,7 @@ export default function EnableSingleAddressSettings({ selectedWalletId }: { sele
             <Box mt="2px" mr="8px">
               <InfoTooltip content={strings.enableSettingsDescription} />
             </Box>
-            <RevampSwitch checked={isEnabled} onChange={toggle} />
+            <RevampSwitch checked={isSingleAddress} onChange={toggle} />
           </Box>
         }
         labelPlacement="start"

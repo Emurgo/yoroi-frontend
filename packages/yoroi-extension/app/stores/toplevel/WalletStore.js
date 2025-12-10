@@ -17,7 +17,7 @@ import type { WalletState } from '../../../chrome/extension/background/types';
 import { getWallets, subscribe, listenForWalletStateUpdate, setCashbackWallet } from '../../api/thunk';
 import { FlagsApi } from '@emurgo/yoroi-lib/dist/flags';
 import type { StorageAPI } from '@emurgo/yoroi-lib/dist/flags';
-import { createFlagStorage, loadSubmittedTransactions } from '../../api/localStorage';
+import { createFlagStorage, loadSubmittedTransactions, type SingleAddressMode } from '../../api/localStorage';
 import { forceNonNull, noop, timeCached } from '../../coreUtils';
 import type { BestBlockResponse } from '../../api/ada/lib/state-fetch/types';
 import TimeUtils from '../../api/ada/lib/storage/bridge/timeUtils';
@@ -75,6 +75,8 @@ export default class WalletStore extends Store<StoresMap> {
     () => Promise<?WalletState>
   > = new Request(this.getCashbackWallet.bind(this));
 
+  @observable singleAddressMode: SingleAddressMode = {};
+
   setup(): void {
     super.setup();
     this.flagStorage = createFlagStorage();
@@ -112,6 +114,16 @@ export default class WalletStore extends Store<StoresMap> {
       }
       // we don't handle (params.eventType === 'new') because currently there is only one open tab allowed
     });
+
+    this.stores.loading.registerBlockingLoadingRequest(
+      (async () => {
+        const singleAddressMode = await this.api.localStorage.getSingleAddressMode();
+        runInAction(() => {
+          this.singleAddressMode = singleAddressMode;
+        });
+      })(),
+      'load wallet single address mode config'
+    );
   }
 
   // <TODO:ENCAPSULATE> make it a part of the wallet.network api
@@ -418,6 +430,15 @@ export default class WalletStore extends Store<StoresMap> {
       this.selectedIndex = this.wallets.indexOf(selectedWallet);
     });
     await this.api.localStorage.saveWalletListOrder(this.wallets.map(wallet => wallet.publicKey));
+  }
+
+  get isSelectedWalletSingleAddress(): boolean {
+    return this.singleAddressMode[String(this.selectedIndex)] === true;
+  }
+
+  async updateSelectedWalletSingleAddressMode(mode: boolean): Promise<void> {
+    this.singleAddressMode[String(this.selectedIndex)] = mode;
+    await this.api.localStorage.setSingleAddressMode(this.singleAddressMode);
   }
 }
 
