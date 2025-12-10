@@ -9,7 +9,7 @@ import driversPoolsManager from '../../../utils/driversPool.js';
 import { prepareWallet } from '../../../helpers/restoreWalletHelper.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
-import { banxaTabName, WindowManager } from '../../../helpers/windowManager.js';
+import { buyTabName, WindowManager } from '../../../helpers/windowManager.js';
 
 describe('Checking Buy workflow redirection', function () {
   this.timeout(2 * oneMinute);
@@ -54,12 +54,12 @@ describe('Checking Buy workflow redirection', function () {
 
   it('Check the Buy provider page', async function () {
     await buySellPage.proceed();
-    await windowManager.findNewWindowAndSwitchTo(banxaTabName);
+    await windowManager.findNewWindowAndSwitchTo(buyTabName);
     const title = await windowManager.getCurrentPageTitle();
-    expect(title, 'The Buy provider page is not opened').to.be.equal(banxaTabName);
+    expect(title, 'The Buy provider page is not opened').to.be.equal(buyTabName);
     const pageUrl = await windowManager.getCurrentUrl();
     const expectedUrlPart = `https://yoroi.banxa.com/?orderType=buy&fiatType=USD&coinType=ADA&coinAmount=${adaAmount}`;
-    expect(pageUrl, 'The page URL is not correct').to.contain(expectedUrlPart);
+    expect(pageUrl, 'The page URL is not correct').to.be.a('string').and.satisfy(msg => msg.startsWith(expectedUrlPart));
   });
 
   afterEach(async function () {
