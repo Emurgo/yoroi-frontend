@@ -29,7 +29,6 @@ export const StakepoolFeeIncrease = ({ stores }) => {
       const wasClosed = await localStorage.getStakingPoolFeeIncreaseModalClosed();
 
       if (wasClosed === 'true') return;
-
       const stakingUpdate = data?.popups?.stakingUpdate;
 
       if (!stakingUpdate || stakingUpdate.display !== true) return;
@@ -43,8 +42,8 @@ export const StakepoolFeeIncrease = ({ stores }) => {
 
       if (!isAffectedPool || !currentlyDelegating) return;
 
-      const handleClose = () => {
-        localStorage.setStakingPoolFeeIncreaseModalClosed('true');
+      const handleClose = async () => {
+        await localStorage.setStakingPoolFeeIncreaseModalClosed('true');
         closeModal();
       };
 
@@ -59,7 +58,7 @@ export const StakepoolFeeIncrease = ({ stores }) => {
     };
 
     checkModalState();
-  }, [currentPool, currentlyDelegating, data, closeModal, openModal, localStorage, strings]);
+  }, [currentPool]);
 
   return null;
 };
@@ -83,15 +82,15 @@ const CardanoCardContent = ({ onClose }) => {
       </Stack>
 
       <Grid justifyContent="space-between" direction="column" style={{ marginTop: 28 }}>
+        {/* @ts-ignore */}
+        <CustomButton variant="primary" color="primary" onClick={onClose}>
+          {strings.skip}
+        </CustomButton>
         <Link href={STAKEPOOL_MARGIN_FEE_URL} target="_blank" rel="noopener noreferrer" onClick={onClose}>
-          {/* @ts-ignore */}
-          <CustomButton variant="primary" color="primary">
+          <CustomButton variant="text" sx={{ marginTop: '8px' }}>
             {strings.learnMore}
           </CustomButton>
         </Link>
-        <CustomButton variant="text" onClick={onClose} sx={{ marginTop: '8px' }}>
-          {strings.skip}
-        </CustomButton>
       </Grid>
     </Stack>
   );
