@@ -59,7 +59,9 @@ describe('Checking Buy workflow redirection', function () {
     expect(title, 'The Buy provider page is not opened').to.be.equal(buyTabName);
     const pageUrl = await windowManager.getCurrentUrl();
     const expectedUrlPart = `https://yoroi.banxa.com/?orderType=buy&fiatType=USD&coinType=ADA&coinAmount=${adaAmount}`;
-    expect(pageUrl, 'The page URL is not correct').to.be.a('string').and.satisfy(msg => msg.startsWith(expectedUrlPart));
+    expect(pageUrl, 'The page URL is not correct')
+      .to.be.a('string')
+      .and.satisfy(msg => msg.startsWith(expectedUrlPart));
   });
 
   afterEach(async function () {
