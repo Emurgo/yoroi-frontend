@@ -11,6 +11,8 @@ export const extensionTabName = 'Yoroi';
 export const faqTabName = 'Yoroi - EMURGO';
 export const trezorConnectTabName = 'Trezor';
 export const ledgerConnectTabName = 'Ledger Connect | Yoroi';
+export const buyTabName = 'Banxa – Buy Crypto';
+export const sellTabName = 'Encryptus';
 export const backgroungTabName = 'background';
 export const serviceWorkersTabName = 'chrome://serviceworker-internals';
 export const serviceWorkersLink = 'chrome://serviceworker-internals';
@@ -46,7 +48,9 @@ export class WindowManager {
 
     while (endTime >= Date.now()) {
       const windowTitle = await this.driver.getTitle();
-      if (windowTitle !== '') return windowTitle;
+      if (windowTitle !== '') {
+        return windowTitle;
+      }
       await this.driver.sleep(repeatPeriodMs);
     }
     this.logger.error(`WindowManager::_waitWindowTitle The window has the empty title`);
@@ -126,6 +130,20 @@ export class WindowManager {
     throw new WindowManagerError(`The handle with the title ${windowName} already exists`);
   }
 
+  async getCurrentPageTitle() {
+    this.logger.info('WindowManager::getCurrentPageTitle is called');
+    const title = await this.driver.getTitle();
+    this.logger.info(`WindowManager::getCurrentPageTitle. Result: ${title}`);
+    return title;
+  }
+
+  async getCurrentUrl() {
+    this.logger.info('WindowManager::getCurrentUrl is called');
+    const url = await this.driver.getCurrentUrl();
+    this.logger.info(`WindowManager::getCurrentUrl. Result: ${url}`);
+    return url;
+  }
+
   async openNewTab(tabTitle, url) {
     return await this._openNewWithCheck(browserWindowType.tab, tabTitle, url);
   }
@@ -191,20 +209,20 @@ export class WindowManager {
     this.logger.info(
       `WindowManager::findNewWindowAndSwitchTo Finding a new window and switching to it and set the title "${newWindowTitle}" to it`
     );
-    const popupWindowHandleArr = await this.findNewWindows();
-    if (popupWindowHandleArr.length !== 1) {
+    const windowHandleArr = await this.findNewWindows();
+    if (windowHandleArr.length !== 1) {
       this.logger.error(`WindowManager::findNewWindowAndSwitchTo Can not find the popup window`);
-      throw new WindowManagerError('Can not find the popup window');
+      throw new WindowManagerError('Can not find the new window');
     }
-    const popupWindowHandle = popupWindowHandleArr[0];
-    const popUpCustomHandle = { title: newWindowTitle, handle: popupWindowHandle };
-    this.windowHandles.push(popUpCustomHandle);
+    const windowHandle = windowHandleArr[0];
+    const customHandle = { title: newWindowTitle, handle: windowHandle };
+    this.windowHandles.push(customHandle);
 
-    await this.driver.switchTo().window(popupWindowHandle);
-    this.logger.info(`WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(popUpCustomHandle)}`);
+    await this.driver.switchTo().window(windowHandle);
+    this.logger.info(`WindowManager::findNewWindowAndSwitchTo Switched to the new window ${JSON.stringify(customHandle)}`);
     await this._waitWindowTitle();
 
-    return popUpCustomHandle;
+    return customHandle;
   }
 
   async isClosed(title) {
