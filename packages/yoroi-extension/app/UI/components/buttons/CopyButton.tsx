@@ -16,13 +16,13 @@ export const messages = Object.freeze(
     },
   })
 );
-
 interface Props {
   textToCopy: string;
   disabled?: boolean;
+  pathTestId?: string;
 }
 
-export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
+export const CopyButton = ({ textToCopy, disabled, pathTestId = '', ...props }: Props) => {
   const [copied, setCopied] = useState(false);
   const intl = useIntl();
   const strings = useRef({
@@ -39,7 +39,7 @@ export const CopyButton = ({ textToCopy, disabled, ...props }: Props) => {
   };
 
   return (
-    <Box onClick={handleCopy} {...props}>
+    <Box onClick={handleCopy} {...props} id={`${pathTestId}-copy-button`}>
       <Tooltip title={copied ? strings.copied : strings.copyToClipboard} arrow place="bottom-start">
         <IconWrapper
           disabled={disabled}

@@ -7,12 +7,12 @@
     "allowUnusedLabels": false,
     /* Modules */
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "es2020",
     "forceConsistentCasingInFileNames": true,
     "jsx": "react-jsx",
 
     /* Type Checking */
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "noImplicitUseStrict": false,
@@ -26,6 +26,6 @@
     "noImplicitAny": false,
     "types": ["chrome"]
   },
-  "include": ["app/UI/**/*", ".d.ts", "api/", "chrome/extension/background/**/*.ts"],
+  "include": ["app/UI/**/*", ".d.ts", "api/", "chrome/extension/background/**/*.ts", "posthog/*"],
   "exclude": ["**/*.js", "**/*.flow.js"]
 }

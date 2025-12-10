@@ -3,7 +3,6 @@ import { Nft } from '../common/types';
 import { TabItem, Tabs } from '../../../components/tabs/Tabs';
 import { Box, Button, Grid, Modal, Stack, Typography } from '@mui/material';
 import { Link, useLocation } from 'react-router';
-import { ampli } from '../../../../../ampli';
 import { ROUTES } from '../../../../routes-config';
 import { IconWrapper, Icons } from '../../../components';
 import { useStrings } from '../common/hooks/useStrings';
@@ -19,7 +18,7 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box onClick={onClick} sx={{ cursor: 'zoom-in', overflow: 'hidden', height: 'auto' }}>
+    <Box sx={{ overflow: 'hidden', height: '100%' }}>
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
@@ -28,6 +27,8 @@ const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => v
         height="100%"
         contentHeight="550px"
         nftPathId={nftPathId}
+        onClickHandler={onClick}
+        cursor={'zoom-in'}
       />
     </Box>
   );
@@ -46,13 +47,11 @@ export default function NftDetails() {
 
   const openModal = () => {
     setOpen(true);
-    ampli.nftGalleryDetailsImageViewed();
   };
 
   const handleTabChange = (tab: TabItem | undefined) => {
     if (!tab) return;
     setCurrentTab(tab);
-    ampli.nftGalleryDetailsTab({ nft_tab: tab.id === 'overview' ? 'Overview' : 'Metadata' });
   };
 
   const getTabs = useCallback(() => {
@@ -132,13 +131,13 @@ export default function NftDetails() {
             overflow: 'auto',
             cursor: 'zoom-out',
           }}
-          onClick={onClose}
         >
           <NftImage
             imageUrl={currentNft?.image}
             name={currentNft?.name || '-'}
             imageSx={{ maxWidth: '100%', maxHeight: '100%' }}
             nftPathId={nftPathId + ':zoomedImage'}
+            onClickHandler={onClose}
           />
         </Box>
       </Modal>

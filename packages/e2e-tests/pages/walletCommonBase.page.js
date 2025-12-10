@@ -1,6 +1,15 @@
 import { balanceReplacer } from '../helpers/constants.js';
-import { defaultWaitTimeout, fiveSeconds, halfSecond, oneMinute, oneSecond, quarterSecond } from '../helpers/timeConstants.js';
+import {
+  defaultWaitTimeout,
+  fiveSeconds,
+  halfSecond,
+  oneMinute,
+  oneSecond,
+  quarterSecond,
+  threeSeconds,
+} from '../helpers/timeConstants.js';
 import BasePage from './basepage.js';
+import { ElementLocator } from './locator.js';
 
 export default class WalletCommonBase extends BasePage {
   // locators
@@ -14,8 +23,8 @@ export default class WalletCommonBase extends BasePage {
     locator: 'sidebar.staking',
     method: 'id',
   };
-  assetsTabButtonLocator = {
-    locator: 'sidebar.assets',
+  portfolioTabButtonLocator = {
+    locator: 'sidebar.portfolio',
     method: 'id',
   };
   nftsTabButtonLocator = {
@@ -30,12 +39,27 @@ export default class WalletCommonBase extends BasePage {
     locator: 'connector.appNameShort',
     method: 'id',
   };
+  cashbackTabButtonLocator = {
+    locator: 'sidebar.cashback',
+    method: 'id',
+  };
   settingTabButtonLocator = {
     locator: 'sidebar.settings',
     method: 'id',
   };
+  governanceTabButtonLocator = {
+    locator: 'sidebar.governance',
+    method: 'id',
+  };
   navBarPageTitleLocator = {
     locator: 'topBar-pageTitle-text',
+    method: 'id',
+  };
+  /**
+   * @type {ElementLocator}
+   */
+  buySellBtnLocator = {
+    locator: 'topBar-buySell-button',
     method: 'id',
   };
   // selected wallet panel
@@ -78,9 +102,19 @@ export default class WalletCommonBase extends BasePage {
       method: 'id',
     };
   };
+  generalWalletBtn = {
+    locator: '//div[starts-with(@id, "changeWalletDialog:walletsList-selectWallet_") and contains(@id, "-button")]',
+    method: 'xpath',
+  };
   getWalletNameLocator = index => {
     return {
       locator: `changeWalletDialog:walletsList:walletCard_${index}-walletName-text`,
+      method: 'id',
+    };
+  };
+  getWalletPlateLocator = index => {
+    return {
+      locator: `changeWalletDialog:walletsList:walletCard_${index}-walletPlate-text`,
       method: 'id',
     };
   };
@@ -127,6 +161,10 @@ export default class WalletCommonBase extends BasePage {
   };
   //
   // functions
+  async openBuySellDialog() {
+    this.logger.info(`WalletCommonBase::openBuySellDialog is called`);
+    await this.click(this.buySellBtnLocator);
+  }
   /**
    * Getting the selected wallet info from the top-right corner of the app
    * @returns {Promise<{name: string, plate: string, balance: number, fiatBalance: number, fiatCurrency: string}>}
@@ -155,6 +193,20 @@ export default class WalletCommonBase extends BasePage {
     };
     this.logger.info(`WalletCommonBase::getSelectedWalletInfo::walletInfo is ${JSON.stringify(walletInfo)}`);
     return walletInfo;
+  }
+  async walletNameIsChanged(oldName, timeout = fiveSeconds, repeatPeriod = quarterSecond) {
+    this.logger.info(`WalletCommonBase::walletNameIsChanged is called. Old name: ${oldName}`);
+    const endTime = Date.now() + timeout;
+    while (Date.now() <= endTime) {
+      const rawNameAndPlateText = await this.getText(this.walletNameAndPlateNumberTextLocator);
+      const [walletName, _] = rawNameAndPlateText.split('\n');
+      this.logger.info(`WalletCommonBase::walletNameIsChanged Wallet name: ${walletName}`);
+      if (walletName !== oldName) {
+        return true;
+      }
+      await this.sleep(repeatPeriod);
+    }
+    return false;
   }
   async closeUpdatesModalWindow() {
     this.logger.info(`WalletCommonBase::closeUpdatesModalWindow is called`);
@@ -206,10 +258,9 @@ export default class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::goToStakingTab is called`);
     await this.click(this.stakingTabButtonLocator);
   }
-  // TODO Portfolio should be here
-  async goToAssetsTab() {
-    this.logger.info(`WalletCommonBase::goToAssetsTab is called`);
-    await this.click(this.assetsTabButtonLocator);
+  async goToPortfolioTab() {
+    this.logger.info(`WalletCommonBase::goToPortfolioTab is called`);
+    await this.click(this.portfolioTabButtonLocator);
   }
   async goToNftsTab() {
     this.logger.info(`WalletCommonBase::goToNftsTab is called`);
@@ -223,11 +274,20 @@ export default class WalletCommonBase extends BasePage {
     this.logger.info(`WalletCommonBase::goToConnectorTab is called`);
     await this.click(this.connectorTabButtonLocator);
   }
+  async goToCashbackTab() {
+    this.logger.info(`WalletCommonBase::goToCashbackTab is called`);
+    await this.click(this.cashbackTabButtonLocator);
+  }
   async goToSettingsTab() {
     this.logger.info(`WalletCommonBase::goToSettingsTab is called`);
     await this.setImplicitTimeout(oneSecond, this.goToSettingsTab.name);
+    await this.scrollIntoView(this.settingTabButtonLocator);
     await this.click(this.settingTabButtonLocator);
     await this.setImplicitTimeout(defaultWaitTimeout, this.goToSettingsTab.name);
+  }
+  async goToGovernanceTab() {
+    this.logger.info(`WalletCommonBase::goToGovernanceTab is called`);
+    await this.click(this.governanceTabButtonLocator);
   }
   async openChangeWalletModal() {
     this.logger.info(`WalletCommonBase::openChangeWalletModal is called`);
@@ -242,19 +302,19 @@ export default class WalletCommonBase extends BasePage {
     await this.openChangeWalletModal();
     await this.click(this.changeWalletDialogAddNewWalletButtonLocator);
   }
-  async _findAndSelectWallet(walletName, totalWallets) {
+  async _findAndSelectWallet(walletPlate) {
     this.logger.info(`WalletCommonBase::_findAndSelectWallet is called`);
-    for (let index = 0; index < totalWallets; index++) {
-      const walletNameLocator = this.getWalletNameLocator(index);
-      const foundWalletName = await this.getText(walletNameLocator);
-      if (foundWalletName === walletName) {
-        const walletButtonLocator = this.getWalletButtonLocator(index);
-        await this.click(walletButtonLocator);
-        this.logger.info(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is found and selected`);
+    const allWalletBtns = await this.findElements(this.generalWalletBtn);
+    for (let index = 0; index < allWalletBtns.length; index++) {
+      const walletPlateLocator = this.getWalletPlateLocator(index);
+      const foundWalletPlate = await this.getText(walletPlateLocator);
+      if (foundWalletPlate === walletPlate) {
+        await allWalletBtns[index].click();
+        this.logger.info(`WalletCommonBase::_findAndSelectWallet with the plate "${walletPlate}" is found and selected`);
         return;
       }
     }
-    this.logger.warn(`WalletCommonBase::_findAndSelectWallet with the name "${walletName}" is NOT found`);
+    this.logger.warn(`WalletCommonBase::_findAndSelectWallet with the plate "${walletPlate}" is NOT found`);
   }
   async switchToFirstWallet() {
     this.logger.info(`WalletCommonBase::switchToFirstWallet is called`);
@@ -263,16 +323,17 @@ export default class WalletCommonBase extends BasePage {
     await this.click(firstWalletLocator);
     await this.click(this.changeWalletDialogApplyWalletButtonLocator);
   }
-  async switchToWallet(walletObject, totalWallets) {
-    this.logger.info(`WalletCommonBase::switchToWallet is called`);
+  async switchToWallet(walletPlate) {
+    this.logger.info(`WalletCommonBase::switchToWallet is called. Wallet's plate to switch is ${walletPlate} `);
     await this.openChangeWalletModal();
-    await this._findAndSelectWallet(walletObject.name, totalWallets);
+    await this._findAndSelectWallet(walletPlate);
     await this.click(this.changeWalletDialogApplyWalletButtonLocator);
   }
   async getWalletInfoFromChangeWalletDialog(walletIndex) {
     this.logger.info(`WalletCommonBase::getWalletInfoFromChangeWalletDialog is called. Wallet index: ${walletIndex}`);
     const name = await this.getText(this.getWalletNameLocator(walletIndex));
     const balanceString = (await this.getText(this.getWalletBalanceLocator(walletIndex))).split(' ')[0];
+    const plate = await this.getText(this.getWalletPlateLocator(walletIndex));
     const tokensString = await this.getText(this.getWalletTokensAmountLocator(walletIndex));
     const nftsString = await this.getText(this.getWalletNFTsAmountLocator(walletIndex));
     const balance = parseFloat(balanceString);
@@ -281,6 +342,7 @@ export default class WalletCommonBase extends BasePage {
 
     return {
       name,
+      plate,
       balance,
       tokens,
       nfts,
@@ -323,7 +385,13 @@ export default class WalletCommonBase extends BasePage {
    */
   async titleIsCorrect(expectedPageTitle) {
     this.logger.info(`WalletCommonBase::titleIsCorrect is called`);
-    const displayedTitle = await this.getPageTitle();
-    return displayedTitle === expectedPageTitle;
+    return await this.customWaiter(
+      async () => {
+        const displayedTitle = await this.getPageTitle();
+        return displayedTitle === expectedPageTitle;
+      },
+      threeSeconds,
+      quarterSecond
+    );
   }
 }

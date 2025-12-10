@@ -1,7 +1,6 @@
 // @flow
 
 import Config from '../../config';
-import environment from '../../environment';
 import TrezorConnect, { UI_EVENT, DEVICE_EVENT } from 'trezor-connect-flow';
 import type { Manifest, DeviceEvent, UiEvent } from 'trezor-connect-flow';
 
@@ -24,15 +23,8 @@ export function getTrezorManifest(): Manifest {
 
   const trezorManifest: Manifest = {
     email: manifest.EMAIL,
-    appUrl: (() => {
-      if (environment.isFirefox()) {
-        // Set appUrl for `moz-extension:` protocol using browser (like Firefox)
-        return manifest.appURL.FIREFOX;
-      }
-      // For all other browser supported that uses `chrome-extension:` protocol
-      // In future if other non chrome like browser is supported them we can consider updating
-      return manifest.appURL.CHROME;
-    })(),
+    appUrl: manifest.appURL.CHROME,
+    appName: manifest.appName,
   };
 
   return trezorManifest;

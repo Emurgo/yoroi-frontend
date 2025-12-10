@@ -37,7 +37,6 @@ const always = () => true;
 const existsSelectedWallet = ({ selected }) => selected != null;
 const isOnMainnet = ({ selected }): boolean => selected != null && !selected.isTestnet;
 const isDev = (): boolean => environment.isDev();
-const nonTrezorWallet = ({ selected }): boolean => selected?.type !== 'trezor';
 
 // TODO: Fix routes and isVisible prop
 export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
@@ -69,17 +68,10 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'swap',
-    route: ROUTES.SWAP.ROOT,
+    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
     isVisible: isOnMainnet,
-  },
-  {
-    className: 'swap',
-    route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
-    icon: swapIcon,
-    label: { id: 'sidebar.swap2', defaultMessage: '!!!Swap2' },
-    isVisible: isDev,
   },
   {
     className: 'portfolio',
@@ -89,18 +81,11 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
-    className: 'nfts',
-    route: ROUTES.NFTS.ROOT,
-    icon: nftsIcon,
-    label: globalMessages.sidebarNfts,
-    isVisible: existsSelectedWallet,
-  },
-  {
     className: 'nft-gallery',
     route: ROUTES.NFT_GALLERY.ROOT,
     icon: nftsIcon,
     label: globalMessages.sidebarNfts,
-    isVisible: isDev,
+    isVisible: existsSelectedWallet,
   },
   {
     className: 'voting',
@@ -121,7 +106,7 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     route: ROUTES.CASHBACK.ROOT,
     icon: CashbackIcon,
     label: globalMessages.sidebarCashback,
-    isVisible: params => isOnMainnet(params) && nonTrezorWallet(params),
+    isVisible: params => isOnMainnet(params),
   },
   {
     className: 'connected-websites',

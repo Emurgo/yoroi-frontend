@@ -10,8 +10,6 @@ declare var CONFIG: ConfigType;
 
 const localStorageApi = new LocalStorageApi();
 
-const FIREBASE_SERVICE_WORKER_SCOPE = 'firebase-cloud-messaging-push-scope';
-
 export default class PushNotificationStore<
   StoresMapType: {
     +loading: {
@@ -22,6 +20,7 @@ export default class PushNotificationStore<
   },
 > extends Store<StoresMapType> {
   @observable metadata: PushNotificationMetadata | null = null;
+  permissionDenied: boolean = false;
 
   setup(): void {
     this.stores.loading.registerBlockingLoadingRequest(
@@ -30,7 +29,13 @@ export default class PushNotificationStore<
         runInAction(() => {
           this.metadata = metadata;
         });
-        if (this.metadata?.isEnabled === undefined) {
+        if (
+          // first time after upgrading
+          this.metadata?.isEnabled === undefined ||
+          // By observation we need to re-run `getToken` after manually reloading the extension,
+          // and the returned token may change. So it is possible that we need to also do this after upgrading.
+          this.metadata?.isEnabled
+        ) {
           this._enableNotifications();
         }
       })(),
@@ -63,31 +68,31 @@ export default class PushNotificationStore<
     return this.metadata?.isEnabled !== false;
   }
 
-  toggleEnabled: () => Promise<void> = async () => {
-    runInAction(() => {
-      if (!this.metadata) {
-        throw new Error('push notification metadata not loaded');
+  setEnabled: (enabled: boolean) => Promise<void> = async enabled => {
+    if (enabled) {
+      if (!(await this._enableNotifications())) {
+        return;
       }
-      this.metadata.isEnabled = !this.metadata.isEnabled;
-    });
-
-    let success;
-    if (this.isEnabled) {
-      success = await this._enableNotifications();
-    } else {
-      success = await this._disableNotifications();
-    }
-
-    if (!success) {
       runInAction(() => {
-        if (!this.metadata) {
-          throw new Error('push notification metadata not loaded');
+        if (this.metadata) {
+          this.metadata.isEnabled = true;
+        } else {
+          this.metadata = { isEnabled: true };
         }
-        this.metadata.isEnabled = !this.metadata.isEnabled;
       });
-
-      return;
+    } else {
+      if (!(await this._disableNotifications())) {
+        return;
+      }
+      runInAction(() => {
+        if (this.metadata) {
+          this.metadata.isEnabled = false;
+        } else {
+          this.metadata = { isEnabled: false };
+        }
+      });
     }
+
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
@@ -99,9 +104,13 @@ export default class PushNotificationStore<
     const messaging = getMessaging(app);
     const result = await Notification.requestPermission();
     if (result === 'denied') {
+      this.permissionDenied = true;
       return false;
     }
-    const token = await getToken(messaging, { vapidKey: CONFIG.notifications.vapidPublicKey });
+    const token = await getToken(messaging, {
+      vapidKey: CONFIG.notifications.vapidPublicKey,
+      serviceWorkerRegistration: await this._getBackgroundServiceWorkerRegistration(),
+    });
     runInAction(() => {
       if (!this.metadata) {
         throw new Error('push notification metadata not loaded');
@@ -116,18 +125,17 @@ export default class PushNotificationStore<
   }
 
   async _disableNotifications(): Promise<boolean> {
-    const registrations = [...((await navigator.serviceWorker?.getRegistrations()) || [])];
+    const registration = await this._getBackgroundServiceWorkerRegistration();
 
-    const registration = registrations.find(reg => reg.scope.endsWith(FIREBASE_SERVICE_WORKER_SCOPE));
-
-    if (!registration) {
-      throw new Error('unexpectedly missing service worker registration');
-    }
     let subscription = await registration.pushManager.getSubscription();
     if (!subscription) {
       throw new Error('unexpected missing subscription');
     }
     return await subscription.unsubscribe();
+  }
+
+  async _getBackgroundServiceWorkerRegistration(): Promise<ServiceWorkerRegistration> {
+    return window.navigator.serviceWorker.getRegistration();
   }
 
   get fcmToken(): ?string {

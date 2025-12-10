@@ -1,9 +1,10 @@
-import { Box, IconButton, Drawer, Divider, styled, Stack, Typography, Button } from '@mui/material';
+import { Box, IconButton, Drawer, Divider, styled, Stack, Typography, Button, ButtonBase } from '@mui/material';
 import { Icon } from '../../../components';
 import { useStrings } from '../common/hooks/useStrings';
 import { useNotifications } from './NotificationsProvider';
 import { appState, useModelValue, call } from '../../../../../api/frontEnd';
 import { ReactComponent as NoNotificationIllustration } from '../../../../assets/images/revamp/no-open-orders.inline.svg';
+import { useNavigate } from 'react-router';
 
 const StyledDrawer = styled(Drawer)(({ theme }: any) => ({
   '& .MuiDrawer-paper': {
@@ -24,6 +25,48 @@ const StyledButton = styled(IconButton)(({ theme }: any) => ({
   },
 }));
 
+const Notification = (props: { notification: (typeof appState.notifications.all)[number] }) => {
+  const { notification } = props;
+  const navigateTo = useNavigate();
+  const { setIsNotificationCenterOpen } = useNotifications();
+  const onNavigate = () => {
+    if (!notification.redirection) {
+      throw new Error('unexpectedly missing redirection in notification data');
+    }
+    notification.isExternalUrl
+      ? window.open(notification.redirection, '_blank', 'noopener,noreferrer')
+      : navigateTo(notification.redirection);
+    setIsNotificationCenterOpen(false);
+    call(appState.notifications.setRead, notification.fcmMessageId);
+  };
+
+  const content = (
+    <>
+      <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium" textAlign="left">
+        {notification.title}
+      </Typography>
+      {notification.body !== notification.title && (
+        <Typography variant="body1" color="ds.text_gray_medium" textAlign="left">
+          {notification.body}
+        </Typography>
+      )}
+      {/* @ts-ignore */}
+      <Typography variant="caption1" color="ds.text_gray_low">
+        {new Date(notification.time).toLocaleString()}
+      </Typography>
+    </>
+  );
+
+  if (notification.redirection) {
+    return (
+      <ButtonBase sx={{ flexDirection: 'column', display: 'flex', alignItems: 'start' }} onClick={onNavigate}>
+        {content}
+      </ButtonBase>
+    );
+  }
+  return <Box>{content}</Box>;
+};
+
 const NotificationList = () => {
   const strings = useStrings();
   const notifications = useModelValue(appState.notifications.all).value;
@@ -39,32 +82,17 @@ const NotificationList = () => {
               <Box>
                 <Icon.Notification />
               </Box>
-              <Box>
-                <Typography variant="body1" color="ds.text_gray_medium">
-                  {notification.title}
-                </Typography>
-                {notification.body !== notification.title && (
-                  <Typography variant="body1" color="ds.text_gray_medium">
-                    {notification.body}
-                  </Typography>
-                )}
-                {/* @ts-ignore */}
-                <Typography variant="caption1" color="ds.text_gray_low">
-                  {new Date(notification.time).toLocaleString()}
-                </Typography>
-              </Box>
-              {!notification.read && (
-                <Box
-                  sx={{
-                    height: '6px',
-                    minWidth: '6px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--static-red, rgba(255, 19, 81, 1))',
-                    marginLeft: 'auto',
-                    marginBottom: 'auto',
-                  }}
-                />
-              )}
+              <Notification notification={notification} />
+              <Box
+                sx={{
+                  height: '6px',
+                  minWidth: '6px',
+                  borderRadius: '50%',
+                  backgroundColor: notification.read ? 'inherit' : 'ds.sys_magenta_500',
+                  marginLeft: 'auto',
+                  marginBottom: 'auto',
+                }}
+              />
             </Box>
           ))}
         </Stack>

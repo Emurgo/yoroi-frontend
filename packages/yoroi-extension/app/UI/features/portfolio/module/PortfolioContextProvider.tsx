@@ -60,7 +60,16 @@ export const PortfolioContextProvider = ({
   openDialogWrapper,
   shouldHideBalance,
 }: PortfolioProviderProps) => {
-  const { walletBalance, ftAssetList, selectedWallet, networkId, primaryTokenInfo, backendServiceZero, explorer } = currentWallet;
+  const {
+    walletBalance,
+    ftAssetList,
+    selectedWallet,
+    networkId,
+    primaryTokenInfo,
+    backendServiceZero,
+    explorer,
+    stakingRewards,
+  } = currentWallet;
 
   if (selectedWallet === undefined) {
     return <></>;
@@ -98,6 +107,8 @@ export const PortfolioContextProvider = ({
       ftAssetList: ftAssetList || [],
       networkId,
       primaryTokenInfo,
+      stakingRewards,
+      selectedWallet,
       isHiddenAmount: shouldHideBalance,
       openBuyDialog: () => {
         if (selectedWallet.isTestnet) {
@@ -111,7 +122,7 @@ export const PortfolioContextProvider = ({
       explorer,
       isTestnet: selectedWallet.isTestnet,
     }),
-    [state, actions, ftAssetList]
+    [state, actions, ftAssetList, networkId, selectedWallet, settingFiatPairUnit, stakingRewards]
   );
 
   return <PortfolioContext.Provider value={context}>{children}</PortfolioContext.Provider>;

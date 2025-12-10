@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { isMacOS, getRandomItem } from '../utils/utils.js';
+import { getRandomItem } from '../utils/utils.js';
 import * as fs from 'node:fs';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -46,18 +46,8 @@ export const getTestString = (basePart, stringLength, withCapitals) => {
 
 export const DRIVERS_AMOUNT = 1;
 export const chromeExtIdUrl = `chrome-extension://bdlknlffjjmjckcldekkbejaogpkjphg`;
-export const firefoxExtensionId = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
-export const firefoxExtIdUrl = `moz-extension://${firefoxExtensionId}`;
-export const firefoxUuidMapping = `{"{530f7c6c-6077-4703-8f71-cb368c663e35}":"${firefoxExtensionId}"}`;
-export const firefoxBin =
-  process.env.FIREFOX_BIN != null
-    ? process.env.FIREFOX_BIN
-    : '/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox-bin';
 export const chromeBin = process.env.CHROME_PATH;
-export const TargetBrowser = Object.freeze({
-  Chrome: 'chrome',
-  FF: 'firefox',
-});
+
 export const WalletWordsSize = Object.freeze({
   Shelley: 15,
   Daedalus: 24,
@@ -72,7 +62,7 @@ export const projectRootDir = path.resolve(__dirname, '..');
 
 export const dbSnapshotsDir = path.resolve(projectRootDir, 'helpers', 'wallet-dbSnapshots');
 
-export const testRunDir = browserName => path.resolve(__dirname, '..', `testRunsData_${browserName}`);
+export const testRunDir = path.resolve(__dirname, '..', `testRunsData`);
 
 export const getTestWalletName = (walletNameLength = 0, withCapitals = false) => {
   let basePart = 'test';
@@ -119,6 +109,9 @@ export const yoroiObject = Object.freeze({
 
 export const Colors = Object.freeze({
   errorRed: 'rgb(255, 19, 81)',
+  portfolioPositive: 'rgba(18, 112, 93, 1)',
+  portfolioNegative: 'rgba(207, 5, 58, 1)',
+  arrowSelected: 'rgb(0, 0, 0)',
 });
 
 export const balanceReplacer = '******';
@@ -128,3 +121,13 @@ export const getSnapshotedMemo = () => {
   const data = fs.readFileSync(dbSnapshotPath, 'utf8');
   return JSON.parse(data).TxMemo[0].value.Content;
 };
+
+export const handlesEndpoints = Object.freeze({
+  'ADA Handle': 'https://api.handle.me/handles/svinkopepo',
+  'Cardano Name Service (CNS)':
+    'https://api.yoroiwallet.com/api/asset/accounts?policy=e0c4c2d7c4a0ed2cf786753fd845dee82c45512cee03e92adfd3fb8d&asset=726168756c2e616461',
+  'Unstoppable Domains': 'https://api.unstoppabledomains.com/resolve/domains/stackchain.blockchain',
+});
+
+export const PROVIDER_BUY_FEE = 2;
+export const PROVIDER_SELL_FEE = 2.5;

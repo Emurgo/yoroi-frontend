@@ -21,8 +21,8 @@ export default Object.freeze({
           EMAIL: 'rnd@emurgo.io',
           appURL: {
             CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
-            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/',
           },
+          appName: 'Yoroi extension',
         },
       },
       trezorSafe3: {
@@ -32,7 +32,6 @@ export default Object.freeze({
           EMAIL: 'rnd@emurgo.io',
           appURL: {
             CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
-            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/',
           },
         },
       },
@@ -43,7 +42,6 @@ export default Object.freeze({
           EMAIL: 'rnd@emurgo.io',
           appURL: {
             CHROME: 'https://chrome.google.com/webstore/detail/yoroi/ffnbelfdoeiohenkjibnmadjiehjhajb',
-            FIREFOX: 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/',
           },
         },
       },

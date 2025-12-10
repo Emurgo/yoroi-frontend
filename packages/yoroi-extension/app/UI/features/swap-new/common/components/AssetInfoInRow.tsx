@@ -8,6 +8,8 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import TokenInfoModal from './Modals/TokenInfoModal';
 import { AssetDirectionType } from '../types';
 import { ASSET_DIRECTION_IN } from '../constants';
+import { SelectAssetTo } from './Modals/SelectAssetTo';
+import { useStrings } from '../hooks/useStrings';
 
 interface AssetInfoInRowProps {
   token: any;
@@ -34,6 +36,7 @@ export const AssetInfoInRow = React.memo(
     direction,
   }: AssetInfoInRowProps) => {
     const { atoms }: any = useTheme();
+    const strings = useStrings();
     const isPrimary = token.id === '-' || token.id === '';
     const tokenPrice = secondaryToken24Activity?.[1]?.price?.close ?? 1;
     const decimals = isPrimary ? primaryTokenInfo.decimals : token.decimals;
@@ -55,10 +58,18 @@ export const AssetInfoInRow = React.memo(
 
     const openTokenInfo = () => {
       openModal({
-        title: 'Asset details',
+        title: strings.assetDetails,
         content: <TokenInfoModal token={token} />,
         height: '624px',
         width: '612px',
+        handleBack: () => {
+          openModal({
+            title: strings.swapToLabel,
+            content: <SelectAssetTo />,
+            height: '624px',
+            width: '612px',
+          });
+        },
       });
     };
 
@@ -68,7 +79,7 @@ export const AssetInfoInRow = React.memo(
           <TokenInfoIcon info={{ id: formatId(token?.id), policy: token?.fingerprint, name: token?.name }} size="md" />
           <Stack direction="column" justifyContent="space-between">
             <Typography variant="body1" color="ds.text_gray_medium">
-              {token.name}
+              {token.longName ?? token.name}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_low">
               {direction === ASSET_DIRECTION_IN ? token.name : token.fingerprint}
@@ -79,7 +90,7 @@ export const AssetInfoInRow = React.memo(
         {direction === ASSET_DIRECTION_IN ? (
           <Stack direction="column" alignItems="flex-end">
             <Typography variant="body1" color="ds.text_gray_medium">
-              {token.formatedAmount} {token.name}
+              {token.formatedAmount} {token.longName ?? token.name}
             </Typography>
             <Typography variant="body2" color="ds.text_gray_low">
               {totalPrice} {currency}

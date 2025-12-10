@@ -96,6 +96,18 @@ import { Swap } from './Swap';
 import { AdaToken } from './AdaToken';
 import { Bell } from './Bell';
 import { Notification } from './Notification';
+import { MuesliSwap } from './MuesliSwap';
+import { MinSwap } from './MinSwap';
+import { SpectrumSwap } from './SpectrumSwap';
+import { WingRiders } from './WingRinders';
+import { VyfiSwap } from './VyfiSwap';
+import { SundaeSwap } from './SundaeSwap';
+import { Cswap } from './CSwap';
+import { ChatboxSupport } from './ChatboxSupport';
+import { YoroiLogo } from './YoroiLogo';
+import { VotingDrep } from './VotingDrep';
+import { VotingAbstain } from './VotingAbstain';
+import { VotingNoConfidence } from './VotingNoConfidence';
 
 export const Icon = {
   Assets,
@@ -194,6 +206,18 @@ export const Icon = {
   Swap,
   Bell,
   Notification,
+  MuesliSwap,
+  MinSwap,
+  SpectrumSwap,
+  WingRiders,
+  VyfiSwap,
+  SundaeSwap,
+  Cswap,
+  ChatboxSupport,
+  YoroiLogo,
+  VotingDrep,
+  VotingAbstain,
+  VotingNoConfidence,
 };
 
 export enum Icons {
@@ -288,6 +312,18 @@ export enum Icons {
   Wallet = 'Wallet',
   Wallets = 'Wallets',
   Swap = 'Swap',
+  MuesliSwap = 'MuesliSwap',
+  MinSwap = 'MinSwap',
+  SpectrumSwap = 'SpectrumSwap',
+  WingRiders = 'WingRiders',
+  VyfiSwap = 'VyfiSwap',
+  SundaeSwap = 'SundaeSwap',
+  CSwap = 'CSwap',
+  ChatboxSupport = 'ChatboxSupport',
+  YoroiLogo = 'YoroiLogo',
+  VotingDrep = 'VotingDrep',
+  VotingAbstain = 'VotingAbstain',
+  VotingNoConfidence = 'VotingNoConfidence',
 }
 
 interface IconWrapperProps {

@@ -18,10 +18,6 @@ export const settingsMenuMessages: Object = defineMessages({
     id: 'settings.menu.blockchain.link.label',
     defaultMessage: '!!!Blockchain',
   },
-  levelOfComplexity: {
-    id: 'settings.menu.levelOfComplexity.link.label',
-    defaultMessage: '!!!Level of Complexity',
-  },
   externalStorage: {
     id: 'settings.menu.externalStorage.link.label',
     defaultMessage: '!!!External Storage',
@@ -74,11 +70,6 @@ export default class SettingsMenu extends Component<Props> {
         label: intl.formatMessage(globalMessages.support),
         route: ROUTES.SETTINGS.SUPPORT,
         className: 'support',
-      },
-      {
-        label: intl.formatMessage(settingsMenuMessages.levelOfComplexity),
-        route: ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY,
-        className: 'levelOfComplexity',
       },
       {
         label: intl.formatMessage(settingsMenuMessages.analytics),

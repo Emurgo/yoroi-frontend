@@ -10,6 +10,8 @@ import LoadingSpinner from '../../../components/widgets/LoadingSpinner';
 import { observer } from 'mobx-react';
 import { Box, useTheme } from '@mui/material';
 
+declare var chrome;
+
 export type SocialLinks = {|
   tw?: string,
   fb?: string,
@@ -145,20 +147,11 @@ export default class SeizaFetcher extends Component<Props> {
   }
 
   _getBrowserReplacement(): string {
-    // 1) handle Yoroi running as an extension
+    // handle Yoroi running as an extension
     if (environment.isExtension()) {
-      if (environment.isFirefox()) {
-        return 'firefox&mozId=' + location.hostname;
-      }
-      // otherwise assume Chrome
-      // $FlowFixMe[cannot-resolve-name]
       return 'chrome&chromeId=' + chrome.runtime.id;
     }
 
-    // 2) Handle Yoroi running as a website
-    if (environment.isFirefox()) {
-      return 'firefox&host' + location.host;
-    }
     // otherwise assume Chrome
     return 'chrome&chromeId=' + location.host;
   }

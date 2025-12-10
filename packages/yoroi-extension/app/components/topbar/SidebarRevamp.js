@@ -73,7 +73,7 @@ export default class SidebarRevamp extends Component<Props> {
         </ScrollableCategoriesWrapper>
         <Button
           className={styles.faq}
-          href="https://emurgohelpdesk.zendesk.com/hc/en-us/categories/4412619927695-Yoroi"
+          href="https://help.yoroi-wallet.com/en/"
           target="_blank"
           rel="noreferrer"
           sx={{

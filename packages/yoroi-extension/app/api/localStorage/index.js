@@ -6,7 +6,6 @@ import { DEFAULT_CURRENCY_PAIR } from '../../types/unitOfAccountType';
 
 import { getLocalItem, isEmptyStorage, removeLocalItem, setLocalItem } from './primitives';
 import { TabIdKeys } from '../../utils/tabManager';
-import type { ComplexityLevelType } from '../../types/complexityLevelType';
 import type { WhitelistEntry } from '../../../chrome/extension/connector/types';
 import type { CatalystRoundInfoResponse } from '../ada/lib/state-fetch/types';
 import type { CardanoShelleyTransactionCtorData } from '../../domain/CardanoShelleyTransaction';
@@ -19,7 +18,6 @@ const networkForLocalStorage = String(environment.getNetworkName());
 const storageKeys = {
   USER_LOCALE: networkForLocalStorage + '-USER-LOCALE',
   URI_SCHEME_ACCEPTANCE: networkForLocalStorage + '-URI-SCHEME-ACCEPTANCE',
-  COMPLEXITY_LEVEL: networkForLocalStorage + '-COMPLEXITY-LEVEL',
   IS_USER_MIGRATED_TO_REVAMP: 'IS_USER_MIGRATED_TO_REVAMP',
   LAST_ANNOUNCED_FEATURE_VERSION: 'LAST_ANNOUNCED_FEATURE_VERSION',
   TESTNET_MODAL_DISPLAYED: 'TESTNET_MODAL_DISPLAYED',
@@ -38,8 +36,7 @@ const storageKeys = {
   BUY_SELL_DISCLAIMER: networkForLocalStorage + '-BUY_SELL_DISCLAIMER',
   BRING_SANDBOX: networkForLocalStorage + '-BRING_SANDBOX',
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
-  MIDNIGHT_MODAL_CLOSED: networkForLocalStorage + '-MIDNIGHT_MODAL_CLOSED',
-  MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED',
+  MIDNIGHT_BANNER_PHASE2_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_PHASE2_CLOSED',
   CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
@@ -47,6 +44,8 @@ const storageKeys = {
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
   SINGLE_ADDRESS_MODE: '-SINGLE_ADDRESS_MODE',
+  CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
+  SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -115,18 +114,6 @@ export default class LocalStorageApi {
 
   unsetUriSchemeAcceptance: void => Promise<void> = () => removeLocalItem(storageKeys.URI_SCHEME_ACCEPTANCE);
 
-  // ========== Level Complexity ========== //
-  getComplexityLevel: void => Promise<?ComplexityLevelType> = () =>
-    getLocalItem(storageKeys.COMPLEXITY_LEVEL).then(level => {
-      if (level == null) return null;
-      return JSON.parse(level);
-    });
-
-  setComplexityLevel: ComplexityLevelType => Promise<void> = (level: ComplexityLevelType) =>
-    setLocalItem(storageKeys.COMPLEXITY_LEVEL, JSON.stringify(level));
-
-  unsetComplexityLevel: void => Promise<void> = () => removeLocalItem(storageKeys.COMPLEXITY_LEVEL);
-
   // ========== User Theme Mode========== //
 
   getUserThemeMode: void => Promise<?string> = () => getLocalItem(storageKeys.USER_THEME);
@@ -167,12 +154,15 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== CARDANO_CARD Modal ========== //
-  getCardanoCardModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+  // ========== SWAP Disclaimer Modal ========== //
+  getSwapDisclaimerModalClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
-  setCardanoCardModalClosed: string => Promise<void> = closed => setLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED, closed);
+  setSwapDisclaimerModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED, closed);
 
-  unsetCardanoCardModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.CARDANO_CARD_MODAL_CLOSED);
+  unsetSwapDisclaimerModalClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
 
   // ========== SINGLE_ADDRESS Mode ========== //
 
@@ -181,14 +171,12 @@ export default class LocalStorageApi {
   setSingleAddressMode: string => Promise<void> = mode => setLocalItem(storageKeys.SINGLE_ADDRESS_MODE, mode);
 
   // ========== Midnight Banner Announcement ========== //
-  getMidnightBannerAnnouncementClosed: void => Promise<?string> = () =>
-    getLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+  getMidnightBannerPhase2Closed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);
 
-  setMidnightBannerAnnouncementClosed: string => Promise<void> = closed =>
-    setLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED, closed);
+  setMidnightBannerPhase2Closed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED, closed);
 
-  unsetMidnightBannerAnnouncementClosed: void => Promise<void> = () =>
-    removeLocalItem(storageKeys.MIDNIGHT_BANNER_ANNOUNCEMENT_CLOSED);
+  unsetMidnightBannerPhase2Closed: void => Promise<void> = () => removeLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);
 
   // ========== Buy/Sell Disclaimer ========== //
   getBuySellDisclaimer: void => Promise<?string> = () => getLocalItem(storageKeys.BUY_SELL_DISCLAIMER);
@@ -356,6 +344,15 @@ export default class LocalStorageApi {
     await setLocalItem(storageKeys.NFTS_GRID_VIEW_STATE, gridViewState);
   };
 
+  // ========== Catalyst Disclaimer State ========== //
+
+  getCatalystDisclaimerState: void => Promise<boolean> = () =>
+    getLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE).then(s => s === 'false');
+
+  setCatalystDisclaimerState: boolean => Promise<void> = async state => {
+    await setLocalItem(storageKeys.CATALYST_DISCLAIMER_STATE, state.toString());
+  };
+
   // =========== Common =============== //
 
   // ========== Unit of account ========== //
@@ -365,7 +362,11 @@ export default class LocalStorageApi {
     if (unitOfAccount == null) {
       return DEFAULT_CURRENCY_PAIR;
     }
-    return JSON.parse(unitOfAccount);
+    const unitOfAccountObject = JSON.parse(unitOfAccount);
+    if (unitOfAccountObject.currency === null) {
+      return DEFAULT_CURRENCY_PAIR;
+    }
+    return unitOfAccountObject;
   };
 
   setUnitOfAccount: UnitOfAccountSettingType => Promise<void> = async currency => {
@@ -439,17 +440,8 @@ export default class LocalStorageApi {
 
   unsetAcceptedTosVersion: void => Promise<void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
 
-  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
-  _getIsAnalyticsAllowedKey: () => string = () => {
-    let key = storageKeys.IS_ANALYTICS_ALLOWED;
-    if (environment.isFirefox()) {
-      key += '-firefox';
-    }
-    return key;
-  };
-
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
-    const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
+    const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
     if (!json) {
       return undefined;
     }
@@ -457,7 +449,7 @@ export default class LocalStorageApi {
   };
 
   saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
-    await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
+    await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
   };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
@@ -539,7 +531,6 @@ export default class LocalStorageApi {
 
   async reset(): Promise<void> {
     await this.unsetUserLocale();
-    await this.unsetComplexityLevel();
     await this.unsetLastLaunchVersion();
     await this.unsetHideBalance();
     await this.unsetUnitOfAccount();
@@ -594,9 +585,7 @@ export type PersistedSubmittedTransaction = {|
   isDrepDelegation?: boolean,
 |};
 
-const STORAGE_API =
-  window.browser?.storage.local || // firefox mv2
-  window.chrome?.storage.local; // chrome mv2 and mv3
+const STORAGE_API = window.chrome?.storage.local; // chrome mv2 and mv3
 
 export async function persistSubmittedTransactions(submittedTransactions: Array<PersistedSubmittedTransaction>): Promise<void> {
   await STORAGE_API.set({

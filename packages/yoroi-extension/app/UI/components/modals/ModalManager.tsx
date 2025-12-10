@@ -13,11 +13,13 @@ const BootstrapDialog: any = styled(Dialog)(({ theme, width, height }: { width: 
   },
   '& .MuiDialog-root': {
     maxWidth: width,
+    width: width,
     maxHeight: height,
     margin: 0,
   },
   '& .MuiPaper-root': {
     maxWidth: width,
+    width: width,
     height: height,
     maxHeight: height,
     margin: 0,
@@ -76,7 +78,7 @@ export const ModalManager = () => {
         borderColor="ds.el_gray_max"
         asButton
         buttonProps={{
-          onClick: closeModal,
+          onClick: modalOnClose,
           sx: {
             position: 'absolute',
             right: 18,

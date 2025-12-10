@@ -67,6 +67,9 @@ export type YoroiRemoteConfig = {
     cardanoCardAnnouncement: {
       display: boolean;
     };
+    firefoxSupportAnnouncement: {
+      display: boolean;
+    };
   };
   dapps?: {
     recommended: {
@@ -91,4 +94,5 @@ export type YoroiRemoteConfig = {
     verifiedTokens: string[];
     partners: Record<string, string>;
   };
+  enableTrezorAirdrop?: boolean;
 };

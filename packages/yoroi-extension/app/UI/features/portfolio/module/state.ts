@@ -41,6 +41,8 @@ export type PortfolioState = {
   ftAssetList: any[];
   showWelcomeBanner: boolean;
   primaryTokenInfo: any;
+  stakingRewards: any;
+  selectedWallet: any;
   isHiddenAmount: boolean;
   openBuyDialog: () => void;
   backendServiceZero: string;
@@ -60,6 +62,8 @@ export const defaultPortfolioState: PortfolioState = {
   networkId: null,
   ftAssetList: [],
   primaryTokenInfo: null,
+  stakingRewards: null,
+  selectedWallet: null,
   isHiddenAmount: false,
   showWelcomeBanner: false,
   openBuyDialog: () => {},

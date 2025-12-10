@@ -23,6 +23,7 @@ import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledger
 import { WrongPassphraseError } from '../../api/ada/lib/cardanoCrypto/cryptoErrors';
 import { IncorrectWalletPasswordError } from '../../api/common/errors';
 import { convertToLocalizableError } from '../../domain/LedgerLocalizedError';
+import { convertToLocalizableError as trezorConvertToLocalizableError } from '../../domain/TrezorLocalizedError';
 import LocalizableError from '../../i18n/LocalizableError';
 import type { $npm$ReactIntl$IntlShape } from 'react-intl';
 import { injectIntl, defineMessages } from 'react-intl';
@@ -33,6 +34,10 @@ import LocalStorageApi from '../../api/localStorage';
 import DisclaimerDialog from '../../components/widgets/DisclaimerDialog';
 import type { BringConfigType, ConfigType } from '../../../config/config-types';
 import { ReactComponent as CloseCrossRevamp } from '../../assets/images/cross-dark-revamp.inline.svg';
+import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
+import { CardanoAddressType, CardanoDerivationType } from 'trezor-connect-flow';
+
+declare var chrome;
 
 const messages = defineMessages({
   claim: {
@@ -151,6 +156,7 @@ const NotCurrentWalletModal = injectIntl(
               onClick: props.onSwitchToCashbackWallet,
             },
           ]}
+          id="cashbackWrongWallet"
         >
           <Typography sx={{ fontSize: '16px', lineHeight: '24px' }} color="ds.text_gray_medium">
             {intl.formatMessage(messages.chooseText1)}
@@ -178,6 +184,7 @@ const NotCurrentWalletModal = injectIntl(
             onClick: props.onSetCurrentAsCashbackWallet,
           },
         ]}
+        id="cashbackWrongWallet"
       >
         <Typography sx={{ fontSize: '16px', lineHeight: '24px' }} color="ds.text_gray_medium">
           {intl.formatMessage(messages.switchText)}
@@ -258,6 +265,8 @@ const CashbackPageContainer = observer((props: AllProps) => {
       const url = new URL(data.iframeUrl);
       url.searchParams.set('token', data.token);
       url.searchParams.set('theme', theme.name.split('-')[0]);
+      url.searchParams.set('extensionId', chrome.runtime.id);
+      url.searchParams.set('terms', 'false');
 
       setIframeSrc(url.href);
     } catch (error) {
@@ -319,6 +328,39 @@ const CashbackPageContainer = observer((props: AllProps) => {
           res = await encodeHardwareWalletSignResult(addressFieldHex, signatureHex, messageHex, signingPublicKeyHex, hashPayload);
         } catch (error) {
           throw new convertToLocalizableError(error);
+        }
+      } else if (wallet.type === 'trezor') {
+        try {
+          const network = getNetworkById(wallet.networkId);
+          const config = network.BaseConfig[0];
+          const messageHex = stringToHex(msg);
+          const signResult = await wrapWithFrame(trezor =>
+            trezor.cardanoSignMessage({
+              path: [...addressing.path],
+              payload: messageHex,
+              preferHexDisplay: false,
+              networkId: Number(config.ChainNetworkId),
+              protocolMagic: config.ByronNetworkId,
+              addressParameters: {
+                addressType: CardanoAddressType.BASE,
+                path: [...addressing.path],
+                stakingPath: [...wallet.stakingAddressing.addressing.path],
+              },
+              derivationType: CardanoDerivationType.ICARUS_TREZOR,
+            })
+          );
+          if (!signResult.success) {
+            throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+          }
+          res = await encodeHardwareWalletSignResult(
+            signResult.payload.headers.protected.address,
+            signResult.payload.signature,
+            messageHex,
+            signResult.payload.pubKey,
+            false
+          );
+        } catch (error) {
+          throw new trezorConvertToLocalizableError(error);
         }
       } else {
         throw new Error('unsupported wallet type');

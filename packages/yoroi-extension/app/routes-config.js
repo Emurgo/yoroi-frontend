@@ -9,7 +9,6 @@ export const ROUTES = {
   PROFILE: {
     LANGUAGE_SELECTION: '/profile/language-selection',
     TERMS_OF_USE: '/profile/terms-of-use',
-    COMPLEXITY_LEVEL: '/profile/complexity-level',
     URI_PROMPT: '/profile/uri-prompt',
     OPT_FOR_ANALYTICS: '/profile/opt-for-analytics',
   },
@@ -33,7 +32,6 @@ export const ROUTES = {
     EXTERNAL_STORAGE: '/settings/external-storage',
     TERMS_OF_USE: '/settings/terms-of-use',
     SUPPORT: '/settings/support',
-    LEVEL_OF_COMPLEXITY: '/settings/level-of-complexity',
     ANALYTICS: '/settings/analytics',
     PAPER_WALLET: '/settings/paper-wallet',
   },
@@ -52,10 +50,6 @@ export const ROUTES = {
   // Bringweb3
   CASHBACK: {
     ROOT: '/cashback',
-  },
-  NFTS: {
-    ROOT: '/nfts',
-    DETAILS: '/nfts/:nftId',
   },
   NFT_GALLERY: {
     ROOT: '/nft-gallery',
@@ -85,14 +79,13 @@ export const ROUTES = {
   SWAP_REVAMP: {
     ASSET_SWAP: '/swap-revamp',
     ORDERS: '/swap-revamp/orders',
+    REVIEW: '/swap-revamp/review',
     // $FlowIgnore
     ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
   },
-  Governance: {
+  GOVERNANCE: {
     ROOT: '/governance',
-    DELEGATE: '/governance/delagation',
-    SUBMITTED: '/governance/submitted',
-    FAIL: '/governance/failed',
+    OPTIONS: '/governance/options',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

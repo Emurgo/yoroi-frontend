@@ -9,22 +9,25 @@ import { SwitchAssets } from '../../common/components/SwitchAssets';
 import { SelectAssetTo } from '../../common/components/Modals/SelectAssetTo';
 import { AssetDirectionType } from '../../common/types';
 import { ASSET_DIRECTION_IN, ASSET_DIRECTION_OUT, MARKET_ORDER } from '../../common/constants';
-import { SwapAction, useSwapRevamp } from '../../module/SwapContextProvider';
+import { useSwapRevamp } from '../../module/SwapContextProvider';
 import { useEffect } from 'react';
-import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
-import { getCborTxBody } from '../../../transaction-review/common/hooks/usetxBody';
 import { ErrorMessage } from '../../common/components/ErrorMessage';
-import { TransactionResult } from '../../../transaction-review/common/types';
 import { LimitInput } from '../../common/components/LimitInput';
 import { useStrings } from '../../common/hooks/useStrings';
+import { DisclaimerDialog } from '../../common/components/Modals/DisclaimerDialog';
+import PriceImpact from '../../common/components/PriceImpact';
+import { useNavigateTo } from '../../common/hooks/useNavigateTo';
+import { useWalletSwitchReset } from '../../common/hooks/useWalletSwitchReset';
+import { captureEvent } from '../../../../../../posthog';
 
 export const AssetSwap = () => {
   const { atoms }: any = useTheme();
-  const { createOrder, swapForm, tokenInfos, isCreateOrderLoading, stores } = useSwapRevamp();
+  const { createOrder, swapForm, isCreateOrderLoading } = useSwapRevamp();
   const { openModal } = useModal();
+  const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { openTxReviewModal, closeTxReviewModal, showTxResultModal } = useTxReviewModal();
-  const wallet = stores.wallets.selectedOrFail;
+
+  useWalletSwitchReset();
 
   const openSelectAssetModal = (direction: AssetDirectionType) => {
     openModal({
@@ -35,47 +38,19 @@ export const AssetSwap = () => {
     });
   };
 
-  // @ts-ignore
-  const handleSubmitTransaction = async password => {
-    const parsedCbor = await getCborTxBody(swapForm.createTx.cbor);
-    // @ts-ignore
-    const unisgnedTxRequest = await stores.substores.ada.swapStore.createRevampUnsignedSwapTx({
-      wallet,
-      swapState: swapForm,
-      tokenInfos,
-      parsedCbor,
-    });
-
-    try {
-      await stores.transactionProcessingStore.adaSendAndRefresh({
-        wallet,
-        signRequest: unisgnedTxRequest,
-        password,
-        callback: () => stores.wallets.refreshWalletFromRemote(wallet.publicDeriverId),
-      });
-      showTxResultModal(TransactionResult.SUCCESS);
-    } catch (e) {
-      showTxResultModal(TransactionResult.FAIL);
-    } finally {
-      swapForm.action({ type: SwapAction.ResetForm });
-      closeTxReviewModal();
-    }
-  };
+  useEffect(() => {
+    captureEvent('Swap Initiated');
+  }, []);
 
   useEffect(() => {
-    if (swapForm.createTx?.cbor) {
-      openTxReviewModal({
-        modalView: 'transactionReview',
-        submitTx: passswordInput => {
-          handleSubmitTransaction(passswordInput);
-        },
-        cborTx: swapForm.createTx.cbor,
-      });
+    if (swapForm.createTx?.cbor && swapForm.reviewSwapSelected === false) {
+      navigateTo.swapReview();
     }
-  }, [swapForm.createTx]);
+  }, [swapForm.createTx, swapForm.reviewSwapSelected, navigateTo]);
 
   return (
     <Content direction="column" justifyContent="space-between" alignItems="center">
+      <DisclaimerDialog />
       <Stack>
         <TopBarActions />
         <Stack {...atoms.pt_lg} />
@@ -86,7 +61,8 @@ export const AssetSwap = () => {
         <Stack {...atoms.pt_lg} />
         <ErrorMessage />
         <LimitInput />
-        <EstimateSummary />
+        <PriceImpact />
+        <EstimateSummary showToolTips />
       </Stack>
       <LoadingButton
         //  @ts-ignore
@@ -94,6 +70,7 @@ export const AssetSwap = () => {
         onClick={() => {
           createOrder();
         }}
+        disabled={!swapForm.canSwap}
         loading={isCreateOrderLoading}
       >
         {swapForm.orderType === MARKET_ORDER ? strings.swapLabel : strings.placeOrder}

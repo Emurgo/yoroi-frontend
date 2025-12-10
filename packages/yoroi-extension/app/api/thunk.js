@@ -65,6 +65,7 @@ import { Logger, stringifyError } from '../utils/logging';
 import LocalizableError from '../i18n/LocalizableError';
 import { WrongPassphraseError } from './ada/lib/cardanoCrypto/cryptoErrors';
 import { sanitizeForLog } from '../coreUtils';
+import { OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER } from '../../chrome/extension/background/constants';
 
 export type { CreateHardwareWalletRequest } from '../../chrome/extension/background/handlers/yoroi/wallet';
 
@@ -89,12 +90,19 @@ declare var chrome;
 
 // UI -> background queries:
 
+type LongMessageReceiverInfo = {|
+  chunks: Array<string>,
+  resolve: Object => void,
+  receivedChunkCount: number,
+|};
+const longMessageReceiverMap = new Map<string, LongMessageReceiverInfo>();
+
 export function callBackground<R>(message: {| type: string, request?: Object |}): Promise<R> {
   return new Promise((resolve, reject) => {
     const serializedMessage = { type: message.type, request: JSON.stringify(message.request ?? null) };
     window.chrome.runtime.sendMessage(serializedMessage, response => {
       // $FlowIgnore
-      console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
+      //console.debug(`CLIENT [${message.type}] received result: `, JSON.stringify(sanitizeForLog(response)));
       if (window.chrome.runtime.lastError) {
         // eslint-disable-next-line prefer-promise-reject-errors
         reject(
@@ -102,7 +110,21 @@ export function callBackground<R>(message: {| type: string, request?: Object |})
         );
         return;
       }
-      resolve(response);
+      if (response?.type === OVERSIZE_RESPONSE_MESSAGE_PLACEHOLDER) {
+        const receiverInfo = longMessageReceiverMap.get(response.messageId);
+        if (receiverInfo) {
+          receiverInfo.resolve = resolve;
+          // theoretically there is the possibility that all chunks have been received but it's unlikely to happen
+        } else {
+          longMessageReceiverMap.set(response.messageId, {
+            resolve,
+            chunks: [],
+            receivedChunkCount: 0,
+          });
+        }
+      } else {
+        resolve(response);
+      }
     });
   });
 }
@@ -393,16 +415,67 @@ const callbacks = Object.freeze({
 });
 const APP_ORIGIN = window.location.origin || null;
 const EXPECTED_MESSAGE_TYPE = 'yoroi-emit-update';
+const LONG_RESPONSE_MESSAGE_TYPE = 'long-response';
+/*
+  Two types of messages are received here:
+  1. Oversized response message of RPC call to background initiated by callBackground().
+  These are sent by chrome/extension/background/handlers/yoroi/index.js
+  2. State updates initiated from the background, via emitUpdateToSubscriptions() in
+  chrome/extension/background/subscriptionManager.js. They might also be chunked.
+*/
+const longNotificationMap = new Map<string, {| chunks: Array<string>, receivedChunkCount: number |}>();
+
 chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => {
   if (APP_ORIGIN != null && origin !== APP_ORIGIN) {
     Logger.debug('[client] ignoring non-origin message (' + origin + '/' + APP_ORIGIN + ')');
+    return;
+  }
+  if (rawMessage.type === LONG_RESPONSE_MESSAGE_TYPE) {
+    let receiverInfo = longMessageReceiverMap.get(rawMessage.id);
+    if (!receiverInfo) {
+      receiverInfo = {
+        resolve: () => {},
+        chunks: [],
+        receivedChunkCount: 0,
+      };
+    }
+    receiverInfo.chunks[rawMessage.chunkIndex] = rawMessage.chunk;
+    receiverInfo.receivedChunkCount += 1;
+    if (receiverInfo.receivedChunkCount === rawMessage.chunkCount) {
+      const message = receiverInfo.chunks.join('');
+      const messageObj = JSON.parse(message);
+      receiverInfo.resolve(messageObj);
+      longMessageReceiverMap.delete(rawMessage.id);
+    }
     return;
   }
   if (rawMessage.type !== EXPECTED_MESSAGE_TYPE) {
     Logger.debug('[client] ignoring unknown type message (' + rawMessage.type + '/' + EXPECTED_MESSAGE_TYPE + ')');
     return;
   }
-  const serializedMessage = rawMessage.data;
+  let serializedMessage;
+  if (
+    rawMessage.id &&
+    rawMessage.chunk &&
+    typeof rawMessage.chunkIndex === 'number' &&
+    typeof rawMessage.chunkCount === 'number'
+  ) {
+    let longNotificationEntry = longNotificationMap.get(rawMessage.id);
+    if (!longNotificationEntry) {
+      longNotificationEntry = { chunks: [], receivedChunkCount: 0 };
+      longNotificationMap.set(rawMessage.id, longNotificationEntry);
+    }
+    longNotificationEntry.chunks[rawMessage.chunkIndex] = rawMessage.chunk;
+    longNotificationEntry.receivedChunkCount += 1;
+    if (longNotificationEntry.receivedChunkCount === rawMessage.chunkCount) {
+      serializedMessage = longNotificationEntry.chunks.join('');
+      longNotificationMap.delete(rawMessage.id);
+    } else {
+      return;
+    }
+  } else {
+    serializedMessage = rawMessage.data;
+  }
   const messageType = typeof serializedMessage;
   if (messageType !== 'string') {
     Logger.error(
@@ -424,7 +497,7 @@ chrome.runtime.onMessage.addListener((rawMessage, { origin }, _sendResponse) => 
     Logger.error('unrecognizable message type: ' + typeof message + ' (expected object); Original message: ' + serializedMessage);
     return;
   }
-  Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
+  //Logger.debug('get message from background:', JSON.stringify(sanitizeForLog(message)));
 
   if (message.type === 'wallet-state-update') {
     if (message.params.newTxs) {

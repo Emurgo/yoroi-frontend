@@ -71,7 +71,7 @@ export default class SignTxContainer extends Component<ConnectorStoresProps> {
     return (
       <FullscreenLayout bottomPadding={0}>
         <VerticallyCenteredLayout>
-          <LoadingSpinner />
+          <LoadingSpinner id="dApp" />
         </VerticallyCenteredLayout>
       </FullscreenLayout>
     );

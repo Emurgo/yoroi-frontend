@@ -7,17 +7,11 @@ import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { getFormattedPairingValue } from '../common/helpers';
-import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
+import { useGovernanceManagerMaker } from '../common/hooks/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
 type drepDelegation = { status: string | null; drep: string | null };
 type GetCurrentPrice = (from: string, to: string) => number | Promise<number>;
-
-type GovernanceAnalytics = {
-  governanceChooseDrepPageViewed: () => void;
-  governanceConfirmTransactionPageViewed: () => void;
-  governanceTransactionSuccessPageViewed: () => void;
-};
 
 const initialGovernanceProvider = {
   ...defaultGovernanceState,
@@ -38,8 +32,8 @@ const initialGovernanceProvider = {
   triggerBuySellAdaDialog: null,
   recentTransactions: [],
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
-  ampli: null as GovernanceAnalytics | null,
   networkId: null,
+  isTestnet: false,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -54,7 +48,6 @@ type GovernanceProviderProps = {
   tokenInfo: any;
   triggerBuySellAdaDialog: any;
   getCurrentPrice: GetCurrentPrice;
-  ampli: GovernanceAnalytics;
 };
 
 export const GovernanceContextProvider = ({
@@ -67,7 +60,6 @@ export const GovernanceContextProvider = ({
   tokenInfo,
   triggerBuySellAdaDialog,
   getCurrentPrice,
-  ampli,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -175,7 +167,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
-    ampli,
+    isTestnet: selectedWallet.isTestnet,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

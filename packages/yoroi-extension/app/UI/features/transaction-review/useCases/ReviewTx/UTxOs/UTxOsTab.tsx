@@ -17,8 +17,10 @@ interface Asset {
 // TODO Define the type for an individual input
 interface InputData {
   address: string;
-  txHash: string;
-  txIndex: number;
+  tx_hash?: string;
+  tx_index?: number;
+  txHash?: string;
+  txIndex?: number;
   assets: Asset[];
 }
 
@@ -38,7 +40,6 @@ interface OutputProps {
 
 export const UTxOsTab: any = ({ tx }) => {
   const { primaryTokenInfo } = useTxReviewModal();
-
   return (
     <Stack direction="column" sx={{ padding: '24px 0 24px 24px', marginBottom: '100px' }}>
       <Inputs inputs={tx.inputs} />
@@ -62,7 +63,7 @@ export const Inputs: React.FC<InputsProps> = ({ inputs }) => {
         content={
           <Stack gap="8px">
             {inputs.map(input => (
-              <Input key={`${input.address}-${input.txHash}-${input.txIndex}`} input={input} />
+              <Input key={`${input.address}-${input.txHash || input.tx_hash}-${input.tx_index}`} input={input} />
             ))}
           </Stack>
         }
@@ -101,10 +102,10 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
     if (!input.assets.length) return null;
     return input.assets.map(asset => (
       <TokenItem
-        key={asset.tokenInfo.id}
-        tokenInfo={asset.tokenInfo}
-        quantity={asset.quantity}
-        isPrimary={asset.tokenInfo.nature === Portfolio.Token.Nature.Primary}
+        key={asset?.tokenInfo?.id || asset.Token.TokenId}
+        tokenInfo={asset?.tokenInfo || asset.Token?.Metadata}
+        quantity={asset?.quantity || Number(asset?.TokenList.Amount)}
+        isPrimary={asset.Token?.Metadata.ticker === 'ADA'}
       />
     ));
   };
@@ -127,14 +128,14 @@ const Input: React.FC<InputProps> = ({ input }: any) => {
 
       <Stack direction="row" alignItems="flex-start" width="100%" display="flex" gap="8px">
         <Typography sx={{ wordWrap: 'break-word', flex: '1 1 0' }} variant="body1" color="ds.text_gray_medium" minWidth="0">
-          {input.txHash}
+          {input.txHash || input.tx_hash}
         </Typography>
 
         <Stack display="flex" flexDirection="row" gap="8px">
           <Typography variant="body1" fontWeight={500}>
-            {`#${input.txIndex}`}
+            {`#${input?.txIndex ?? input?.tx_index}`}
           </Typography>
-          <CopyButton textToCopy={input.txHash} />
+          <CopyButton textToCopy={input.txHash || input.tx_hash} />
         </Stack>
       </Stack>
 

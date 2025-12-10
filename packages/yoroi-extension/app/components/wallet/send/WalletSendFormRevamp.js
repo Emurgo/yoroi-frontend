@@ -48,7 +48,8 @@ import { calculateAndFormatValue } from '../../../utils/unit-of-account';
 import { CannotSendBelowMinimumValueError } from '../../../api/common/errors';
 import { getImageFromTokenMetadata } from '../../../utils/nftMetadata';
 import type { ISignRequest } from '../../../api/common/lib/transactions/ISignRequest';
-import { ampli } from '../../../../ampli/index';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../../posthog';
 import type { DomainResolverFunc, DomainResolverResponse } from '../../../stores/ada/AdaAddressesStore';
 import { isResolvableDomain } from '@yoroi/resolver';
 import SupportedAddressDomainsBanner from '../../../containers/wallet/SupportedAddressDomainsBanner';
@@ -617,6 +618,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
                     ? intl.formatMessage(messages.receiverFieldLabelResolverSupported)
                     : intl.formatMessage(messages.receiverFieldLabelDefault)
                 }
+                componentId="wallet:send:enterAddressStep:receiver"
               />
               {domainResolverResult != null ? (
                 <Typography
@@ -908,11 +910,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               tokens={tokens}
               nfts={nfts}
               onRemoveTokens={tokensRemove => {
-                const assetCount = totalAmount.nonDefaultEntries().length - 1;
                 this.props.onRemoveTokens(tokensRemove);
-                ampli.sendSelectAssetUpdated({
-                  asset_count: assetCount,
-                });
               }}
               shouldSendAll={shouldSendAll}
             />
@@ -966,7 +964,9 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
               onSuccess={() => {
                 this.onUpdateStep(SEND_FORM_STEP.RECEIVER);
               }}
-              receiverHandler={receiverField.value}
+              // Сommented until better times
+              // receiverHandler={receiverField.value}
+              domainResolverResult={this.state.domainResolverResult}
             />
           </>
         );
@@ -1016,7 +1016,7 @@ export default class WalletSendFormRevamp extends Component<Props, State> {
     if (step > this.maxStep) {
       this.maxStep = step;
       if (step === SEND_FORM_STEP.AMOUNT) {
-        ampli.sendSelectAssetPageViewed();
+        captureEvent('Send Select Asset Page Viewed');
       }
     }
   }

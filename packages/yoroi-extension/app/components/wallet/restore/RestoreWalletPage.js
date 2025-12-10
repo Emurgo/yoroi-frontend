@@ -14,7 +14,6 @@ import AddWalletDetailsStep from '../create-wallet/AddWalletDetailsStep';
 import { markDialogAsShown } from '../dialogs/utils';
 import { ROUTES } from '../../../routes-config';
 import { useRestoreWallet } from './hooks';
-import { ampli } from '../../../../ampli/index';
 import { runInAction } from 'mobx';
 import { isWalletExist } from '../../../stores/toplevel/WalletRestoreStore';
 import type { StoresMap } from '../../../stores';
@@ -114,9 +113,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
               setSelectedRestoreMode(mode);
               setCurrentStep(RESTORE_WALLET_STEPS.ENTER_RECOVERY_PHRASE);
             });
-            ampli.restoreWalletEnterPhraseStepViewed({
-              recovery_phrase_lenght: mode.length === 15 ? '15' : '24',
-            });
           }}
           goBack={() => {
             resetRestoreWalletData();
@@ -138,7 +134,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
           closeDialog={closeDialog}
           setCurrentStep={step => {
             setCurrentStep(step);
-            ampli.restoreWalletDetailsStepViewed();
           }}
           checkValidPhrase={phrase => {
             if (!selectedRestoreMode) {
@@ -165,7 +160,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
               duplicatedWallet: existingWallet,
               recoveryPhrase: enteredRecoveryPhrase,
             });
-
             return existingWallet?.publicDeriverId;
           }}
         />
@@ -185,7 +179,6 @@ function RestoreWalletPage(props: Props & Intl): Node {
             if (!profileData.selectedNetwork) throw new Error('Network must be selected to create a wallet. Should never happen');
 
             restoreWallet({ walletName, walletPassword, recoveryPhrase });
-            ampli.restoreWalletDetailsSettled();
           }}
           {...manageDialogsProps}
         />

@@ -5,7 +5,6 @@ import type { Node } from 'react';
 import { useThemeMode } from '../../../styles/context/mode';
 import LocalStorageApi from '../../../api/localStorage';
 import { useIntl, defineMessages } from 'react-intl';
-import { ampli } from '../../../../ampli/index';
 
 const messages = defineMessages({
   lightTheme: {
@@ -41,7 +40,6 @@ const ThemeToggler = (): Node => {
             const theme = e.target.value;
             toggleColorMode(theme);
             await localStorageApi.setUserThemeMode(theme);
-            ampli.themeSelected({ theme });
           }}
           sx={{
             display: 'flex',

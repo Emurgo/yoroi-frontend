@@ -1,15 +1,16 @@
-// @flow
+//@flow
 import moment from 'moment';
 import { inspect } from 'util';
 import type { ConfigType } from '../../config/config-types';
 import environment from '../environment';
+import { storeLog, createLogEntry, getAllLogs, formatLogEntry } from './logStorage';
 
 const logger = console;
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
 const { logsBufferSize, logsFileSuffix } = CONFIG.app;
-const errors = [];
+const errors: string[] = [];
 
 function pushError(s: string): void {
   errors.push(s);
@@ -25,6 +26,10 @@ export const Logger = {
 
   info: (...args: any[]) => {
     logger.info(...args);
+    // Store in chrome.storage for main window context
+    storeLog('main', createLogEntry('info', ...args)).catch(() => {
+      // Ignore storage errors
+    });
   },
 
   error: (data: string) => {
@@ -32,10 +37,18 @@ export const Logger = {
     const fixedString = data.replace(/\\n/g, '\n');
     logger.error(fixedString);
     pushError(`[${moment().format()}] ${fixedString}\n`);
+    // Store in chrome.storage for main window context
+    storeLog('main', createLogEntry('error', fixedString)).catch(() => {
+      // Ignore storage errors
+    });
   },
 
   warn: (...args: any[]) => {
     logger.warn(...args);
+    // Store in chrome.storage for main window context
+    storeLog('main', createLogEntry('warn', ...args)).catch(() => {
+      // Ignore storage errors
+    });
   },
 };
 
@@ -47,23 +60,81 @@ export const silenceLogsForTesting = () => {
   Logger.warn = () => {};
 };
 
-export const downloadLogs = (publicKey?: string) => {
-  const header = generateLogHeader(publicKey);
-  let errorLogs = [...errors];
-  if (errorLogs.length === 0) {
-    errorLogs = [`[${moment().format()}] No errors logged.`];
-  }
-  errorLogs.unshift(header);
-  const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
+export const downloadLogs = async (publicKey?: string): Promise<void> => {
+  try {
+    const header = generateLogHeader(publicKey);
+    const timestamp = moment().format('YYYY-MM-DDTHH-mm-ss');
 
-  import('file-saver')
-    .then(FileSaver => {
-      FileSaver.default.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
-      return null;
-    })
-    .catch(error => {
-      Logger.error(`error when downloading error log ${error}`);
-    });
+    // Collect logs from all contexts
+    const allLogs = await getAllLogs();
+
+    // Import JSZip dynamically
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+
+    // Helper function to format logs for a file
+    const formatLogsForFile = (logs: Array<any>, contextName: string): string => {
+      if (logs.length === 0) {
+        return `${header}[${moment().format()}] No logs found for ${contextName}.\n`;
+      }
+
+      const formattedLogs = logs.map(log => {
+        if (typeof log === 'string') {
+          // Legacy format (from errors array)
+          return log;
+        }
+        // New format (from logStorage)
+        return formatLogEntry(log);
+      });
+
+      return header + formattedLogs.join('\n');
+    };
+
+    // Add main window logs
+    const mainLogsContent = formatLogsForFile(allLogs.main, 'main window');
+    zip.file('main_window.log', mainLogsContent);
+
+    // Add background service logs
+    const backgroundLogsContent = formatLogsForFile(allLogs.background, 'background service');
+    zip.file('background_service.log', backgroundLogsContent);
+
+    // Add connector logs
+    const connectorLogsContent = formatLogsForFile(allLogs.connector, 'main window connector');
+    zip.file('main_window_connector.log', connectorLogsContent);
+
+    // Also include legacy errors array for backward compatibility
+    if (errors.length > 0) {
+      const legacyErrorsContent = header + errors.join('');
+      zip.file('legacy_errors.log', legacyErrorsContent);
+    }
+
+    // Generate zip file
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    // Download the zip file
+    const FileSaver = (await import('file-saver')).default;
+    FileSaver.saveAs(zipBlob, `${timestamp}-yoroi-logs.zip`);
+  } catch (error) {
+    // Fallback to old behavior if zip creation fails
+    Logger.error(`error when downloading logs, falling back to single file: ${error}`);
+
+    const header = generateLogHeader(publicKey);
+    let errorLogs = [...errors];
+    if (errorLogs.length === 0) {
+      errorLogs = [`[${moment().format()}] No errors logged.`];
+    }
+    errorLogs.unshift(header);
+    const blob = new Blob(errorLogs, { type: 'text/plain;charset=utf-8' });
+
+    import('file-saver')
+      .then(FileSaver => {
+        FileSaver.default.saveAs(blob, `${moment().format()}${logsFileSuffix}`);
+        return null;
+      })
+      .catch(fallbackError => {
+        Logger.error(`error when downloading error log ${fallbackError}`);
+      });
+  }
 };
 
 // ========== STRINGIFY =========

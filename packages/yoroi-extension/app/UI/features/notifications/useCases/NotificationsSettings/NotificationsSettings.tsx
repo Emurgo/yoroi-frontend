@@ -3,7 +3,6 @@ import { Box, FormControlLabel, Typography } from '@mui/material';
 import { useStrings } from '../../common/hooks/useStrings';
 import { Switch } from '../../../../components/Switch/Switch';
 import LocalStorageApi from '../../../../../api/localStorage';
-import { ampli } from '../../../../../../ampli';
 import { noop } from '../../../../../coreUtils';
 
 type Props = {
@@ -45,10 +44,6 @@ const NotificationsSettings = ({ openDurationDialog, selectedWalletId, duration 
     const enabled = event.target.checked;
     setNotificationsEnabled(enabled);
     await setNotificationsSetting(enabled);
-    // noinspection TypeScriptUnresolvedFunction
-    ampli.settingsInAppNotificationsStatusUpdated({
-      status: event.target.checked ? 'enabled' : 'disabled',
-    });
   };
 
   return (

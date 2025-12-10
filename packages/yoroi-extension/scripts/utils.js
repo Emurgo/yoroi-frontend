@@ -12,7 +12,8 @@ const isE2E: boolean = argv.isE2E != null;
 const exec: string => void = cmd => {
   const r = shell.exec(cmd);
   if (r.code !== 0) {
-    process.exit(r);
+    console.error(`Command failed with exit code ${r.code}`);
+    process.exit(r.code);
   }
 };
 
@@ -40,4 +41,22 @@ const buildAndCopyInjector: (string, string) => void = (destDir, buildType) => {
   }
 };
 
-module.exports = { exec, argv, shouldInjectConnector, isNightly, isE2E, buildAndCopyInjector };
+const embedPushNotificationHandler = () => {
+  const embedded = fs.readFileSync(`${__dirname}/../chrome/extension/background/pushNotificationHandler.embedded`);
+  const fileName = `${__dirname}/../build/js/background-service-worker.js`;
+  const original = fs.readFileSync(fileName);
+  const fd = fs.openSync(fileName, 'w');
+  fs.writeSync(fd, embedded);
+  fs.writeSync(fd, original);
+  fs.closeSync(fd);
+};
+
+module.exports = {
+  exec,
+  argv,
+  shouldInjectConnector,
+  isNightly,
+  isE2E,
+  buildAndCopyInjector,
+  embedPushNotificationHandler,
+};

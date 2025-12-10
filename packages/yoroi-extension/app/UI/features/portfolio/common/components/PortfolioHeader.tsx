@@ -43,11 +43,20 @@ interface Props {
   stores: any;
 }
 
+const pathId = 'portfolio:header';
+
 const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, tooltipTitle, stores }: Props): React.ReactNode => {
   const [loading, setLoading] = React.useState(false);
   const strings = useStrings();
   const theme: any = useTheme();
-  const { unitOfAccount, changeUnitOfAccountPair, accountPair, primaryTokenInfo } = usePortfolio();
+  const {
+    unitOfAccount,
+    changeUnitOfAccountPair,
+    accountPair,
+    primaryTokenInfo,
+    selectedWallet: contextSelectedWallet,
+    networkId: contextNetworkId,
+  } = usePortfolio();
   const { tokenActivity } = usePortfolioTokenActivity();
   const localStorageApi = new LocalStorageApi();
   const {
@@ -55,15 +64,15 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     config,
   } = useCurrencyPairing();
 
-  // TODO refactor and remove this caluclation from here in the future - this should come from the main selected wallet context
-  const { wallets, delegation } = stores;
-  const selectedWallet /*: WalletState */ = wallets.selectedOrFail;
-  const networkId = selectedWallet.networkId;
+  const { delegation } = stores;
+  const selectedWallet = contextSelectedWallet;
+  const networkId = contextNetworkId;
   const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
-  const balance = selectedWallet.balance;
+
+  const balance = selectedWallet?.balance;
   const totalBalanceAmount = getTotalAmount(balance, rewards);
   const defaultEntry = totalBalanceAmount?.getDefaultEntry();
-  const primaryBalance = defaultEntry.amount.shiftedBy(-primaryTokenInfo.decimals);
+  const primaryBalance = defaultEntry?.amount.shiftedBy(-primaryTokenInfo?.decimals || 0);
   // End of total Ada balance calculation
 
   const { changeValue, changePercent, variantPnl } = priceChange(open, ptPrice);
@@ -79,7 +88,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     const totalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptPrice)));
 
     return totalAmount;
-  }, [tokenActivity, config.decimals, ptPrice]);
+  }, [tokenActivity, config.decimals, ptPrice, accountPair, primaryTokenInfo, unitOfAccount]);
 
   const handleCurrencyChange = async () => {
     const pair = {
@@ -124,7 +133,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
     };
 
     setFiatPair();
-  }, [totalTokenPrice, walletBalance, showADA, networkId]);
+  }, [totalTokenPrice, walletBalance, showADA, networkId, primaryTokenInfo, unitOfAccount, changeUnitOfAccountPair]);
 
   if (!accountPair) {
     return <LoadingSkeleton />;
@@ -137,7 +146,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
           {isLoading ? (
             <Skeleton width="146px" height="24px" />
           ) : (
-            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax">
+            <Typography variant="h2" fontWeight="500" color="ds.gray_cmax" id={`${pathId}-mainCurrencyValue-text`}>
               <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
                 {showADA ? Number(primaryBalance) || '0' : totalTokenPrice}
               </HiddenAmount>
@@ -169,7 +178,7 @@ const PortfolioHeader = observer(({ walletBalance, setKeyword, isLoading, toolti
         </Stack>
       </Stack>
 
-      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} />
+      <SearchInput onChange={e => setKeyword(e.target.value)} placeholder={strings.search} id={`${pathId}-search-input`} />
     </Stack>
   );
 });
@@ -190,10 +199,16 @@ const LoadingSkeleton = () => (
 
 const CurrencyDisplay = ({ from, handleCurrencyChange }) => (
   <Stack direction="row" alignItems="flex-end" gap="4px" ml="2px">
-    <Typography component="span" variant="body1" fontWeight="500" color="ds.text_gray_medium">
+    <Typography
+      component="span"
+      variant="body1"
+      fontWeight="500"
+      color="ds.text_gray_medium"
+      id={`${pathId}-mainCurrencyFiat-text`}
+    >
       {from}
     </Typography>
-    <IconWrapper onClick={handleCurrencyChange}>
+    <IconWrapper onClick={handleCurrencyChange} id={`${pathId}-switchCurrencies-button`}>
       <Switch />
     </IconWrapper>
   </Stack>
@@ -219,7 +234,7 @@ type PnlPercentChangeProps = { variantPnl: 'danger' | 'success' | 'neutral'; cha
 export const PnlPercentChange = ({ variantPnl, changePercent }: PnlPercentChangeProps) => {
   return (
     <PnlTag variant={variantPnl} withIcon>
-      <Typography variant="caption" lineHeight="16px">
+      <Typography variant="caption" lineHeight="16px" id={`${pathId}:performance-percentage-text`}>
         {changePercent}
       </Typography>
     </PnlTag>
@@ -235,7 +250,7 @@ export const PnlPairedChange = ({ variantPnl, changeValue }: PnlPairedChangeProp
 
   return (
     <PnlTag variant={variantPnl} withPercentSign={false}>
-      <Typography variant="caption" lineHeight="16px">{`${
+      <Typography variant="caption" lineHeight="16px" id={`${pathId}:performance-price-text`}>{`${
         Number(changeValue) > 0 ? '+' : ''
       }${changeValue} ${currency}`}</Typography>
     </PnlTag>

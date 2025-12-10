@@ -60,13 +60,8 @@ type Props = {|
   +stores: StoresMap,
 |};
 
-type State = {|
-  isBannerVisible: boolean,
-  isSurveyVisible: boolean,
-|};
-
 @observer
-class WalletSummaryRevamp extends Component<Props, State> {
+class WalletSummaryRevamp extends Component<Props> {
   static contextType: any = IntlContext;
 
   renderAmountDisplay: ({| shouldHideBalance: boolean, amount: MultiToken |}) => Node = request => {

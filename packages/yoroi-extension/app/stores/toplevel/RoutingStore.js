@@ -13,7 +13,7 @@ export default class RoutingStore extends Store<StoresMap> {
     this.navigate(routePath, { replace: true });
   };
 
-  goToRoute: ({| route: string, params?: Object, query?: {| [string]: string |} |}) => void = options => {
+  goToRoute: ({| route: string, params?: Object, query?: {| [string]: string | boolean |} |}) => void = options => {
     let routePath = buildRoute(options.route, options.params);
     if (options.query) {
       const query = new URLSearchParams();

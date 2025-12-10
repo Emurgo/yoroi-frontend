@@ -1,6 +1,6 @@
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { atomicBreakdown } from '@yoroi/common';
+import { atomicBreakdown, isNumber } from '@yoroi/common';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCurrencyPairing } from '../../../../context/CurrencyContext';
@@ -11,8 +11,10 @@ import { DEFAULT_FIAT_PAIR, TOKEN_CHART_INTERVAL } from '../../common/helpers/co
 import { formatPriceChange, priceChange } from '../../common/helpers/priceChange';
 import { useGetPortfolioTokenChart } from '../../common/hooks/usePortfolioTokenChart';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
+import { useMemo } from 'react';
+import { getTotalAmount } from '../../../../utils/createCurrentWalletInfo';
 
-export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
+export const TokenDisplay = ({ token, pathId }: { token: TokenInfoType; pathId: string }) => {
   const theme = useTheme();
 
   return (
@@ -38,7 +40,7 @@ export const TokenDisplay = ({ token }: { token: TokenInfoType }) => {
         />
       </Box>
       <Stack direction="column">
-        <Typography fontWeight="500" color="ds.text_gray_medium">
+        <Typography fontWeight="500" color="ds.text_gray_medium" id={`${pathId}-name-text`}>
           {token.info.name}
         </Typography>
         <Typography variant="body2" color="ds.text_gray_low">
@@ -54,6 +56,7 @@ type TokenPriceChangeChipProps = {
   primaryTokenActivity: any;
   isPrimaryToken: any;
   timeInterval?: any;
+  pathId?: string;
 };
 
 export const TokenPriceChangeChip = ({
@@ -61,8 +64,11 @@ export const TokenPriceChangeChip = ({
   primaryTokenActivity,
   isPrimaryToken,
   timeInterval,
+  pathId,
 }: TokenPriceChangeChipProps) => {
   const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
+  const pathIdInterval = timeInterval ? timeInterval.replace(' ', '') : '24h';
+  const fullPathId = `${pathId}-${pathIdInterval}_priceChanges-text`;
 
   const deltaPtTokenDataInterval =
     timeInterval === TOKEN_CHART_INTERVAL.WEEK
@@ -102,7 +108,7 @@ export const TokenPriceChangeChip = ({
         justifyContent="center"
         gap="4px"
       >
-        <Typography variant="caption" color="ds.text_gray_low">
+        <Typography variant="caption" color="ds.text_gray_low" id={fullPathId}>
           -
         </Typography>
         <Typography variant="caption" color="ds.text_gray_low">
@@ -112,31 +118,49 @@ export const TokenPriceChangeChip = ({
     );
   }
 
-  const priceChangeProcent = formatPriceChange(
-    isPrimaryToken && timeInterval !== undefined ? (deltaPtTokenDataInterval ?? 0) : (changePercent ?? 0)
-  );
+  const priceChangePercent =
+    isPrimaryToken && timeInterval !== undefined ? (deltaPtTokenDataInterval ?? 0) : (changePercent ?? 0);
+
+  const priceChangePercentNumber = isNumber(priceChangePercent) ? priceChangePercent : Number(priceChangePercent);
+
+  const formattedPercent = formatPriceChange(Math.abs(priceChangePercentNumber));
+
   return (
     <Box sx={{ display: 'flex' }}>
       <PnlTag variant={deltaVariantPnl} withIcon>
-        <Typography fontSize="12px">{Math.abs(Number(priceChangeProcent))}</Typography>
+        <Typography fontSize="12px" id={fullPathId}>
+          {formattedPercent}
+        </Typography>
       </PnlTag>
     </Box>
   );
 };
 
-export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stores }) => {
+export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stores, pathId }) => {
   const theme = useTheme();
-  const { accountPair, primaryTokenInfo, walletBalance, showWelcomeBanner } = usePortfolio();
+  const { accountPair, primaryTokenInfo, showWelcomeBanner, selectedWallet: contextSelectedWallet } = usePortfolio();
+  const mainFiatFullPathId = `${pathId}-totalMain-text`;
+  const secondFiatFullPathId = `${pathId}-totalSecond-text`;
+  const mainCurrencyValueFullPathId = `${pathId}-totalMainCurrencyValue-text`;
+  const mainCurrencyFiatFullPathId = `${pathId}-totalMainCurrencyFiat-text`;
+  const selectedWallet = contextSelectedWallet;
+
+  const { delegation } = stores;
+  const rewards = delegation.getRewardBalanceOrZero(selectedWallet);
+  const balance = selectedWallet?.balance;
+  const totalBalanceAmount = getTotalAmount(balance, rewards);
+  const defaultEntry = totalBalanceAmount?.getDefaultEntry();
+  const primaryBalance = defaultEntry?.amount.shiftedBy(-primaryTokenInfo?.decimals || 0);
 
   // TODO refactor this properly
   if (showWelcomeBanner) {
     return (
       <Stack direction="row" spacing={theme.spacing(12)} sx={{ float: 'right' }}>
         <Stack direction="column">
-          <Typography color="ds.text_gray_normal">
+          <Typography color="ds.text_gray_normal" id={mainFiatFullPathId}>
             {0} {token.info.name}
           </Typography>
-          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }}>
+          <Typography variant="body2" color="ds.text_gray_medium" sx={{ textAlign: 'right' }} id={secondFiatFullPathId}>
             {token.info.name !== accountPair?.from.name && `0 ${accountPair?.from.name ?? DEFAULT_FIAT_PAIR}`}
           </Typography>
         </Stack>
@@ -168,12 +192,15 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
 
   if (ptPrice === null) return `... ${currency}`;
 
-  const totalPrice =
-    ptPrice &&
-    atomicBreakdown(tokenQuantityAsBigInt, decimals)
-      .bn.times(tokenPrice ?? 1)
-      .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
-      .toFormat(decimals);
+  const totalPrice = useMemo(() => {
+    return (
+      ptPrice &&
+      atomicBreakdown(tokenQuantityAsBigInt, decimals)
+        .bn.times(tokenPrice ?? 1)
+        .times(showingAda ? 1 : new BigNumber(ptPrice.toString()))
+        .toFormat(decimals)
+    );
+  }, [primaryBalance, selectedWallet?.balance]);
 
   const primaryAda = isPrimary && showingAda;
 
@@ -185,14 +212,16 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
       <Stack direction="column">
         <Typography columnGap="3px" color="ds.text_gray_medium" sx={{ display: 'flex' }}>
           <HiddenAmount isHidden={stores.profile.shouldHideBalance}>
-            <Typography mr="4px">{isPrimary ? walletBalance?.ada : token.formatedAmount}</Typography>
+            <Typography mr="4px" id={mainCurrencyValueFullPathId}>
+              {isPrimary ? Number(primaryBalance) : token.formatedAmount}
+            </Typography>
           </HiddenAmount>
-          <Typography>{token.info.name}</Typography>
+          <Typography id={mainCurrencyFiatFullPathId}>{token.info.name}</Typography>
         </Typography>
         {token.info.name === accountPair?.from.name ? (
           <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}></Typography>
         ) : (
-          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }}>
+          <Typography variant="body2" color="ds.text_gray_low" sx={{ textAlign: 'right' }} id={secondFiatFullPathId}>
             <HiddenAmount isHidden={stores.profile.shouldHideBalance}>{totalTokenPrice}</HiddenAmount>
             <span>&nbsp;{totalTicker ?? DEFAULT_FIAT_PAIR}</span>
           </Typography>
@@ -202,7 +231,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
   );
 });
 
-export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
+export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token, pathId }) => {
   const { unitOfAccount } = usePortfolio();
   const isPrimaryToken = token.id === '-';
   const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
@@ -213,18 +242,18 @@ export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token }) => {
   const noDataToDisplay = priceDisplay === 'NaN';
 
   return (
-    <Typography variant="body2" color="ds.text_gray_medium">
+    <Typography variant="body2" color="ds.text_gray_medium" id={`${pathId}-price-text`}>
       {noDataToDisplay ? '-' : `${priceDisplay} ${unitOfAccount}`}
     </Typography>
   );
 };
 
-export const TokenProcentage = ({ procentage }) => {
+export const TokenProcentage = ({ procentage, pathId }) => {
   const { showWelcomeBanner } = usePortfolio();
   if (procentage === undefined) return <Skeleton variant="text" width="50px" height="30px" />;
 
   return (
-    <Typography variant="body2" color="ds.text_gray_medium">
+    <Typography variant="body2" color="ds.text_gray_medium" id={`${pathId}-percentage-text`}>
       {showWelcomeBanner ? 0 : parseFloat(procentage).toFixed(2)}%
     </Typography>
   );

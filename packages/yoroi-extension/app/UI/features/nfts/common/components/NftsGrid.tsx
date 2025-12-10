@@ -1,8 +1,8 @@
 import { Grid } from '@mui/material';
 import { Nft } from '../types';
-import { ampli } from '../../../../../../ampli';
 import { useNavigateTo } from '../hooks/useNavigateTo';
 import NftCard from './NftCard';
+import { captureEvent } from '../../../../../../posthog';
 
 export default function NftsGrid({ columnsCount, nftsList }: { columnsCount: number; nftsList: Nft[] }) {
   const navigateTo = useNavigateTo();
@@ -12,7 +12,7 @@ export default function NftsGrid({ columnsCount, nftsList }: { columnsCount: num
         <Grid key={nft.id} item xs={1} sx={{ aspectRatio: '1/1' }}>
           <NftCard
             onClick={() => {
-              ampli.nftGalleryDetailsPageViewed();
+              captureEvent('NFT Gallery Details Page Viewed');
               navigateTo.nftDetails(nft.id);
             }}
             ipfsUrl={nft.image}

@@ -18,7 +18,7 @@ const messages = defineMessages({
   networkErrorLabel: {
     id: 'networkError.label.message',
     defaultMessage:
-      '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <zendeskLink></zendeskLink>here</zendeskLink>.',
+      '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <crispLink></crispLink>here</crispLink>.',
   },
 });
 
@@ -54,7 +54,7 @@ export default class ServerErrorBanner extends Component<Props> {
               values={{
                 newLine: <br />,
                 yoroiXLink: makeLink('https://twitter.com/YoroiWallet'),
-                zendeskLink: makeLink('https://emurgohelpdesk.zendesk.com/hc/en-us/requests/new?ticket_form_id=360013330335'),
+                crispLink: makeLink('https://help.yoroi-wallet.com/en/'),
               }}
             />
           </div>

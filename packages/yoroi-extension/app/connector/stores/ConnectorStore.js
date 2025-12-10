@@ -43,12 +43,10 @@ import { convertToLocalizableError as convertToLocalizableLedgerError } from '..
 import { convertToLocalizableError as convertToLocalizableTrezorError } from '../../domain/TrezorLocalizedError';
 import {
   transactionHashMismatchError,
-  trezorSignDataUnsupportedError,
   unknownAddressError,
   unsupportedTransactionError,
 } from '../../domain/HardwareWalletLocalizedError';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
-import { ampli } from '../../../ampli/index';
 import { iterateLenGet, hexToBytes, noop, purify } from '../../coreUtils';
 import {
   broadcastTransaction,
@@ -71,6 +69,10 @@ import {
 } from '../../api/ada/lib/cardanoCrypto/utils';
 import AdaApi, { findPath } from '../../api/ada';
 import { MessageAddressFieldType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
+import { CardanoDerivationType } from 'trezor-connect-flow';
+// $FlowFixMe[cannot-resolve-module]
+import { captureEvent } from '../../../posthog';
+import { genLookupOrNull } from '../../stores/stateless/tokenHelpers';
 
 // Need to run only once - Connecting wallets
 let initedConnecting = false;
@@ -174,14 +176,9 @@ export default class ConnectorStore extends Store<StoresMap> {
         if (response) {
           if (response.sign.type === 'tx/cardano') {
             this.createAdaTransaction();
-            ampli.dappPopupSignTransactionPageViewed();
           }
           if (response.sign.type === 'tx-reorg/cardano') {
             this.generateReorgTransaction();
-            ampli.dappPopupAddCollateralPageViewed();
-          }
-          if (response.sign.type === 'data') {
-            this.checkHwWalletSignData();
           }
         }
       })
@@ -263,6 +260,7 @@ export default class ConnectorStore extends Store<StoresMap> {
           password,
         });
       }
+      captureEvent('Dapp Connector Transaction Signed');
     } else if (signingMessage.sign.type === 'data') {
       const { payload } = signingMessage.sign;
 
@@ -317,6 +315,56 @@ export default class ConnectorStore extends Store<StoresMap> {
           });
           throw error;
         }
+      } else if (wallet.type === 'trezor') {
+        const signingPath = findPath(wallet, signingMessage.sign.address);
+        if (signingPath == null) {
+          runInAction(() => {
+            this.hwWalletError = unknownAddressError;
+            this.isHwWalletErrorRecoverable = false;
+          });
+          return;
+        }
+
+        try {
+          const signResult = await wrapWithFrame(trezor =>
+            trezor.cardanoSignMessage({
+              path: [...signingPath], // convert mobx array to native array
+              payload,
+              preferHexDisplay: false,
+              derivationType: CardanoDerivationType.ICARUS_TREZOR,
+            })
+          );
+          if (!signResult.success) {
+            throw new Error(`Trezor signing error: ${signResult.payload.error} (code=${String(signResult.payload.code)})`);
+          }
+          const {
+            signature,
+            pubKey,
+            headers: {
+              protected: { address },
+            },
+          } = signResult.payload;
+
+          userSignConfirm({
+            tx: null,
+            uid: signingMessage.sign.uid,
+            tabId: signingMessage.tabId,
+            password: '',
+            signedMessageData: {
+              signatureHex: signature,
+              signingPublicKeyHex: pubKey,
+              addressFieldHex: address,
+            },
+          });
+        } catch (error) {
+          //todo: handle insufficient handware version
+          bringWindowToForeground();
+          runInAction(() => {
+            this.hwWalletError = new convertToLocalizableTrezorError(error);
+            this.isHwWalletErrorRecoverable = true;
+          });
+          throw error;
+        }
       } else {
         throw new Error('Not expected to reach here. Unexpectedly wallet type');
       }
@@ -327,8 +375,6 @@ export default class ConnectorStore extends Store<StoresMap> {
     runInAction(() => {
       this.isSignInExecuted = true;
     });
-
-    await ampli.dappPopupSignTransactionSubmitted();
   };
 
   @action
@@ -370,9 +416,6 @@ export default class ConnectorStore extends Store<StoresMap> {
       if (this.signingMessage?.sign.type === 'tx-reorg/cardano') {
         this.generateReorgTransaction();
       }
-      if (this.signingMessage?.sign.type === 'data') {
-        this.checkHwWalletSignData();
-      }
     } catch (err) {
       runInAction(() => {
         this.loadingWallets = LoadingWalletStates.REJECTED;
@@ -389,7 +432,7 @@ export default class ConnectorStore extends Store<StoresMap> {
     if (!signingMessage.sign.tx) return undefined;
     // Invoked only for Cardano, so we know the type of `tx` must be `CardanoTx`.
     // $FlowFixMe[prop-missing]
-    const { tx /* , partialSign, tabId */ } = signingMessage.sign.tx;
+    const { tx, partialSign /* tabId */ } = signingMessage.sign.tx;
 
     const network = getNetworkById(connectedWallet.networkId);
 
@@ -503,32 +546,48 @@ export default class ConnectorStore extends Store<StoresMap> {
         utxos: foreignInputs,
       });
       for (let i = 0; i < foreignUtxos.length; i++) {
+        const foreignUtxoId = `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`;
         const foreignUtxo = foreignUtxos[i];
         if (foreignUtxo == null || typeof foreignUtxo !== 'object') {
-          signFail({
-            errorType: 'missing_utxo',
-            data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
-            uid: signingMessage.sign.uid,
-            tabId: signingMessage.tabId,
+          if (partialSign) {
+            console.log(`Foreign utxo '${foreignUtxoId}' cannot be resolved, but this is ignored due to the partial sign mode`);
+          } else {
+            console.error(
+              `Foreign utxo '${foreignUtxoId}' cannot be resolved, this is a critical failure in a NON-partial sign mode.`
+            );
+            signFail({
+              errorType: 'missing_utxo',
+              data: foreignUtxoId,
+              uid: signingMessage.sign.uid,
+              tabId: signingMessage.tabId,
+            });
+            this.closeWindow();
+            return;
+          }
+        } else {
+          if (foreignUtxo.spendingTxHash != null) {
+            if (partialSign) {
+              console.log(`Foreign utxo '${foreignUtxoId}' is already spent, but this is ignored due to the partial sign mode`);
+            } else {
+              console.error(
+                `Foreign utxo '${foreignUtxoId}' is already spent, this is a critical failure in a NON-partial sign mode.`
+              );
+              signFail({
+                errorType: 'spent_utxo',
+                data: foreignUtxoId,
+                uid: signingMessage.sign.uid,
+                tabId: signingMessage.tabId,
+              });
+              this.closeWindow();
+              return;
+            }
+          }
+          const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
+          foreignInputDetails.push({
+            address: addressBech32ToHex(foreignUtxo.output.address),
+            value,
           });
-          this.closeWindow();
-          return;
         }
-        if (foreignUtxo.spendingTxHash != null) {
-          signFail({
-            errorType: 'spent_utxo',
-            data: `${foreignInputs[i].txHash}${foreignInputs[i].txIndex}`,
-            uid: signingMessage.sign.uid,
-            tabId: signingMessage.tabId,
-          });
-          this.closeWindow();
-          return;
-        }
-        const value = multiTokenFromRemote(foreignUtxo.output, defaultToken.NetworkId);
-        foreignInputDetails.push({
-          address: addressBech32ToHex(foreignUtxo.output.address),
-          value,
-        });
       }
     }
 
@@ -730,6 +789,31 @@ export default class ConnectorStore extends Store<StoresMap> {
         amount,
         cip95Info,
       };
+    });
+
+    const getTokenInfo = genLookupOrNull(this.stores.tokenInfoStore.tokenInfo);
+    const assetList = [
+      {
+        policy_id: '',
+        asset_name: '',
+        asset_ticker: 'ADA',
+      },
+      ...amount.nonDefaultEntries().map(({ identifier }) => {
+        const tokenInfo = getTokenInfo({
+          identifier,
+          networkId: amount.getDefaultEntry().networkId,
+        });
+        const [policyId, assetName] = identifier.split('.');
+        return {
+          asset_ticker: tokenInfo?.Metadata.ticker,
+          policy_id: policyId,
+          asset_name: assetName,
+        };
+      }),
+    ];
+    captureEvent('Dapp Connector Transaction Review Page Reviewed', {
+      asset_count: assetList.length,
+      asset_list: assetList,
     });
   };
 
@@ -1113,22 +1197,6 @@ export default class ConnectorStore extends Store<StoresMap> {
     };
 
     return buildSignedLedgerTransaction(rawTxHex, ledgerSignResult.witnesses, publicKeyInfo).txHex;
-  }
-
-  /**
-   * <TODO:LEDGER/SIGN_DATA>
-   */
-  checkHwWalletSignData(): void {
-    const { connectedWallet } = this;
-    if (connectedWallet == null) {
-      return;
-    }
-    if (connectedWallet.type === 'trezor') {
-      runInAction(() => {
-        this.hwWalletError = trezorSignDataUnsupportedError;
-        this.isHwWalletErrorRecoverable = false;
-      });
-    }
   }
 
   // legacy, maybe remove

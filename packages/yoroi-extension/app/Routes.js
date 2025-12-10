@@ -12,7 +12,7 @@ import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
@@ -21,7 +21,6 @@ import SwapPageContainer from './containers/swap/SwapPageContainer';
 import SwapProvider from './containers/swap/SwapProvider';
 import AssetsWrapper from './containers/wallet/AssetsWrapper';
 import CreateWalletPage, { CreateWalletPagePromise } from './containers/wallet/CreateWalletPageContainer';
-import NFTsWrapper from './containers/wallet/NFTsWrapper';
 import Wallet from './containers/wallet/Wallet';
 import RestoreWalletPage, { RestoreWalletPagePromise } from './containers/wallet/restore/RestoreWalletPage';
 
@@ -48,13 +47,9 @@ import { CatalystRegistrationContextProvider } from './UI/features/catalyst-regi
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
-import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
+import GovernanceOptionsPage from './UI/pages/Governance/GovernanceOptionsPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
@@ -68,13 +63,13 @@ import PortfolioDetailPage from './UI/pages/portfolio/PortfolioDetailPage';
 // $FlowIgnore: suppressing this error
 import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 // $FlowIgnore: suppressing this error
-import { ampli } from '../ampli/index';
-// $FlowIgnore: suppressing this error
 import PortfolioPage from './UI/pages/portfolio/PortfolioPage';
 // $FlowIgnore: suppressing this error
 import AssetSwapRevampPage from './UI/pages/Swap-New/AssetSwapPage';
 // $FlowIgnore: suppressing this error
 import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
+// $FlowIgnore: suppressing this error
+import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
 
@@ -126,12 +121,6 @@ const URILandingPage = React.lazy(URILandingPagePromise);
 const ReceivePromise = () => import('./containers/wallet/Receive');
 const Receive = React.lazy(ReceivePromise);
 
-const ComplexityLevelSettingsPagePromise = () => import('./containers/settings/categories/ComplexityLevelSettingsPage');
-const ComplexityLevelSettingsPage = React.lazy(ComplexityLevelSettingsPagePromise);
-
-const ComplexityLevelPagePromise = () => import('./containers/profile/ComplexityLevelPage');
-const ComplexityLevelPage = React.lazy(ComplexityLevelPagePromise);
-
 const BlockchainSettingsPagePromise = () => import('./containers/settings/categories/BlockchainSettingsPage');
 const BlockchainSettingsPage = React.lazy(BlockchainSettingsPagePromise);
 
@@ -143,12 +132,6 @@ const TokensDetailPageRevamp = React.lazy(TokensDetailPageRevampPromise);
 
 const CashbackPagePromise = () => import('./containers/cashback/CashbackPage');
 const CashbackPage = React.lazy(CashbackPagePromise);
-
-const NFTsPageRevampPromise = () => import('./containers/wallet/NFTsPageRevamp');
-const NFTsPageRevamp = React.lazy(NFTsPageRevampPromise);
-
-const NFTDetailPageRevampPromise = () => import('./containers/wallet/NFTDetailPageRevamp');
-const NFTDetailPageRevamp = React.lazy(NFTDetailPageRevampPromise);
 
 // SWAP
 const SwapPagePromise = () => import('./containers/swap/asset-swap/SwapPage');
@@ -179,13 +162,9 @@ export const LazyLoadPromises: Array<() => any> = [
   WalletTransferPagePromise,
   ReceivePromise,
   VotingPageContentPromise,
-  ComplexityLevelSettingsPagePromise,
-  ComplexityLevelPagePromise,
   BlockchainSettingsPagePromise,
   TokensPageRevampPromise,
   TokensDetailPageRevampPromise,
-  NFTsPageRevampPromise,
-  NFTDetailPageRevampPromise,
   ConnectedWebsitesPagePromise,
   SwapPagePromise,
   SwapOrdersPagePromise,
@@ -196,6 +175,7 @@ export const LazyLoadPromises: Array<() => any> = [
 
 export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
@@ -203,7 +183,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.ROOT} element={<LoadingPage stores={stores} />} />
           <Route path={ROUTES.NIGHTLY_INFO} element={<NightlyPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.LANGUAGE_SELECTION} element={<LanguageSelectionPage stores={stores} />} />
-          <Route path={ROUTES.PROFILE.COMPLEXITY_LEVEL} element={<ComplexityLevelPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.TERMS_OF_USE} element={<TermsOfUsePage stores={stores} />} />
           <Route path={ROUTES.PROFILE.URI_PROMPT} element={<UriPromptPage stores={stores} />} />
           <Route path={ROUTES.PROFILE.OPT_FOR_ANALYTICS} element={<OptForAnalyticsPage stores={stores} />} />
@@ -211,10 +190,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<AssetsSubpages stores={stores} />}>
             <Route path={ROUTES.ASSETS.ROOT} element={<TokensPageRevamp stores={stores} />} />
             <Route path={ROUTES.ASSETS.DETAILS} element={<TokensDetailPageRevamp stores={stores} />} />
-          </Route>
-          <Route element={<NFTsSubPages stores={stores} />}>
-            <Route path={ROUTES.NFTS.ROOT} element={<NFTsPageRevamp stores={stores} />} />
-            <Route path={ROUTES.NFTS.DETAILS} element={<NFTDetailPageRevamp stores={stores} />} />
           </Route>
           <Route element={<NftGallerySubPages stores={stores} />}>
             <Route path={ROUTES.NFT_GALLERY.ROOT} element={<NftsPage stores={stores} />} />
@@ -251,7 +226,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.SETTINGS.WALLET} element={<WalletSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.EXTERNAL_STORAGE} element={<ExternalStorageSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.SUPPORT} element={<SupportSettingsPage stores={stores} />} />
-            <Route path={ROUTES.SETTINGS.LEVEL_OF_COMPLEXITY} element={<ComplexityLevelSettingsPage stores={stores} />} />
             <Route path={ROUTES.SETTINGS.ANALYTICS} element={<AnalyticsSettingsPage stores={stores} />} />
 
             <Route path={ROUTES.SETTINGS.ROOT} element={<Navigate to={ROUTES.SETTINGS.GENERAL} />} />
@@ -273,13 +247,12 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<SwapRevampSubpages stores={stores} />}>
             <Route path={ROUTES.SWAP_REVAMP.ASSET_SWAP} element={<AssetSwapRevampPage stores={stores} />} />
             <Route path={ROUTES.SWAP_REVAMP.ORDERS} element={<SwapOrdersRevampPage stores={stores} />} />
+            <Route path={ROUTES.SWAP_REVAMP.REVIEW} element={<SwapReviewRevampPage stores={stores} />} />
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
-            <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
-            <Route path={ROUTES.Governance.DELEGATE} element={<GovernanceDelegationFormPage stores={stores} />} />
-            <Route path={ROUTES.Governance.SUBMITTED} element={<GovernanceTransactionSubmittedPage stores={stores} />} />
-            <Route path={ROUTES.Governance.FAIL} element={<GovernanceTransactionFailedPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
@@ -377,14 +350,6 @@ const PortfolioSubpages = ({ stores }) => {
   );
 };
 
-const NFTsSubPages = ({ stores }) => (
-  <NFTsWrapper stores={stores}>
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-  </NFTsWrapper>
-);
-
 const AssetsSubpages = ({ stores }) => (
   <AssetsWrapper stores={stores}>
     <Suspense fallback={null}>
@@ -409,7 +374,6 @@ const CatalystRegistrationSubpages = ({ stores }) => (
   </CatalystRegistrationContextProvider>
 );
 
-// NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
@@ -428,12 +392,10 @@ const GovernanceSubpages = ({ stores }) => {
         tokenInfo={stores.tokenInfoStore.tokenInfo}
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-        ampli={ampli}
       >
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        ;
       </GovernanceContextProvider>
     </CurrencyProvider>
   );

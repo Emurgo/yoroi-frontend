@@ -120,6 +120,7 @@ export default class WalletCard extends Component<Props> {
     const { tokenTypes, nfts } = this.countTokenTypes();
     const buttonId = `${id}-selectWallet_${idx}-button`;
     const walletNameId = `${id}:walletCard_${idx}-walletName-text`;
+    const walletPlateId = `${id}:walletCard_${idx}-walletPlate-text`;
     const walletBalanceId = `${id}:walletCard_${idx}`;
     const walletTokensAmountId = `${id}:walletCard_${idx}-walletTokensAmount-text`;
     const walletNFTsAmountId = `${id}:walletCard_${idx}-walletNFTsAmount-text`;
@@ -172,7 +173,7 @@ export default class WalletCard extends Component<Props> {
                         <Typography id={walletNameId} variant="body2" color="ds.text_gray_medium" fontWeight={500}>
                           {truncateLongName(this.props.name)}
                         </Typography>
-                        <Typography variant="caption1" color="ds.text_gray_low">
+                        <Typography variant="caption1" color="ds.text_gray_low" id={walletPlateId}>
                           {walletPlate}
                         </Typography>
                       </Box>

@@ -22,8 +22,6 @@ import { truncateAddressShort } from '../../../utils/formatters';
 import { Quantities } from '../../../utils/quantities';
 import { useRichOrders } from './hooks';
 import { LoadingCompletedOrders, LoadingOpenOrders } from './OrdersPlaceholders';
-import { ampli } from '../../../../ampli/index';
-import { tokenInfoToAnalyticsFromAndToAssets } from '../swapAnalytics';
 import { useStrings } from '../common/useStrings';
 import { isHex } from '@emurgo/yoroi-lib/dist/internals/utils/index';
 import type { StoresProps } from '../../../stores';
@@ -129,14 +127,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
   }, [openTxModalAfterColateral]);
 
   const [showCompletedOrders, setShowCompletedOrders] = useState<boolean>(false);
-
-  useEffect(() => {
-    // on change open/closed orders tab
-
-    ampli.swapConfirmedPageViewed({
-      swap_tab: showCompletedOrders ? strings.ordersCompletedLabel : strings.openOrdersLabel,
-    });
-  }, [showCompletedOrders]);
 
   const {
     wallets,
@@ -274,7 +264,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
                 duplicated: false,
               },
             ],
-            kind: 'swap-cancel',
+            kind: 'swap',
           },
         });
       }
@@ -283,7 +273,7 @@ export default function SwapOrdersPage(props: StoresProps): Node {
     }
   };
 
-  const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, order: any) => {
+  const submitTx = async (passswordInput, cancelTxCbor, signedCollateralReorgTx, _order: any) => {
     try {
       startLoadingTxReview();
       const { signedTxHex: signedCancelTx } = await props.stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
@@ -298,17 +288,6 @@ export default function SwapOrdersPage(props: StoresProps): Node {
         signedTransactionHexes,
       });
       showTxResultModal(TransactionResult.SUCCESS);
-
-      try {
-        ampli.swapCancelationSubmitted({
-          ...tokenInfoToAnalyticsFromAndToAssets(order.from.token, order.to.token),
-          from_amount: Number(Quantities.format(order.from.quantity, order.from.token.decimals || 0)),
-          to_amount: Number(Quantities.format(order.to.quantity, order.to.token.decimals || 0)),
-          pool_source: order.provider,
-        });
-      } catch (e) {
-        console.log('analytics fail', e);
-      }
     } catch (error) {
       console.log('Failed to sign transaction', error);
       showTxResultModal(TransactionResult.FAIL);

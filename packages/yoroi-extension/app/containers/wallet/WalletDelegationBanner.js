@@ -151,7 +151,7 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
                 padding: '9px 20px',
               },
             }}
-            href="https://emurgohelpdesk.zendesk.com/hc/en-us/articles/4412946533903-What-is-delegation-Is-it-the-same-as-staking-"
+            href="https://help.yoroi-wallet.com/en/article/what-is-delegation-is-it-the-same-as-staking-18gg638/"
             target="_blank"
             rel="noreferrer noopener"
           >

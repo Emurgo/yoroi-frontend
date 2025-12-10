@@ -30,7 +30,7 @@ export const TopActions = ({ onBack }: { onBack?: () => void }) => {
     if (modalView === 'submitTx') {
       return strings.submitTransaction;
     }
-    if (modalView === 'chooseDrepId') {
+    if (modalView === 'chooseOtherDrepId') {
       return strings.chooseDrep;
     }
     if (modalView === 'operations') {
