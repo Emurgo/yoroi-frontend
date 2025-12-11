@@ -932,6 +932,7 @@
   "wallet.receive.page.walletAddressLabel": "Your wallet address",
   "wallet.receive.page.walletReceiveInstructions": "Share this wallet address to receive payments.{newLine}To protect your privacy, new addresses are generated automatically once you use them.",
   "wallet.receive.page.rewardAddressesTitle": "Reward addresses",
+  "wallet.receive.page.singleAddress.walletReceiveInstructions": "Share this wallet address to receive payments.",
   "wallet.receive.page.internalAddressesTitle": "Internal addresses",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Clear",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirm",
