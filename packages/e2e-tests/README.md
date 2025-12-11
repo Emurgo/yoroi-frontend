@@ -308,11 +308,11 @@ graph TD
     BasePage -.->|modals| DeleteMemoModal[DeleteMemoModal]
     
     %% Styling
-    classDef basePage fill:#e1f5ff,stroke:#01579b,stroke-width:3px
-    classDef walletBase fill:#fff3e0,stroke:#e65100,stroke-width:2px
-    classDef tab fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
-    classDef subTab fill:#e8f5e9,stroke:#1b5e20,stroke-width:1px
-    classDef modal fill:#fce4ec,stroke:#880e4f,stroke-width:1px,stroke-dasharray: 5 5
+    classDef basePage fill:#e1f5ff,stroke:#01579b,stroke-width:3px,color:#000000
+    classDef walletBase fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000000
+    classDef tab fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000000
+    classDef subTab fill:#e8f5e9,stroke:#1b5e20,stroke-width:1px,color:#000000
+    classDef modal fill:#fce4ec,stroke:#880e4f,stroke-width:1px,stroke-dasharray: 5 5,color:#000000
     
     class BasePage basePage
     class WalletCommonBase walletBase
