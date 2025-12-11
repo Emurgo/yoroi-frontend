@@ -89,7 +89,7 @@ type WalletClaimResult = {|
 |};
 
 export type SingleAddressMode = {|
-  [publicDeriverId: string]: boolean
+  [publicDeriverId: string]: boolean,
 |};
 
 /**
@@ -176,9 +176,10 @@ export default class LocalStorageApi {
       return {};
     }
     return JSON.parse(raw);
-  }
+  };
 
-  setSingleAddressMode: (SingleAddressMode) => Promise<void> = mode => setLocalItem(storageKeys.SINGLE_ADDRESS_MODE, JSON.stringify(mode));
+  setSingleAddressMode: SingleAddressMode => Promise<void> = mode =>
+    setLocalItem(storageKeys.SINGLE_ADDRESS_MODE, JSON.stringify(mode));
 
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerPhase2Closed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);

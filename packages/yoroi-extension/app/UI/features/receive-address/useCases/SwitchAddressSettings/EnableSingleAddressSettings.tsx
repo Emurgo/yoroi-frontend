@@ -4,8 +4,8 @@ import { RevampSwitch } from '../../../../../components/widgets/Switch';
 import { InfoTooltip } from '../../../../../components/widgets/InfoTooltip';
 
 type Props = {
-  isSingleAddress: boolean,
-  updateSingleAddressMode: (mode: boolean) => void,
+  isSingleAddress: boolean;
+  updateSingleAddressMode: (mode: boolean) => void;
 };
 
 export default function EnableSingleAddressSettings({ isSingleAddress, updateSingleAddressMode }: Props) {

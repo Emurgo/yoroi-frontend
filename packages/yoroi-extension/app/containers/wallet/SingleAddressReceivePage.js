@@ -7,10 +7,10 @@ import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/
 export default class SingleAddressReceivePage extends Component<StoresProps> {
   render() {
     const { stores } = this.props;
-    const firstAddress = stores.wallets.selectedOrFail.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE);
-    const walletAddress = addressHexToBech32(
-      firstAddress.address.Hash
+    const firstAddress = stores.wallets.selectedOrFail.allAddresses.utxoAddresses.find(
+      a => a.address.Type === CoreAddressTypes.CARDANO_BASE
     );
+    const walletAddress = addressHexToBech32(firstAddress.address.Hash);
 
     const selectedExplorerForNetwork =
       stores.explorers.selectedExplorer.get(stores.wallets.selectedOrFail.networkId) ??
@@ -19,12 +19,12 @@ export default class SingleAddressReceivePage extends Component<StoresProps> {
       })();
 
     return (
-          <SingleAddress
-            walletAddress={walletAddress}
-            selectedExplorer={selectedExplorerForNetwork}
-            isWalletAddressUsed={firstAddress.IsUsed}
-            onCopyAddressTooltip={()=>{}}
-          />
+      <SingleAddress
+        walletAddress={walletAddress}
+        selectedExplorer={selectedExplorerForNetwork}
+        isWalletAddressUsed={firstAddress.IsUsed}
+        onCopyAddressTooltip={() => {}}
+      />
     );
   }
 }

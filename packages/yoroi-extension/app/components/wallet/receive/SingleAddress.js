@@ -20,8 +20,7 @@ const messages = defineMessages({
   },
   walletReceiveInstructions: {
     id: 'wallet.receive.page.singleAddress.walletReceiveInstructions',
-    defaultMessage:
-      '!!!Share this wallet address to receive payments.',
+    defaultMessage: '!!!Share this wallet address to receive payments.',
   },
 });
 
@@ -29,9 +28,8 @@ type Props = {|
   +walletAddress: string,
   +selectedExplorer: SelectedExplorer,
   +isWalletAddressUsed: boolean,
-  +onCopyAddressTooltip: (string) => void,
+  +onCopyAddressTooltip: string => void,
 |};
-
 
 export default class SingleAddress extends Component<Props> {
   static contextType: any = IntlContext;
@@ -104,7 +102,6 @@ export default class SingleAddress extends Component<Props> {
             <Typography component="div" mb="24px" variant="body2" lineHeight="22px" color="ds.text_gray_low">
               <FormattedMessage {...messages.walletReceiveInstructions} values={{ newLine: <br /> }} />
             </Typography>
-
           </Box>
         </Box>
       </Box>

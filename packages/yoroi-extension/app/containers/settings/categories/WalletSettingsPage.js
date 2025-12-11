@@ -77,9 +77,11 @@ export default class WalletSettingsPage extends Component<StoresProps> {
         {selectedWalletId != null ? (
           <EnableSingleAddressSettings
             isSingleAddress={stores.wallets.isSelectedWalletSingleAddress}
-            updateSingleAddressMode={mode => { stores.wallets.updateSelectedWalletSingleAddressMode(mode); }}
+            updateSingleAddressMode={mode => {
+              stores.wallets.updateSelectedWalletSingleAddressMode(mode);
+            }}
           />
-        ): null}
+        ) : null}
         {selectedWalletId != null ? (
           <NotificationsSettings
             selectedWalletId={selectedWalletId}

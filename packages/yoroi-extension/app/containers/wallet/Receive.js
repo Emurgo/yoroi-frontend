@@ -58,7 +58,7 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
     if (stores.wallets.isSelectedWalletSingleAddress) {
-      return (<SingleAddressReceivePage stores={stores} />);
+      return <SingleAddressReceivePage stores={stores} />;
     }
 
     const storesForWallet = allAddressSubgroups
