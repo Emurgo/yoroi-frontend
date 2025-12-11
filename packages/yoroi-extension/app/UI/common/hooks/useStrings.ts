@@ -123,6 +123,18 @@ export const messages = Object.freeze(
       id: 'global.labels.understand',
       defaultMessage: '!!!I understand',
     },
+    stakingUpdates: {
+      id: 'staking.dialog.stakingUpdates',
+      defaultMessage: '!!!Staking updates',
+    },
+    upcomingUpdate: {
+      id: 'staking.dialog.upcomingUpdate',
+      defaultMessage: '!!!Upcoming update to EMURGO and Yoroi stakepools',
+    },
+    updateDetails: {
+      id: 'staking.dialog.updateDetails',
+      defaultMessage: '!!!EMURGO is updating the margin fee on its stakepools as a part of a broader 2026 modernization effort.',
+    },
   })
 );
 
@@ -162,5 +174,8 @@ export const useStrings = () => {
     }),
     goToMidnight: intl.formatMessage(messages.goToMidnight),
     claimAnnouncementPhase2: intl.formatMessage(messages.claimAnnouncementPhase2),
+    stakingUpdates: intl.formatMessage(messages.stakingUpdates),
+    upcomingUpdate: intl.formatMessage(messages.upcomingUpdate),
+    updateDetails: intl.formatMessage(messages.updateDetails),
   }).current;
 };
