@@ -433,11 +433,19 @@ export default class WalletStore extends Store<StoresMap> {
   }
 
   get isSelectedWalletSingleAddress(): boolean {
+    if (this.selectedIndex === null) {
+      throw new Error('no selected wallet');
+    }
     return this.singleAddressMode[String(this.selectedIndex)] === true;
   }
 
   async updateSelectedWalletSingleAddressMode(mode: boolean): Promise<void> {
-    this.singleAddressMode[String(this.selectedIndex)] = mode;
+    if (this.selectedIndex === null) {
+      throw new Error('no selected wallet');
+    }
+    runInAction(() => {
+      this.singleAddressMode[String(this.selectedIndex)] = mode;
+    });
     await this.api.localStorage.setSingleAddressMode(this.singleAddressMode);
   }
 }
