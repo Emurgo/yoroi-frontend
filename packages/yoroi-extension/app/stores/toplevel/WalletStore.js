@@ -436,7 +436,7 @@ export default class WalletStore extends Store<StoresMap> {
     return this.singleAddressMode[String(this.selectedOrFail.publicDeriverId)] === true;
   }
 
-  async updateSelectedWalletSingleAddressMode(mode: boolean): Promise<void> {
+  updateSelectedWalletSingleAddressMode: (boolean) => Promise<void> = async (mode) => {
     runInAction(() => {
       this.singleAddressMode[String(this.selectedOrFail.publicDeriverId)] = mode;
     });
