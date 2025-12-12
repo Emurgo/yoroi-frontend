@@ -22,6 +22,28 @@ class SupportSubTab extends SettingsTab {
     await this.click(this.downloadLogsButtonLocator);
     await this.sleep(oneSecond);
   }
+  async getFaqLink() {
+    this.logger.info(`SupportSubTab::getFaqLink is called`);
+    const linkElement = await this.findElement(this.faqLinkLocator);
+    const result = await linkElement.getAttribute('href');
+    this.logger.info(`SupportSubTab::getFaqLink::result ${result}`);
+    return result;
+  }
+  async openFaqLink() {
+    this.logger.info(`SupportSubTab::openFaqLink is called`);
+    await this.click(this.faqLinkLocator);
+  }
+  async getRequestSupportLink() {
+    this.logger.info(`SupportSubTab::getRequestSupportLink is called`);
+    const linkElement = await this.findElement(this.requestSupportLinkLocator);
+    const result = await linkElement.getAttribute('href');
+    this.logger.info(`SupportSubTab::getRequestSupportLink::result ${result}`);
+    return result;
+  }
+  async openRequestSupportLink() {
+    this.logger.info(`SupportSubTab::openRequestSupportLink is called`);
+    await this.click(this.requestSupportLinkLocator);
+  }
 }
 
 export default SupportSubTab;
