@@ -79,10 +79,31 @@ class DriversManager {
   }
 
   async getDriverFromPool() {
-    const driverObject = poolOfDrivers.shift();
+    let driverObject = poolOfDrivers.shift();
+    if (!driverObject) {
+      this.logger.warn(`DriversManager::getDriverFromPool No drivers in the pool of drivers`);
+      this.logger.warn(`DriversManager::getDriverFromPool Creating a new one`);
+      driverGlobalCounter++;
+      driverObject = {
+        driver: await this.getPreparedDriver(),
+        driverId: driverGlobalCounter,
+      };
+    }
     this.logger.info(`DriversManager::getDriverFromPool Returning driver ${driverObject.driverId}`);
-    const newDriverObject = this.addNewDriverToPool();
-    this.prepareExtension(newDriverObject);
+    const newDriver = getDriver();
+    driverGlobalCounter++;
+    const newDriverObject = {
+      driver: newDriver,
+      driverId: driverGlobalCounter,
+    };
+    this.prepareExtension(newDriverObject)
+      .then(() => {
+        poolOfDrivers.push(newDriverObject);
+        this.logger.info(`DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${driverGlobalCounter}`);
+      })
+      .catch(error => {
+        this.logger.error(`DriversManager::getDriverFromPool Failed to prepare new driver ${driverGlobalCounter}: ${error}`);
+      });
 
     return driverObject.driver;
   }
