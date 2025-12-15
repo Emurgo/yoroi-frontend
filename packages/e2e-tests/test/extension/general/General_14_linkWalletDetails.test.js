@@ -40,9 +40,7 @@ describe('Check learn more on Wallet details step', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadBrowserStorage(webdriver, logger, null, true, {
-      'test-CURRENT_NETWORK_ID': '0',
-    });
+    await preloadBrowserStorage(webdriver, logger);
     const wmLogger = getTestLogger('windowManager', this.test.parent.title);
     windowManager = new WindowManager(webdriver, wmLogger);
     await windowManager.init();
