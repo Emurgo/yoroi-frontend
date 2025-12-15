@@ -143,12 +143,22 @@ export const preloadBrowserStorage = async (
   useGeneralStorageInfo = true,
   opts = {}
 ) => {
-  logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
-  const state = await addWalletPage.isDisplayed();
-  expect(state, 'The Add new wallet page is not displayed').to.be.true;
-  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
-  logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
+  logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
+  try {
+    const state = await addWalletPage.isDisplayed();
+    expect(state, 'The Add new wallet page is not displayed').to.be.true;
+    await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
+    logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
+  } catch (error) {
+    logger.error(`DriversManager::preloadBrowserStorage Error: ${JSON.stringify(error)}`);
+    const prepareTime = Date.now();
+    await addWalletPage.getDriverLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.getBrowserLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.takeScreenshot('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.takeSnapshot('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    throw error;
+  }
 };
 
 export const waitTxPage = async (webdriver, logger) => {

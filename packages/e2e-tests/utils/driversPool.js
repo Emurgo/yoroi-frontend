@@ -53,8 +53,8 @@ class DriversManager {
       await initialStepsPage.skipInitialSteps();
     } catch (error) {
       logger.error(`DriversManager::_prepareExtensionCommon Error during extension preparation: ${error}`);
-      await basePage.takeScreenshot(`DriversManager_PrepareExtensionError_${prepareTime}`, 'PrepareExtensionError');
-      await basePage.takeSnapshot(`DriversManager_PrepareExtensionError_${prepareTime}`, 'PrepareExtensionError');
+      await basePage.takeScreenshot('PrepareExtensionError', `DriversManager_PrepareExtensionError_${prepareTime}`);
+      await basePage.takeSnapshot('PrepareExtensionError', `DriversManager_PrepareExtensionError_${prepareTime}`);
       throw error;
     }
   }
