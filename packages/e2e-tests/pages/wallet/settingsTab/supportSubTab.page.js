@@ -22,7 +22,7 @@ class SupportSubTab extends SettingsTab {
   transferFaqLinkLocator = {
     locator: 'settings:support:transfer-faq-link',
     method: 'id',
-  }
+  };
   // methods
   async downloadLogs() {
     this.logger.info(`SupportSubTab::downloadLogs is called.`);
