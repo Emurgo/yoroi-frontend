@@ -70,7 +70,7 @@ describe('Checking links on Support tab in Settings', function () {
         await supportSubTab[testDatum.openLinkMethod]();
         await windowManager.findNewWindowAndSwitchTo(testDatum.tabTitle);
         const titleIsCorrect = await windowManager.waitTitleEquals(testDatum.tabTitle);
-        expect(titleIsCorrect, 'The Buy provider page title is not correct').to.be.true;
+        expect(titleIsCorrect, `The "${testDatum.name}" page title is not correct`).to.be.true;
         const pageUrl = await windowManager.getCurrentUrl();
         expect(pageUrl, 'The page URL is not correct').to.be.equal(testDatum.browserLink);
       });
