@@ -44,11 +44,19 @@ class DriversManager {
   }
 
   async _prepareExtensionCommon(driver) {
-    const logger = getTestLogger(`DriversManager_Page_${Date.now()}`, 'DriversManager');
+    const prepareTime = Date.now();
+    const logger = getTestLogger(`DriversManager_Page_${prepareTime}`, 'DriversManager');
     const basePage = new BasePage(driver, logger);
-    await basePage.goToExtension();
     const initialStepsPage = new InitialStepsPage(driver, logger);
-    await initialStepsPage.skipInitialSteps();
+    try {
+      await basePage.goToExtension();
+      await initialStepsPage.skipInitialSteps();
+    } catch (error) {
+      logger.error(`DriversManager::_prepareExtensionCommon Error during extension preparation: ${error}`);
+      await basePage.takeScreenshot(`DriversManager_PrepareExtensionError_${prepareTime}`, 'PrepareExtensionError');
+      await basePage.takeSnapshot(`DriversManager_PrepareExtensionError_${prepareTime}`, 'PrepareExtensionError');
+      throw error;
+    }
   }
 
   /**

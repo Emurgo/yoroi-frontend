@@ -40,14 +40,14 @@ describe('Check learn more on Wallet details step', function () {
   before(async function () {
     webdriver = await driversPoolsManager.getDriverFromPool();
     logger = getTestLogger(this.test.parent.title);
-    await preloadBrowserStorage(webdriver, logger);
-    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
-    windowManager = new WindowManager(webdriver, wmLogger);
-    await windowManager.init();
     addNewWalletPage = new AddNewWallet(webdriver, logger);
     restoreWalletStepOnePage = new RestoreWalletStepOne(webdriver, logger);
     restoreWalletStepTwoPage = new RestoreWalletStepTwo(webdriver, logger);
     walletDetailsPage = new WalletDetails(webdriver, logger);
+    await preloadBrowserStorage(webdriver, logger);
+    const wmLogger = getTestLogger('windowManager', this.test.parent.title);
+    windowManager = new WindowManager(webdriver, wmLogger);
+    await windowManager.init();
   });
 
   it('Selecting Restore wallet 15-word', async function () {
