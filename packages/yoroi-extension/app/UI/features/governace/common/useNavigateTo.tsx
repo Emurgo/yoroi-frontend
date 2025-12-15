@@ -6,9 +6,7 @@ export const useNavigateTo = () => {
   const navigate = useNavigate();
 
   return React.useRef({
-    selectStatus: () => navigate(ROUTES.Governance.ROOT),
-    delegationForm: () => navigate(ROUTES.Governance.DELEGATE),
-    transactionSubmited: () => navigate(ROUTES.Governance.SUBMITTED),
-    transactionFail: () => navigate(ROUTES.Governance.FAIL),
+    selectRevampStatus: () => navigate(ROUTES.GOVERNANCE.ROOT),
+    selectRevampOptions: () => navigate(ROUTES.GOVERNANCE.OPTIONS),
   }).current;
 };

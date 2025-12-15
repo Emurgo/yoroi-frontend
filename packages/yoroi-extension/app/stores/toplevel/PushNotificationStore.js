@@ -20,6 +20,7 @@ export default class PushNotificationStore<
   },
 > extends Store<StoresMapType> {
   @observable metadata: PushNotificationMetadata | null = null;
+  permissionDenied: boolean = false;
 
   setup(): void {
     this.stores.loading.registerBlockingLoadingRequest(
@@ -67,31 +68,31 @@ export default class PushNotificationStore<
     return this.metadata?.isEnabled !== false;
   }
 
-  toggleEnabled: () => Promise<void> = async () => {
-    runInAction(() => {
-      if (!this.metadata) {
-        throw new Error('push notification metadata not loaded');
+  setEnabled: (enabled: boolean) => Promise<void> = async enabled => {
+    if (enabled) {
+      if (!(await this._enableNotifications())) {
+        return;
       }
-      this.metadata.isEnabled = !this.metadata.isEnabled;
-    });
-
-    let success;
-    if (this.isEnabled) {
-      success = await this._enableNotifications();
-    } else {
-      success = await this._disableNotifications();
-    }
-
-    if (!success) {
       runInAction(() => {
-        if (!this.metadata) {
-          throw new Error('push notification metadata not loaded');
+        if (this.metadata) {
+          this.metadata.isEnabled = true;
+        } else {
+          this.metadata = { isEnabled: true };
         }
-        this.metadata.isEnabled = !this.metadata.isEnabled;
       });
-
-      return;
+    } else {
+      if (!(await this._disableNotifications())) {
+        return;
+      }
+      runInAction(() => {
+        if (this.metadata) {
+          this.metadata.isEnabled = false;
+        } else {
+          this.metadata = { isEnabled: false };
+        }
+      });
     }
+
     if (!this.metadata) {
       throw new Error('push notification metadata not loaded');
     }
@@ -103,6 +104,7 @@ export default class PushNotificationStore<
     const messaging = getMessaging(app);
     const result = await Notification.requestPermission();
     if (result === 'denied') {
+      this.permissionDenied = true;
       return false;
     }
     const token = await getToken(messaging, {

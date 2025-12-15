@@ -69,7 +69,7 @@ describe('Export transactions, positive', function () {
     const expectedFileName = `Yoroi-Transaction-History_TADA-${testWallet1.plate}_${todayStr}.csv`;
     expect(fileName, 'Exported file name is different').to.equal(expectedFileName);
     // check exported file content
-    const fileContent = getDownloadedFileContent(fileName);
+    const fileContent = await getDownloadedFileContent(fileName);
     const parsedFileContent = parseExportedCSV(fileContent);
     // get txs info from the transactions page <list of objects>
     expect(parsedFileContent.length, 'Something wrong in the exported file').to.equal(5);
@@ -78,7 +78,7 @@ describe('Export transactions, positive', function () {
   it('Compare displayed txs with the exported txs', async function () {
     const allDownloadedFiles = getListOfDownloadedFiles();
     const fileName = allDownloadedFiles[0];
-    const fileContent = getDownloadedFileContent(fileName);
+    const fileContent = await getDownloadedFileContent(fileName);
     const parsedFileContent = parseExportedCSV(fileContent);
 
     const displayedTxs = await transactionsPage.getTxsInfo(startDate, endDate);

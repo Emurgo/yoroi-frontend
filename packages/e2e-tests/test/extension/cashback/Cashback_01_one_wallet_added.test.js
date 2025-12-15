@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import BasePage from '../../../pages/basepage.js';
 import CashbackPage from '../../../pages/wallet/cashback/cashback.page.js';
 import CashbackTermsModal from '../../../pages/wallet/cashback/modals/disclaimerModal.page.js';
 import WalletTab from '../../../pages/wallet/walletTab/walletTab.page.js';

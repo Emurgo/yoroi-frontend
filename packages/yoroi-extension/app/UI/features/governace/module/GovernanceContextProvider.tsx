@@ -7,7 +7,7 @@ import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
 import { getFormattedPairingValue } from '../common/helpers';
-import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
+import { useGovernanceManagerMaker } from '../common/hooks/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
 type drepDelegation = { status: string | null; drep: string | null };
@@ -33,6 +33,7 @@ const initialGovernanceProvider = {
   recentTransactions: [],
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
   networkId: null,
+  isTestnet: false,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -166,6 +167,7 @@ export const GovernanceContextProvider = ({
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,
+    isTestnet: selectedWallet.isTestnet,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

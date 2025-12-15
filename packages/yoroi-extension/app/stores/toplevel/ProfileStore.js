@@ -16,24 +16,9 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
   @observable
   hasRedirected: boolean = false;
 
-  _analyticsStep: {| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |} = {
-    isDone: () => this.isAnalyticsOpted,
-    action: async () => {
-      const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
-      if (this.stores.routing.currentRoute === route) {
-        return;
-      }
-      this.stores.routing.goToRoute({ route });
-    },
-  };
-
-  _isFirefox: boolean = environment.isFirefox();
-
   /** Linear list of steps that need to be completed before app start */
   @observable
   SETUP_STEPS: Array<{| isDone: void => boolean | Promise<boolean>, action: void => Promise<void> |}> = [
-    // Firefox policy requires this to be the first
-    ...(this._isFirefox ? [this._analyticsStep] : []),
     {
       isDone: () => this.isCurrentLocaleSet,
       action: async () => {
@@ -54,7 +39,16 @@ export default class ProfileStore extends BaseProfileStore<StoresMap> {
         this.stores.routing.goToRoute({ route });
       },
     },
-    ...(this._isFirefox ? [] : [this._analyticsStep]),
+    {
+      isDone: () => this.isAnalyticsOpted,
+      action: async () => {
+        const route = ROUTES.PROFILE.OPT_FOR_ANALYTICS;
+        if (this.stores.routing.currentRoute === route) {
+          return;
+        }
+        this.stores.routing.goToRoute({ route });
+      },
+    },
     {
       isDone: () => !environment.isNightly() || this.acceptedNightly,
       action: async () => {

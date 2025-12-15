@@ -4,6 +4,7 @@ export interface EventDefinitions {
       type: 'swap' | 'send' | 'dapp' | 'delegate' | 'undelegate' | 'withdraw rewards' | 'delegate vote';
       asset_count: number;
       asset_list: string;
+      aggregator?: string;
     },
   ];
   'Payment Urls Page Viewed': [];
@@ -31,5 +32,24 @@ export interface EventDefinitions {
   'Cashback Dashboard Viewed': [];
   'Settings Page Viewed': [];
   'Transactions Page Viewed': [];
+  'Transaction Results Popup Viewed': [
+    {
+      status: 'Success' | 'Failure';
+    },
+  ];
+  'Transaction Review Submit Modal Viewed': [];
   'Midnight Airdrop Page Viewed': [];
+  'Swap Initiated': [];
+  'Swap Review Page Viewed': [];
+  'Dapp Connector Transaction Review Page Reviewed': [
+    {
+      asset_count: number;
+      asset_list: {
+        policy_id: string;
+        asset_name: string;
+        asset_ticker: string;
+      };
+    },
+  ];
+  'Dapp Connector Transaction Signed': [];
 }

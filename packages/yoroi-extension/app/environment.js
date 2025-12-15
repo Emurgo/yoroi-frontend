@@ -8,50 +8,13 @@ import pkg from '../package.json';
 
 // populated by ConfigWebpackPlugin
 declare var CONFIG: ConfigType;
-declare var browser;
-
-const IS_FIREFOX_BROWSER_INFO: [boolean | null] = [null];
-if (typeof browser !== 'undefined') {
-  browser.runtime
-    .getBrowserInfo()
-    .then(({ name }) => {
-      const isff = name === 'Firefox';
-      console.debug(`isFirefox = ${String(isff)} / defined by browser info API`);
-      IS_FIREFOX_BROWSER_INFO[0] = isff;
-      return null;
-    })
-    .catch(e => {
-      console.error('failed to call browser info API', e);
-    });
-}
 
 function isChromeProtocol(): boolean {
   return location.protocol === 'chrome-extension:';
 }
 
-function isMozProtocol(): boolean {
-  return location.protocol === 'moz-extension:';
-}
-
 function isExtension(): boolean {
-  return isChromeProtocol() || isMozProtocol();
-}
-
-function isFirefox(): boolean {
-  if (IS_FIREFOX_BROWSER_INFO[0] != null) {
-    return IS_FIREFOX_BROWSER_INFO[0];
-  }
-
-  if (isMozProtocol()) {
-    return true;
-  }
-  // if an extension type that isn't Firefox, return false
-  if (isExtension()) {
-    return false;
-  }
-
-  // $FlowExpectedError[cannot-resolve-name] InstallTrigger is a global from the browser
-  return typeof InstallTrigger !== 'undefined';
+  return isChromeProtocol();
 }
 
 function isChrome(): boolean {
@@ -67,14 +30,10 @@ function isChrome(): boolean {
     return false;
   }
 
-  return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime) && !isFirefox();
+  return !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
 }
 
 function canRegisterProtocol(): boolean {
-  // Moz-Extension specify the protocol in the manifest not at runtime
-  if (isExtension() && isFirefox()) {
-    return false;
-  }
   // Can only register a protocol to a website if it's https
   if (!isExtension() && window.location.protocol !== 'https:') {
     return false;
@@ -85,8 +44,6 @@ function canRegisterProtocol(): boolean {
 function getVersion(): string {
   return pkg.version;
 }
-
-const FIREFOX_PRIVACY_POLICY_URL = 'https://addons.mozilla.org/en-US/firefox/addon/yoroi/privacy';
 
 export const environment = ({
   ...process.env,
@@ -111,19 +68,13 @@ export const environment = ({
   isMainnet: () => environment.getNetworkName() === NetworkType.MAINNET,
   /** Environment used during webpack build */
   isProduction: () => process.env.NODE_ENV === 'production',
+  isNotProd: () => environment.isDev() || environment.isE2EBuild() || environment.isNightly(),
   getWalletRefreshInterval: () => CONFIG.app.walletRefreshInterval,
   getServerStatusRefreshInterval: () => CONFIG.app.serverStatusRefreshInterval,
   userAgentInfo,
-  isFirefox,
   isChrome,
   isExtension,
   canRegisterProtocol,
-  externalPrivacyPolicyURL: () => {
-    if (isFirefox()) {
-      return FIREFOX_PRIVACY_POLICY_URL;
-    }
-    return null;
-  },
 }: {
   getNetworkName: void => Network,
   getVersion: void => string,
@@ -137,15 +88,14 @@ export const environment = ({
   isE2EBuild: void => boolean,
   isMainnet: void => boolean,
   isProduction: void => boolean,
+  isNotProd: void => boolean,
   getWalletRefreshInterval: void => number,
   getServerStatusRefreshInterval: void => number,
   userAgentInfo: UserAgentInfo,
   isLight: boolean,
   isExtension: void => boolean,
-  isFirefox: void => boolean,
   isChrome: void => boolean,
   canRegisterProtocol: void => boolean,
-  externalPrivacyPolicyURL: void => ?string,
   ...
 });
 

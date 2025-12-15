@@ -17,24 +17,21 @@ const messages = defineMessages({
 
 type Props = {|
   showWebAuthnTop: boolean,
-  isFirefox: boolean,
 |};
 
 @observer
 export default class WebAuthnTopBlock extends React.Component<Props> {
   static contextType: any = IntlContext;
   render(): Node {
-    const { showWebAuthnTop, isFirefox } = this.props;
+    const { showWebAuthnTop } = this.props;
 
     if (!showWebAuthnTop) {
       // Do not show this component
       return null;
     }
 
-    const styleComponent = isFirefox ? `${styles.component} ${styles.componentFirefox}` : `${styles.component}`;
-
     return (
-      <div className={styleComponent}>
+      <div className={styles.component}>
         <div className={styles.warningBlock}>
           <img className={styles.warningIcon} src={imgWarningIcon} alt="Warning Icon" />
           <div className={styles.text}>{<FormattedMessage {...messages.noteText} values={{ strong }} />}</div>

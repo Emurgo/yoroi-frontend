@@ -38,7 +38,6 @@ const storageKeys = {
   BRING_BANNER_CLOSED: networkForLocalStorage + '-BRING_BANNER_CLOSED',
   MIDNIGHT_BANNER_PHASE2_CLOSED: networkForLocalStorage + '-MIDNIGHT_BANNER_PHASE2_CLOSED',
   CARDANO_CARD_MODAL_CLOSED: networkForLocalStorage + '-CARDANO_CARD_MODAL_CLOSED',
-  FIREFOX_SUPPORT_MODAL_CLOSED: networkForLocalStorage + '-FIREFOX_SUPPORT_MODAL_CLOSED',
   DREP_YOROI_BANNER: networkForLocalStorage + '-DREP_YOROI_BANNER',
   CURRENT_NETWORK_ID: networkForLocalStorage + '-CURRENT_NETWORK_ID',
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
@@ -46,6 +45,7 @@ const storageKeys = {
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
   SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
+  STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED: 'STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -154,13 +154,15 @@ export default class LocalStorageApi {
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
 
-  // ========== FIREFOX SUPPORT Modal ========== //
-  getFirefoxSupportModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED);
+  // ========== Staking Pool Update Fee Dialog ========== //
+  getStakingPoolFeeIncreaseModalClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED);
 
-  setFirefoxSupportModalClosed: string => Promise<void> = closed =>
-    setLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED, closed);
+  setStakingPoolFeeIncreaseModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED, closed);
 
-  unsetFirefoxSupportModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.FIREFOX_SUPPORT_MODAL_CLOSED);
+  unsetStakingPoolFeeIncreaseModalClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED);
 
   // ========== SWAP Disclaimer Modal ========== //
   getSwapDisclaimerModalClosed: void => Promise<?string> = () =>
@@ -442,17 +444,8 @@ export default class LocalStorageApi {
 
   unsetAcceptedTosVersion: void => Promise<void> = () => removeLocalItem(storageKeys.ACCEPTED_TOS_VERSION);
 
-  // Firefox demands us to re-show the data collection consent screen, so change the key for Firefox
-  _getIsAnalyticsAllowedKey: () => string = () => {
-    let key = storageKeys.IS_ANALYTICS_ALLOWED;
-    if (environment.isFirefox()) {
-      key += '-firefox';
-    }
-    return key;
-  };
-
   loadIsAnalyticsAllowed: () => Promise<?boolean> = async () => {
-    const json = await getLocalItem(this._getIsAnalyticsAllowedKey());
+    const json = await getLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
     if (!json) {
       return undefined;
     }
@@ -460,7 +453,7 @@ export default class LocalStorageApi {
   };
 
   saveIsAnalysticsAllowed: (flag: boolean) => Promise<void> = async flag => {
-    await setLocalItem(this._getIsAnalyticsAllowedKey(), JSON.stringify(flag));
+    await setLocalItem(storageKeys.IS_ANALYTICS_ALLOWED, JSON.stringify(flag));
   };
 
   unsetIsAnalyticsAllowed: void => Promise<void> = () => removeLocalItem(storageKeys.IS_ANALYTICS_ALLOWED);
@@ -596,9 +589,7 @@ export type PersistedSubmittedTransaction = {|
   isDrepDelegation?: boolean,
 |};
 
-const STORAGE_API =
-  window.browser?.storage.local || // firefox mv2
-  window.chrome?.storage.local; // chrome mv2 and mv3
+const STORAGE_API = window.chrome?.storage.local; // chrome mv2 and mv3
 
 export async function persistSubmittedTransactions(submittedTransactions: Array<PersistedSubmittedTransaction>): Promise<void> {
   await STORAGE_API.set({

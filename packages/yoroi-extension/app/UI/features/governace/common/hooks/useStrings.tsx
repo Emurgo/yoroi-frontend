@@ -1,7 +1,7 @@
 import React from 'react';
 import { defineMessages } from 'react-intl';
 import { useIntl } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
+import globalMessages from '../../../../../i18n/global-messages';
 
 export const messages = Object.freeze(
   defineMessages({
@@ -159,6 +159,109 @@ export const messages = Object.freeze(
       id: 'global.labels.incorectFormat',
       defaultMessage: '!!!Incorrect format',
     },
+
+    // NEW STRINGSS
+
+    delegationOptions: {
+      id: 'governance.delegationOptions',
+      defaultMessage: '!!!Delegation Options',
+    },
+    chooseDelegationOption: {
+      id: 'governance.chooseDelegationOption',
+      defaultMessage: '!!!Choose to delegate your voting power to Yoroi DRep or explore other options',
+    },
+    exploreOtherDRepsOrAbstain: {
+      id: 'governance.exploreOtherDRepsOrAbstain',
+      defaultMessage: '!!!Explore other governance options',
+    },
+    browseAdditionalDelegation: {
+      id: 'governance.browseAdditionalDelegation',
+      defaultMessage: '!!!Pick another DRep, abstain from voting, or show no confidence',
+    },
+    learnMoreLabel: {
+      id: 'governance.learnMoreLabel',
+      defaultMessage: '!!!Learn more about delegation options',
+    },
+    yoroiDRep: {
+      id: 'governance.yoroiDRep',
+      defaultMessage: '!!!Yoroi DRep',
+    },
+    yoroiTestnetDRep: {
+      id: 'governance.yoroiTestnetDRep',
+      defaultMessage: '!!!Testnet DRep',
+    },
+    yoroiDRepInfo: {
+      id: 'governance.yoroiDRepInfo',
+      defaultMessage:
+        '!!!Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.',
+    },
+    drepStatus: {
+      id: 'governance.drepStatus',
+      defaultMessage: '!!!DRep Status',
+    },
+    yoroiVotingRecord: {
+      id: 'governance.yoroiVotingRecord',
+      defaultMessage: '!!!Yoroi Voting Record',
+    },
+    backToDashboard: {
+      id: 'governance.backToDashboard',
+      defaultMessage: '!!!Back to dashboard',
+    },
+    chooseVotingPower: {
+      id: 'governance.chooseVotingPower',
+      defaultMessage: '!!!Choose How to Use Your Voting Power',
+    },
+    letYoroiDRepVoteForYou: {
+      id: 'governance.letYoroiDRepVoteForYou',
+      defaultMessage:
+        '!!!You can let Yoroi’s DRep vote for you, pick another DRep using their ID, or choose to abstain or show no confidence.',
+    },
+    delegateLabel: {
+      id: 'global.labels.delegate',
+      defaultMessage: '!!!Delegate',
+    },
+    otherDReps: {
+      id: 'governance.otherDReps',
+      defaultMessage: '!!!Other DReps',
+    },
+    designatedSomeoneElse: {
+      id: 'governance.designatedSomeoneElse',
+      defaultMessage:
+        '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
+    },
+    chooseAbstain: {
+      id: 'governance.abstainInfo',
+      defaultMessage: '!!!You are choosing not to cast a vote on all proposals now and in the future.',
+    },
+    chooseNoConfidence: {
+      id: 'governance.chooseNoConfidence',
+      defaultMessage: '!!!You are expressing a lack of trust for all proposals now and in the future.',
+    },
+    changeToDrep: {
+      id: 'governance.changeToDrep',
+      defaultMessage: '!!!Change to DRep',
+    },
+    delegateToOtherDrep: {
+      id: 'governance.delegateToOtherDrep',
+      defaultMessage: '!!!Delegate to other DRep',
+    },
+    delegatingLabel: {
+      id: 'governance.delegatingLabel',
+      defaultMessage: '!!!Delegateing',
+    },
+    delegationStatus: {
+      id: 'governance.delegationStatus',
+      defaultMessage: '!!!Delegation status',
+    },
+    votingPowerInfo: {
+      id: 'governance.votingPowerInfo',
+      defaultMessage:
+        '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
+    },
+    delegatingInGovernance: {
+      id: 'gouvernace.delegatingInGovernance',
+      defaultMessage: '!!!Delegating in Governance',
+    },
   })
 );
 
@@ -205,5 +308,30 @@ export const useStrings = () => {
     notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
     delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
     yoroiVotingRecordLink: intl.formatMessage(messages.yoroiVotingRecordLink),
+    // New Strings
+    delegationOptions: intl.formatMessage(messages.delegationOptions),
+    chooseDelegationOption: intl.formatMessage(messages.chooseDelegationOption),
+    exploreOtherDRepsOrAbstain: intl.formatMessage(messages.exploreOtherDRepsOrAbstain),
+    browseAdditionalDelegation: intl.formatMessage(messages.browseAdditionalDelegation),
+    learnMoreLabel: intl.formatMessage(messages.learnMoreLabel),
+    yoroiDRep: intl.formatMessage(messages.yoroiDRep),
+    yoroiDRepInfo: intl.formatMessage(messages.yoroiDRepInfo),
+    drepStatus: intl.formatMessage(messages.drepStatus),
+    yoroiVotingRecord: intl.formatMessage(messages.yoroiVotingRecord),
+    backToDashboard: intl.formatMessage(messages.backToDashboard),
+    chooseVotingPower: intl.formatMessage(messages.chooseVotingPower),
+    letYoroiDRepVoteForYou: intl.formatMessage(messages.letYoroiDRepVoteForYou),
+    delegateLabel: intl.formatMessage(messages.delegateLabel),
+    otherDReps: intl.formatMessage(messages.otherDReps),
+    designatedSomeoneElse: intl.formatMessage(messages.designatedSomeoneElse),
+    chooseAbstain: intl.formatMessage(messages.chooseAbstain),
+    chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
+    changeToDrep: intl.formatMessage(messages.changeToDrep),
+    delegateToOtherDrep: intl.formatMessage(messages.delegateToOtherDrep),
+    delegatingLabel: intl.formatMessage(messages.delegatingLabel),
+    delegationStatus: intl.formatMessage(messages.delegationStatus),
+    votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
+    yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
+    delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
   }).current;
 };

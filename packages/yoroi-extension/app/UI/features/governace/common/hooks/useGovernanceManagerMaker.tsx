@@ -1,7 +1,7 @@
 import { governanceApiMaker, governanceManagerMaker } from '@yoroi/staking';
 import React from 'react';
 // @ts-ignore
-import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 export const useGovernanceManagerMaker = (walletId: string, networkId: string): any => {
   // TODO - sancho testnet networkId id 450 - can't use it for now as the network is not working

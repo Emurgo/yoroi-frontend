@@ -33,7 +33,7 @@ import { useYoroiRemoteConfig } from '../../UI/common/hooks/useYoroiRemoteConfig
 // $FlowIgnore: suppressing this error
 import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteConfig';
 // $FlowIgnore: suppressing this error
-import { FirefoxSupportBanner } from '../../UI/components/Dialogs/FirefoxSupportBanner';
+import { StakepoolFeeIncrease } from '../../UI/components/Dialogs/StakepoolFeeIncrease';
 
 type Props = {|
   +children: Node,
@@ -134,7 +134,7 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
                   <ReviewTxModal />
                   {this.props.children}
                   {this.getDialogs(intl, currentPool)}
-                  <FirefoxSupportBanner />
+                  <StakepoolFeeIncrease stores={stores} />
                 </ReviewTxProvider>
               </ModalProvider>
             </CurrencyProvider>

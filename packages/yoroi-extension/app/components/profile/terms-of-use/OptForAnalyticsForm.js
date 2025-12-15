@@ -11,9 +11,8 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { ReactComponent as AnalyticsIllustration } from '../../../assets/images/analytics-illustration.inline.svg';
 import { ReactComponent as YesIcon } from '../../../assets/images/yes.inline.svg';
 import { ReactComponent as NoIcon } from '../../../assets/images/no.inline.svg';
-import { Box, Button, Link, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { RevampSwitch } from '../../widgets/Switch';
-import environment from '../../../environment';
 import { ReactComponent as BackIcon } from '../../../assets/images/assets-page/backarrow.inline.svg';
 import ReactMarkdown from 'react-markdown';
 import { strong } from '../../../i18n/htmlEmbeddedMessageHelper';
@@ -136,8 +135,6 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
     const isStartupScreen = variant === 'startup';
     const isSettingsScreen = variant === 'settings';
 
-    const isFirefox = environment.isFirefox();
-
     const analyticsDetails = [
       [YesIcon, messages.line1],
       [YesIcon, messages.line2],
@@ -251,29 +248,18 @@ export default class OptForAnalyticsForm extends Component<Props, State> {
                 justifyContent: isStartupScreen ? 'center' : 'flex-start',
               }}
             >
-              {isFirefox ? (
-                <Link
-                  sx={{ '&:hover': { cursor: 'pointer' } }}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={environment.externalPrivacyPolicyURL()}
-                >
-                  {intl.formatMessage(messages.privacyNotice)}
-                </Link>
-              ) : (
-                <Box
-                  sx={{
-                    color: 'ds.text_primary_medium',
-                    '&:hover': {
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                    },
-                  }}
-                  onClick={this.togglePrivacyNotice}
-                >
-                  {intl.formatMessage(messages.privacyNotice)}
-                </Box>
-              )}
+              <Box
+                sx={{
+                  color: 'ds.text_primary_medium',
+                  '&:hover': {
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  },
+                }}
+                onClick={this.togglePrivacyNotice}
+              >
+                {intl.formatMessage(messages.privacyNotice)}
+              </Box>
             </Box>
           </div>
         </Box>

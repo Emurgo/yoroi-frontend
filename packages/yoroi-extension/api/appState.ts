@@ -1,12 +1,13 @@
 import { lazy, mutateFunc, makeAccessor } from './objectModel';
 import Dexie, { type EntityTable } from 'dexie';
 
-interface NotificationData {
+export interface NotificationData {
   fcmMessageId: string;
   read: boolean;
   title: string;
   body: string;
   time: string;
+  isExternalUrl?: boolean;
   redirection?: string | null;
 }
 interface Notification extends NotificationData {

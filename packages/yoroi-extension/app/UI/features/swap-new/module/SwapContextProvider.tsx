@@ -14,7 +14,7 @@ import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { swapManagerMaker, swapStorageMaker } from '@yoroi/swap';
 import { isPrimaryToken, primaryTokenId } from '@yoroi/portfolio';
 import { useSwapConfig } from '../common/hooks/useSwapConfig';
-import { useQuery } from 'react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Api, Chain, Portfolio, Swap } from '@yoroi/types';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { produce } from 'immer';
@@ -29,11 +29,12 @@ export const convertBech32ToHex = async (bech32Address: string) => {
   return await RustModule.WalletV4.Address.from_bech32(bech32Address).to_hex();
 };
 
-export const useAddressHex = address => {
-  const result = useQuery([address, 'addressHex'], () => convertBech32ToHex(address), {
-    suspense: true,
+export const useAddressHex = (address: string) => {
+  const result = useSuspenseQuery({
+    queryKey: [address, 'addressHex'],
+    queryFn: () => convertBech32ToHex(address),
   });
-  if (!result.data) throw new Error('invalid state');
+
   return result.data;
 };
 
@@ -54,13 +55,14 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   const strings = useStrings();
 
   useEffect(() => {
-    const stakignAddr = stores.wallets.selected.stakingAddress;
+    if (!selectedWallet) return;
+    const stakignAddr = selectedWallet.stakingAddress;
     const skey = unwrapStakingKey(stakignAddr).to_keyhash()?.to_hex();
     if (skey == null) {
       throw new Error('Cannot get staking key from the wallet!');
     }
     setStakingKey(skey);
-  }, []);
+  }, [selectedWallet?.stakingAddress, selectedWallet?.publicDeriverId]);
 
   const swapManager = useMemo(() => {
     const storage = swapStorageMaker();
@@ -113,16 +115,16 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
   }, [swapManager.settings.slippage]);
 
   const estimateReqIdRef = useRef(0);
-
-  const { data: limitOptions, isLoading: isLimitOptionsLoading } = useQuery(
-    [
+  const { data: limitOptions, isLoading: isLimitOptionsLoading } = useQuery({
+    queryKey: [
       'useSwapLimitOptions',
       'mainet',
       swapManager.settings.routingPreference,
       state.tokenInInput.tokenId,
       state.tokenOutInput.tokenId,
     ],
-    async () => {
+    enabled: state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
+    queryFn: async () => {
       if (state.tokenInInput.tokenId === undefined || state.tokenOutInput.tokenId === undefined) throw Error();
 
       const res = await swapManager.api.limitOptions({
@@ -133,11 +135,7 @@ export const SwapContextProvider = ({ children, currentWallet, stores }: any) =>
       if (isRight(res)) return res.value.data;
       return undefined;
     },
-    {
-      enabled:
-        state.orderType === 'limit' && state.tokenInInput.tokenId !== undefined && state.tokenOutInput.tokenId !== undefined,
-    }
-  );
+  });
 
   useEffect(() => {
     const value = limitOptions?.defaultProtocol;
@@ -512,6 +510,8 @@ export const swapReducer = (state: SwapState, action: SwapAction) => {
         break;
 
       case SwapActionType.SwapReviewSelected:
+        draft.needsNewEstimate = false;
+        draft.lastInputTouched = state.lastInputTouched;
         draft.reviewSwapSelected = action.value;
         break;
 

@@ -40,9 +40,6 @@ export async function getCommonStateFetcher(): Promise<IFetcherCommon> {
 }
 
 export function getPlatform(): string {
-  if (environment.isFirefox()) {
-    return 'firefox';
-  }
   if (environment.isChrome()) {
     return 'chrome';
   }

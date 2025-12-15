@@ -12,7 +12,7 @@ import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
@@ -45,13 +45,9 @@ import { CatalystRegistrationContextProvider } from './UI/features/catalyst-regi
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
-import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
+import GovernanceOptionsPage from './UI/pages/Governance/GovernanceOptionsPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
@@ -177,6 +173,7 @@ export const LazyLoadPromises: Array<() => any> = [
 
 export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
@@ -250,10 +247,8 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
-            <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
-            <Route path={ROUTES.Governance.DELEGATE} element={<GovernanceDelegationFormPage stores={stores} />} />
-            <Route path={ROUTES.Governance.SUBMITTED} element={<GovernanceTransactionSubmittedPage stores={stores} />} />
-            <Route path={ROUTES.Governance.FAIL} element={<GovernanceTransactionFailedPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
@@ -375,7 +370,6 @@ const CatalystRegistrationSubpages = ({ stores }) => (
   </CatalystRegistrationContextProvider>
 );
 
-// NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
@@ -398,7 +392,6 @@ const GovernanceSubpages = ({ stores }) => {
         <Suspense fallback={null}>
           <Outlet />
         </Suspense>
-        ;
       </GovernanceContextProvider>
     </CurrencyProvider>
   );

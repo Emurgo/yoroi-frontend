@@ -77,16 +77,6 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     }
   };
 
-  // <TODO:GENERALIZE> This is a weird function to have for governance feature only.
-  // This should be changed to some generic mechanic that drops user back to TOP routes
-  checkAndResetGovRoutes: void => void = () => {
-    const { stores } = this.props;
-    const currentRoute = stores.routing.currentRoute;
-    if (currentRoute === ROUTES.Governance.FAIL || currentRoute === ROUTES.Governance.SUBMITTED) {
-      stores.routing.goToRoute({ route: ROUTES.Governance.ROOT });
-    }
-  };
-
   render(): Node {
     const { updateHideBalance } = this;
     const { stores, pageBanner, isErrorPage } = this.props;
@@ -200,12 +190,10 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
             name: wallet.name,
           }))}
           onSelect={wallet => {
-            this.checkAndResetGovRoutes();
             this.onSelectWallet(wallet);
           }}
           selectedWalletId={selected?.publicDeriverId}
           close={() => {
-            this.checkAndResetGovRoutes();
             this.props.stores.uiDialogs.closeActiveDialog();
           }}
           shouldHideBalance={shouldHideBalance}

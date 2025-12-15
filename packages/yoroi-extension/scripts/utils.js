@@ -12,7 +12,8 @@ const isE2E: boolean = argv.isE2E != null;
 const exec: string => void = cmd => {
   const r = shell.exec(cmd);
   if (r.code !== 0) {
-    process.exit(r);
+    console.error(`Command failed with exit code ${r.code}`);
+    process.exit(r.code);
   }
 };
 

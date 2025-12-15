@@ -22,7 +22,6 @@ export default ({
   version,
   enableProtocolHandlers,
   shouldInjectConnector,
-  isFirefox
 } /*: {|
   description: string,
   defaultTitle: string,
@@ -35,7 +34,6 @@ export default ({
   version: string,
   enableProtocolHandlers: boolean,
   shouldInjectConnector: boolean,
-  isFirefox: boolean,
 |} */
 )/* : * */ => { // eslint-disable-line function-paren-newline
   const icons = iconOverride == null
@@ -47,13 +45,6 @@ export default ({
       /* eslint-enable quote-props */
     }
     : iconOverride;
-  let background = {
-    service_worker: 'js/background-service-worker.js',
-  };
-
-  if (isFirefox) {
-    background =  { scripts: ['js/background-service-worker.js']}
-  }
 
   const base = {
     version,
@@ -72,7 +63,9 @@ export default ({
       },
     },
     icons,
-    background,
+    background: {
+      service_worker: 'js/background-service-worker.js',
+    },
     permissions: [
       'storage',
       'tabs',

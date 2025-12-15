@@ -51,10 +51,6 @@ export const messages = Object.freeze(
       id: 'banners.usda.button',
       defaultMessage: '!!!Go to swap',
     },
-    firefoxNoSupport: {
-      id: 'banners.firefox.noSupport',
-      defaultMessage: '!!!Firefox is no longer supporting hardware wallets. Please consider another browser to continue.',
-    },
     receiverFieldLabelUnresolvedAddress: {
       id: 'wallet.send.form.receiver.label.unresolvedAddress',
       defaultMessage: "!!!Receiver address, ADA Handle or domain you entered doesn't exist. Please double-check it and try again",
@@ -107,18 +103,6 @@ export const messages = Object.freeze(
       id: 'banners.midnight.goToMidnight',
       defaultMessage: '!!!Go to midnight',
     },
-    surveyTitle: {
-      id: 'survey.title',
-      defaultMessage: '!!!We’d love your feedback!',
-    },
-    surveyDescription: {
-      id: 'survey,description',
-      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
-    },
-    surveyButton: {
-      id: 'survey.button',
-      defaultMessage: '!!!take survey',
-    },
     assetReceived: {
       id: 'notification.assetReceived',
       defaultMessage: '!!!{ asset } received',
@@ -139,18 +123,17 @@ export const messages = Object.freeze(
       id: 'global.labels.understand',
       defaultMessage: '!!!I understand',
     },
-    firefoxSupportSubtitle: {
-      id: 'banners.firefoxSupport.subtitle',
-      defaultMessage: '!!!Firefox support ending for updates',
+    stakingUpdates: {
+      id: 'staking.dialog.stakingUpdates',
+      defaultMessage: '!!!Staking updates',
     },
-    firefoxSupportDescription: {
-      id: 'banners.firefoxSupport.description',
-      defaultMessage:
-        '!!!We’ve stopped pushing updates to Firefox because hardware wallets aren’t supported. To keep using hardware wallets, open the app in a supported browser.',
+    upcomingUpdate: {
+      id: 'staking.dialog.upcomingUpdate',
+      defaultMessage: '!!!Upcoming update to EMURGO and Yoroi stakepools',
     },
-    firefoxSupportLearnMore: {
-      id: 'banners.firefoxSupport.learnMore',
-      defaultMessage: '!!!Learn more about Firefox deprecation',
+    updateDetails: {
+      id: 'staking.dialog.updateDetails',
+      defaultMessage: '!!!EMURGO is updating the margin fee on its stakepools as a part of a broader 2026 modernization effort.',
     },
   })
 );
@@ -181,22 +164,18 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
-    surveyTitle: intl.formatMessage(messages.surveyTitle),
-    surveyDescription: intl.formatMessage(messages.surveyDescription),
-    surveyButton: intl.formatMessage(messages.surveyButton),
     assetReceived: (asset: string) => intl.formatMessage(messages.assetReceived, { asset }),
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
     multipleAssetsSent: intl.formatMessage(messages.multipleAssetsSent),
     understandLabel: intl.formatMessage(messages.understandLabel),
-    firefoxSupportSubtitle: intl.formatMessage(messages.firefoxSupportSubtitle),
-    firefoxSupportDescription: intl.formatMessage(messages.firefoxSupportDescription),
-    firefoxSupportLearnMore: intl.formatMessage(messages.firefoxSupportLearnMore),
-    firefoxNoSupport: intl.formatMessage(messages.firefoxNoSupport),
     midnightDappConnect: intl.formatMessage(messages.midnightDappConnect, {
       strong: chunks => React.createElement('strong', null, chunks),
     }),
     goToMidnight: intl.formatMessage(messages.goToMidnight),
     claimAnnouncementPhase2: intl.formatMessage(messages.claimAnnouncementPhase2),
+    stakingUpdates: intl.formatMessage(messages.stakingUpdates),
+    upcomingUpdate: intl.formatMessage(messages.upcomingUpdate),
+    updateDetails: intl.formatMessage(messages.updateDetails),
   }).current;
 };
