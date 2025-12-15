@@ -1,24 +1,15 @@
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
 import globalMessages from '../../../../i18n/global-messages';
-import { ReactComponent as Illustration } from './group-7.svg';
 
 const messages = defineMessages({
-  phase1Closed1: {
-    id: 'aidrop.phase1Closed.line1',
-    defaultMessage: '!!!Phase 1 of the Midnight claiming event has now closed.',
+  noAllocTitle: {
+    id: 'aidrop.noAllocTitle',
+    defaultMessage: '!!!No eligible addresses found in your wallet',
   },
-  phase1Closed2: {
-    id: 'aidrop.phase1Closed.line2',
-    defaultMessage: '!!!But good news — Phase 2, called Scavenger Mine, is live!',
-  },
-  phase1Closed3: {
-    id: 'aidrop.phase1Closed.line3',
-    defaultMessage: '!!!Connect your wallet in the Midnight DApp to start earning NIGHT tokens.',
-  },
-  phase1Closed4: {
-    id: 'aidrop.phase1Closed.line4',
-    defaultMessage: '!!!Don’t miss your chance to take part in the new phase.',
+  noRedemptionText: {
+    id: 'aidrop.noRedemptionText',
+    defaultMessage: '!!!None of the addresses in this wallet are eligible for redemption',
   },
 });
 
@@ -32,37 +23,27 @@ export default function Zero() {
         marginRight: 'auto',
         width: '612px',
         borderRadius: '8px',
-        background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+        bgcolor: 'ds.bg_color_contrast_min',
         padding: '24px',
-        gap: '16px',
-        display: 'flex',
-        flexDirection: 'column',
+        textAlign: 'center',
       }}
     >
-      <Box sx={{ margin: 'auto' }}>
-        <Illustration />
-      </Box>
       {/*  @ts-ignore */}
-      <Typography variant="h5" sx={{ lineHeight: '26px' }}>
-        {intl.formatMessage(messages.phase1Closed1)}
-        <br />
-        {intl.formatMessage(messages.phase1Closed2)}
+      <Typography variant="h1xl">
+        {intl.formatMessage(messages.noAllocTitle)}
       </Typography>
 
       {/*  @ts-ignore */}
-      <Typography variant="body-1-regular" sx={{ lineHeight: '24px' }} as="div">
-        {intl.formatMessage(messages.phase1Closed3)}
-        <br />
-        {intl.formatMessage(messages.phase1Closed4)}
+      <Typography variant="body1">
+        {intl.formatMessage(messages.noRedemptionText)}
       </Typography>
 
-      <Button
-        variant="outlined"
-        style={{ border: '2px solid' }}
-        onClick={() => window.open('https://www.midnight.gd/', '_blank', 'noopener,noreferrer')}
-      >
-        {intl.formatMessage(globalMessages.goToMidnightApp)}
-      </Button>
+      {/*  @ts-ignore */}
+      <Typography variant="body1">
+        <a href="">
+          {intl.formatMessage(globalMessages.learnMore)}
+        </a>
+      </Typography>
     </Box>
   );
 }

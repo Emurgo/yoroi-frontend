@@ -1,6 +1,7 @@
 {
   "aidrop.noAllocText": "None of the addresses provided are eligible for an allocation",
   "aidrop.noAllocTitle": "No eligible addresses found in your wallet",
+  "aidrop.noRedemptionText": "None of the addresses in this wallet are eligible for redemption",
   "aidrop.phase1Closed.line1": "Phase 1 of the Midnight claiming event has now closed.",
   "aidrop.phase1Closed.line2": "But good news — Phase 2, called Scavenger Mine, is live!",
   "aidrop.phase1Closed.line3": "Connect your wallet in the Midnight DApp to start earning NIGHT tokens.",

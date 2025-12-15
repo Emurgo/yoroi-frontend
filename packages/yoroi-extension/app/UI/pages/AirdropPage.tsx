@@ -25,6 +25,7 @@ import TextField from '../../components/common/TextField';
 import Redeem from '../features/airdrop/useCases/Redeem';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
+import Zero from '../features/airdrop/useCases/Zero';
 
 interface Props {
   stores: {
@@ -111,6 +112,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
   }, [wallet.publicDeriverId]);
 
 
+  if (!queryingThaws && addressThawsData.length === 0) {
+    return (<Zero />);
+  }
+
   let content;
 
   content = (
@@ -123,7 +128,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
            <pre>{JSON.stringify(schedule, null, 2)}</pre>
          </div>
       ))}
-      {(!queryingThaws && addressThawsData.length === 0) && 'no redeemable address'}
       {queryingThaws && 'scanning...'}
       {/* next stage
       <h1>addresses from other wallets</h1>
