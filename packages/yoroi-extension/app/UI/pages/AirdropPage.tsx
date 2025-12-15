@@ -90,7 +90,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
       const isMainnet = wallet.networkId === 0;
       const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
       await scanAddressesForThaws(thawEndpoint, wallet, (data) => {
-        setAddressThawsData([...addressThawsData, data]);
+        setAddressThawsData(orig => [...orig, data]);
       });
       setQueryingThaws(false);
     })();
