@@ -9,6 +9,7 @@ import globalMessages from '../../i18n/global-messages';
 import { Box, Button } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { scanAddressesForThaws, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
+import { type ThawData, getRedeemable, getTotal, getStatus } from '../../api/ada/midnightRedemption';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -26,6 +27,7 @@ import Redeem from '../features/airdrop/useCases/Redeem';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import Zero from '../features/airdrop/useCases/Zero';
+import AddressCard from '../features/airdrop/useCases/AddressCard';
 
 interface Props {
   stores: {
@@ -58,21 +60,6 @@ interface Props {
   };
 }
 
-interface ThawData {
-  address: string;
-  schedule: {
-    numberOfClaimedAllocations: number;
-    thaws: {
-      amount: number;
-      queue_position: null;
-      status: string; // 'upcoming'
-      thawing_period_start: string; // "2026-03-03T00:00:00Z"
-      transaction_id: null | string;
-    }[];
-  };
-}
-
-const NUMBER_OF_NIGHT_DECIMALS = 6;
 const THAW_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
@@ -85,7 +72,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
   // one element for each redeemable address
   const [addressThawsData, setAddressThawsData] = useState<ThawData>([]);
 
-  const [arbitraryAddr, setArbitraryAddr] = useState('');
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
+
+  // for next stage
+  // const [arbitraryAddr, setArbitraryAddr] = useState('');
 
   const [redeemingAddr, setRedeemingAddr] = useState(null);
   const startRedeem = (addr) => {
@@ -108,47 +98,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
       // switch wallet
       setAddressThawsData([]);
       setQueryingThaws(true);
+      setSelectedAddressIndex(0);
     };
   }, [wallet.publicDeriverId]);
 
-
-  if (!queryingThaws && addressThawsData.length === 0) {
-    return (<Zero />);
-  }
-
-  let content;
-
-  content = (
-    <div>
-      <h1>Redeemable addresses</h1>
-      {addressThawsData.map(({ address, schedule }) => (
-         <div>
-           <div>address: {address}</div>
-           <div>schedule:</div>
-           <pre>{JSON.stringify(schedule, null, 2)}</pre>
-         </div>
-      ))}
-      {queryingThaws && 'scanning...'}
-      {/* next stage
-      <h1>addresses from other wallets</h1>
-      <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
-        <TextField
-          sx={{ width: '936px' }}
-          value={arbitraryAddr}
-          label="address"
-          onChange={e => { setArbitraryAddr(e.target.value); }}
-        />
-        <Button
-          variant="outlined"
-          style={{ height: '48px', marginTop: '12px' }}
-          onClick={() => { startRedeem(arbitraryAddr); }}
-        >
-          Check address
-        </Button>
-      </Box>
-      */}
-    </div>
-  );
 
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
   const onReorg = async (signRequest: any) => {
@@ -266,9 +219,37 @@ function AirdropPage({ stores }: Readonly<Props>) {
     });
   }
 
+  if (!queryingThaws && addressThawsData.length === 0) {
+    return (<Zero />);
+  }
+
+  const leftPanel = (
+    <>
+      {addressThawsData.map(({ address, schedule }, index) => (
+        <AddressCard
+          index={index + 1}
+          address={address}
+          status={getStatus(schedule)}
+          redeemable={getRedeemable(schedule)}
+          total={getTotal(schedule)}
+          isSelected={index === selectedAddressIndex}
+          onSelect={() => { setSelectedAddressIndex(index); }}
+        />
+      ))}
+      {queryingThaws && <LoadingSpinner />}
+    </>
+  );
+
   return (
     <>
-      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>{content}</Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
+        <Box sx={{ width: '600px', overflowY: 'auto' }}>
+         {leftPanel}
+        </Box>
+        <Box sx={{ flexGrow: 1 }}>
+          details
+        </Box>
+      </Box>
       {redeemingAddr && (
         <Redeem
           address={redeemingAddr}
