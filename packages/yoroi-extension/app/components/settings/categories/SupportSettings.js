@@ -130,7 +130,7 @@ export default class SupportSettings extends Component<Props> {
           size="flat"
           onClick={onDownloadLogs}
           sx={{ marginTop: '40px' }}
-          id="settings:support-downloadLogs-buttons"
+          id="settings:support-downloadLogs-button"
         >
           {intl.formatMessage(globalMessages.downloadLogsButtonLabel)}
         </Button>
@@ -139,7 +139,7 @@ export default class SupportSettings extends Component<Props> {
           <Typography component="div" variant="body1" color="ds.text_gray_medium" fontWeight={500} mb="8px">
             {intl.formatMessage(messages.paperWallet)}
           </Typography>
-          <Button variant="contained" onClick={this.props.onPaperWalletTransfer}>
+          <Button variant="contained" onClick={this.props.onPaperWalletTransfer} id="settings:support-transfer-button">
             {intl.formatMessage(messages.paperWalletTransfer)}
           </Button>
         </Box>

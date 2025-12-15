@@ -36,7 +36,7 @@ export default class TransferTypeSelect extends Component<Props> {
       <Link
         href="https://help.yoroi-wallet.com/en/article/how-to-claim-a-byron-era-wallet-in-yoroi-qdxql3/"
         onClick={event => handleExternalLinkClick(event)}
-        id="settings:support-faq-link"
+        id="settings:support:transfer-faq-link"
       >
         {intl.formatMessage(messages.faqAbbreviation)}
       </Link>
