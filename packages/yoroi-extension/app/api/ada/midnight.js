@@ -209,7 +209,7 @@ export async function scanForOriginalDestAddress(
   const airdropClaims = await localStorageApi.getAirdropClaimResults();
   const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
   if (currentWalletClaim) {
-    return { address: currentWalletClaim.destAddr, amount: currentWalletClaim.amount, };
+    return { address: currentWalletClaim.destAddr, amount: String(currentWalletClaim.amount), };
   } else {
     const usedAddrs = wallet.allAddresses.utxoAddresses
           .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
@@ -247,10 +247,13 @@ export async function scanForOriginalDestAddress(
   }
 }
 
-export async function scanForMineDestAddress(
+type ThawData = Object;
+
+export async function scanAddressesForThaws(
   thawEndpoint: string,
   wallet: WalletState,
-): Promise<Array<{| address: string, amount: string |}>> {
+  callback: (data: {| address: string, schedule: ThawData |}) => void,
+): Promise<void> {
   const usedAddrs = wallet.allAddresses.utxoAddresses
         .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
         .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
@@ -260,14 +263,12 @@ export async function scanForMineDestAddress(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
     ).address.Hash
   );
-  const result = [];
   for (let address of [unusedAddr1, ...usedAddrs]) {
-    const amount = await getThawedAmountOfAddress(thawEndpoint, address);
-    if (amount > 0) {
-      result.push({ address, amount });
+    const schedule = await getThawScheduleOfAddress(thawEndpoint, address);
+    if (schedule) {
+      callback({ address, schedule });
     }
   }
-  return result;
 }
 
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
@@ -388,8 +389,8 @@ type GetCollateralUtxosResponse = {|
 export async function getCollateralUtxos(
   wallet: WalletState,
   amount: string,
-): Promise<HaskellShelleyTxSignRequest> {
-  const getCollateralUtxosResult = await pickCollateralUtxos(wallet, amount);
+): Promise<GetCollateralUtxosResponse > {
+  const getCollateralUtxosResult = await pickCollateralUtxos(wallet);
   if (getCollateralUtxosResult) {
     return {
       state: 'exist',
@@ -398,7 +399,7 @@ export async function getCollateralUtxos(
     };
   }
   try {
-    const signRequest = await createReorgTransaction(wallet, amount);
+    const signRequest = await createReorgTransaction(wallet);
     return {
       state: 'need-reorg',
       signRequest,
@@ -417,21 +418,16 @@ export async function getCollateralUtxos(
   }
 }
 
-async function getThawedAmountOfAddress(thawEndpoint: string, addr: string): Promise<number> {
+async function getThawScheduleOfAddress(thawEndpoint: string, addr: string): Promise<null | ThawData> {
   try {
     const resp = await fetch(`${thawEndpoint}/thaws/${addr}/schedule`);
     if (!resp.ok) {
       throw new Error('http error');
     }
     const data = await resp.json();
-    const thaw = data.thaws[0];
-    if (Date.now() > (new Date(thaw.thawing_period_start)).valueOf()) {
-      return thaw.amount;
-    } else {
-      return 0;
-    }
+    return data;
   } catch {
-    return 0;
+    return null;
   }
 }
 
@@ -441,7 +437,7 @@ export async function getRedemptionTransaction(
   changeAddr: string,
   collateralUtxoIds: Array<string>,
   fundingUtxos: Array<string>
-) {
+): Promise<Object> {
   const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`);
   if (!resp.ok) {
     throw new Error('error when querying the redemption transaction building endpoint');

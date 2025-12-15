@@ -8,7 +8,7 @@ import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
 import { Box, Button } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { scanForOriginalDestAddress, scanForMineDestAddress, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
+import { scanAddressesForThaws, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
@@ -57,22 +57,32 @@ interface Props {
   };
 }
 
+interface ThawData {
+  address: string;
+  schedule: {
+    numberOfClaimedAllocations: number;
+    thaws: {
+      amount: number;
+      queue_position: null;
+      status: string; // 'upcoming'
+      thawing_period_start: string; // "2026-03-03T00:00:00Z"
+      transaction_id: null | string;
+    }[];
+  };
+}
+
 const NUMBER_OF_NIGHT_DECIMALS = 6;
-const CLAIM_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
-const CLAIM_ENDPOINT_PREPROD = 'https://external-claim.gd.midnighttge.io';
-const THAW_ENDPOINT_MAINNET = '';
-const THAW_ENDPOINT_PREPROD = '';
+const THAW_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
+const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 
 function AirdropPage({ stores }: Readonly<Props>) {
   const intl = useIntl();
   const wallet = stores.wallets.selectedOrFail;
 
-  const [queryingAlloc, setQueryingAlloc] = useState(true);
-  const [alloc, setAlloc] = useState(null);
-
-  const [queryingMine, setQueryingMine] = useState(true);
-  const [mineDestAddrs, setMineDestAddrs] = useState([]);
+  const [queryingThaws, setQueryingThaws] = useState(true);
+  // one element for each redeemable address
+  const [addressThawsData, setAddressThawsData] = useState<ThawData>([]);
 
   const [arbitraryAddr, setArbitraryAddr] = useState('');
 
@@ -87,22 +97,16 @@ function AirdropPage({ stores }: Readonly<Props>) {
   useEffect(() => {
     (async () => {
       const isMainnet = wallet.networkId === 0;
-      const claimEndpoint = isMainnet ? CLAIM_ENDPOINT_MAINNET : CLAIM_ENDPOINT_PREPROD;
-      const result = await scanForOriginalDestAddress(claimEndpoint, wallet);
-      setAlloc(result);
-      setQueryingAlloc(false);
-
       const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
-      const mineAddrs = await scanForMineDestAddress(thawEndpoint, wallet);
-      setMineDestAddrs(mineAddrs);
-      setQueryingMine(false);
+      await scanAddressesForThaws(thawEndpoint, wallet, (data) => {
+        setAddressThawsData([...addressThawsData, data]);
+      });
+      setQueryingThaws(false);
     })();
     return () => {
       // switch wallet
-      setAlloc(null);
-      setQueryingAlloc(true);
-      setMineDestAddrs([]);
-      setQueryingMine(true);
+      setAddressThawsData([]);
+      setQueryingThaws(true);
     };
   }, [wallet.publicDeriverId]);
 
@@ -111,31 +115,18 @@ function AirdropPage({ stores }: Readonly<Props>) {
 
   content = (
     <div>
-      <div>Airdrop allocation</div>
-      {queryingAlloc ? '...'
-        : alloc ?  (
+      <h1>Redeemable addresses</h1>
+      {addressThawsData.map(({ address, schedule }) => (
          <div>
-           <div>address: {alloc.address}</div>
-           <div>amount: {alloc.amount / 10**6}</div>
-           <Button
-             variant="outlined"
-             onClick={() => { startRedeem(alloc.address); }}
-           >
-             Claim
-           </Button>
+           <div>address: {address}</div>
+           <div>schedule:</div>
+           <pre>{JSON.stringify(schedule, null, 2)}</pre>
          </div>
-       ) : 'no allocation'}
-      <div>scavenger mine addresses</div>
-      {queryingMine ? '...'
-        : (mineDestAddrs.length === 0) ? 'no scavenger mine rewards'
-        : mineDestAddrs.map(({ address, amount }) => (
-           <div>
-             <div>address: {address}</div>
-             <div>amount: {amount / 10**6}</div>
-           </div>
-        ))
-      }
-      <div>addresses from other wallets</div>
+      ))}
+      {(!queryingThaws && addressThawsData.length === 0) && 'no redeemable address'}
+      {queryingThaws && 'scanning...'}
+      {/* next stage
+      <h1>addresses from other wallets</h1>
       <Box sx={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
         <TextField
           sx={{ width: '936px' }}
@@ -151,6 +142,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
           Check address
         </Button>
       </Box>
+      */}
     </div>
   );
 
