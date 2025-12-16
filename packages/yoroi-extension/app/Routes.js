@@ -262,7 +262,6 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
 
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
-          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
           <Route path={ROUTES.AIRDROP} element={<AirdropPage stores={stores} />} />
         </Routes>
       </Suspense>

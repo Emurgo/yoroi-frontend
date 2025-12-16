@@ -12,7 +12,6 @@ import { HIDDEN_AMOUNT } from '../../../../common/constants';
 import { truncateToken } from '../../../../../utils/formatters';
 import { GraphData } from '../../common/types';
 import { Icon } from '../../../../components';
-import BigNumber from 'bignumber.js';
 
 export type SummaryCardProps = {
   onOpenRewardList: () => void;
@@ -67,18 +66,8 @@ const InfoDetails = styled(Box)({});
 
 export const RewardsSummaryCard: React.FC<SummaryCardProps> = ({ govStatusFetched }) => {
   const strings = useStrings();
-  const {
-    getTokenInfo,
-    onOpenRewardList,
-    totalRewards,
-    totalDelegated,
-    shouldHideBalance,
-    historyGraphData,
-    primaryTokenInfo,
-    toUnitOfAccount,
-  } = useStaking();
-  console.log('totalRewards', { totalRewards, totalDelegated, primaryTokenInfo });
-
+  const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
+    useStaking();
   const formatTokenEntry = (tokenEntry): ReactNode => {
     const tokenInfo = getTokenInfo(tokenEntry);
     const decimals = tokenInfo.Metadata.numberOfDecimals;
@@ -200,9 +189,3 @@ export const RewardsSummaryCard: React.FC<SummaryCardProps> = ({ govStatusFetche
     </Card>
   );
 };
-
-function formatLovelaceAsAda(amount: BigNumber | string): string {
-  return new BigNumber(amount)
-    .shiftedBy(-6) // apply ADA decimals
-    .toFormat(6); // format nicely
-}
