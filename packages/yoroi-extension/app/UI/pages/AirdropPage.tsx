@@ -247,7 +247,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
   }
 
   const leftPanel = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px'}} >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }} >
       <AddressesTitle count={addressThawsData.length} />
       {addressThawsData.map(({ address, schedule }, index) => (
         <AddressCard
@@ -268,10 +268,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-        <Box sx={{ overflowY: 'auto' }}>
+        <Box sx={{ overflowY: 'auto', padding: '24px' }}>
          {leftPanel}
         </Box>
-        <Box sx={{ flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
               address={selectedAddressData.address}
@@ -304,6 +304,7 @@ export default function AirDropPageWrap({ stores }: Readonly<Props>) {
         <NavBarContainerRevamp stores={stores} title={<NavBarTitle title={intl.formatMessage(globalMessages.airdrop)} />} />
       }
       showInContainer
+      withPadding={false}
     >
       <ModalProvider>
         <ModalManager />
