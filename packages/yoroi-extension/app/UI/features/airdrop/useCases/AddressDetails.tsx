@@ -1,5 +1,5 @@
 import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import { defineMessages, useIntl } from 'react-intl';
+import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import CopyableText from '../../../components/CopyableText';
 
@@ -38,7 +38,7 @@ const messages = defineMessages({
   },
   subTitle: {
     id: 'airdrop.addrDetails.subTitle',
-    defaultMessage: '!!!🧩 Thawing & Redemption of Midnight airdrop has started.',
+    defaultMessage: '!!!🧩 <strong>Thawing & Redemption</strong> of Midnight airdrop has started.',
   },
   redeemableNow: {
     id: 'airdrop.addrDetails.redeemableNow',
@@ -49,6 +49,8 @@ const messages = defineMessages({
     defaultMessage: '!!!Destination address',
   },
 });
+
+const strong = chunks => (<Typography fontWeight="500" display="inline">{chunks}</Typography>);
 
 interface Props {
   schedule: Schedule;
@@ -74,7 +76,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         </Typography>
         {/*  @ts-ignore */}
         <Typography variant="body1">
-          {intl.formatMessage(messages.subTitle)}
+          <FormattedMessage {...messages.subTitle} values={{ strong }} />
         </Typography>
       </Box>
 
