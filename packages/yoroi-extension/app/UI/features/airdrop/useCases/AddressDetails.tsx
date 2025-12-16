@@ -153,13 +153,21 @@ export default function AddressDetails({ schedule, redeemableAmount, address, ne
           {intl.formatMessage(messages.redeemableNow)}
         </Typography>
         <Box>
-          {/*  @ts-ignore */}
-          <Typography as="span" fontSize="30px" fontWeight="500">
+          <Typography
+            variant="h4"
+            component="span"
+            sx={{
+              fontSize: '20px',
+              lineHeight: '28px',
+              fontWeight: 500,
+              color: 'ds.text_gray_medium',
+            }}
+          >
             {redeemableAmount}
           </Typography>
           {/*  @ts-ignore */}
-          <Typography as="span" variant="body1" fontWeight="500">
-            NIGHT
+          <Typography as="span" variant="body1" fontWeight="500" sx={{ color: 'ds.text_gray_medium' }}>
+            {' '}NIGHT
           </Typography>
         </Box>
         <Box>
@@ -344,7 +352,6 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
           const statusType = getThawStatusType(thaw.status);
           const isRedeemable = statusType === 'redeemable';
           const isRedeemed = statusType === 'confirmed';
-          const isActive = isRedeemable || isRedeemed;
           const isCurrent = index === currentThawIndex;
           const isPast = index < currentThawIndex;
           const isLast = index === totalThaws - 1;
@@ -392,11 +399,10 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
 
                 <Stack direction="row" alignItems="baseline" gap="4px" sx={{ mb: '8px' }}>
                   <Typography
+                    variant="h5"
                     sx={{
-                      fontSize: isActive ? '24px' : '18px',
-                      fontWeight: 500,
-                      lineHeight: 1.2,
-                      color: isActive ? 'ds.text_gray_medium' : 'ds.text_gray_low',
+                      color: isRedeemable ? 'ds.text_gray_medium' : 'ds.text_gray_low',
+                      textDecorationLine: isRedeemed ? 'line-through' : 'none',
                     }}
                   >
                     {formatNumber(thaw.amount)}
@@ -404,9 +410,9 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                   <Typography
                     variant="caption"
                     fontWeight={500}
-                    color={isActive ? 'ds.text_gray_medium' : 'ds.text_gray_low'}
+                    color={isRedeemable ? 'ds.text_gray_medium' : 'ds.text_gray_low'}
                   >
-                    NIGHT
+                    {' '}NIGHT
                   </Typography>
                 </Stack>
 
