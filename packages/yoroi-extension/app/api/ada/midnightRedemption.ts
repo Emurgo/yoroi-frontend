@@ -23,7 +23,7 @@ export interface Schedule {
   }[];
 }
 
-function formatNumber(n: number): string {
+export function formatNumber(n: number): string {
   return (new BigNumber(n)).shiftedBy(-NUMBER_OF_NIGHT_DECIMALS).toFixed(2);
 }
 

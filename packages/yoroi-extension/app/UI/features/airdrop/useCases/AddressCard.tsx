@@ -82,7 +82,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
       }}
       onClick={(event) => {
         //hack: detect that the copy address icon is clicked
-        if (event.target.tagName === 'svg') {
+        if ((event.target as HTMLElement).tagName === 'svg') {
           return;
         }
         onSelect();

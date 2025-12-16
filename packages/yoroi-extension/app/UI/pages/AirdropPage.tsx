@@ -274,7 +274,9 @@ function AirdropPage({ stores }: Readonly<Props>) {
         <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
+              address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
+              redeemableAmount={getRedeemable(selectedAddressData.schedule)}
             />
           )}
         </Box>

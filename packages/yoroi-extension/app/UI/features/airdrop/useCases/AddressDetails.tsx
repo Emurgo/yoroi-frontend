@@ -1,43 +1,7 @@
 import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import BigNumber from 'bignumber.js';
 import { defineMessages, useIntl } from 'react-intl';
-import type { Schedule } from '../../../../api/ada/midnightRedemption';
-
-const NUMBER_OF_NIGHT_DECIMALS = 6;
-
-/* const scheduleMockData = {
-  "numberOfClaimedAllocations": 1,
-  "thaws": [
-    {
-      "amount": 2000000000,
-      "queue_position": null,
-      "status": "confirmed",
-      "thawing_period_start": "2025-09-12T10:33:00Z",
-      "transaction_id": "abc123"
-    },
-    {
-      "amount": 2000000000,
-      "queue_position": null,
-      "status": "redeemable",
-      "thawing_period_start": "2025-11-12T10:33:00Z",
-      "transaction_id": null
-    },
-    {
-      "amount": 2000000000,
-      "queue_position": null,
-      "status": "upcoming",
-      "thawing_period_start": "2025-12-12T10:33:00Z",
-      "transaction_id": null
-    },
-    {
-      "amount": 2000000000,
-      "queue_position": null,
-      "status": "upcoming",
-      "thawing_period_start": "2026-01-12T10:33:00Z",
-      "transaction_id": null
-    }
-  ]
-} */
+import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
+import CopyableText from '../../../components/CopyableText';
 
 const messages = defineMessages({
   details: {
@@ -68,24 +32,106 @@ const messages = defineMessages({
     id: 'airdrop.schedule.thawExplanation',
     defaultMessage: '!!!Each thaw is 25% of your claimed NIGHT allocation',
   },
+  status: {
+    id: 'airdrop.addrDetails.statusLabel',
+    defaultMessage: '!!!Redemption status',
+  },
+  subTitle: {
+    id: 'airdrop.addrDetails.subTitle',
+    defaultMessage: '!!!🧩 Thawing & Redemption of Midnight airdrop has started.',
+  },
+  redeemableNow: {
+    id: 'airdrop.addrDetails.redeemableNow',
+    defaultMessage: '!!!Redeemable now',
+  },
+  dstAddrLabel: {
+    id: 'airdrop.addrCard.destAddrLabel',
+    defaultMessage: '!!!Destination address',
+  },
 });
 
 interface Props {
   schedule: Schedule;
+  redeemableAmount: string;
+  address: string;
 }
 
-export default function AddressDetails({ schedule }: Props) {
-
+export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
+  const intl = useIntl();
 
   return (
-    <Box>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+      }}
+    >
+      <Box>
+        {/*  @ts-ignore */}
+        <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
+          {intl.formatMessage(messages.status)}
+        </Typography>
+        {/*  @ts-ignore */}
+        <Typography variant="body1">
+          {intl.formatMessage(messages.subTitle)}
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          borderRadius: 'var(--corner-radius-8, 8px)',
+          background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+          padding: '16px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+        }}
+      >
+        <Typography variant="body1" fontWeight="500">
+          {intl.formatMessage(messages.redeemableNow)}
+        </Typography>
+        <Box>
+          {/*  @ts-ignore */}
+          <Typography as="span" fontSize="30px" fontWeight="500">
+            {redeemableAmount}
+          </Typography>
+          {/*  @ts-ignore */}
+          <Typography as="span" variant="body1" fontWeight="500">
+            NIGHT
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+            {intl.formatMessage(messages.dstAddrLabel)}
+          </Typography>
+          {/*  @ts-ignore */}
+          <CopyableText value={address} copyButtonFollowText>
+            <Typography variant="body1">
+              {address}
+            </Typography>
+          </CopyableText>
+        </Box>
+      </Box>
+
       <ScheduleCard schedule={schedule} />
+
+      <Box sx={{ height: '1px', background: 'var(--grayscale-200, #DCE0E9)' }}/>
+
+      <Box>
+        <Typography variant="body1" fontWeight="500">
+          {intl.formatMessage(messages.details)}
+        </Typography>
+      </Box>
+
+      <Box>
+        {/* allocation size
+            no. of claimed allocations
+            ...
+         */}
+      </Box>
     </Box>
   );
-}
-
-function formatAmount(amount: number): string {
-  return new BigNumber(amount).shiftedBy(-NUMBER_OF_NIGHT_DECIMALS).toFormat(2);
 }
 
 function formatDate(dateString: string, locale: string): string {
@@ -231,7 +277,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                       color: isActive ? 'ds.text_gray_medium' : 'ds.text_gray_low',
                     }}
                   >
-                    {formatAmount(thaw.amount)}
+                    {formatNumber(thaw.amount)}
                   </Typography>
                   <Typography
                     variant="caption"
