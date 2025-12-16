@@ -363,19 +363,28 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                   sx={{
                     width: '24px',
                     height: '24px',
-                    borderRadius: '50%',
+                    padding: '4px',
+                    borderRadius: '24px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: isCurrent || isPast ? 'ds.primary_500' : 'ds.gray_200',
-                    color: isCurrent || isPast ? 'ds.white_static' : 'ds.text_gray_low',
+                    backgroundColor: isPast ? 'ds.primary_300' : isCurrent ? 'ds.primary_500' : 'ds.gray_200',
+                    color: isPast || isCurrent ? 'ds.white_static' : 'ds.text_gray_min',
                     fontSize: '12px',
                     fontWeight: 500,
                     zIndex: 1,
                     flexShrink: 0,
                   }}
                 >
-                  {index + 1}
+                  {isPast ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                        <path fillRule="evenodd" clipRule="evenodd" d="M13.7007 4.28655C14.0947 4.67354 14.1004 5.30668 13.7134 5.70071L6.83845 12.7007C6.65042 12.8922 6.39334 13 6.125 13C5.85666 13 5.59958 12.8922 5.41155 12.7007L2.28655 9.51889C1.89956 9.12486 1.90527 8.49172 2.29929 8.10473C2.69332 7.71774 3.32646 7.72345 3.71345 8.11747L6.125 10.5729L12.2866 4.29929C12.6735 3.90527 13.3067 3.89956 13.7007 4.28655Z" fill="white"/>
+                      </svg>
+                    </Box>
+                  ) : (
+                    index + 1
+                  )}
                 </Box>
                 {!isLast && (
                   <Box
