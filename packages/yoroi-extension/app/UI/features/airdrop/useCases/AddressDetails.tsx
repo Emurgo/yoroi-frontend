@@ -1,6 +1,7 @@
-import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import { defineMessages, useIntl, FormattedMessage } from 'react-intl';
+import { Box, Link, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
+import { Collapsible } from '../../../components/Collapsible/Collapsible';
 import CopyableText from '../../../components/CopyableText';
 
 const messages = defineMessages({
@@ -48,18 +49,76 @@ const messages = defineMessages({
     id: 'airdrop.addrCard.destAddrLabel',
     defaultMessage: '!!!Destination address',
   },
+  allocationSize: {
+    id: 'airdrop.addrDetails.allocationSize',
+    defaultMessage: '!!!Allocation size',
+  },
+  claimedAllocations: {
+    id: 'airdrop.addrDetails.claimedAllocations',
+    defaultMessage: '!!!No. of claimed allocations',
+  },
+  redeemedSoFar: {
+    id: 'airdrop.addrDetails.redeemedSoFar',
+    defaultMessage: '!!!Redeemed so far',
+  },
+  totalLeftToRedeem: {
+    id: 'airdrop.addrDetails.totalLeftToRedeem',
+    defaultMessage: '!!!Total left to redeem',
+  },
+  totalToRedeem: {
+    id: 'airdrop.addrDetails.totalToRedeem',
+    defaultMessage: '!!!Total to redeem',
+  },
+  detailsOn: {
+    id: 'airdrop.addrDetails.detailsOn',
+    defaultMessage: '!!!Details on',
+  },
+  cardanoscan: {
+    id: 'airdrop.addrDetails.cardanoscan',
+    defaultMessage: '!!!Cardanoscan',
+  },
+  adaex: {
+    id: 'airdrop.addrDetails.adaex',
+    defaultMessage: '!!!Adaex',
+  },
 });
 
 const strong = chunks => (<Typography fontWeight="500" display="inline">{chunks}</Typography>);
+
+function getTotalAllocation(schedule: Schedule): number {
+  return schedule.thaws.reduce((sum, thaw) => sum + thaw.amount, 0);
+}
+
+function getRedeemedSoFar(schedule: Schedule): number {
+  return schedule.thaws
+    .filter(thaw => thaw.status === 'confirmed')
+    .reduce((sum, thaw) => sum + thaw.amount, 0);
+}
+
+function getExplorerUrls(networkId: number, address: string) {
+  const isMainnet = networkId === 0;
+  return {
+    cardanoscan: isMainnet
+      ? `https://cardanoscan.io/address/${address}`
+      : `https://preprod.cardanoscan.io/address/${address}`,
+    adaex: `https://adaex.org/${address}`,
+  };
+}
 
 interface Props {
   schedule: Schedule;
   redeemableAmount: string;
   address: string;
+  networkId: number;
 }
 
-export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
+export default function AddressDetails({ schedule, redeemableAmount, address, networkId }: Props) {
   const intl = useIntl();
+
+  const totalAllocation = getTotalAllocation(schedule);
+  const redeemedSoFar = getRedeemedSoFar(schedule);
+  const totalLeftToRedeem = totalAllocation - redeemedSoFar;
+  const explorerUrls = getExplorerUrls(networkId, address);
 
   return (
     <Box
@@ -120,19 +179,80 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
 
       <Box sx={{ height: '1px', background: 'var(--grayscale-200, #DCE0E9)' }}/>
 
-      <Box>
-        <Typography variant="body1" fontWeight="500">
-          {intl.formatMessage(messages.details)}
-        </Typography>
-      </Box>
-
-      <Box>
-        {/* allocation size
-            no. of claimed allocations
-            ...
-         */}
-      </Box>
+      <Collapsible
+        expanded={true}
+        title={
+          <Typography variant="body1" fontWeight="500" color="ds.text_gray_medium">
+            {intl.formatMessage(messages.details)}
+          </Typography>
+        }
+        content={
+          <Stack spacing="16px" sx={{ paddingBottom: '16px' }}>
+            <DetailRow
+              label={intl.formatMessage(messages.allocationSize)}
+              value={`${formatNumber(totalAllocation)} NIGHT`}
+            />
+            <DetailRow
+              label={intl.formatMessage(messages.claimedAllocations)}
+              value={String(schedule.numberOfClaimedAllocations)}
+            />
+            <DetailRow
+              label={intl.formatMessage(messages.redeemedSoFar)}
+              value={`${formatNumber(redeemedSoFar)} NIGHT`}
+            />
+            <DetailRow
+              label={intl.formatMessage(messages.totalLeftToRedeem)}
+              value={`${formatNumber(totalLeftToRedeem)} NIGHT`}
+            />
+            <DetailRow
+              label={intl.formatMessage(messages.totalToRedeem)}
+              value={`${formatNumber(totalAllocation)} NIGHT`}
+            />
+            <Box>
+              <Typography variant="body1" color="ds.text_gray_low">
+                {intl.formatMessage(messages.detailsOn)}
+              </Typography>
+              <Stack direction="row" spacing="16px" sx={{ mt: '4px' }}>
+                <Link
+                  href={explorerUrls.cardanoscan}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: 'none' }}
+                >
+                  {intl.formatMessage(messages.cardanoscan)}
+                </Link>
+                <Link
+                  href={explorerUrls.adaex}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{ textDecoration: 'none' }}
+                >
+                  {intl.formatMessage(messages.adaex)}
+                </Link>
+              </Stack>
+            </Box>
+          </Stack>
+        }
+      />
     </Box>
+  );
+}
+
+type DetailRowProps = {
+  label: string;
+  value: string;
+};
+
+function DetailRow({ label, value }: DetailRowProps) {
+  return (
+    <Stack direction="row" justifyContent="space-between" alignItems="center">
+      <Typography variant="body1" color="ds.text_gray_low">
+        {label}
+      </Typography>
+      <Typography variant="body1" color="ds.text_gray_medium">
+        {value}
+      </Typography>
+    </Stack>
   );
 }
 
