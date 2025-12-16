@@ -27,7 +27,7 @@ import Redeem from '../features/airdrop/useCases/Redeem';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
 import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
 import Zero from '../features/airdrop/useCases/Zero';
-import AddressCard from '../features/airdrop/useCases/AddressCard';
+import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
 
 interface Props {
   stores: {
@@ -224,7 +224,8 @@ function AirdropPage({ stores }: Readonly<Props>) {
   }
 
   const leftPanel = (
-    <>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px'}} >
+      <AddressesTitle count={addressThawsData.length} />
       {addressThawsData.map(({ address, schedule }, index) => (
         <AddressCard
           index={index + 1}
@@ -237,13 +238,13 @@ function AirdropPage({ stores }: Readonly<Props>) {
         />
       ))}
       {queryingThaws && <LoadingSpinner />}
-    </>
+    </Box>
   );
 
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-        <Box sx={{ width: '600px', overflowY: 'auto' }}>
+        <Box sx={{ overflowY: 'auto' }}>
          {leftPanel}
         </Box>
         <Box sx={{ flexGrow: 1 }}>
