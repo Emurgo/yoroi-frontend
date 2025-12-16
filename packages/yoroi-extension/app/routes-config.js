@@ -43,7 +43,9 @@ export const ROUTES = {
   },
   STAKING: '/staking',
   // revamp
-  STAKING_REVAMP: '/staking-revamp',
+  STAKING_REVAMP: {
+    ROOT: '/staking-revamp',
+  },
   ASSETS: {
     ROOT: '/assets',
     DETAILS: '/assets/tokens/:tokenId',

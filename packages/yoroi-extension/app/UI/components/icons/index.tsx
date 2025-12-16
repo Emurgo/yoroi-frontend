@@ -108,6 +108,8 @@ import { YoroiLogo } from './YoroiLogo';
 import { VotingDrep } from './VotingDrep';
 import { VotingAbstain } from './VotingAbstain';
 import { VotingNoConfidence } from './VotingNoConfidence';
+import { StakingActive } from './StakingActive';
+import { TotalDelegated } from './TotalDelegated';
 
 export const Icon = {
   Assets,
@@ -218,6 +220,8 @@ export const Icon = {
   VotingDrep,
   VotingAbstain,
   VotingNoConfidence,
+  StakingActive,
+  TotalDelegated,
 };
 
 export enum Icons {
@@ -324,6 +328,8 @@ export enum Icons {
   VotingDrep = 'VotingDrep',
   VotingAbstain = 'VotingAbstain',
   VotingNoConfidence = 'VotingNoConfidence',
+  StakingActive = 'StakingActive',
+  TotalDelegated = 'TotalDelegated',
 }
 
 interface IconWrapperProps {

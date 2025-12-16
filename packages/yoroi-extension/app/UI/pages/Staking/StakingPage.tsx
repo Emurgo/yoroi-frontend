@@ -1,11 +1,12 @@
-import { Stack, Typography } from '@mui/material';
-import PoolList from './useCases/PoolList/PoolList';
+import { StakingRoot } from '../../features/staking/StakingRoot';
+import Layout from './layout';
 
-export const StakingPage = () => {
+const StakingPage = ({ stores }) => {
   return (
-    <Stack>
-      <Typography variant="h2">MAINSTAKING PAGE </Typography>
-      <PoolList />
-    </Stack>
+    <Layout stores={stores}>
+      <StakingRoot />
+    </Layout>
   );
 };
+
+export default StakingPage;
