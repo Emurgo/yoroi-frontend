@@ -99,10 +99,11 @@ class DriversManager {
     this.prepareExtension(newDriverObject)
       .then(() => {
         poolOfDrivers.push(newDriverObject);
-        this.logger.info(`DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${driverGlobalCounter}`);
+        this.logger.info(`DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${newDriverObject.driverId}`);
       })
       .catch(error => {
-        this.logger.error(`DriversManager::getDriverFromPool Failed to prepare new driver ${driverGlobalCounter}: ${error}`);
+        this.logger.error(`DriversManager::getDriverFromPool Failed to prepare new driver ${newDriverObject.driverId}: ${error}`);
+        newDriverObject.driver.close();
       });
 
     return driverObject.driver;
