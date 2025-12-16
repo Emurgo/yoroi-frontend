@@ -1,4 +1,3 @@
-// RewardHistoryGraph.tsx
 import React from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
@@ -185,7 +184,7 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
       )}
 
       {!Array.isArray(rewardList) ? (
-          <CircularProgress />
+        <CircularProgress />
       ) : (
         <Box ml="-50px">
           <RewardGraphClean

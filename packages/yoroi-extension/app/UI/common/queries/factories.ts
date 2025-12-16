@@ -1,6 +1,6 @@
-import {Chain} from '@yoroi/types'
+import { Chain } from '@yoroi/types';
 
-import {QueryKey} from '@tanstack/react-query'
+import { QueryKey } from '@tanstack/react-query';
 
 /**
  * React Query Query Factories
@@ -18,11 +18,12 @@ export const poolQueryKeys = {
    * @param network - Network
    * @param searchQuery - Optional search query
    */
-  list: (
-    walletId: string,
-    network: Chain.SupportedNetworks,
-    searchQuery?: string,
-  ): QueryKey => ['poolList', walletId, network, searchQuery?.trim() ?? ''],
+  list: (walletId: string, network: Chain.SupportedNetworks, searchQuery?: string): QueryKey => [
+    'poolList',
+    walletId,
+    network,
+    searchQuery?.trim() ?? '',
+  ],
 
   /**
    * Query key for a single pool info
@@ -37,16 +38,11 @@ export const poolQueryKeys = {
    * @param searchQuery - Optional search query
    * @param pageParam - Page parameter for infinite queries
    */
-  listInfinite: (
-    walletId: string,
-    network: Chain.SupportedNetworks,
-    searchQuery?: string,
-    pageParam?: number,
-  ): QueryKey => [
+  listInfinite: (walletId: string, network: Chain.SupportedNetworks, searchQuery?: string, pageParam?: number): QueryKey => [
     'poolList',
     walletId,
     network,
     searchQuery?.trim() ?? '',
     pageParam ?? 0,
   ],
-}
+};

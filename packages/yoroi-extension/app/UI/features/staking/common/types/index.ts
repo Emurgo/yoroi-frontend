@@ -1,6 +1,5 @@
 // Define types
-export type StakingActions = {
-};
+export type StakingActions = {};
 
 // Define state type
 export type StakingState = {
@@ -17,21 +16,20 @@ export type StakingState = {
 };
 
 export interface GraphItems {
-  readonly name: number
-  readonly primary: number
-  readonly poolName: string
+  readonly name: number;
+  readonly primary: number;
+  readonly poolName: string;
 }
-
 
 export interface RewardsGraphData {
   readonly items?: {
-    readonly totalRewards: GraphItems[]
-    readonly perEpochRewards: GraphItems[]
-  }
-  readonly hideYAxis: boolean
-  readonly error?: any
+    readonly totalRewards: GraphItems[];
+    readonly perEpochRewards: GraphItems[];
+  };
+  readonly hideYAxis: boolean;
+  readonly error?: any;
 }
 
 export interface GraphData {
-  readonly rewardsGraphData: RewardsGraphData
+  readonly rewardsGraphData: RewardsGraphData;
 }
