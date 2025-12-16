@@ -17,7 +17,6 @@ export type SummaryCardProps = {
   onOpenRewardList: () => void;
   unitOfAccount: (entry: any) => void | { currency: string; amount: string };
   graphData: GraphData;
-  govStatusFetched: boolean;
   stores: any;
 };
 
