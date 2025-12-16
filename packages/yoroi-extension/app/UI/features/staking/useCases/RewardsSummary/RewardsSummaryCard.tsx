@@ -64,10 +64,12 @@ const InfoRow = styled(Box)({
 
 const InfoDetails = styled(Box)({});
 
-export const RewardsSummaryCard: React.FC<SummaryCardProps> = ({ govStatusFetched }) => {
+export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
   const strings = useStrings();
   const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
     useStaking();
+  const govStatusFetched = true; // TODO: get from governance provider
+
   const formatTokenEntry = (tokenEntry): ReactNode => {
     const tokenInfo = getTokenInfo(tokenEntry);
     const decimals = tokenInfo.Metadata.numberOfDecimals;
@@ -130,7 +132,7 @@ export const RewardsSummaryCard: React.FC<SummaryCardProps> = ({ govStatusFetche
           {strings.rewardsSummary}
         </Typography>
 
-        <WithdrawButton govStatusFetched={govStatusFetched} isDisabled={totalRewards !== undefined} />
+        <WithdrawButton govStatusFetched={govStatusFetched} isDisabled={totalRewards === undefined} />
       </Box>
 
       <Divider sx={{ borderColor: 'ds.gray_200' }} />
