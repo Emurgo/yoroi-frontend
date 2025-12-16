@@ -1,35 +1,35 @@
-import { useEffect, useState } from 'react';
-import TopBarLayout from '../../components/layout/TopBarLayout';
-import BannerContainer from '../../containers/banners/BannerContainer';
-import SidebarContainer from '../../containers/SidebarContainer';
-import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
-import NavBarTitle from '../../components/topbar/NavBarTitle';
-import { useIntl } from 'react-intl';
-import globalMessages from '../../i18n/global-messages';
 import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import { useIntl } from 'react-intl';
 import { scanAddressesForThaws } from '../../api/ada/midnight';
-import { type Schedule, getRedeemable, getTotal, getStatus } from '../../api/ada/midnightRedemption';
+import { type Schedule, getRedeemable, getStatus, getTotal } from '../../api/ada/midnightRedemption';
+import TopBarLayout from '../../components/layout/TopBarLayout';
+import NavBarTitle from '../../components/topbar/NavBarTitle';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
+import BannerContainer from '../../containers/banners/BannerContainer';
+import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
+import SidebarContainer from '../../containers/SidebarContainer';
+import globalMessages from '../../i18n/global-messages';
 //import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
 //import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
 //import { forceNonNull } from '../../coreUtils.js';
-import { useTxReviewModal } from '../features/transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../features/transaction-review/common/types';
+import { useTxReviewModal } from '../features/transaction-review/module/ReviewTxProvider';
 //import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
+import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
 import { ModalProvider } from '../components/modals/ModalContext';
 import { ModalManager } from '../components/modals/ModalManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx';
-import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
 //import TextField from '../../components/common/TextField';
-import Redeem from '../features/airdrop/useCases/Redeem';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { /*broadcastTransaction, */getProtocolParameters } from '../../api/thunk';
-import Zero from '../features/airdrop/useCases/Zero';
-import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import { /*broadcastTransaction, */ getProtocolParameters } from '../../api/thunk';
+import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
 import AddressDetails from '../features/airdrop/useCases/AddressDetails';
+import Redeem from '../features/airdrop/useCases/Redeem';
+import Zero from '../features/airdrop/useCases/Zero';
 
 interface ThawData {
   address: string;
@@ -274,7 +274,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
         <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
-              address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
             />
           )}
