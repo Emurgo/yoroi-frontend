@@ -78,9 +78,17 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
         flexDirection: 'column',
         gap: '16px',
         ...selectedBackground,
+        cursor: 'pointer',
+      }}
+      onClick={(event) => {
+        //hack: detect that the copy address icon is clicked
+        if (event.target.tagName === 'svg') {
+          return;
+        }
+        onSelect();
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between' }} onClick={onSelect}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body1">
           {intl.formatMessage(messages.dstAddr, { index })}
