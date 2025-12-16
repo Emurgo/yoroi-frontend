@@ -151,7 +151,7 @@ export const preloadBrowserStorage = async (
     await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
     logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
   } catch (error) {
-    logger.error(`DriversManager::preloadBrowserStorage Error: ${JSON.stringify(error)}`);
+    logger.error(`RestoreWalletHelper::preloadBrowserStorage Error: ${error}`);
     const prepareTime = Date.now();
     await addWalletPage.getDriverLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
     await addWalletPage.getBrowserLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
