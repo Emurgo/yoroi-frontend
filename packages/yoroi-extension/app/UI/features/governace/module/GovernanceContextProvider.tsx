@@ -58,7 +58,6 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
-  getCurrentPrice,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
