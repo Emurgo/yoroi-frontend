@@ -1,6 +1,5 @@
 import { Box, Typography } from '@mui/material';
 import { useIntl, defineMessages } from 'react-intl';
-import globalMessages from '../../../../i18n/global-messages';
 import { type Status } from '../../../../api/ada/midnightRedemption';
 import CopyableText from '../../../components/CopyableText';
 import { IconWrapper, Icons } from '../../../components';
@@ -43,6 +42,7 @@ const messages = defineMessages({
 export function AddressesTitle({ count }: { count: number }) {
   const intl = useIntl();
   return (
+    /*  @ts-ignore */
     <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }} as="div">
       {intl.formatMessage(messages.dstAddrs, { count })}
     </Typography>

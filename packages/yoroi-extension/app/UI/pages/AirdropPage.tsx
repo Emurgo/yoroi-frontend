@@ -6,14 +6,14 @@ import NavBarContainerRevamp from '../../containers/NavBarContainerRevamp';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import { useIntl } from 'react-intl';
 import globalMessages from '../../i18n/global-messages';
-import { Box, Button } from '@mui/material';
+import { Box } from '@mui/material';
 import BigNumber from 'bignumber.js';
-import { scanAddressesForThaws, getCollateralUtxos, createReorgTransaction } from '../../api/ada/midnight';
-import { type ThawData, getRedeemable, getTotal, getStatus } from '../../api/ada/midnightRedemption';
+import { scanAddressesForThaws } from '../../api/ada/midnight';
+import { type Schedule, getRedeemable, getTotal, getStatus } from '../../api/ada/midnightRedemption';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
-import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
-import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
-import { forceNonNull } from '../../coreUtils.js';
+//import { addressHexToBech32 } from '../../api/ada/lib/cardanoCrypto/utils';
+//import { CoreAddressTypes } from '../../api/ada/lib/storage/database/primitives/enums';
+//import { forceNonNull } from '../../coreUtils.js';
 import { useTxReviewModal } from '../features/transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../features/transaction-review/common/types';
 //import { isCardanoAppNotRunning, isTxCancelledByUser } from '../hwConnect/common/util';
@@ -22,12 +22,18 @@ import { ModalManager } from '../components/modals/ModalManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx';
 import { isCardanoAppNotRunning, isTxCancelledByUser } from '../../components/wallet/hwConnect/common/util';
-import TextField from '../../components/common/TextField';
+//import TextField from '../../components/common/TextField';
 import Redeem from '../features/airdrop/useCases/Redeem';
 import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { broadcastTransaction, getProtocolParameters } from '../../api/thunk';
+import { /*broadcastTransaction, */getProtocolParameters } from '../../api/thunk';
 import Zero from '../features/airdrop/useCases/Zero';
 import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
+import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+
+interface ThawData {
+  address: string;
+  schedule: Schedule;
+}
 
 interface Props {
   stores: {
@@ -52,10 +58,25 @@ interface Props {
         allAddressesByType: {
           address: string;
         }[][];
+        utxos: {
+          address: string;
+          addressing: any;
+          output: {
+            Transaction: {
+              Hash: string;
+            };
+            UtxoTransactionOutput: {
+              OutputIndex: number;
+            };
+          };
+        }[];
       };
     };
     profile: {
       currentLocale: string;
+    };
+    transactionProcessingStore: {
+      adaSendAndRefresh: (params: { wallet: any, signRequest: any, password: any, callback: any }) => Promise<void>;
     };
   };
 }
@@ -65,12 +86,11 @@ const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 
 function AirdropPage({ stores }: Readonly<Props>) {
-  const intl = useIntl();
   const wallet = stores.wallets.selectedOrFail;
 
   const [queryingThaws, setQueryingThaws] = useState(true);
   // one element for each redeemable address
-  const [addressThawsData, setAddressThawsData] = useState<ThawData>([]);
+  const [addressThawsData, setAddressThawsData] = useState<ThawData[]>([]);
 
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
 
@@ -81,6 +101,8 @@ function AirdropPage({ stores }: Readonly<Props>) {
   const startRedeem = (addr) => {
     setRedeemingAddr(addr);
   };
+  void(startRedeem);
+
   const closeRedeem = () => {
     setRedeemingAddr(null);
   };
@@ -105,7 +127,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
 
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
   const onReorg = async (signRequest: any) => {
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async (password) => {
@@ -144,7 +166,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
     // todo: validate the transaction
     const protocolParameters = await getProtocolParameters(wallet);
     const tx = RustModule.WalletV4.Transaction.from_hex(unsignedTxHex);
-    const senderUtxos = [];
+    const senderUtxos: any = [];
     const inputs = tx.body().inputs();
     for (let i = 0; i < inputs.len(); i++) {
       const input = inputs.get(i);
@@ -184,7 +206,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
       },
     });
 
-    await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async (password) => {
@@ -278,7 +300,7 @@ export default function AirDropPageWrap({ stores }: Readonly<Props>) {
     >
       <ModalProvider>
         <ModalManager />
-          <ReviewTxProvider stores={stores} intl={intl}>
+          <ReviewTxProvider stores={stores}>
             <ReviewTxModal />
             <AirdropPage stores={stores}/>
           </ReviewTxProvider>
