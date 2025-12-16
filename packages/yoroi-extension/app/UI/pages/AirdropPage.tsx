@@ -29,6 +29,7 @@ import { /*broadcastTransaction, */getProtocolParameters } from '../../api/thunk
 import Zero from '../features/airdrop/useCases/Zero';
 import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
 import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
+import AddressDetails from '../features/airdrop/useCases/AddressDetails';
 
 interface ThawData {
   address: string;
@@ -263,6 +264,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
     </Box>
   );
 
+  const selectedAddressData = addressThawsData[selectedAddressIndex];
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
@@ -270,7 +272,12 @@ function AirdropPage({ stores }: Readonly<Props>) {
          {leftPanel}
         </Box>
         <Box sx={{ flexGrow: 1 }}>
-          details
+          {selectedAddressData && (
+            <AddressDetails
+              address={selectedAddressData.address}
+              schedule={selectedAddressData.schedule}
+            />
+          )}
         </Box>
       </Box>
       {redeemingAddr && (
@@ -307,5 +314,4 @@ export default function AirDropPageWrap({ stores }: Readonly<Props>) {
       </ModalProvider>
     </TopBarLayout>
   );
-
 }
