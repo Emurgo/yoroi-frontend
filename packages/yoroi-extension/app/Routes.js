@@ -12,7 +12,7 @@ import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
@@ -176,6 +176,7 @@ export const LazyLoadPromises: Array<() => any> = [
 
 export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>

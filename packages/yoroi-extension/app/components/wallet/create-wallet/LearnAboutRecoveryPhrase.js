@@ -99,6 +99,7 @@ function LearnAboutRecoveryPhrase(props: Props & Intl): Node {
             mb: '20px',
             color: 'ds.text_primary_medium',
           }}
+          id="createWallet:stepOne-learnMore-link"
         >
           {intl.formatMessage(infoDialogMessages.learnMore)}
         </Link>

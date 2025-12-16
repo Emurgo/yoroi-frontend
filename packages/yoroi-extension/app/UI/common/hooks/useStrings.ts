@@ -103,18 +103,6 @@ export const messages = Object.freeze(
       id: 'banners.midnight.goToMidnight',
       defaultMessage: '!!!Go to midnight',
     },
-    surveyTitle: {
-      id: 'survey.title',
-      defaultMessage: '!!!We’d love your feedback!',
-    },
-    surveyDescription: {
-      id: 'survey,description',
-      defaultMessage: '!!!Take our quick survey to help shape the future of Yoroi.',
-    },
-    surveyButton: {
-      id: 'survey.button',
-      defaultMessage: '!!!take survey',
-    },
     assetReceived: {
       id: 'notification.assetReceived',
       defaultMessage: '!!!{ asset } received',
@@ -134,6 +122,18 @@ export const messages = Object.freeze(
     understandLabel: {
       id: 'global.labels.understand',
       defaultMessage: '!!!I understand',
+    },
+    stakingUpdates: {
+      id: 'staking.dialog.stakingUpdates',
+      defaultMessage: '!!!Staking updates',
+    },
+    upcomingUpdate: {
+      id: 'staking.dialog.upcomingUpdate',
+      defaultMessage: '!!!Upcoming update to EMURGO and Yoroi stakepools',
+    },
+    updateDetails: {
+      id: 'staking.dialog.updateDetails',
+      defaultMessage: '!!!EMURGO is updating the margin fee on its stakepools as a part of a broader 2026 modernization effort.',
     },
   })
 );
@@ -164,9 +164,6 @@ export const useStrings = () => {
     learnMore: intl.formatMessage(messages.learnMore),
     importantUpdates: intl.formatMessage(messages.importantUpdates),
     skip: intl.formatMessage(messages.skip),
-    surveyTitle: intl.formatMessage(messages.surveyTitle),
-    surveyDescription: intl.formatMessage(messages.surveyDescription),
-    surveyButton: intl.formatMessage(messages.surveyButton),
     assetReceived: (asset: string) => intl.formatMessage(messages.assetReceived, { asset }),
     assetSent: (asset: string) => intl.formatMessage(messages.assetSent, { asset }),
     multipleAssetsReceived: intl.formatMessage(messages.multipleAssetsReceived),
@@ -177,5 +174,8 @@ export const useStrings = () => {
     }),
     goToMidnight: intl.formatMessage(messages.goToMidnight),
     claimAnnouncementPhase2: intl.formatMessage(messages.claimAnnouncementPhase2),
+    stakingUpdates: intl.formatMessage(messages.stakingUpdates),
+    upcomingUpdate: intl.formatMessage(messages.upcomingUpdate),
+    updateDetails: intl.formatMessage(messages.updateDetails),
   }).current;
 };

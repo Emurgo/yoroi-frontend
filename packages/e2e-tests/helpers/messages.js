@@ -14,3 +14,6 @@ export const ADA_HANDLE_UNEXPECTED_ERROR = 'ADA Handle: unexpected error';
 export const CASHBACK_ANOTHER_WALLET = 'Your cashback rewards are currently linked to another wallet';
 export const CASHBACK_SWITCH_WALLET = 'Switch wallet to access your rewards or set this wallet as your cashback wallet';
 export const PORTFOLIO_NO_RESULTS = 'No results for this search';
+export const PROVIDER_BUY = 'Banxa';
+export const PROVIDER_SELL = 'Encryptus';
+export const BUY_MINIMUM = 'Minimum 100 ADA required';

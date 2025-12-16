@@ -164,6 +164,7 @@ export default class AddWalletDetailsStep extends Component<Props> {
                 justifyContent: 'center',
               }}
               onClick={() => openDialog(WalletNameAndPasswordTipsDialog)}
+              id="walletDetails-tips-button"
             >
               <InfoIcon />
             </IconWrapper>

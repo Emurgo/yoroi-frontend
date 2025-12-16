@@ -1,4 +1,4 @@
-import { defaultWaitTimeout, quarterSecond } from '../../helpers/timeConstants.js';
+import { defaultWaitTimeout, fiveSeconds, quarterSecond, threeSeconds } from '../../helpers/timeConstants.js';
 import BasePage from '../basepage.js';
 import { ElementLocator } from '../locator.js';
 
@@ -84,13 +84,31 @@ class BuySell extends BasePage {
 
     return states.every(state => state === true);
   }
+  async closeModal() {
+    this.logger.info(`BuySell::closeModal is called`);
+    await this.click(this.closeModalBtnLocator);
+    const isClosed = await this.customWaitIsNotPresented(this.modalWindowLocator, fiveSeconds, quarterSecond);
+    this.logger.info(`BuySell::closeModal. Modal is closed: ${isClosed}`);
+    return isClosed;
+  }
   async enterAdaAmount(amount) {
     this.logger.info(`BuySell::enterAdaAmount is called. Amount ${amount}`);
     await this.input(this.adaAmountInputLocator, amount);
   }
   async getHelperText() {
     this.logger.info(`BuySell::getHelperText is called`);
-    return await this.getText(this.adaAmountHelperTextLocator);
+    const messageAppeared = await this.customWaiter(
+      async () => {
+        const currentText = await this.getText(this.adaAmountHelperTextLocator);
+        return currentText !== '';
+      },
+      threeSeconds,
+      quarterSecond
+    );
+    if (messageAppeared) {
+      return await this.getText(this.adaAmountHelperTextLocator);
+    }
+    return '';
   }
   async getProviderInfo() {
     this.logger.info(`BuySell::getProviderInfo is called`);
@@ -103,14 +121,26 @@ class BuySell extends BasePage {
   }
   async selectBuyTab() {
     this.logger.info(`BuySell::selectBuyTab is called`);
-    await this.click(this.buyTabBtnLocator);
+    return await this.selectTab(this.buyTabBtnLocator);
   }
   async selectSellTab() {
     this.logger.info(`BuySell::selectSellTab is called`);
-    await this.click(this.sellTabBtnLocator);
+    return await this.selectTab(this.sellTabBtnLocator);
+  }
+  async selectTab(tabBtnLocator) {
+    this.logger.info(`BuySell::selectTab is called. Locator: ${JSON.stringify(tabBtnLocator)}`);
+    await this.click(tabBtnLocator);
+    return await this.customWaiter(async () => {
+      const btnIsSelected = await this.getAttribute(tabBtnLocator, 'aria-selected');
+      return btnIsSelected === 'true';
+    });
+  }
+  async isProceedBtnDisabled() {
+    this.logger.info(`BuySell::isProceedBtnDisabled is called`);
+    return await this.buttonIsDisabled(this.proceedBtnLocator);
   }
   async isProceedBtnEnabled() {
-    this.logger.info(`BuySell::isProceedActive is called`);
+    this.logger.info(`BuySell::isProceedBtnEnabled is called`);
     return await this.buttonIsEnabled(this.proceedBtnLocator);
   }
   async proceed() {

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { isRight } from '@yoroi/common';
 import { isPrimaryToken, createUnknownTokenInfo } from '@yoroi/portfolio';
 import { Portfolio, Chain } from '@yoroi/types';
@@ -60,6 +60,7 @@ const scoreInfo = (info?: Portfolio.Token.Info) => {
   if (info.name && !/^unknown/i.test(info.name)) score += 2;
   return score;
 };
+
 const preferBetter = (prev: Portfolio.Token.Info | undefined, next: Portfolio.Token.Info) =>
   scoreInfo(next) > scoreInfo(prev) ? next : (prev ?? next);
 
@@ -196,19 +197,23 @@ export const useSyncedTokenInfos = ({
         for (const [id, info] of prev.tokenInfos) merged.set(id, preferBetter(merged.get(id), info));
       }
 
-      for (const [id, info] of data.tokenInfosArray) merged.set(id, preferBetter(merged.get(id), info));
+      for (const [id, info] of data.tokenInfosArray) {
+        merged.set(id, preferBetter(merged.get(id), info));
+      }
 
       const tokenInfoList = Array.from(merged.values());
       return { tokenIds: data.tokenIds, tokenInfos: merged, tokenInfoList };
     },
 
-    keepPreviousData: true,
+    // v5: keepPreviousData removed; use placeholderData to keep last result
+    placeholderData: prev => prev,
+
     refetchOnWindowFocus: false,
     refetchOnMount: false,
     refetchOnReconnect: false,
     retry: false,
     staleTime: Infinity,
-    cacheTime: 5 * 60 * 1000,
+    gcTime: 5 * 60 * 1000, // v5: cacheTime -> gcTime
   });
 
   return {
