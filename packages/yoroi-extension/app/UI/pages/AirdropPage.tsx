@@ -109,16 +109,22 @@ function AirdropPage({ stores }: Readonly<Props>) {
   };
 
   useEffect(() => {
+    let abort = false;
     (async () => {
       const isMainnet = wallet.networkId === 0;
       const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
       await scanAddressesForThaws(thawEndpoint, wallet, (data) => {
+        if (abort) {
+          return false;
+        }
         setAddressThawsData(orig => [...orig, data]);
+        return true;
       });
       setQueryingThaws(false);
     })();
     return () => {
       // switch wallet
+      abort = true;
       setAddressThawsData([]);
       setQueryingThaws(true);
       setSelectedAddressIndex(0);

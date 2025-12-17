@@ -40,7 +40,7 @@ export default function Zero() {
 
       {/*  @ts-ignore */}
       <Typography variant="body1">
-        <a href="">
+        <a href="https://www.midnight.gd/" rel="noopener noreferrer">
           {intl.formatMessage(globalMessages.learnMore)}
         </a>
       </Typography>

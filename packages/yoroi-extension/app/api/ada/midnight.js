@@ -3,22 +3,20 @@
 import { CoreAddressTypes } from './lib/storage/database/primitives/enums';
 import { addressHexToBech32 } from './lib/cardanoCrypto/utils';
 import { getPublicDeriverById } from '../../../chrome/extension/background/handlers/yoroi/utils';
-import { walletSignData, encodeHardwareWalletSignResult } from './index';
+import AdaApi, { walletSignData, encodeHardwareWalletSignResult } from './index';
 import { getNetworkById } from './lib/storage/database/prepackaged/networks';
 import { MessageAddressFieldType, AddressType } from '@cardano-foundation/ledgerjs-hw-app-cardano';
 import { LedgerConnect } from '../../utils/hwConnectHandler';
 import type { WalletState } from '../../../chrome/extension/background/types';
 import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { CardanoDerivationType } from 'trezor-connect-flow';
-import { loadSubmittedTransactions } from '../localStorage';
-import AdaApi from './';
+import LocalStorageApi, { loadSubmittedTransactions } from '../localStorage';
 import BigNumber from 'bignumber.js';
 import type { CardanoAddressedUtxo } from './transactions/types';
 import { forceNonNull } from '../../coreUtils.js';
 import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import { asAddressedUtxo } from './transactions/utils';
-import LocalStorageApi from '../localStorage';
 import { NotEnoughMoneyToSendError } from '../common/errors';
 
 const localStorageApi = new LocalStorageApi();
@@ -210,50 +208,7 @@ export async function scanForOriginalDestAddress(
   const currentWalletClaim = airdropClaims.find(r => r.publicDeriverId === wallet.publicDeriverId);
   if (currentWalletClaim) {
     return { address: currentWalletClaim.destAddr, amount: String(currentWalletClaim.amount), };
-  } else {
-    const usedAddrs = wallet.allAddresses.utxoAddresses
-          .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
-          .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
-          .map(addr => addressHexToBech32(addr.address.Hash));
-    const unusedAddr1 = addressHexToBech32(
-      forceNonNull(
-        wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
-      ).address.Hash
-    );
-
-    for (let addr of [unusedAddr1, ...usedAddrs]) {
-      const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
-      if (!resp.ok) {
-        continue;
-      }
-      const json = await resp.json();
-      if (json.length === 1) {
-        airdropClaims.push({
-          publicDeriverId: wallet.publicDeriverId,
-          destAddr: addr,
-          claimId: json[0].claim_id,
-          amount: json[0].amount,
-        });
-        await localStorageApi.saveAirdropClaimResults(airdropClaims);
-
-        return {
-          address: addr,
-          amount: json[0].amount,
-        };
-      }
-    }
-    return null;
-
   }
-}
-
-type ThawData = Object;
-
-export async function scanAddressesForThaws(
-  thawEndpoint: string,
-  wallet: WalletState,
-  callback: (data: {| address: string, schedule: ThawData |}) => void,
-): Promise<void> {
   const usedAddrs = wallet.allAddresses.utxoAddresses
         .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
         .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
@@ -263,10 +218,54 @@ export async function scanAddressesForThaws(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
     ).address.Hash
   );
+
+  for (let addr of [unusedAddr1, ...usedAddrs]) {
+    const resp = await fetch(`${claimEndpoint}/claims/${addr}`);
+    if (!resp.ok) {
+      continue;
+    }
+    const json = await resp.json();
+    if (json.length === 1) {
+      airdropClaims.push({
+        publicDeriverId: wallet.publicDeriverId,
+        destAddr: addr,
+        claimId: json[0].claim_id,
+        amount: json[0].amount,
+      });
+      await localStorageApi.saveAirdropClaimResults(airdropClaims);
+
+      return {
+        address: addr,
+        amount: json[0].amount,
+      };
+    }
+  }
+  return null;
+}
+
+type ThawData = Object;
+
+export async function scanAddressesForThaws(
+  thawEndpoint: string,
+  wallet: WalletState,
+  callback: (data: {| address: string, schedule: ThawData |}) => boolean,
+): Promise<void> {
+  const usedAddrs = wallet.allAddresses.utxoAddresses
+    .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
+    .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
+    .map(addr => addressHexToBech32(addr.address.Hash));
+  const unusedAddr1 = addressHexToBech32(
+    forceNonNull(
+      wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
+    ).address.Hash
+  );
   for (let address of [unusedAddr1, ...usedAddrs]) {
     const schedule = await getThawScheduleOfAddress(thawEndpoint, address);
     if (schedule) {
-      callback({ address, schedule });
+      const shouldContinue = callback({ address, schedule });
+      if (!shouldContinue) {
+        break;
+      }
     }
   }
 }
@@ -388,7 +387,6 @@ type GetCollateralUtxosResponse = {|
 
 export async function getCollateralUtxos(
   wallet: WalletState,
-  amount: string,
 ): Promise<GetCollateralUtxosResponse > {
   const getCollateralUtxosResult = await pickCollateralUtxos(wallet);
   if (getCollateralUtxosResult) {
@@ -438,7 +436,20 @@ export async function getRedemptionTransaction(
   collateralUtxoIds: Array<string>,
   fundingUtxos: Array<string>
 ): Promise<Object> {
-  const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`);
+  const resp = await fetch(
+    `${thawEndpoint}/thaws/${destAddr}/transactions/build`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([{
+        change_address: changeAddr,
+        collateral_utxos: collateralUtxoIds,
+        funding_utxos: fundingUtxos,
+      }]),
+    }
+  );
   if (!resp.ok) {
     throw new Error('error when querying the redemption transaction building endpoint');
   }
@@ -447,6 +458,6 @@ export async function getRedemptionTransaction(
     redeemedAmount: respBody.redeemed_amount,
     requireThawingExtraSignature: respBody.require_thawing_extra_signature,
     transaction: respBody.transaction,
-    transactionId: respBody.transationId,
+    transactionId: respBody.transactionId,
   };
 }
