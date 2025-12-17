@@ -1,28 +1,8 @@
 import Dialog from '../../../../components/widgets/Dialog';
-import { useIntl, defineMessages } from 'react-intl';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
-
-const messages = defineMessages({
-  claimDialogTitle: {
-    id: 'airdrop.claimDialogTitle',
-    defaultMessage: '!!!sign message',
-  },
-  ledgerClaimDialogTitle: {
-    id: 'airdrop.ledgerClaimDialogTitle',
-    defaultMessage: '!!!sign message { index } of { total }',
-  },
-  messageLabel: {
-    id: 'airdrop.messageLabel',
-    defaultMessage: '!!!Message',
-  },
-  ledgerClaimDialogText: {
-    id: 'airdrop.ledgerClaimDialogText',
-    defaultMessage:
-      '!!!Signing this messages proves you have ownership of the address you want to use to claim NIGHT. Each message must be signed individually per address',
-  },
-});
+import { useStrings } from '../common/hooks/useStrings';
 
 export default function LedgerClaimDialog(
   props: Readonly<{
@@ -31,7 +11,7 @@ export default function LedgerClaimDialog(
     onClaim: (_password: string) => Promise<void>;
   }>
 ) {
-  const intl = useIntl();
+  const strings = useStrings();
 
   const [error, setError] = useState<string | null>(null);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -56,10 +36,10 @@ export default function LedgerClaimDialog(
     <Dialog
       withCloseButton
       onClose={props.onClose}
-      title={intl.formatMessage(messages.claimDialogTitle)}
+      title={strings.claimDialogTitle}
       dialogActions={[
         {
-          label: intl.formatMessage(messages.claimDialogTitle),
+          label: strings.claimDialogTitle,
           primary: true,
           disabled: isClaiming,
           onClick: onClaim,
@@ -67,7 +47,7 @@ export default function LedgerClaimDialog(
       ]}
     >
       <Typography variant="body1" color="ds.text_gray_medium">
-        {intl.formatMessage(messages.ledgerClaimDialogText)}
+        {strings.ledgerClaimDialogText}
       </Typography>
       {isClaiming ? (
         <Box sx={{ marginTop: '16px', marginBottom: '16px' }}>
@@ -77,7 +57,7 @@ export default function LedgerClaimDialog(
         <Box sx={{ height: '39px' }}></Box>
       )}
       <Typography variant="body1" color="ds.text_gray_low">
-        {intl.formatMessage(messages.messageLabel)}
+        {strings.messageLabel}
       </Typography>
       <Typography variant="body1" color="ds.text_gray_medium">
         {props.message}
