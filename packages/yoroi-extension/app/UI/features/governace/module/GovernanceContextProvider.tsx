@@ -6,7 +6,6 @@ import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
-import { getFormattedPairingValue } from '../common/helpers';
 import { useGovernanceManagerMaker } from '../common/hooks/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
