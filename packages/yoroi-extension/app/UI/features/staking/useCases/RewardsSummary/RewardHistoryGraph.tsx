@@ -168,7 +168,7 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphD
         </Typography>
         <Button
           // @ts-ignore
-          variant="outlined"
+          variant="tertiary"
           size="medium"
           onClick={() =>
             stores.uiDialogs.open({
