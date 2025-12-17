@@ -1,6 +1,5 @@
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
 import * as React from 'react';
-
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';

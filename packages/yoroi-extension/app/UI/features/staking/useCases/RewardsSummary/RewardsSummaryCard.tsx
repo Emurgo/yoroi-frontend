@@ -53,7 +53,7 @@ const InfoRow = styled(Box)({
 
 const InfoDetails = styled(Box)({});
 
-export const RewardsSummaryCard = () => {
+export const RewardsSummaryCard: React.FC = () => {
   const strings = useStrings();
   const { getTokenInfo, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } = useStaking();
 
