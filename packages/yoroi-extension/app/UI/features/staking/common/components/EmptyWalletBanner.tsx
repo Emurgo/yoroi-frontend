@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/system';
 import { Button, Stack, Typography } from '@mui/material';
-import { ReactComponent as CoverBg } from '../../assets/images/transaction/wallet-empty-banner.inline.svg';
+import { ReactComponent as CoverBg } from './wallet-empty-banner.inline.svg';
 import { captureEvent } from '../../../../../../posthog';
 import { TESTNET_FAUCET } from '../constants';
 import { useStrings } from '../hooks/useStrings';

@@ -19,6 +19,7 @@ export type StakingState = {
   legacyUIDialogs: any;
   delegationRequests: any;
   isWalletWithNoFunds: boolean;
+  currentlyDelegating: boolean;
 };
 
 export interface GraphItems {

@@ -9,25 +9,25 @@ import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './common/components/EmptyWalletBanner';
 
 export const StakingRoot = () => {
-  const { isWalletWithNoFunds, selectedWallet, legacyUIDialogs } = useStaking();
+  const { isWalletWithNoFunds, selectedWallet, legacyUIDialogs, currentlyDelegating } = useStaking();
 
-  if (isWalletWithNoFunds) {
-    return (
-      <WalletEmptyBanner
-        onBuySellClick={() => legacyUIDialogs.open({ dialog: BuySellDialog })}
-        isTestnet={selectedWallet.isTestnet}
-      />
-    );
-  }
   return (
     <Stack>
-      <WrapperCards>
-        <RewardsSummaryCard />
-        <RightCardsWrapper>
-          <StakePoolDelegated />
-          <EpochProgress />
-        </RightCardsWrapper>
-      </WrapperCards>
+      {isWalletWithNoFunds ? (
+        <WalletEmptyBanner
+          onBuySellClick={() => legacyUIDialogs.open({ dialog: BuySellDialog })}
+          isTestnet={selectedWallet.isTestnet}
+        />
+      ) : null}
+      {currentlyDelegating && (
+        <WrapperCards>
+          <RewardsSummaryCard />
+          <RightCardsWrapper>
+            <StakePoolDelegated />
+            <EpochProgress />
+          </RightCardsWrapper>
+        </WrapperCards>
+      )}
       <PoolList />
       <LegacyDialogs />
     </Stack>

@@ -107,6 +107,7 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
     currentPool,
     delegationRequests,
     isWalletWithNoFunds,
+    currentlyDelegating,
   };
 
   const state = React.useMemo(

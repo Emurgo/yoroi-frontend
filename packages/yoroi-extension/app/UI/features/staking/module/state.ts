@@ -18,6 +18,7 @@ export const defaultStakingState: StakingState = {
   legacyUIDialogs: null,
   delegationRequests: null,
   isWalletWithNoFunds: false,
+  currentlyDelegating: false,
 };
 
 // Define action handlers
