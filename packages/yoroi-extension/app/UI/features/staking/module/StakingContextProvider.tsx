@@ -7,7 +7,8 @@ import { generateGraphData } from '../common/helpers/graph';
 import { GraphData } from '../common/types';
 import { networkConfigs } from '../../../utils/network-config';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
-import RewardHistoryDialog from '../../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import { getDefaultAssetByWallet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
+import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 
 const initialStakingProvider = {
   ...defaultStakingState,
@@ -33,6 +34,9 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
   const currentlyDelegating = stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
   const delegatedUtxo = stores.delegation.getDelegatedUtxoBalance(selectedWallet.publicDeriverId);
   const delegationRequests = delegationStore.getDelegationRequests(selectedWallet.publicDeriverId);
+  const currentPool = delegationStore.getDelegatedPoolId(selectedWallet.publicDeriverId);
+  const balance = selectedWallet.balance;
+  const isWalletWithNoFunds = balance != null && balance.getDefaultEntry().amount.isZero();
 
   if (delegationRequests == null) {
     throw new Error(`Page opened for non-reward wallet`);
@@ -85,23 +89,24 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
     };
   };
 
-  const onOpenRewardList = () => {
-    stores.uiDialogs.open({
-      dialog: RewardHistoryDialog,
-    });
-  };
+  const defaultDelegatedAsset = getDefaultAssetByWallet(selectedWallet);
 
   const initialState = {
-    selectedWallet: selectedWallet,
+    selectedWallet: selectedWallet, // TODO - to be replaced by hook - useSelectedWallet
+    delegationStore: delegationStore, // TODO - to be replaced by hook - useDelegation
+    legacyUIDialogs: stores.uiDialogs, // TODO - to be replaced by individual hooks - maybe create useUiDialogs hook until will remoeve mobx
+    stores: stores, // TODO - to be replaced by individual hooks - maybe create useStores hook until will remoeve mobx
     shouldHideBalance: profile.shouldHideBalance,
     tokenInfo: tokenInfoStore.tokenInfo,
-    stores: stores,
     totalRewards: delegatedRewards,
     totalDelegated: totalDelegated(),
     historyGraphData: graphData,
     primaryTokenInfo,
     toUnitOfAccount,
-    onOpenRewardList,
+    defaultDelegatedAsset,
+    currentPool,
+    delegationRequests,
+    isWalletWithNoFunds,
   };
 
   const state = React.useMemo(
@@ -109,10 +114,14 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
       ...defaultStakingState,
       ...initialState,
     }),
-    [initialState]
+    [initialState, currentPool]
   );
 
-  React.useEffect(() => {}, [stores]);
+  React.useEffect(() => {
+    const currentPool2 = delegationStore.getDelegatedPoolId(selectedWallet.publicDeriverId);
+
+    console.log('currentPool222222222', { delegationStore, networkId, currentPool2, selectedWallet: selectedWallet });
+  }, [currentPool, delegationStore, selectedWallet.publicDeriverId]);
 
   const actions = React.useRef({
     getTokenInfo: genLookupOrFail(tokenInfoStore.tokenInfo),
@@ -132,6 +141,7 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
 export const useStaking = () =>
   React.useContext(StakingContext) ?? console.log('useStaking: needs to be wrapped in a StakingProvider');
 
+// Legacy utility functions - to be moved refactored later
 export function formatValue(value: BigNumber): string {
   if (value.isZero()) {
     return '0';
@@ -144,4 +154,34 @@ export function formatValue(value: BigNumber): string {
 
 export function maybe<T, R>(value: T | null | undefined, fn: (value: T) => R | null | undefined): R | null | undefined {
   return value == null ? undefined : fn(value);
+}
+
+export function roundTwoDecimal(num: number): string {
+  const fNum = Number(num);
+  return (Math.round(fNum * 100) / 100).toFixed(2);
+}
+
+export function formatLovelacesHumanReadableShort(num: string): string {
+  const fNum = Number(num) / 1000000; // divided in 1,000,000 to convert from Lovelace to ADA
+  if (fNum >= 1e3) {
+    const units = ['k', 'M', 'B', 'T'];
+    // Divide to get SI Unit engineering style numbers (1e3,1e6,1e9, etc)
+    const unit = Math.floor((fNum.toFixed(0).length - 1) / 3) * 3;
+    // Calculate the remainder
+    const formattedNum = (fNum / Number(`1e${unit}`)).toFixed(2);
+    const unitname = units[Math.floor(unit / 3) - 1];
+    return `${formattedNum}${unitname}`;
+  }
+  return fNum.toLocaleString();
+}
+
+export function roundOneDecimal(num: number): string {
+  const fNum = Number(num);
+  const number = Math.round(fNum * 10) / 10;
+  if (number === 0) return number.toFixed(1);
+  return number.toString();
+}
+
+export function poolIdHexToBech32(hex: string): string {
+  return RustModule.WasmScope(Module => Module.WalletV4.Ed25519KeyHash.from_hex(hex).to_bech32('pool'));
 }

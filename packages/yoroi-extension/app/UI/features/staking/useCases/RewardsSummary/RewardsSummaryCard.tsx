@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Box, styled } from '@mui/system';
 import { Divider, Typography } from '@mui/material';
 // import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss'
@@ -10,15 +10,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { maybe, useStaking } from '../../module/StakingContextProvider';
 import { HIDDEN_AMOUNT } from '../../../../common/constants';
 import { truncateToken } from '../../../../../utils/formatters';
-import { GraphData } from '../../common/types';
 import { Icon } from '../../../../components';
-
-export type SummaryCardProps = {
-  onOpenRewardList: () => void;
-  unitOfAccount: (entry: any) => void | { currency: string; amount: string };
-  graphData: GraphData;
-  stores: any;
-};
 
 const StakingIconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -63,11 +55,10 @@ const InfoRow = styled(Box)({
 
 const InfoDetails = styled(Box)({});
 
-export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
+export const RewardsSummaryCard = () => {
   const strings = useStrings();
   const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
     useStaking();
-  const govStatusFetched = true; // TODO: get from governance provider
 
   const formatTokenEntry = (tokenEntry): ReactNode => {
     const tokenInfo = getTokenInfo(tokenEntry);
@@ -106,8 +97,7 @@ export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
     );
   };
 
-  // TODO: enable later
-  // const hasNoRewards = (token?: any | null): boolean => (totalRewards ? token?.getDefaultEntry()?.amount?.isZero() : true);
+  const hasNoRewards = token => maybe(token, t => t.getDefaultEntry()?.amount?.isZero?.()) ?? false;
 
   return (
     <Card
@@ -131,7 +121,7 @@ export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
           {strings.rewardsSummary}
         </Typography>
 
-        <WithdrawButton govStatusFetched={govStatusFetched} isDisabled={totalRewards === undefined} />
+        <WithdrawButton isDisabled={hasNoRewards(totalRewards)} />
       </Box>
 
       <Divider sx={{ borderColor: 'ds.gray_200' }} />
@@ -186,7 +176,7 @@ export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
         </InfoRow>
       </Box>
 
-      {historyGraphData && <RewardHistoryGraph onOpenRewardList={onOpenRewardList} graphData={historyGraphData} />}
+      {historyGraphData && <RewardHistoryGraph graphData={historyGraphData} />}
     </Card>
   );
 };

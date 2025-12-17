@@ -204,9 +204,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<DappCenterSubpages stores={stores} />}>
             <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
           </Route>
-          <Route element={<StakingSubpages stores={stores} />}>
-            <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
-          </Route>
+
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -255,6 +253,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<GovernanceSubpages stores={stores} />}>
             <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
             <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
+          </Route>
+          <Route element={<StakingSubpages stores={stores} />}>
+            <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />

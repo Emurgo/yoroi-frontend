@@ -12,6 +12,12 @@ export const defaultStakingState: StakingState = {
   historyGraphData: null,
   primaryTokenInfo: null,
   toUnitOfAccount: () => ({ currency: '', amount: '' }),
+  defaultDelegatedAsset: null,
+  selectedWallet: null,
+  delegationStore: null,
+  legacyUIDialogs: null,
+  delegationRequests: null,
+  isWalletWithNoFunds: false,
 };
 
 // Define action handlers

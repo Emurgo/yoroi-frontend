@@ -2,15 +2,16 @@ import React from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
 import RewardGraphClean from './RewardGraphClean';
-// import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout'; // --- IGNORE ---
 import MuiAccordion, { AccordionProps as MuiAccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, { AccordionSummaryProps as MuiAccordionSummaryProps } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { getAvatarFromPoolId } from '../../common/helpers';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GraphData } from '../../common/types';
+import { useStaking } from '../../module/StakingContextProvider';
 
-/* ---------- Types ---------- */
+import RewardHistoryDialog from '../../../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import { observer } from 'mobx-react';
 
 type RewardHistoryEntry = {
   type: string;
@@ -27,7 +28,6 @@ type RewardHistoryItemProps = {
 
 type RewardHistoryGraphProps = {
   graphData: GraphData;
-  onOpenRewardList: () => void;
 };
 
 /* ---------- RewardHistoryItem ---------- */
@@ -138,11 +138,19 @@ const AccordionSummary = styled((props: MuiAccordionSummaryProps) => (
   },
 }));
 
-const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOpenRewardList }) => {
+const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphData }) => {
   const strings = useStrings();
+  const { stores } = useStaking();
   const { rewardsGraphData } = graphData;
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = strings.rewardHistoryLabel;
+
+  const onOpenRewardList = async () => {
+    console.log('OPENNNNNN222');
+    stores.uiDialogs.open({
+      dialog: RewardHistoryDialog,
+    });
+  };
 
   return (
     <Box
@@ -166,9 +174,13 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
         </Typography>
         <Button
           // @ts-ignore
-          variant="primary"
+          variant="outlined"
           size="medium"
-          onClick={onOpenRewardList}
+          onClick={() =>
+            stores.uiDialogs.open({
+              dialog: RewardHistoryDialog,
+            })
+          }
           sx={{ lineHeight: '21px' }}
         >
           {title}
@@ -200,6 +212,6 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
       )}
     </Box>
   );
-};
+});
 
 export default RewardHistoryGraph;
