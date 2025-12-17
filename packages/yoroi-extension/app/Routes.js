@@ -70,9 +70,12 @@ import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
 import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
+// $FlowIgnore: suppressing this error
+import StakingPageRevamp from './UI/pages/Staking/StakingPage';
+// $FlowIgnore: suppressing this error
+import { StakingContextProvider } from './UI/features/staking/module/StakingContextProvider';
 
 // $FlowIgnore: suppressing this error
-// import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
@@ -201,6 +204,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<DappCenterSubpages stores={stores} />}>
             <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
           </Route>
+          <Route element={<StakingSubpages stores={stores} />}>
+            <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
+          </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -255,7 +261,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.PORTFOLIO.DAPPS} element={<PortfolioDappsPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DETAILS} element={<PortfolioDetailPage stores={stores} />} />
           </Route>
-          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
+
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
           <Route path={ROUTES.AIRDROP} element={<AirdropPage stores={stores} />} />
         </Routes>
@@ -301,7 +307,6 @@ const SwapSubpages = ({ stores }) => {
     </FullscreenLayout>
   );
   return (
-    // <QueryClientProvider client={queryClient}>
     <SwapProvider publicDeriver={stores.wallets.selected} key={stores.wallets.selected?.publicDeriverId}>
       <SwapPageContainer stores={stores}>
         <Suspense fallback={loader}>
@@ -309,7 +314,6 @@ const SwapSubpages = ({ stores }) => {
         </Suspense>
       </SwapPageContainer>
     </SwapProvider>
-    // </QueryClientProvider>
   );
 };
 
@@ -360,6 +364,14 @@ const DappCenterSubpages = ({ stores }) => (
       <Outlet />
     </Suspense>
   </DappCenterContextProvider>
+);
+
+const StakingSubpages = ({ stores }) => (
+  <StakingContextProvider stores={stores}>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
+  </StakingContextProvider>
 );
 
 const CatalystRegistrationSubpages = ({ stores }) => (

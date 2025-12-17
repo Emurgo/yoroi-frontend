@@ -60,6 +60,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
+    className: 'staking-revamp',
+    route: ROUTES.STAKING_REVAMP.ROOT,
+    icon: stakingIcon,
+    label: globalMessages.sidebarStaking,
+    isVisible: () => environment.isDev(),
+  },
+  {
     className: 'airdrop',
     route: ROUTES.AIRDROP,
     icon: airdropIcon,
