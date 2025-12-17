@@ -70,10 +70,6 @@ export const UndelegateButton = ({ poolTransition, delegateToSpecificPool, poolI
       });
 
       showTxResultModal(TransactionResult.SUCCESS);
-
-      // ampli.claimAdaTransactionSubmitted({
-      //   reward_amount: signRequest.withdrawals()[0]?.amount.getDefaultEntry().amount.toNumber(),
-      // });
     } catch (_error) {
       showTxResultModal(TransactionResult.FAIL);
     }

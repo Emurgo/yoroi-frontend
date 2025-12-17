@@ -1,8 +1,6 @@
 import { ReactNode } from 'react';
 import { Box, styled } from '@mui/system';
 import { Divider, Typography } from '@mui/material';
-// import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss'
-// import LoadingSpinner from '../../../widgets/LoadingSpinner'
 import RewardHistoryGraph from './RewardHistoryGraph';
 import LoadingSpinner from '../../../../../components/widgets/LoadingSpinner';
 import { WithdrawButton } from './WithdrawButton';
@@ -57,8 +55,7 @@ const InfoDetails = styled(Box)({});
 
 export const RewardsSummaryCard = () => {
   const strings = useStrings();
-  const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
-    useStaking();
+  const { getTokenInfo, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } = useStaking();
 
   const formatTokenEntry = (tokenEntry): ReactNode => {
     const tokenInfo = getTokenInfo(tokenEntry);

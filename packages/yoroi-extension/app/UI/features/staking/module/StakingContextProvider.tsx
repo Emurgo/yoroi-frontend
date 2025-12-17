@@ -117,12 +117,6 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
     [initialState, currentPool]
   );
 
-  React.useEffect(() => {
-    const currentPool2 = delegationStore.getDelegatedPoolId(selectedWallet.publicDeriverId);
-
-    console.log('currentPool222222222', { delegationStore, networkId, currentPool2, selectedWallet: selectedWallet });
-  }, [currentPool, delegationStore, selectedWallet.publicDeriverId]);
-
   const actions = React.useRef({
     getTokenInfo: genLookupOrFail(tokenInfoStore.tokenInfo),
   }).current;

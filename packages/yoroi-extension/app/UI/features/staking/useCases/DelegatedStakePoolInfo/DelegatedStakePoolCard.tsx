@@ -123,7 +123,7 @@ const AvatarWrapper = styled(Box)({
   overflow: 'hidden',
 });
 
-const AvatarImg = styled('img')(({ theme }:any) => ({
+const AvatarImg = styled('img')(({ theme }: any) => ({
   width: '100%',
   background: theme.palette.ds.primary_100,
   objectFit: 'scale-down',

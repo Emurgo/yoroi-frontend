@@ -12,7 +12,7 @@ export const LegacyDialogs = observer(() => {
 
   const showRewardAmount = errorIfPresent == null && stores.delegation.isExecutedDelegatedBalance(selectedWallet.publicDeriverId);
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
-    const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
+  const isStakeRegistered = stores.delegation.isStakeRegistered(selectedWallet.publicDeriverId);
 
   const onClose = () => {
     legacyUIDialogs.closeActiveDialog();
