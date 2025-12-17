@@ -1,5 +1,4 @@
 import { expect } from 'chai';
-import BasePage from '../../../pages/basepage.js';
 import AddNewWallet from '../../../pages/addNewWallet.page.js';
 import CreateWalletStepOne from '../../../pages/newWalletPages/createWalletSteps/createWalletStepOne.page.js';
 import CreateWalletStepTwo from '../../../pages/newWalletPages/createWalletSteps/createWalletStepTwo.page.js';

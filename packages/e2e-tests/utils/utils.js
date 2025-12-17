@@ -36,7 +36,12 @@ export function getMethod(locatorMethod) {
   }
 }
 
-export const getByLocator = locator => getMethod(locator.method)(locator.locator);
+export const getByLocator = locator => {
+  if (!locator.method || locator.method === '') {
+    throw new Error(`The method is not defined for the locator "${locator.locator}"`);
+  }
+  return getMethod(locator.method)(locator.locator);
+};
 
 export const getCurrentOS = () => process.platform;
 export const isLinux = () => getCurrentOS() === 'linux';

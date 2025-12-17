@@ -37,7 +37,7 @@ class BasePage {
   };
 
   linkLocator = {
-    locator: './a',
+    locator: './/a',
     method: 'xpath',
   };
 

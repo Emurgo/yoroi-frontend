@@ -53,22 +53,6 @@ class GeneralSubTab extends SettingsTab {
     locator: 'settings:general-yoroiWebsiteLink-linkButton',
     method: 'id',
   };
-  facebookLinkLocator = {
-    locator: 'settings:general-facebookLink-linkButton',
-    method: 'id',
-  };
-  youtubeLinkLocator = {
-    locator: 'settings:general-youtubeLink-linkButton',
-    method: 'id',
-  };
-  telegramLinkLocator = {
-    locator: 'settings:general-telegramLink-linkButton',
-    method: 'id',
-  };
-  mediumLinkLocator = {
-    locator: 'settings:general-mediumLink-linkButton',
-    method: 'id',
-  };
   githubLinkLocator = {
     locator: 'settings:general-githubLink-linkButton',
     method: 'id',
@@ -158,42 +142,21 @@ class GeneralSubTab extends SettingsTab {
   }
   async getTwitterLink() {
     this.logger.info(`GeneralSubTab::getTwitterLink is called`);
+    await this.scrollIntoView(this.twitterLinkLocator);
     const result = await this.getLinkFromComponent(this.twitterLinkLocator);
     this.logger.info(`GeneralSubTab::getTwitterLink::result ${result}`);
     return result;
   }
   async getYoroiWebsiteLink() {
     this.logger.info(`GeneralSubTab::getYoroiWebsiteLink is called`);
+    await this.scrollIntoView(this.yoroiWebsiteLinkLocator);
     const result = await this.getLinkFromComponent(this.yoroiWebsiteLinkLocator);
     this.logger.info(`GeneralSubTab::getYoroiWebsiteLink::result ${result}`);
     return result;
   }
-  async getFacebookLink() {
-    this.logger.info(`GeneralSubTab::getFacebookLink is called`);
-    const result = await this.getLinkFromComponent(this.facebookLinkLocator);
-    this.logger.info(`GeneralSubTab::getFacebookLink::result ${result}`);
-    return result;
-  }
-  async getYoutubeLink() {
-    this.logger.info(`GeneralSubTab::getYoutubeLink is called`);
-    const result = await this.getLinkFromComponent(this.youtubeLinkLocator);
-    this.logger.info(`GeneralSubTab::getYoutubeLink::result ${result}`);
-    return result;
-  }
-  async getTGLink() {
-    this.logger.info(`GeneralSubTab::getTGLink is called`);
-    const result = await this.getLinkFromComponent(this.telegramLinkLocator);
-    this.logger.info(`GeneralSubTab::getTGLink::result ${result}`);
-    return result;
-  }
-  async getMediumLink() {
-    this.logger.info(`GeneralSubTab::getMediumLink is called`);
-    const result = await this.getLinkFromComponent(this.mediumLinkLocator);
-    this.logger.info(`GeneralSubTab::getMediumLink::result ${result}`);
-    return result;
-  }
   async getGithubLink() {
     this.logger.info(`GeneralSubTab::getGithubLink is called`);
+    await this.scrollIntoView(this.githubLinkLocator);
     const result = await this.getLinkFromComponent(this.githubLinkLocator);
     this.logger.info(`GeneralSubTab::getGithubLink::result ${result}`);
     return result;
