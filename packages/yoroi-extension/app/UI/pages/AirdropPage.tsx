@@ -88,6 +88,9 @@ const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 function AirdropPage({ stores }: Readonly<Props>) {
   const wallet = stores.wallets.selectedOrFail;
 
+  const isMainnet = wallet.networkId === 0;
+  const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
+
   const [queryingThaws, setQueryingThaws] = useState(true);
   // one element for each redeemable address
   const [addressThawsData, setAddressThawsData] = useState<ThawData[]>([]);
@@ -101,7 +104,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
   const startRedeem = addr => {
     setRedeemingAddr(addr);
   };
-  void startRedeem;
 
   const closeRedeem = () => {
     setRedeemingAddr(null);
@@ -110,8 +112,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
   useEffect(() => {
     let abort = false;
     (async () => {
-      const isMainnet = wallet.networkId === 0;
-      const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
       await scanAddressesForThaws(thawEndpoint, wallet, data => {
         if (abort) {
           return false;
@@ -279,7 +279,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
           {selectedAddressData && (
             <AddressDetails
               isRedeemable={getRedeemableAmount(selectedAddressData.schedule) != 0}
-              onRedeem={() => {}}
+              onRedeem={() => { startRedeem(selectedAddressData.address); }}
               address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
               redeemableAmount={getRedeemable(selectedAddressData.schedule)}
@@ -289,7 +289,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
         </Box>
       </Box>
       {redeemingAddr && (
-        <Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} onRedeem={onRedeem} />
+        <Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} onRedeem={onRedeem} endpoint={thawEndpoint} />
       )}
     </>
   );

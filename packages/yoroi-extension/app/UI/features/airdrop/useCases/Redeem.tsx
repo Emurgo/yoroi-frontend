@@ -10,6 +10,7 @@ export default function Redeem(props: {
   onClose: () => void;
   onReorg: (signRequest: any) => void;
   onRedeem: (unsignedTxHex: string) => Promise<void>;
+  endpoint: string;
 }) {
   const strings = useStrings();
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
@@ -22,7 +23,13 @@ export default function Redeem(props: {
     setGetCollateralUtxosResult(result);
     if (result.state === 'exist') {
       try {
-        const resp = await getRedemptionTransaction();
+        const resp = await getRedemptionTransaction(
+          props.address,
+          props.endpoint,
+          result.fundingUtxoAddr,
+          result.collateralUtxoIds,
+          [result.fundingUtxoId],
+        );
         setRedemptionTxBuildingResponse(resp);
       } catch (err: any) {
         setError(err.message);

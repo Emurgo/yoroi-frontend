@@ -277,7 +277,7 @@ const FUNDING_AMOUNT = '2000000';
 
 async function pickCollateralUtxos(
   wallet: WalletState
-): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxoId: string |}> {
+): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxoId: string, fundingUtxoAddr: string, |}> {
   const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
@@ -303,10 +303,12 @@ async function pickCollateralUtxos(
   ).filter(utxo => utxo.assets.length === 0);
   utxosToConsider.sort((utxo1, utxo2) => new BigNumber(utxo1.amount).comparedTo(utxo2.amount));
   let fundingUtxoId = null;
+  let fundingUtxoAddr = null;
   for (let i = 0; i < utxosToConsider.length; i++) {
     const utxo = utxosToConsider[i];
     if (new BigNumber(utxo.amount).gte(FUNDING_AMOUNT)) {
       fundingUtxoId = utxo.utxo_id;
+      fundingUtxoAddr = addressHexToBech32(utxo.receiver);
       utxosToConsider.splice(i, 1);
       break;
     }
@@ -343,7 +345,7 @@ async function pickCollateralUtxos(
         break;
       }
     }
-    return { utxosToUse, fundingUtxoId };
+    return { utxosToUse, fundingUtxoId, fundingUtxoAddr };
   }
 
   return null;
@@ -376,6 +378,7 @@ type GetCollateralUtxosResponse =
       state: 'exist',
       collateralUtxoIds: Array<string>,
       fundingUtxoId: string,
+      fundingUtxoAddr: string,
     |}
   | {|
       state: 'need-reorg',
@@ -396,6 +399,7 @@ export async function getCollateralUtxos(wallet: WalletState): Promise<GetCollat
       state: 'exist',
       collateralUtxoIds: getCollateralUtxosResult.utxosToUse.map(utxo => utxo.utxo_id),
       fundingUtxoId: getCollateralUtxosResult.fundingUtxoId,
+      fundingUtxoAddr: getCollateralUtxosResult.fundingUtxoAddr,
     };
   }
   try {
@@ -443,13 +447,13 @@ export async function getRedemptionTransaction(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify([
+    body: JSON.stringify(
       {
         change_address: changeAddr,
         collateral_utxos: collateralUtxoIds,
         funding_utxos: fundingUtxos,
       },
-    ]),
+    ),
   });
   if (!resp.ok) {
     throw new Error('error when querying the redemption transaction building endpoint');
