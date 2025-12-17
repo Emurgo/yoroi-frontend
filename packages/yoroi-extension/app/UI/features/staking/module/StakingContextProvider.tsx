@@ -9,6 +9,7 @@ import { networkConfigs } from '../../../utils/network-config';
 import { MultiToken } from '../../../../api/common/lib/MultiToken';
 import { getDefaultAssetByWallet } from '../../../../api/ada/lib/storage/database/prepackaged/networks';
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
+import { BigNumber } from 'bignumber.js';
 
 const initialStakingProvider = {
   ...defaultStakingState,
