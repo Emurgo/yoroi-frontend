@@ -54,7 +54,7 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
       defaultTokenId: selectedWallet.defaultTokenId,
     });
     setGraphData(historyGraphData);
-  }, [delegationRequests, selectedWallet, currentlyDelegating]);
+  }, [delegationRequests, selectedWallet, currentlyDelegating, stores.profile.shouldHideBalance]);
 
   React.useEffect(() => {}, []);
 
