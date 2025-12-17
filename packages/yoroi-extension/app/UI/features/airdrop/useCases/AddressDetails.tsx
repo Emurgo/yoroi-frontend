@@ -1,4 +1,4 @@
-import { Box, Link, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
+import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
 import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import { Collapsible } from '../../../components/Collapsible/Collapsible';
@@ -97,14 +97,6 @@ function getRedeemedSoFar(schedule: Schedule): number {
   return schedule.thaws.filter(thaw => thaw.status === 'confirmed').reduce((sum, thaw) => sum + thaw.amount, 0);
 }
 
-function getExplorerUrls(networkId: number, address: string) {
-  const isMainnet = networkId === 0;
-  return {
-    cardanoscan: isMainnet ? `https://cardanoscan.io/address/${address}` : `https://preprod.cardanoscan.io/address/${address}`,
-    adaex: `https://adaex.org/${address}`,
-  };
-}
-
 interface Props {
   schedule: Schedule;
   redeemableAmount: string;
@@ -112,13 +104,12 @@ interface Props {
   networkId: number;
 }
 
-export default function AddressDetails({ schedule, redeemableAmount, address, networkId }: Props) {
+export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
   const intl = useIntl();
 
   const totalAllocation = getTotalAllocation(schedule);
   const redeemedSoFar = getRedeemedSoFar(schedule);
   const totalLeftToRedeem = totalAllocation - redeemedSoFar;
-  const explorerUrls = getExplorerUrls(networkId, address);
 
   return (
     <Box
@@ -205,20 +196,6 @@ export default function AddressDetails({ schedule, redeemableAmount, address, ne
               label={intl.formatMessage(messages.totalLeftToRedeem)}
               value={`${formatNumber(totalLeftToRedeem)} NIGHT`}
             />
-            <DetailRow label={intl.formatMessage(messages.totalToRedeem)} value={`${formatNumber(totalAllocation)} NIGHT`} />
-            <Box>
-              <Typography variant="body1" color="ds.text_gray_low">
-                {intl.formatMessage(messages.detailsOn)}
-              </Typography>
-              <Stack direction="row" spacing="16px" sx={{ mt: '4px' }}>
-                <Link href={explorerUrls.cardanoscan} target="_blank" rel="noopener noreferrer" sx={{ textDecoration: 'none' }}>
-                  {intl.formatMessage(messages.cardanoscan)}
-                </Link>
-                <Link href={explorerUrls.adaex} target="_blank" rel="noopener noreferrer" sx={{ textDecoration: 'none' }}>
-                  {intl.formatMessage(messages.adaex)}
-                </Link>
-              </Stack>
-            </Box>
           </Stack>
         }
       />
