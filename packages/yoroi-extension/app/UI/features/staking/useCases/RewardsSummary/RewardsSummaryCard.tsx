@@ -8,6 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { maybe, useStaking } from '../../module/StakingContextProvider';
 import { HIDDEN_AMOUNT } from '../../../../common/constants';
 import { truncateToken } from '../../../../../utils/formatters';
+import { getTokenName } from '../../../../../stores/stateless/tokenHelpers';
 import { Icon } from '../../../../components';
 
 const StakingIconWrapper = styled(Box)(({ theme }) => ({
@@ -78,7 +79,7 @@ export const RewardsSummaryCard: React.FC = () => {
     return (
       <>
         <span>{amountNode} </span>
-        {truncateToken(tokenInfo?.assetName || '', 12)}
+        {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   };
@@ -130,16 +131,19 @@ export const RewardsSummaryCard: React.FC = () => {
           </StakingIconWrapper>
 
           <InfoDetails>
-            <Typography variant="caption" color="ds.gray_600" sx={{ textTransform: 'uppercase' }}>
+            {/*@ts-ignore */}
+            <Typography variant="caption1" color="ds.gray_600" sx={{ textTransform: 'uppercase' }}>
               {strings.totalRewardsLabel}
             </Typography>
           </InfoDetails>
 
           <InfoDetails>
-            <Typography variant="h2" color="ds.text_gray_medium" fontWeight={500}>
-              {totalRewards ? renderAmount(totalRewards) : <LoadingSpinner small />}
+            <Typography component="div" variant="h2" color="ds.text_gray_medium" fontWeight={500}>
+              {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="ds.gray_600" fontWeight={500}></Typography>
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
+              {renderAmountWithUnitOfAccount(totalRewards)}
+            </Typography>
           </InfoDetails>
         </InfoRow>
 
@@ -149,7 +153,8 @@ export const RewardsSummaryCard: React.FC = () => {
           </TotalDelegatedIconWrapper>
 
           <InfoDetails>
-            <Typography variant="caption" color="ds.gray_600" marginBottom="4px" sx={{ textTransform: 'uppercase' }}>
+            {/*@ts-ignore */}
+            <Typography variant="caption1" color="ds.gray_600" marginBottom="4px" sx={{ textTransform: 'uppercase' }}>
               {strings.totalDelegated}
             </Typography>
           </InfoDetails>
