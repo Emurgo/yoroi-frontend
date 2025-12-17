@@ -42,7 +42,7 @@
   "airdrop.addrCard.redeemableLabel": "Redeemable",
   "airdrop.addrCard.statusReady": "Ready for redemption",
   "airdrop.addrCard.statusNotReady": "Waiting for thawing",
-  "airdrop.addrCard.totalLabel": "Total",
+  "airdrop.addrCard.totalLabel": "Total to redeem",
   "airdrop.schedule.currentThaw": "Current thaw: {current}/{total}",
   "airdrop.schedule.thawTitle": "Thaw {index}/{total}",
   "airdrop.schedule.redeemable": "Redeemable",

@@ -1,87 +1,9 @@
 import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import { Collapsible } from '../../../components/Collapsible/Collapsible';
 import CopyableText from '../../../components/CopyableText';
-
-const messages = defineMessages({
-  details: {
-    id: 'aidrop.addrDetail.detailsLabel',
-    defaultMessage: '!!!More Midnight airdrop details',
-  },
-  currentThaw: {
-    id: 'airdrop.schedule.currentThaw',
-    defaultMessage: '!!!Current thaw: {current}/{total}',
-  },
-  thawTitle: {
-    id: 'airdrop.schedule.thawTitle',
-    defaultMessage: '!!!Thaw {index}/{total}',
-  },
-  redeemable: {
-    id: 'airdrop.schedule.redeemable',
-    defaultMessage: '!!!Redeemable',
-  },
-  notAvailable: {
-    id: 'airdrop.schedule.notAvailable',
-    defaultMessage: '!!!Not available yet',
-  },
-  redeemed: {
-    id: 'airdrop.schedule.redeemed',
-    defaultMessage: '!!!Redeemed',
-  },
-  thawExplanation: {
-    id: 'airdrop.schedule.thawExplanation',
-    defaultMessage: '!!!Each thaw is 25% of your claimed NIGHT allocation',
-  },
-  status: {
-    id: 'airdrop.addrDetails.statusLabel',
-    defaultMessage: '!!!Redemption status',
-  },
-  subTitle: {
-    id: 'airdrop.addrDetails.subTitle',
-    defaultMessage: '!!!🧩 <strong>Thawing & Redemption</strong> of Midnight airdrop has started.',
-  },
-  redeemableNow: {
-    id: 'airdrop.addrDetails.redeemableNow',
-    defaultMessage: '!!!Redeemable now',
-  },
-  dstAddrLabel: {
-    id: 'airdrop.addrCard.destAddrLabel',
-    defaultMessage: '!!!Destination address',
-  },
-  allocationSize: {
-    id: 'airdrop.addrDetails.allocationSize',
-    defaultMessage: '!!!Allocation size',
-  },
-  claimedAllocations: {
-    id: 'airdrop.addrDetails.claimedAllocations',
-    defaultMessage: '!!!No. of claimed allocations',
-  },
-  redeemedSoFar: {
-    id: 'airdrop.addrDetails.redeemedSoFar',
-    defaultMessage: '!!!Redeemed so far',
-  },
-  totalLeftToRedeem: {
-    id: 'airdrop.addrDetails.totalLeftToRedeem',
-    defaultMessage: '!!!Total left to redeem',
-  },
-  totalToRedeem: {
-    id: 'airdrop.addrDetails.totalToRedeem',
-    defaultMessage: '!!!Total to redeem',
-  },
-  detailsOn: {
-    id: 'airdrop.addrDetails.detailsOn',
-    defaultMessage: '!!!Details on',
-  },
-  cardanoscan: {
-    id: 'airdrop.addrDetails.cardanoscan',
-    defaultMessage: '!!!Cardanoscan',
-  },
-  adaex: {
-    id: 'airdrop.addrDetails.adaex',
-    defaultMessage: '!!!Adaex',
-  },
-});
+import { useStrings, messages } from '../common/hooks/useStrings';
 
 const strong = chunks => (
   <Typography fontWeight="500" display="inline">
@@ -105,7 +27,7 @@ interface Props {
 }
 
 export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
-  const intl = useIntl();
+  const strings = useStrings();
 
   const totalAllocation = getTotalAllocation(schedule);
   const redeemedSoFar = getRedeemedSoFar(schedule);
@@ -122,7 +44,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
       <Box>
         {/*  @ts-ignore */}
         <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
-          {intl.formatMessage(messages.status)}
+          {strings.statusLabel}
         </Typography>
         {/*  @ts-ignore */}
         <Typography variant="body1">
@@ -141,7 +63,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         }}
       >
         <Typography variant="body1" fontWeight="500">
-          {intl.formatMessage(messages.redeemableNow)}
+          {strings.redeemableNow}
         </Typography>
         <Box>
           <Typography
@@ -164,7 +86,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         </Box>
         <Box>
           <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
-            {intl.formatMessage(messages.dstAddrLabel)}
+            {strings.dstAddrLabel}
           </Typography>
           {/*  @ts-ignore */}
           <CopyableText value={address} copyButtonFollowText>
@@ -181,21 +103,15 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         expanded={true}
         title={
           <Typography variant="body1" fontWeight="500" color="ds.text_gray_medium">
-            {intl.formatMessage(messages.details)}
+            {strings.details}
           </Typography>
         }
         content={
           <Stack spacing="16px" sx={{ paddingBottom: '16px' }}>
-            <DetailRow label={intl.formatMessage(messages.allocationSize)} value={`${formatNumber(totalAllocation)} NIGHT`} />
-            <DetailRow
-              label={intl.formatMessage(messages.claimedAllocations)}
-              value={String(schedule.numberOfClaimedAllocations)}
-            />
-            <DetailRow label={intl.formatMessage(messages.redeemedSoFar)} value={`${formatNumber(redeemedSoFar)} NIGHT`} />
-            <DetailRow
-              label={intl.formatMessage(messages.totalLeftToRedeem)}
-              value={`${formatNumber(totalLeftToRedeem)} NIGHT`}
-            />
+            <DetailRow label={strings.allocationSize} value={`${formatNumber(totalAllocation)} NIGHT`} />
+            <DetailRow label={strings.claimedAllocations} value={String(schedule.numberOfClaimedAllocations)} />
+            <DetailRow label={strings.redeemedSoFar} value={`${formatNumber(redeemedSoFar)} NIGHT`} />
+            <DetailRow label={strings.totalLeftToRedeem} value={`${formatNumber(totalLeftToRedeem)} NIGHT`} />
           </Stack>
         }
       />
@@ -271,18 +187,19 @@ function getStatusBadgeStyle(status: ThawStatus, theme: any) {
   }
 }
 
-function getStatusMessage(status: ThawStatus, intlMessages: typeof messages) {
+function getStatusMessage(status: ThawStatus, strings: ReturnType<typeof useStrings>) {
   switch (status) {
     case 'redeemable':
-      return intlMessages.redeemable;
+      return strings.redeemable;
     case 'confirmed':
-      return intlMessages.redeemed;
+      return strings.redeemed;
     default:
-      return intlMessages.notAvailable;
+      return strings.notAvailable;
   }
 }
 
 function ScheduleCard({ schedule }: { schedule: Schedule }) {
+  const strings = useStrings();
   const intl = useIntl();
   const theme = useTheme() as any;
   const totalThaws = schedule.thaws.length;
@@ -300,7 +217,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
     >
       <Box sx={{ mb: '24px' }}>
         <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-          {intl.formatMessage(messages.currentThaw, { current: currentThawIndex + 1, total: totalThaws })}
+          {strings.currentThaw(currentThawIndex + 1, totalThaws)}
         </Typography>
       </Box>
 
@@ -361,7 +278,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
 
               <Box sx={{ pr: isLast ? 0 : '16px' }}>
                 <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium" sx={{ mb: '4px' }}>
-                  {intl.formatMessage(messages.thawTitle, { index: index + 1, total: totalThaws })}
+                  {strings.thawTitle(index + 1, totalThaws)}
                 </Typography>
 
                 <Typography variant="body2" color="ds.text_gray_low" sx={{ mb: '8px' }}>
@@ -389,7 +306,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                 </Stack>
 
                 <MuiChip
-                  label={intl.formatMessage(getStatusMessage(statusType, messages))}
+                  label={getStatusMessage(statusType, strings)}
                   sx={{
                     height: 'auto',
                     ...getStatusBadgeStyle(statusType, theme),
@@ -409,7 +326,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
       </Stack>
 
       <Typography variant="caption" color="ds.text_gray_low">
-        {intl.formatMessage(messages.thawExplanation)}
+        {strings.thawExplanation}
       </Typography>
     </Box>
   );

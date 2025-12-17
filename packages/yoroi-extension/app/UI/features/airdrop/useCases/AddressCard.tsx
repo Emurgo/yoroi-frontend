@@ -1,50 +1,15 @@
 import { Box, Typography } from '@mui/material';
-import { useIntl, defineMessages } from 'react-intl';
 import { type Status } from '../../../../api/ada/midnightRedemption';
 import CopyableText from '../../../components/CopyableText';
 import { IconWrapper, Icons } from '../../../components';
-
-const messages = defineMessages({
-  dstAddrs: {
-    id: 'airdrop.addrCard.destAddrs',
-    defaultMessage: '!!!Destination addresses ({count})',
-  },
-  dstAddr: {
-    id: 'aidrop.addrCard.destAddr',
-    defaultMessage: '!!!Destination address {index}',
-  },
-  dstAddrLabel: {
-    id: 'airdrop.addrCard.destAddrLabel',
-    defaultMessage: '!!!Destination address',
-  },
-  status: {
-    id: 'aidrop.addrCard.statusLabel',
-    defaultMessage: '!!!Status',
-  },
-  redeemable: {
-    id: 'airdrop.addrCard.redeemableLabel',
-    defaultMessage: '!!!Redeemable',
-  },
-  total: {
-    id: 'airdrop.addrCard.totalLable',
-    defaultMessage: '!!!Total',
-  },
-  statusReady: {
-    id: 'airdrop.addrCard.statusReady',
-    defaultMessage: '!!!Ready for redemption',
-  },
-  statusNotReady: {
-    id: 'airdrop.addrCard.statusNotReady',
-    defaultMessage: '!!!Waiting for thawing',
-  },
-});
+import { useStrings } from '../common/hooks/useStrings';
 
 export function AddressesTitle({ count }: { count: number }) {
-  const intl = useIntl();
+  const strings = useStrings();
   return (
     /*  @ts-ignore */
     <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }} as="div">
-      {intl.formatMessage(messages.dstAddrs, { count })}
+      {strings.dstAddrs(count)}
     </Typography>
   );
 }
@@ -60,13 +25,12 @@ interface Props {
 }
 
 export function AddressCard({ index, address, status, redeemable, total, isSelected, onSelect }: Props) {
-  const intl = useIntl();
-  const statusString = intl.formatMessage(
+  const strings = useStrings();
+  const statusString =
     {
-      ready: messages.statusReady,
-      notReady: messages.statusNotReady,
-    }[status]
-  );
+      ready: strings.statusReady,
+      notReady: strings.statusNotReady,
+    }[status] || '';
 
   const selectedBackground = isSelected ? { background: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)' } : {};
   return (
@@ -92,13 +56,13 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
-        <Typography variant="body1">{intl.formatMessage(messages.dstAddr, { index })}</Typography>
+        <Typography variant="body1">{strings.dstAddr(index)}</Typography>
         <IconWrapper icon={Icons.ChevronRight} />
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
-          {intl.formatMessage(messages.dstAddrLabel)}
+          {strings.dstAddrLabel}
         </Typography>
         {/*  @ts-ignore */}
         <CopyableText value={address} copyButtonFollowText>
@@ -109,7 +73,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
-          {intl.formatMessage(messages.status)}
+          {strings.status}
         </Typography>
 
         {/*  @ts-ignore */}
@@ -119,7 +83,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
-          {intl.formatMessage(messages.redeemable)}
+          {strings.redeemable}
         </Typography>
 
         {/*  @ts-ignore */}
@@ -129,7 +93,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
-          {intl.formatMessage(messages.total)}
+          {strings.total}
         </Typography>
 
         {/*  @ts-ignore */}

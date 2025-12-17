@@ -1,9 +1,8 @@
 import Dialog from '../../../../components/widgets/Dialog';
-//import { useIntl, defineMessages } from 'react-intl';
 import { Typography, Box, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
-//import globalMessages from '../../../../i18n/global-messages';
 import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
+import { useStrings } from '../common/hooks/useStrings';
 
 export default function Redeem(props: {
   address: string;
@@ -12,6 +11,7 @@ export default function Redeem(props: {
   onReorg: (signRequest: any) => void;
   onRedeem: (unsignedTxHex: string) => Promise<void>;
 }) {
+  const strings = useStrings();
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +36,10 @@ export default function Redeem(props: {
 
   let content;
   if (getCollateralUtxosResult === null) {
-    content = '...';
+    content = strings.redeemLoading;
   } else if (getCollateralUtxosResult.state === 'exist') {
     if (!redemptionTxBuildingResponse) {
-      content = '...';
+      content = strings.redeemLoading;
     } else {
       content = (
         <>
@@ -53,7 +53,7 @@ export default function Redeem(props: {
               props.onClose();
             }}
           >
-            Redeem
+            {strings.redeemButton}
           </Button>
         </>
       );
@@ -61,7 +61,7 @@ export default function Redeem(props: {
   } else if (getCollateralUtxosResult.state === 'need-reorg') {
     content = (
       <Box>
-        <Typography>Please re-orgnize the wallet for collateral UTxOs for redeeming</Typography>
+        <Typography>{strings.redeemReorgMessage}</Typography>
         <Button
           onClick={async () => {
             await props.onReorg(getCollateralUtxosResult.signRequest);
@@ -69,18 +69,18 @@ export default function Redeem(props: {
             updateCollateralUtxos();
           }}
         >
-          Confirm
+          {strings.redeemConfirmButton}
         </Button>
       </Box>
     );
   } else if (getCollateralUtxosResult.state === 'not-enough') {
-    content = 'not enough balance to redeem';
+    content = strings.redeemNotEnoughBalance;
   } else {
-    content = `Error when getting collaterals ${getCollateralUtxosResult.message}`;
+    content = strings.redeemErrorGettingCollaterals(getCollateralUtxosResult.message || '');
   }
 
   return (
-    <Dialog withCloseButton onClose={props.onClose} title={'claim'}>
+    <Dialog withCloseButton onClose={props.onClose} title={strings.redeemDialogTitle}>
       {content}
     </Dialog>
   );
