@@ -145,13 +145,6 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphD
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = strings.rewardHistoryLabel;
 
-  const onOpenRewardList = async () => {
-    console.log('OPENNNNNN222');
-    stores.uiDialogs.open({
-      dialog: RewardHistoryDialog,
-    });
-  };
-
   return (
     <Box
       p="24px"
