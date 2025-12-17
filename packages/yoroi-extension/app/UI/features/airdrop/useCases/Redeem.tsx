@@ -5,19 +5,17 @@ import { useEffect, useState } from 'react';
 //import globalMessages from '../../../../i18n/global-messages';
 import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
 
-export default function Redeem(
-  props: {
-    address: string;
-    wallet: any,
-    onClose: () => void;
-    onReorg: (signRequest: any) => void;
-    onRedeem: (unsignedTxHex: string) => Promise<void>;
-  }
-) {
+export default function Redeem(props: {
+  address: string;
+  wallet: any;
+  onClose: () => void;
+  onReorg: (signRequest: any) => void;
+  onRedeem: (unsignedTxHex: string) => Promise<void>;
+}) {
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  void(error);
+  void error;
 
   const updateCollateralUtxos = async () => {
     const result = await getCollateralUtxos(props.wallet);
@@ -36,7 +34,6 @@ export default function Redeem(
     updateCollateralUtxos();
   }, [props.address]);
 
-
   let content;
   if (getCollateralUtxosResult === null) {
     content = '...';
@@ -47,9 +44,7 @@ export default function Redeem(
       content = (
         <>
           <Box>
-            <Typography>
-              {redemptionTxBuildingResponse.redeemedAmount}
-            </Typography>
+            <Typography>{redemptionTxBuildingResponse.redeemedAmount}</Typography>
           </Box>
           <Button
             onClick={async () => {
@@ -83,13 +78,9 @@ export default function Redeem(
   } else {
     content = `Error when getting collaterals ${getCollateralUtxosResult.message}`;
   }
-  
+
   return (
-    <Dialog
-      withCloseButton
-      onClose={props.onClose}
-      title={'claim'}
-    >
+    <Dialog withCloseButton onClose={props.onClose} title={'claim'}>
       {content}
     </Dialog>
   );

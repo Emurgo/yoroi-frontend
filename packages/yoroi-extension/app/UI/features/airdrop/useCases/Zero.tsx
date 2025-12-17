@@ -29,14 +29,10 @@ export default function Zero() {
       }}
     >
       {/*  @ts-ignore */}
-      <Typography variant="h1xl">
-        {intl.formatMessage(messages.noAllocTitle)}
-      </Typography>
+      <Typography variant="h1xl">{intl.formatMessage(messages.noAllocTitle)}</Typography>
 
       {/*  @ts-ignore */}
-      <Typography variant="body1">
-        {intl.formatMessage(messages.noRedemptionText)}
-      </Typography>
+      <Typography variant="body1">{intl.formatMessage(messages.noRedemptionText)}</Typography>
 
       {/*  @ts-ignore */}
       <Typography variant="body1">

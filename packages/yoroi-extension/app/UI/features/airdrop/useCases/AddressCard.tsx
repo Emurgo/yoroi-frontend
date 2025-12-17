@@ -61,12 +61,14 @@ interface Props {
 
 export function AddressCard({ index, address, status, redeemable, total, isSelected, onSelect }: Props) {
   const intl = useIntl();
-  const statusString = intl.formatMessage({
-    ready: messages.statusReady,
-    notReady: messages.statusNotReady,
-  }[status]);
-  
-  const selectedBackground = isSelected ? { 'background': 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)' } : {};
+  const statusString = intl.formatMessage(
+    {
+      ready: messages.statusReady,
+      notReady: messages.statusNotReady,
+    }[status]
+  );
+
+  const selectedBackground = isSelected ? { background: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)' } : {};
   return (
     <Box
       sx={{
@@ -80,7 +82,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
         ...selectedBackground,
         cursor: 'pointer',
       }}
-      onClick={(event) => {
+      onClick={event => {
         //hack: detect that the copy address icon is clicked
         if ((event.target as HTMLElement).tagName === 'svg') {
           return;
@@ -90,9 +92,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
-        <Typography variant="body1">
-          {intl.formatMessage(messages.dstAddr, { index })}
-        </Typography>
+        <Typography variant="body1">{intl.formatMessage(messages.dstAddr, { index })}</Typography>
         <IconWrapper icon={Icons.ChevronRight} />
       </Box>
 
@@ -102,46 +102,38 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
         </Typography>
         {/*  @ts-ignore */}
         <CopyableText value={address} copyButtonFollowText>
-          <Typography variant="body2">
-            {shortenAddress(address)}
-          </Typography>
+          <Typography variant="body2">{shortenAddress(address)}</Typography>
         </CopyableText>
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-       {/*  @ts-ignore */}
+        {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
           {intl.formatMessage(messages.status)}
         </Typography>
 
         {/*  @ts-ignore */}
-        <Typography variant="body2">
-          {statusString}
-        </Typography>
+        <Typography variant="body2">{statusString}</Typography>
       </Box>
 
-     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
           {intl.formatMessage(messages.redeemable)}
         </Typography>
 
         {/*  @ts-ignore */}
-        <Typography variant="body2">
-        {redeemable}&nbsp;NIGHT
-        </Typography>
+        <Typography variant="body2">{redeemable}&nbsp;NIGHT</Typography>
       </Box>
 
-     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
         <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
           {intl.formatMessage(messages.total)}
         </Typography>
 
         {/*  @ts-ignore */}
-        <Typography variant="body2">
-        {total}&nbsp;NIGHT
-        </Typography>
+        <Typography variant="body2">{total}&nbsp;NIGHT</Typography>
       </Box>
     </Box>
   );

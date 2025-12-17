@@ -77,14 +77,13 @@ interface Props {
       currentLocale: string;
     };
     transactionProcessingStore: {
-      adaSendAndRefresh: (params: { wallet: any, signRequest: any, password: any, callback: any }) => Promise<void>;
+      adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<void>;
     };
   };
 }
 
 const THAW_ENDPOINT_MAINNET = 'https://mainnet.prod.gd.midnighttge.io';
 const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
-
 
 function AirdropPage({ stores }: Readonly<Props>) {
   const wallet = stores.wallets.selectedOrFail;
@@ -99,10 +98,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
   // const [arbitraryAddr, setArbitraryAddr] = useState('');
 
   const [redeemingAddr, setRedeemingAddr] = useState(null);
-  const startRedeem = (addr) => {
+  const startRedeem = addr => {
     setRedeemingAddr(addr);
   };
-  void(startRedeem);
+  void startRedeem;
 
   const closeRedeem = () => {
     setRedeemingAddr(null);
@@ -113,7 +112,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
     (async () => {
       const isMainnet = wallet.networkId === 0;
       const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
-      await scanAddressesForThaws(thawEndpoint, wallet, (data) => {
+      await scanAddressesForThaws(thawEndpoint, wallet, data => {
         if (abort) {
           return false;
         }
@@ -131,13 +130,12 @@ function AirdropPage({ stores }: Readonly<Props>) {
     };
   }, [wallet.publicDeriverId]);
 
-
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
   const onReorg = async (signRequest: any) => {
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       openTxReviewModal({
         modalView: 'transactionReview',
-        submitTx: async (password) => {
+        submitTx: async password => {
           try {
             startLoadingTxReview();
 
@@ -213,10 +211,10 @@ function AirdropPage({ stores }: Readonly<Props>) {
       },
     });
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       openTxReviewModal({
         modalView: 'transactionReview',
-        submitTx: async (password) => {
+        submitTx: async password => {
           try {
             startLoadingTxReview();
 
@@ -246,14 +244,14 @@ function AirdropPage({ stores }: Readonly<Props>) {
         unsignedTx: signRequest.unsignedTx,
       });
     });
-  }
+  };
 
   if (!queryingThaws && addressThawsData.length === 0) {
-    return (<Zero />);
+    return <Zero />;
   }
 
   const leftPanel = (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }} >
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <AddressesTitle count={addressThawsData.length} />
       {addressThawsData.map(({ address, schedule }, index) => (
         <AddressCard
@@ -263,7 +261,9 @@ function AirdropPage({ stores }: Readonly<Props>) {
           redeemable={getRedeemable(schedule)}
           total={getTotal(schedule)}
           isSelected={index === selectedAddressIndex}
-          onSelect={() => { setSelectedAddressIndex(index); }}
+          onSelect={() => {
+            setSelectedAddressIndex(index);
+          }}
         />
       ))}
       {queryingThaws && <LoadingSpinner />}
@@ -274,9 +274,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
   return (
     <>
       <Box sx={{ display: 'flex', flexDirection: 'row', height: '100%' }}>
-        <Box sx={{ overflowY: 'auto', padding: '24px' }}>
-         {leftPanel}
-        </Box>
+        <Box sx={{ overflowY: 'auto', padding: '24px' }}>{leftPanel}</Box>
         <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
@@ -289,13 +287,7 @@ function AirdropPage({ stores }: Readonly<Props>) {
         </Box>
       </Box>
       {redeemingAddr && (
-        <Redeem
-          address={redeemingAddr}
-          wallet={wallet}
-          onClose={closeRedeem}
-          onReorg={onReorg}
-          onRedeem={onRedeem}
-        />
+        <Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} onRedeem={onRedeem} />
       )}
     </>
   );
@@ -316,10 +308,10 @@ export default function AirDropPageWrap({ stores }: Readonly<Props>) {
     >
       <ModalProvider>
         <ModalManager />
-          <ReviewTxProvider stores={stores}>
-            <ReviewTxModal />
-            <AirdropPage stores={stores}/>
-          </ReviewTxProvider>
+        <ReviewTxProvider stores={stores}>
+          <ReviewTxModal />
+          <AirdropPage stores={stores} />
+        </ReviewTxProvider>
       </ModalProvider>
     </TopBarLayout>
   );

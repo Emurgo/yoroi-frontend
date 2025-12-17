@@ -83,24 +83,24 @@ const messages = defineMessages({
   },
 });
 
-const strong = chunks => (<Typography fontWeight="500" display="inline">{chunks}</Typography>);
+const strong = chunks => (
+  <Typography fontWeight="500" display="inline">
+    {chunks}
+  </Typography>
+);
 
 function getTotalAllocation(schedule: Schedule): number {
   return schedule.thaws.reduce((sum, thaw) => sum + thaw.amount, 0);
 }
 
 function getRedeemedSoFar(schedule: Schedule): number {
-  return schedule.thaws
-    .filter(thaw => thaw.status === 'confirmed')
-    .reduce((sum, thaw) => sum + thaw.amount, 0);
+  return schedule.thaws.filter(thaw => thaw.status === 'confirmed').reduce((sum, thaw) => sum + thaw.amount, 0);
 }
 
 function getExplorerUrls(networkId: number, address: string) {
   const isMainnet = networkId === 0;
   return {
-    cardanoscan: isMainnet
-      ? `https://cardanoscan.io/address/${address}`
-      : `https://preprod.cardanoscan.io/address/${address}`,
+    cardanoscan: isMainnet ? `https://cardanoscan.io/address/${address}` : `https://preprod.cardanoscan.io/address/${address}`,
     adaex: `https://adaex.org/${address}`,
   };
 }
@@ -167,7 +167,8 @@ export default function AddressDetails({ schedule, redeemableAmount, address, ne
           </Typography>
           {/*  @ts-ignore */}
           <Typography as="span" variant="body1" fontWeight="500" sx={{ color: 'ds.text_gray_medium' }}>
-            {' '}NIGHT
+            {' '}
+            NIGHT
           </Typography>
         </Box>
         <Box>
@@ -176,16 +177,14 @@ export default function AddressDetails({ schedule, redeemableAmount, address, ne
           </Typography>
           {/*  @ts-ignore */}
           <CopyableText value={address} copyButtonFollowText>
-            <Typography variant="body1">
-              {address}
-            </Typography>
+            <Typography variant="body1">{address}</Typography>
           </CopyableText>
         </Box>
       </Box>
 
       <ScheduleCard schedule={schedule} />
 
-      <Box sx={{ height: '1px', background: 'var(--grayscale-200, #DCE0E9)' }}/>
+      <Box sx={{ height: '1px', background: 'var(--grayscale-200, #DCE0E9)' }} />
 
       <Collapsible
         expanded={true}
@@ -196,45 +195,26 @@ export default function AddressDetails({ schedule, redeemableAmount, address, ne
         }
         content={
           <Stack spacing="16px" sx={{ paddingBottom: '16px' }}>
-            <DetailRow
-              label={intl.formatMessage(messages.allocationSize)}
-              value={`${formatNumber(totalAllocation)} NIGHT`}
-            />
+            <DetailRow label={intl.formatMessage(messages.allocationSize)} value={`${formatNumber(totalAllocation)} NIGHT`} />
             <DetailRow
               label={intl.formatMessage(messages.claimedAllocations)}
               value={String(schedule.numberOfClaimedAllocations)}
             />
-            <DetailRow
-              label={intl.formatMessage(messages.redeemedSoFar)}
-              value={`${formatNumber(redeemedSoFar)} NIGHT`}
-            />
+            <DetailRow label={intl.formatMessage(messages.redeemedSoFar)} value={`${formatNumber(redeemedSoFar)} NIGHT`} />
             <DetailRow
               label={intl.formatMessage(messages.totalLeftToRedeem)}
               value={`${formatNumber(totalLeftToRedeem)} NIGHT`}
             />
-            <DetailRow
-              label={intl.formatMessage(messages.totalToRedeem)}
-              value={`${formatNumber(totalAllocation)} NIGHT`}
-            />
+            <DetailRow label={intl.formatMessage(messages.totalToRedeem)} value={`${formatNumber(totalAllocation)} NIGHT`} />
             <Box>
               <Typography variant="body1" color="ds.text_gray_low">
                 {intl.formatMessage(messages.detailsOn)}
               </Typography>
               <Stack direction="row" spacing="16px" sx={{ mt: '4px' }}>
-                <Link
-                  href={explorerUrls.cardanoscan}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ textDecoration: 'none' }}
-                >
+                <Link href={explorerUrls.cardanoscan} target="_blank" rel="noopener noreferrer" sx={{ textDecoration: 'none' }}>
                   {intl.formatMessage(messages.cardanoscan)}
                 </Link>
-                <Link
-                  href={explorerUrls.adaex}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{ textDecoration: 'none' }}
-                >
+                <Link href={explorerUrls.adaex} target="_blank" rel="noopener noreferrer" sx={{ textDecoration: 'none' }}>
                   {intl.formatMessage(messages.adaex)}
                 </Link>
               </Stack>
@@ -379,7 +359,12 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                   {isPast ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none">
-                        <path fillRule="evenodd" clipRule="evenodd" d="M13.7007 4.28655C14.0947 4.67354 14.1004 5.30668 13.7134 5.70071L6.83845 12.7007C6.65042 12.8922 6.39334 13 6.125 13C5.85666 13 5.59958 12.8922 5.41155 12.7007L2.28655 9.51889C1.89956 9.12486 1.90527 8.49172 2.29929 8.10473C2.69332 7.71774 3.32646 7.72345 3.71345 8.11747L6.125 10.5729L12.2866 4.29929C12.6735 3.90527 13.3067 3.89956 13.7007 4.28655Z" fill="white"/>
+                        <path
+                          fillRule="evenodd"
+                          clipRule="evenodd"
+                          d="M13.7007 4.28655C14.0947 4.67354 14.1004 5.30668 13.7134 5.70071L6.83845 12.7007C6.65042 12.8922 6.39334 13 6.125 13C5.85666 13 5.59958 12.8922 5.41155 12.7007L2.28655 9.51889C1.89956 9.12486 1.90527 8.49172 2.29929 8.10473C2.69332 7.71774 3.32646 7.72345 3.71345 8.11747L6.125 10.5729L12.2866 4.29929C12.6735 3.90527 13.3067 3.89956 13.7007 4.28655Z"
+                          fill="white"
+                        />
                       </svg>
                     </Box>
                   ) : (
@@ -421,7 +406,8 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                     fontWeight={500}
                     color={isRedeemable ? 'ds.text_gray_medium' : 'ds.text_gray_low'}
                   >
-                    {' '}NIGHT
+                    {' '}
+                    NIGHT
                   </Typography>
                 </Stack>
 
