@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { scanAddressesForThaws } from '../../api/ada/midnight';
-import { type Schedule, getRedeemable, getStatus, getTotal } from '../../api/ada/midnightRedemption';
+import { type Schedule, getRedeemable, getStatus, getTotal, getRedeemableAmount } from '../../api/ada/midnightRedemption';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -278,6 +278,8 @@ function AirdropPage({ stores }: Readonly<Props>) {
         <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
+              isRedeemable={getRedeemableAmount(selectedAddressData.schedule) != 0}
+              onRedeem={() => {}}
               address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
               redeemableAmount={getRedeemable(selectedAddressData.schedule)}

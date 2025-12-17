@@ -1,9 +1,16 @@
-import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import { FormattedMessage, useIntl } from 'react-intl';
+import { Button, Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
+import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import { Collapsible } from '../../../components/Collapsible/Collapsible';
 import CopyableText from '../../../components/CopyableText';
 import { useStrings, messages } from '../common/hooks/useStrings';
+
+const localMessages = defineMessages({
+  redeem: {
+    id: 'airdrop.redeem',
+    defaultMessage: '!!!Redeem',
+  },
+});
 
 const strong = chunks => (
   <Typography fontWeight="500" display="inline">
@@ -21,6 +28,8 @@ function getRedeemedSoFar(schedule: Schedule): number {
 
 interface Props {
   schedule: Schedule;
+  isRedeemable: boolean;
+  onRedeem: () => void;
   redeemableAmount: string;
   address: string;
   networkId: number;
@@ -29,6 +38,7 @@ interface Props {
 export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
   const strings = useStrings();
   const theme: any = useTheme();
+  const intl = useIntl();
 
   const totalAllocation = getTotalAllocation(schedule);
   const redeemedSoFar = getRedeemedSoFar(schedule);
@@ -42,15 +52,22 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         gap: '16px',
       }}
     >
-      <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+        <Box>
+          {/*  @ts-ignore */}
+          <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
+            {strings.statusLabel}
+          </Typography>
+          {/*  @ts-ignore */}
+          <Typography variant="body1">
+            <FormattedMessage {...messages.subTitle} values={{ strong }} />
+          </Typography>
+        </Box>
         {/*  @ts-ignore */}
-        <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
-          {strings.statusLabel}
-        </Typography>
-        {/*  @ts-ignore */}
-        <Typography variant="body1">
-          <FormattedMessage {...messages.subTitle} values={{ strong }} />
-        </Typography>
+
+        <Button variant="primary" onClick={onRedeem} disabled={!isRedeemable}>
+          {intl.formatMessage(localMessages.redeem)}
+        </Button>
       </Box>
 
       <Box

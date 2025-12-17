@@ -20,7 +20,7 @@ export function formatNumber(n: number): string {
 }
 
 // guesswork
-function getRedeemableAmount(schedule: Schedule): number {
+export function getRedeemableAmount(schedule: Schedule): number {
   return schedule.thaws
     .slice(schedule.numberOfClaimedAllocations)
     .filter(thaw => thaw.status === 'redeemable')

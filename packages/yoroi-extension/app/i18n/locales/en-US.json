@@ -63,6 +63,7 @@
   "aidrop.addrCard.destAddr": "Destination address {index}",
   "aidrop.addrCard.statusLabel": "Status",
   "aidrop.addrDetail.detailsLabel": "More Midnight airdrop details",
+  "airdrop.redeem": "Redeem",
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.CannotSendBelowMinimumValueError": "A minimum of 1 ADA is required",
   "api.errors.GenericApiError": "An error occurred. Please retry.",
