@@ -1,4 +1,4 @@
-import { Box, Button, Typography, Stack, Divider } from '@mui/material';
+import { Box, Button, Typography, Stack, Divider, useTheme } from '@mui/material';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 import CopyableText from '../../../components/CopyableText';
 import { constructPlate } from '../../../../components/topbar/WalletCard';
@@ -14,6 +14,7 @@ interface Props2 {
 
 export function ClaimInfo2(props: Readonly<Props2>) {
   const strings = useStrings();
+  const theme: any = useTheme();
   const { alloc, destAddrBech32, destAddrError, walletPlate, walletName } = props;
   const [accountPlateId, iconComponent] = constructPlate(walletPlate, {
     saturationFactor: 0,
@@ -84,7 +85,7 @@ export function ClaimInfo2(props: Readonly<Props2>) {
           flexDirection: 'column',
           gap: '16px',
           borderRadius: '8px',
-          background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+          background: theme.palette.ds.bg_gradient_1,
           padding: '24px',
         }}
       >

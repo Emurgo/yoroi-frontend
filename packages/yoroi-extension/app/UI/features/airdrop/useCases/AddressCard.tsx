@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { type Status } from '../../../../api/ada/midnightRedemption';
 import CopyableText from '../../../components/CopyableText';
 import { IconWrapper, Icons } from '../../../components';
@@ -26,20 +26,22 @@ interface Props {
 
 export function AddressCard({ index, address, status, redeemable, total, isSelected, onSelect }: Props) {
   const strings = useStrings();
+  const theme: any = useTheme();
   const statusString =
     {
       ready: strings.statusReady,
       notReady: strings.statusNotReady,
     }[status] || '';
 
-  const selectedBackground = isSelected ? { background: 'linear-gradient(180deg, #93F5E1 0%, #C6F7ED 100%)' } : {};
+  const selectedBackground = isSelected ? { background: theme.palette.ds.bg_gradient_2 } : {};
   return (
     <Box
       sx={{
         width: '315px',
         borderRadius: '8px',
         padding: '16px',
-        border: '1px solid var(--grayscale-200, #DCE0E9)',
+        border: '1px solid',
+        borderColor: 'ds.gray_200',
         display: 'flex',
         flexDirection: 'column',
         gap: '16px',
@@ -61,7 +63,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
       </Box>
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+        <Typography variant="body2" color="ds.text_gray_low">
           {strings.dstAddrLabel}
         </Typography>
         {/*  @ts-ignore */}
@@ -72,7 +74,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
-        <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+        <Typography variant="body2" color="ds.text_gray_low">
           {strings.status}
         </Typography>
 
@@ -82,7 +84,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
-        <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+        <Typography variant="body2" color="ds.text_gray_low">
           {strings.redeemable}
         </Typography>
 
@@ -92,7 +94,7 @@ export function AddressCard({ index, address, status, redeemable, total, isSelec
 
       <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
         {/*  @ts-ignore */}
-        <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+        <Typography variant="body2" color="ds.text_gray_low">
           {strings.total}
         </Typography>
 

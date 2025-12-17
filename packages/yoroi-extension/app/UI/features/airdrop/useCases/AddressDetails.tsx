@@ -28,6 +28,7 @@ interface Props {
 
 export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
   const strings = useStrings();
+  const theme: any = useTheme();
 
   const totalAllocation = getTotalAllocation(schedule);
   const redeemedSoFar = getRedeemedSoFar(schedule);
@@ -54,8 +55,8 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
 
       <Box
         sx={{
-          borderRadius: 'var(--corner-radius-8, 8px)',
-          background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+          borderRadius: '8px',
+          background: theme.palette.ds.bg_gradient_1,
           padding: '16px',
           display: 'flex',
           flexDirection: 'column',
@@ -85,7 +86,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
           </Typography>
         </Box>
         <Box>
-          <Typography variant="body2" color="var(--text-gray-low, #6B7384)">
+          <Typography variant="body2" color="ds.text_gray_low">
             {strings.dstAddrLabel}
           </Typography>
           {/*  @ts-ignore */}
@@ -97,7 +98,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
 
       <ScheduleCard schedule={schedule} />
 
-      <Box sx={{ height: '1px', background: 'var(--grayscale-200, #DCE0E9)' }} />
+      <Box sx={{ height: '1px', background: 'ds.gray_200' }} />
 
       <Collapsible
         expanded={true}

@@ -327,8 +327,7 @@ export const useStrings = () => {
     redeemReorgMessage: intl.formatMessage(messages.redeemReorgMessage),
     redeemConfirmButton: intl.formatMessage(messages.redeemConfirmButton),
     redeemNotEnoughBalance: intl.formatMessage(messages.redeemNotEnoughBalance),
-    redeemErrorGettingCollaterals: (message: string) =>
-      intl.formatMessage(messages.redeemErrorGettingCollaterals, { message }),
+    redeemErrorGettingCollaterals: (message: string) => intl.formatMessage(messages.redeemErrorGettingCollaterals, { message }),
     // Global messages (re-exported for convenience)
     close: intl.formatMessage(globalMessages.close),
     continue: intl.formatMessage(globalMessages.continue),
