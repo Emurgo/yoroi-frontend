@@ -33,6 +33,7 @@ type RewardHistoryGraphProps = {
 /* ---------- RewardHistoryItem ---------- */
 
 export const RewardHistoryItem: React.FC<RewardHistoryItemProps> = ({ poolId, poolName, poolAvatar, historyList }) => {
+  const strings = useStrings();
   const avatarGenerated = getAvatarFromPoolId(poolId);
 
   return (
@@ -41,7 +42,7 @@ export const RewardHistoryItem: React.FC<RewardHistoryItemProps> = ({ poolId, po
         <Box>
           <Box display="block">
             <Typography component="div" color="var(--yoroi-palette-gray-600)">
-              Stake Pool
+              {strings.stakePoolLabel}
             </Typography>
           </Box>
           <Box display="flex">

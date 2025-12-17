@@ -826,6 +826,7 @@
   "wallet.delegation.transaction.explanationLine2": "You can switch to delegate to a different stake pool at any time",
   "wallet.delegation.transaction.explanationLine3": "You can cancel your delegation at any time",
   "wallet.delegation.transaction.generation": "Generating transaction",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "Stake pool id",
   "wallet.delegation.transaction.stakePoolName": "Stake pool name",
   "wallet.delegation.transaction.success.button.label": "Dashboard page",

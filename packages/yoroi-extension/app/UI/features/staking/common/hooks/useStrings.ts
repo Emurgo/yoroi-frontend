@@ -112,6 +112,10 @@ export const messages = Object.freeze(
       id: 'button.buyAda',
       defaultMessage: '!!!Buy ADA',
     },
+    stakePoolLabel: {
+      id: 'wallet.delegation.transaction.stakePoolLabel',
+      defaultMessage: '!!!Stake pool',
+    },
   })
 );
 
@@ -145,5 +149,6 @@ export const useStrings = () => {
     welcomeMessageSubtitleTestnetExtra: intl.formatMessage(messages.welcomeMessageSubtitleTestnetExtra),
     goToFaucetButton: intl.formatMessage(messages.goToFaucetButton),
     buyAda: intl.formatMessage(messages.buyAda),
+    stakePoolLabel: intl.formatMessage(messages.stakePoolLabel),
   }).current;
 };
