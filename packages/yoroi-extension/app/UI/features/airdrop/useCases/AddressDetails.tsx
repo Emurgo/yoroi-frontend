@@ -169,21 +169,21 @@ function getStatusBadgeStyle(status: ThawStatus, theme: any) {
   switch (status) {
     case 'redeemable':
       return {
-        background: 'linear-gradient(90deg, #17D1AA 0%, #1ACBAF 15%, #21B8BC 37%, #2E9BD3 62%, #3F71F1 89%, #475FFF 100%)',
-        borderRadius: '1200px',
-        color: theme.palette.ds?.gray_min ?? '#FFFFFF',
+        background: theme.palette.ds.illustration_static,
+        borderRadius: '8px',
+        color: theme.palette.ds.gray_min,
       };
     case 'confirmed':
       return {
-        backgroundColor: theme.palette.ds?.secondary_600 ?? '#00A876',
-        borderRadius: '1200px',
-        color: theme.palette.ds?.gray_min ?? '#FFFFFF',
+        backgroundColor: theme.palette.ds.secondary_600,
+        borderRadius: '8px',
+        color: theme.palette.ds.gray_min,
       };
     default:
       return {
-        backgroundColor: theme.palette.ds?.gray_600 ?? '#6B7384',
-        borderRadius: '1200px',
-        color: theme.palette.ds?.gray_min ?? '#FFFFFF',
+        backgroundColor: theme.palette.ds.gray_600,
+        borderRadius: '8px',
+        color: theme.palette.ds.gray_min,
       };
   }
 }
