@@ -82,4 +82,5 @@ export type DSColorPalette = {|
   light_shadow_dropdown_menu: string,
   light_shadow_notification: string,
   static_green: string,
+  illustration_static: string,
 |};
