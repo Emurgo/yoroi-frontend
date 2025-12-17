@@ -19,6 +19,8 @@ interface BaseBannerProps {
   illustration?: React.ReactNode;
   illustrationProps?: StackProps;
   displayIllustration?: boolean;
+  noClose?: boolean;
+  customButton?: React.ReactNode;
 }
 
 export const BaseBanner = ({
@@ -30,6 +32,8 @@ export const BaseBanner = ({
   illustration,
   illustrationProps,
   displayIllustration = true,
+  noClose = false,
+  customButton,
 }: BaseBannerProps) => {
   const theme: any = useTheme();
 
@@ -39,16 +43,18 @@ export const BaseBanner = ({
 
   return (
     <Container direction="row" justifyContent="space-between" sx={{ position: 'relative', flex: 1 }}>
-      <Stack sx={{ position: 'absolute', zIndex: 20, right: 10, top: 10 }}>
-        <IconWrapper
-          buttonProps={{ onClick: handleClose }}
-          icon={Icons.CloseCircleIcon}
-          iconProps={{ fill: theme.palette.ds.el_gray_max }}
-          color="ds.el_gray_max"
-          borderColor="ds.el_gray_max"
-          asButton
-        />
-      </Stack>
+      {!noClose && (
+        <Stack sx={{ position: 'absolute', zIndex: 20, right: 10, top: 10 }}>
+          <IconWrapper
+            buttonProps={{ onClick: handleClose }}
+            icon={Icons.CloseCircleIcon}
+            iconProps={{ fill: theme.palette.ds.el_gray_max }}
+            color="ds.el_gray_max"
+            borderColor="ds.el_gray_max"
+            asButton
+          />
+        </Stack>
+      )}
       <Stack direction="column" p="16px" alignItems="flex-start">
         {typeof title === 'string' ? (
           <Typography fontSize="16px" fontWeight={500} color="ds.gray_max">
@@ -60,7 +66,7 @@ export const BaseBanner = ({
         <Typography variant="body1" mt="8px" mb={buttonText ? '24px' : '0px'} color="ds.gray_max">
           {description}
         </Typography>
-        {buttonText && <Button {...buttonProps}>{buttonText}</Button>}
+        {customButton ? customButton : buttonText && <Button {...buttonProps}>{buttonText}</Button>}
       </Stack>
       {displayIllustration && (
         <Stack height={125} {...illustrationProps}>

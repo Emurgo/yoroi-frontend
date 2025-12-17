@@ -1,28 +1,79 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import React from 'react';
+import { Box, Button, Link, Stack, styled, Typography } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { toSvg } from 'jdenticon';
-import { TransactionResult } from '../../../../UI/features/transaction-review/common/types';
-import { useTxReviewModal } from '../../../../UI/features/transaction-review/module/ReviewTxProvider';
-import { observer } from 'mobx-react';
-import { useStrings } from '../../../../UI/features/transaction-review/common/hooks/useStrings';
-import { StyledLink } from './StakePool/StakePool.styles';
 import { getSocialMediaLinks } from './UndelegateButton';
+import { TransactionResult } from '../../../transaction-review/common/types';
+import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
+import { useStrings } from '../../../transaction-review/common/hooks/useStrings';
+import { SocialLinks } from '../../common/types';
 
-export const DelegateButton = observer(({ stores, label, disabled, poolName, socialMediaInfo, poolID }) => {
-  console.log('DelegateButton rendered', { label, disabled, poolName, socialMediaInfo, poolID });
+type SocialMediaInfo = {
+  socialLinks?: SocialLinks;
+  websiteUrl?: string;
+};
+
+type DelegateButtonProps = {
+  stores: any;
+  label: React.ReactNode;
+  disabled?: boolean;
+  poolName: string;
+  socialMediaInfo?: SocialMediaInfo;
+  poolID: string;
+  btnVariant?: 'primary' | 'secondary';
+};
+
+const StyledLink: any = styled(Link)(({ theme }: any) => ({
+  marginRight: '5px',
+  color: 'inherit',
+  '& svg': {
+    '& path': {
+      fill: theme.palette.ds.el_gray_medium,
+    },
+  },
+}));
+
+export const DelegateButton: React.FC<DelegateButtonProps> = ({
+  stores,
+  label,
+  disabled = false,
+  poolName,
+  socialMediaInfo,
+  poolID,
+  btnVariant = 'primary',
+}) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
+
   const isTestnet = networkId !== 0;
 
   const avatarSource = toSvg(poolID, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-  const onDelegate = async () => {
+
+  const submitTx = async (passwordInput: string): Promise<void> => {
+    const selectedWallet = stores.wallets.selected;
+    try {
+      startLoadingTxReview();
+      await stores.substores.ada.delegationTransaction.signTransaction({
+        password: passwordInput,
+        wallet: selectedWallet,
+        dialog: null,
+      });
+      showTxResultModal(TransactionResult.SUCCESS);
+    } catch (error) {
+      console.warn('Delegation error', error);
+      showTxResultModal(TransactionResult.FAIL);
+    }
+  };
+
+  const onDelegate = async (): Promise<void> => {
     const id = isTestnet ? (poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349') : poolID;
+
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
 
     openTxReviewModal({
       modalView: 'transactionReview',
-      submitTx: passswordInput => submitTx(passswordInput),
+      submitTx: (passwordInput: string) => submitTx(passwordInput),
       operations: {
         components: [
           {
@@ -30,9 +81,9 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, soc
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
                 poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
-                  primaryTokenInfo.name
-                }`}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit)
+                  .shiftedBy(-primaryTokenInfo.decimals)
+                  .toString()} ${primaryTokenInfo.name}`}
                 socialMediaInfo={socialMediaInfo}
               />
             ),
@@ -45,29 +96,10 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, soc
     });
   };
 
-  const submitTx = async passswordInput => {
-    const selectedWallet = stores.wallets.selected;
-    try {
-      startLoadingTxReview();
-      await stores.substores.ada.delegationTransaction.signTransaction({
-        password: passswordInput,
-        wallet: selectedWallet,
-        dialog: null,
-      });
-      showTxResultModal(TransactionResult.SUCCESS);
-      // ampli.stakingCenterDelegationSubmitted({
-      //   ada_amount: delegationTx.totalAmountToDelegate.getDefault().shiftedBy(-numberOfDecimals).toNumber(),
-      //   staking_pool: selectedPoolId,
-      // });
-    } catch (error) {
-      console.warn('Delegation error', error);
-      showTxResultModal(TransactionResult.FAIL);
-    }
-  };
-
   return (
     <Button
-      variant="primary"
+      // @ts-ignore
+      variant={btnVariant}
       sx={{
         '&.MuiButton-sizeMedium': {
           padding: '9px 20px',
@@ -79,10 +111,18 @@ export const DelegateButton = observer(({ stores, label, disabled, poolName, soc
       {label}
     </Button>
   );
-});
+};
 
-const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
+type OperationsDetailsProps = {
+  avatarGenerated: string;
+  poolName: string;
+  stakeKeyDeposit: string;
+  socialMediaInfo?: SocialMediaInfo;
+};
+
+const OperationsDetails: React.FC<OperationsDetailsProps> = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
   const strings = useStrings();
+
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
   const urls = getSocialMediaLinks(socialLinks, websiteUrl);
   const link = websiteUrl ?? urls[0];
@@ -93,8 +133,10 @@ const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit, socialM
         <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
+
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{strings.stakeWalletBalance}</Typography>
+
         <Stack direction="row" spacing={8} alignItems="center">
           <Box
             sx={{
@@ -106,9 +148,13 @@ const OperationsDetails = ({ avatarGenerated, poolName, stakeKeyDeposit, socialM
             component="img"
             src={avatarGenerated}
           />
-          <StyledLink href={link} target="_blank" rel="noreferrer noopener">
+          {link ? (
+            <StyledLink href={link} target="_blank" rel="noreferrer noopener">
+              <Typography color="ds.text_gray_medium">{poolName}</Typography>
+            </StyledLink>
+          ) : (
             <Typography color="ds.text_gray_medium">{poolName}</Typography>
-          </StyledLink>
+          )}
         </Stack>
       </Stack>
     </Stack>

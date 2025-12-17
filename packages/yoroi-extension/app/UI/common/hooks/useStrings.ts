@@ -135,6 +135,19 @@ export const messages = Object.freeze(
       id: 'staking.dialog.updateDetails',
       defaultMessage: '!!!EMURGO is updating the margin fee on its stakepools as a part of a broader 2026 modernization effort.',
     },
+    earnRewards: {
+      id: 'banners.rewards.earn',
+      defaultMessage: '!!! Earn Rewards with Yoroi',
+    },
+    delegateRewards: {
+      id: 'banners.rewards.delegate',
+      defaultMessage:
+        '!!! Delegate your ADA to our stake pool and DRep in one step. Support Cardano governance, strengthen the network, and earn rewards along the way.',
+    },
+    rewardsButton: {
+      id: 'banners.rewards.button',
+      defaultMessage: '!!! Earn ADA',
+    },
   })
 );
 
@@ -177,5 +190,8 @@ export const useStrings = () => {
     stakingUpdates: intl.formatMessage(messages.stakingUpdates),
     upcomingUpdate: intl.formatMessage(messages.upcomingUpdate),
     updateDetails: intl.formatMessage(messages.updateDetails),
+    earnRewards: intl.formatMessage(messages.earnRewards),
+    delegateRewards: intl.formatMessage(messages.delegateRewards),
+    rewardsButton: intl.formatMessage(messages.rewardsButton),
   }).current;
 };

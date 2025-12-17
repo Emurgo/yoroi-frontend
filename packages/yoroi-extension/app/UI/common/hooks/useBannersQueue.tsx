@@ -2,12 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 
-export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
+export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardBanner }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
 
   const resolveBanner = useCallback(async () => {
+    if (walletBalance > 0 || showRewardBanner) {
+      return BannerType.Rewards;
+    }
     if (
       (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
       bannersRemoteConfig?.midnightPhase2Announcement.display === true
@@ -26,10 +29,13 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
 
   useEffect(() => {
     resolveBanner().then(setVisible);
-  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner]);
+  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner, showRewardBanner]);
 
   const dismiss = async type => {
     switch (type) {
+      case BannerType.Rewards:
+        setVisible(null);
+        break;
       case BannerType.MidnightPhase2:
         setVisible(null);
         await localStorage.setMidnightBannerPhase2Closed('true');
