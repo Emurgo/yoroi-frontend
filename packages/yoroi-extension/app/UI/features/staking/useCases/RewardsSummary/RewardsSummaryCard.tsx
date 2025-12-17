@@ -10,15 +10,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { maybe, useStaking } from '../../module/StakingContextProvider';
 import { HIDDEN_AMOUNT } from '../../../../common/constants';
 import { truncateToken } from '../../../../../utils/formatters';
-import { GraphData } from '../../common/types';
 import { Icon } from '../../../../components';
-
-export type SummaryCardProps = {
-  onOpenRewardList: () => void;
-  unitOfAccount: (entry: any) => void | { currency: string; amount: string };
-  graphData: GraphData;
-  stores: any;
-};
 
 const StakingIconWrapper = styled(Box)(({ theme }) => ({
   '& svg': {
@@ -63,7 +55,7 @@ const InfoRow = styled(Box)({
 
 const InfoDetails = styled(Box)({});
 
-export const RewardsSummaryCard: React.FC<SummaryCardProps> = () => {
+export const RewardsSummaryCard: React.FC = () => {
   const strings = useStrings();
   const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
     useStaking();
