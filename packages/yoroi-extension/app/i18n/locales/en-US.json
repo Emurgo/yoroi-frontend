@@ -1,4 +1,9 @@
 {
+  "airdrop.redeem.notEnoughBalance": "Not enough balance for the redeeming transaction",
+  "airdrop.redeem.errorGettingCollaterals": "Error when getting collaterals: { message }",
+  "airdrop.redeem.dialogTitle": "Building the redemption transaction",
+  "airdrop.redeem.button": "Redeem",
+  "airdrop.redeem.reorgMessage": "Please re-orgnize the wallet for collateral UTxOs",
   "aidrop.noAllocText": "None of the addresses provided are eligible for an allocation",
   "aidrop.noAllocTitle": "No eligible addresses found in your wallet",
   "aidrop.noRedemptionText": "None of the addresses in this wallet are eligible for redemption",
@@ -63,7 +68,6 @@
   "aidrop.addrCard.destAddr": "Destination address {index}",
   "aidrop.addrCard.statusLabel": "Status",
   "aidrop.addrDetail.detailsLabel": "More Midnight airdrop details",
-  "airdrop.redeem": "Redeem",
   "api.errors.ApiMethodNotYetImplementedError": "This API method is not yet implemented.",
   "api.errors.CannotSendBelowMinimumValueError": "A minimum of 1 ADA is required",
   "api.errors.GenericApiError": "An error occurred. Please retry.",

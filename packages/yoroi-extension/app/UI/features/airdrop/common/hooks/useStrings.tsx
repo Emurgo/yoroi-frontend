@@ -227,11 +227,7 @@ export const messages = Object.freeze(
     // Redeem messages
     redeemDialogTitle: {
       id: 'airdrop.redeem.dialogTitle',
-      defaultMessage: '!!!Claim',
-    },
-    redeemLoading: {
-      id: 'airdrop.redeem.loading',
-      defaultMessage: '!!!...',
+      defaultMessage: '!!!Building the redemption transaction',
     },
     redeemButton: {
       id: 'airdrop.redeem.button',
@@ -239,19 +235,15 @@ export const messages = Object.freeze(
     },
     redeemReorgMessage: {
       id: 'airdrop.redeem.reorgMessage',
-      defaultMessage: '!!!Please re-orgnize the wallet for collateral UTxOs for redeeming',
-    },
-    redeemConfirmButton: {
-      id: 'airdrop.redeem.confirmButton',
-      defaultMessage: '!!!Confirm',
+      defaultMessage: '!!!Please re-orgnize the wallet for collateral UTxOs',
     },
     redeemNotEnoughBalance: {
       id: 'airdrop.redeem.notEnoughBalance',
-      defaultMessage: '!!!not enough balance to redeem',
+      defaultMessage: '!!!Not enough balance for the redeeming transaction',
     },
     redeemErrorGettingCollaterals: {
       id: 'airdrop.redeem.errorGettingCollaterals',
-      defaultMessage: '!!!Error when getting collaterals {message}',
+      defaultMessage: '!!!Error when getting collaterals: { message }',
     },
   })
 );
@@ -322,12 +314,11 @@ export const useStrings = () => {
     noRedemptionText: intl.formatMessage(messages.noRedemptionText),
     // Redeem
     redeemDialogTitle: intl.formatMessage(messages.redeemDialogTitle),
-    redeemLoading: intl.formatMessage(messages.redeemLoading),
     redeemButton: intl.formatMessage(messages.redeemButton),
     redeemReorgMessage: intl.formatMessage(messages.redeemReorgMessage),
-    redeemConfirmButton: intl.formatMessage(messages.redeemConfirmButton),
     redeemNotEnoughBalance: intl.formatMessage(messages.redeemNotEnoughBalance),
     redeemErrorGettingCollaterals: (message: string) => intl.formatMessage(messages.redeemErrorGettingCollaterals, { message }),
+    confirm: intl.formatMessage(globalMessages.confirm),
     // Global messages (re-exported for convenience)
     close: intl.formatMessage(globalMessages.close),
     continue: intl.formatMessage(globalMessages.continue),

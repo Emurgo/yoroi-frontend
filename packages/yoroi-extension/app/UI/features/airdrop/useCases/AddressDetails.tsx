@@ -1,16 +1,9 @@
 import { Button, Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
-import { FormattedMessage, defineMessages, useIntl } from 'react-intl';
+import { FormattedMessage, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import { Collapsible } from '../../../components/Collapsible/Collapsible';
 import CopyableText from '../../../components/CopyableText';
 import { useStrings, messages } from '../common/hooks/useStrings';
-
-const localMessages = defineMessages({
-  redeem: {
-    id: 'airdrop.redeem',
-    defaultMessage: '!!!Redeem',
-  },
-});
 
 const strong = chunks => (
   <Typography fontWeight="500" display="inline">
@@ -65,7 +58,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address, is
         {/*  @ts-ignore */}
 
         <Button variant="primary" onClick={onRedeem} disabled={!isRedeemable}>
-          {intl.formatMessage(localMessages.redeem)}
+          {strings.redeemButton}
         </Button>
       </Box>
 

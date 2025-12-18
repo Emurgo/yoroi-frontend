@@ -3,6 +3,7 @@ import { Typography, Box, Button } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
 import { useStrings } from '../common/hooks/useStrings';
+import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 
 export default function Redeem(props: {
   address: string;
@@ -43,10 +44,10 @@ export default function Redeem(props: {
 
   let content;
   if (getCollateralUtxosResult === null) {
-    content = strings.redeemLoading;
+    content = (<LoadingSpinner />);
   } else if (getCollateralUtxosResult.state === 'exist') {
     if (!redemptionTxBuildingResponse) {
-      content = strings.redeemLoading;
+      content = (<LoadingSpinner />);
     } else {
       content = (
         <>
@@ -76,14 +77,22 @@ export default function Redeem(props: {
             updateCollateralUtxos();
           }}
         >
-          {strings.redeemConfirmButton}
+          {strings.confirm}
         </Button>
       </Box>
     );
   } else if (getCollateralUtxosResult.state === 'not-enough') {
-    content = strings.redeemNotEnoughBalance;
+    content = (
+      <Box sx={{ minHeight: '17px', textAlign: 'center' }}>
+        {strings.redeemNotEnoughBalance}
+      </Box>
+    );
   } else {
-    content = strings.redeemErrorGettingCollaterals(getCollateralUtxosResult.message || '');
+    content = (
+      <Box sx={{ minHeight: '17px', textAlign: 'center' }}>
+        {strings.redeemErrorGettingCollaterals(getCollateralUtxosResult.message)}
+      </Box>
+    );
   }
 
   return (
