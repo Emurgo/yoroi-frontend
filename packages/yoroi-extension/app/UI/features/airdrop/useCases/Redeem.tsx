@@ -33,6 +33,7 @@ export default function Redeem(props: {
             [result.fundingUtxo],
           );
           setRedemptionTxBuildingResponse(resp);
+          break;
         } catch {
         }
         await new Promise(resolve => setTimeout(resolve, 10*1000));
