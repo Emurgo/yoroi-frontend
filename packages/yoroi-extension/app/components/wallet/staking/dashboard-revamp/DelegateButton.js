@@ -9,7 +9,6 @@ import { StyledLink } from './StakePool/StakePool.styles';
 import { getSocialMediaLinks } from './UndelegateButton';
 
 export const DelegateButton = observer(({ stores, label, disabled, poolName, socialMediaInfo, poolID }) => {
-  console.log('DelegateButton rendered', { label, disabled, poolName, socialMediaInfo, poolID });
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
   const isTestnet = networkId !== 0;

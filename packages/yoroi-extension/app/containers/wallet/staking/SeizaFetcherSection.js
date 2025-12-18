@@ -6,9 +6,14 @@ import SeizaFetcher from './SeizaFetcher';
 import { useStrings } from '../../../UI/features/transaction-review/common/hooks/useStrings';
 import BigNumber from 'bignumber.js';
 import { StyledLink } from '../../../components/wallet/staking/dashboard-revamp/StakePool/StakePool.styles';
+import { useGovernanceStatusState } from '../../../UI/features/governace/common/hooks/useGovernanceStatusState';
+import { useModal } from '../../../UI/components/modals/ModalContext';
+import { GovernanceRequiredForRewards } from '../../../UI/features/staking/common/modals/GovernanceRequiredForRewards';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
   const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
+  const { governanceStatus } = useGovernanceStatusState();
+  const { openModal } = useModal();
 
   const onDelegate = async poolID => {
     const avatarSource = toSvg(poolID, 36, { padding: 0 });
@@ -48,8 +53,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
         dialog: null,
       });
       showTxResultModal(TransactionResult.SUCCESS);
-
-      // ampli.stakingCenterDelegationInitiated();
     } catch (error) {
       console.warn('Failed to sign transaction', error);
       showTxResultModal(TransactionResult.FAIL);
@@ -58,7 +61,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
 
   return (
     <Box sx={{ iframe: { minHeight: '60vh' } }}>
-      {/* {this.getDialog()} */}
       <SeizaFetcher
         urlTemplate={urlTemplate}
         locale={locale}
@@ -67,7 +69,15 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
         poolList={poolList}
         setFirstPool={setFirstPool}
         stakepoolSelectedAction={async poolId => {
-          onDelegate(poolId);
+          if (governanceStatus.status === 'none') {
+            openModal({
+              modalId: 'governance',
+              title: 'Governance updates',
+              content: <GovernanceRequiredForRewards onDelegate={() => onDelegate(poolId)} />,
+              width: '612px',
+              height: '628px',
+            });
+          } else onDelegate(poolId);
         }}
       />
     </Box>

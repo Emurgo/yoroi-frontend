@@ -116,6 +116,35 @@ export const messages = Object.freeze(
       id: 'wallet.delegation.transaction.stakePoolLabel',
       defaultMessage: '!!!Stake pool',
     },
+    participationInGovernance: {
+      id: 'staking.dialog.participationInGovernance',
+      defaultMessage: '!!!Participation in governance is required to withdraw',
+    },
+    participationInfo: {
+      id: 'staking.dialog.participationInfo',
+      defaultMessage: '!!!Participation in governance is required to withdraw',
+    },
+    goToGovernance: {
+      id: 'staking.dialog.goToGovernance',
+      defaultMessage: '!!!Go to governance center',
+    },
+    governanceRequired: {
+      id: 'staking.dialog.governanceRequired',
+      defaultMessage: '!!Governance Required for Rewards',
+    },
+    toReceiveRewards: {
+      id: 'staking.dialog.toReceiveRewards',
+      defaultMessage:
+        '!!To receive rewards from your stake delegation, you must also delegate your voting power. Save time and fees by delegating to our Yoroi DRep now, alongside your stake pool delegation.',
+    },
+    delegateToYoroiDRep: {
+      id: 'staking.dialog.delegateToYoroiDRep',
+      defaultMessage: '!!Delegate to Yoroi DRep',
+    },
+    delegateStakeOnly: {
+      id: 'staking.dialog.delegateStakeOnly',
+      defaultMessage: '!!Delegate stake only',
+    },
   })
 );
 
@@ -150,5 +179,12 @@ export const useStrings = () => {
     goToFaucetButton: intl.formatMessage(messages.goToFaucetButton),
     buyAda: intl.formatMessage(messages.buyAda),
     stakePoolLabel: intl.formatMessage(messages.stakePoolLabel),
+    participationInGovernance: intl.formatMessage(messages.participationInGovernance),
+    participationInfo: intl.formatMessage(messages.participationInfo),
+    goToGovernance: intl.formatMessage(messages.goToGovernance),
+    governanceRequired: intl.formatMessage(messages.governanceRequired),
+    toReceiveRewards: intl.formatMessage(messages.toReceiveRewards),
+    delegateToYoroiDRep: intl.formatMessage(messages.delegateToYoroiDRep),
+    delegateStakeOnly: intl.formatMessage(messages.delegateStakeOnly),
   }).current;
 };

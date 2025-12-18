@@ -7,6 +7,9 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { useStrings } from '../../../transaction-review/common/hooks/useStrings';
 import { SocialLinks } from '../../common/types';
+import { useGovernanceStatusState } from '../../../governace/common/hooks/useGovernanceStatusState';
+import { useModal } from '../../../../components/modals/ModalContext';
+import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 
 type SocialMediaInfo = {
   socialLinks?: SocialLinks;
@@ -44,6 +47,8 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
 }) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
+  const { governanceStatus } = useGovernanceStatusState();
+  const { openModal } = useModal();
 
   const isTestnet = networkId !== 0;
 
@@ -63,6 +68,20 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
     } catch (error) {
       console.warn('Delegation error', error);
       showTxResultModal(TransactionResult.FAIL);
+    }
+  };
+
+  const handleOnDelegate = async () => {
+    if (governanceStatus.status === 'none') {
+      openModal({
+        modalId: 'governance',
+        title: 'Governance updates',
+        content: <GovernanceRequiredForRewards onDelegate={onDelegate} />,
+        width: '612px',
+        height: '628px',
+      });
+    } else {
+      await onDelegate();
     }
   };
 
@@ -105,7 +124,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
           padding: '9px 20px',
         },
       }}
-      onClick={onDelegate}
+      onClick={handleOnDelegate}
       disabled={disabled}
     >
       {label}

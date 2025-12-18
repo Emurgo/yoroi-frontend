@@ -56,8 +56,6 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
     setGraphData(historyGraphData);
   }, [delegationRequests, selectedWallet, currentlyDelegating]);
 
-  React.useEffect(() => {}, []);
-
   const totalDelegated = () => {
     if (!showRewardAmount) return undefined;
 

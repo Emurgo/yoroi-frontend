@@ -367,14 +367,6 @@ const DappCenterSubpages = ({ stores }) => (
   </DappCenterContextProvider>
 );
 
-const StakingSubpages = ({ stores }) => (
-  <StakingContextProvider stores={stores}>
-    <Suspense fallback={null}>
-      <Outlet />
-    </Suspense>
-  </StakingContextProvider>
-);
-
 const CatalystRegistrationSubpages = ({ stores }) => (
   <CatalystRegistrationContextProvider stores={stores}>
     <Suspense fallback={null}>
@@ -383,12 +375,28 @@ const CatalystRegistrationSubpages = ({ stores }) => (
   </CatalystRegistrationContextProvider>
 );
 
-const GovernanceSubpages = ({ stores }) => {
+const StakingSubpages = ({ stores }) => (
+  <StakingAndGovernancePagesWrapper
+    stores={stores}
+    wrapOutlet={node => <StakingContextProvider stores={stores}>{node}</StakingContextProvider>}
+  />
+);
+
+const GovernanceSubpages = ({ stores }) => <StakingAndGovernancePagesWrapper stores={stores} />;
+
+const StakingAndGovernancePagesWrapper = ({ stores, wrapOutlet }) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
+
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  const outlet = (
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
+  );
 
   return (
     <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
@@ -402,9 +410,7 @@ const GovernanceSubpages = ({ stores }) => {
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
       >
-        <Suspense fallback={null}>
-          <Outlet />
-        </Suspense>
+        {wrapOutlet ? wrapOutlet(outlet) : outlet}
       </GovernanceContextProvider>
     </CurrencyProvider>
   );
