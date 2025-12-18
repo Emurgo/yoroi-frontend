@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
 import { useStrings } from '../common/hooks/useStrings';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
+import { formatNumberExactly } from '../../../../api/ada/midnightRedemption';
 
 export default function Redeem(props: {
   address: string;
@@ -43,34 +44,43 @@ export default function Redeem(props: {
   }, [props.address]);
 
   let content;
+  const spinner = (
+    <Box sx={{ height: '36px' /* to supress a bug in <Dialog> that shows the vertical scroll bar */}}>
+      <LoadingSpinner />
+    </Box>
+  );
   if (getCollateralUtxosResult === null) {
-    content = (<LoadingSpinner />);
+    content = spinner;
   } else if (getCollateralUtxosResult.state === 'exist') {
     if (!redemptionTxBuildingResponse) {
-      content = (<LoadingSpinner />);
+      content = spinner;
     } else {
       content = (
-        <>
-          <Box>
-            <Typography>{redemptionTxBuildingResponse.redeemedAmount}</Typography>
-          </Box>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <Typography sx={{ textAlign: 'center' }}>
+            {strings.redeemReady(formatNumberExactly(redemptionTxBuildingResponse.redeemedAmount))}
+          </Typography>
           <Button
+            variant="primary"
+            sx={{ margin: '0 auto', display: 'block' }}
             onClick={async () => {
-              await props.onRedeem(redemptionTxBuildingResponse.transaction);
-              // todo: error handling
-              props.onClose();
-            }}
-          >
-            {strings.redeemButton}
+                await props.onRedeem(redemptionTxBuildingResponse.transaction);
+                // todo: error handling
+                props.onClose();
+              }}
+            >
+              {strings.redeemButton}
           </Button>
-        </>
+        </Box>
       );
     }
   } else if (getCollateralUtxosResult.state === 'need-reorg') {
     content = (
-      <Box>
-        <Typography>{strings.redeemReorgMessage}</Typography>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Typography sx={{ textAlign: 'center' }}>{strings.redeemReorgMessage}</Typography>
         <Button
+          variant="primary"
+          sx={{ margin: '0 auto', display: 'block' }}
           onClick={async () => {
             await props.onReorg(getCollateralUtxosResult.signRequest);
             setGetCollateralUtxosResult(null);

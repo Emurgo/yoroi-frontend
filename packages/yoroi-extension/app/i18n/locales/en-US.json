@@ -1,4 +1,5 @@
 {
+  "airdrop.redeem.ready": "Ready to redeem {amount} NIGHT",
   "airdrop.redeem.notEnoughBalance": "Not enough balance for the redeeming transaction",
   "airdrop.redeem.errorGettingCollaterals": "Error when getting collaterals: { message }",
   "airdrop.redeem.dialogTitle": "Building the redemption transaction",

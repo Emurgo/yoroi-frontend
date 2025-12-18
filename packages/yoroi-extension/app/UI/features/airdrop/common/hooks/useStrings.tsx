@@ -245,6 +245,10 @@ export const messages = Object.freeze(
       id: 'airdrop.redeem.errorGettingCollaterals',
       defaultMessage: '!!!Error when getting collaterals: { message }',
     },
+    redeemReady: {
+      id: 'airdrop.redeem.ready',
+      defaultMessage: '!!!Ready to redeem {amount} NIGHT',
+    },
   })
 );
 
@@ -319,6 +323,7 @@ export const useStrings = () => {
     redeemNotEnoughBalance: intl.formatMessage(messages.redeemNotEnoughBalance),
     redeemErrorGettingCollaterals: (message: string) => intl.formatMessage(messages.redeemErrorGettingCollaterals, { message }),
     confirm: intl.formatMessage(globalMessages.confirm),
+    redeemReady: (amount: string) => intl.formatMessage(messages.redeemReady, { amount }),
     // Global messages (re-exported for convenience)
     close: intl.formatMessage(globalMessages.close),
     continue: intl.formatMessage(globalMessages.continue),
