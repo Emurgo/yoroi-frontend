@@ -16,7 +16,7 @@ import { HelperTooltip } from '../../components/wallet/staking/dashboard-revamp/
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
 import type { PoolData } from './staking/SeizaFetcher';
 
- // $FlowIgnore
+// $FlowIgnore
 import { DelegateButton } from '../../UI/features/staking/useCases/DelegatedStakePoolInfo/DelegateButton';
 
 type Props = {|
