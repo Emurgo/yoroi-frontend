@@ -30,7 +30,6 @@ interface Props {
 export default function AddressDetails({ schedule, redeemableAmount, address, isRedeemable, onRedeem }: Props) {
   const strings = useStrings();
   const theme: any = useTheme();
-  const intl = useIntl();
 
   const totalAllocation = getTotalAllocation(schedule);
   const redeemedSoFar = getRedeemedSoFar(schedule);

@@ -69,7 +69,8 @@ export default function Redeem(props: {
             {strings.redeemReady(formatNumberExactly(redemptionTxBuildingResponse.redeemedAmount))}
           </Typography>
           <Button
-            variant="primary"
+            variant="contained"
+            color="primary"
             sx={{ margin: '0 auto', display: 'block' }}
             onClick={async () => {
                 await props.onRedeem(redemptionTxBuildingResponse.transaction);
@@ -87,7 +88,8 @@ export default function Redeem(props: {
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
         <Typography sx={{ textAlign: 'center' }}>{strings.redeemReorgMessage}</Typography>
         <Button
-          variant="primary"
+          variant="contained"
+          color="primary"
           sx={{ margin: '0 auto', display: 'block' }}
           onClick={async () => {
             await props.onReorg(getCollateralUtxosResult.signRequest);

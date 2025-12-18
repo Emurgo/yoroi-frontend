@@ -12,7 +12,6 @@ import { wrapWithFrame } from '../../stores/lib/TrezorWrapper';
 import { CardanoDerivationType } from 'trezor-connect-flow';
 import LocalStorageApi, { loadSubmittedTransactions } from '../localStorage';
 import BigNumber from 'bignumber.js';
-import type { CardanoAddressedUtxo } from './transactions/types';
 import { forceNonNull } from '../../coreUtils.js';
 import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
@@ -280,7 +279,7 @@ const FUNDING_AMOUNT = '3000000';
 
 async function pickCollateralUtxos(
   wallet: WalletState
-): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxo: string, fundingUtxoAddr: string, |}> {
+): Promise<?{| utxosToUse: Array<string>, fundingUtxo: string, fundingUtxoAddr: string, |}> {
   const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
@@ -316,7 +315,7 @@ async function pickCollateralUtxos(
       break;
     }
   }
-  if (!fundingUtxo) {
+  if (!fundingUtxo || !fundingUtxoAddr) {
     return null;
   }
   utxosToConsider = utxosToConsider.filter(utxo => new BigNumber(utxo.amount).lt(maxViableUtxoAmount));

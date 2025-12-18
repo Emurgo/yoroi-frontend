@@ -283,7 +283,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
               address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
               redeemableAmount={getRedeemable(selectedAddressData.schedule)}
-              networkId={wallet.networkId}
             />
           )}
         </Box>

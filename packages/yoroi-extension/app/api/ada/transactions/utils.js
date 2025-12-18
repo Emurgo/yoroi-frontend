@@ -345,7 +345,7 @@ export function asAddressedUtxo(utxos: IGetAllUtxosResponse): Array<CardanoAddre
   });
 }
 
-function cardanoUtxoMonadFromRemoteFormat(u: RemoteUnspentOutput): WasmMonad<RustModule.WalletV4.TransactionUnspentOutput> {
+function cardanoUtxoMonadFromRemoteFormat(u: RemoteUnspentOutput | CardanoAddressedUtxo): WasmMonad<RustModule.WalletV4.TransactionUnspentOutput> {
   return RustModule.ScopeMonad(Module => {
     const W4 = Module.WalletV4;
     const input = W4.TransactionInput.new(W4.TransactionHash.from_hex(u.tx_hash), u.tx_index);
@@ -358,7 +358,7 @@ function cardanoUtxoMonadFromRemoteFormat(u: RemoteUnspentOutput): WasmMonad<Rus
   });
 }
 
-export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput): string {
+export function cardanoUtxoHexFromRemoteFormat(u: RemoteUnspentOutput | CardanoAddressedUtxo): string {
   return cardanoUtxoMonadFromRemoteFormat(u).unwrap(output => output.to_hex());
 }
 
