@@ -145,6 +145,9 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphD
   const { rewardsGraphData } = graphData;
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = strings.rewardHistoryLabel;
+  const isRewardListArray = Array.isArray(rewardList);
+  const hasError = rewardsGraphData.error && !rewardsGraphData.items;
+  const isLoading = !isRewardListArray && !hasError;
 
   return (
     <Box
@@ -181,7 +184,7 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphD
         </Button>
       </Box>
 
-      {rewardsGraphData.error && !rewardsGraphData.items && (
+      {hasError && (
         <div>
           <Typography variant="body2" color="ds.text_error">
             {strings.errorLabel}
@@ -189,9 +192,9 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphD
         </div>
       )}
 
-      {!Array.isArray(rewardList) ? (
-        <CircularProgress />
-      ) : (
+      {isLoading && <CircularProgress />}
+
+      {isRewardListArray && (
         <Box ml="-50px">
           <RewardGraphClean
             epochTitle={strings.epochLabel}
