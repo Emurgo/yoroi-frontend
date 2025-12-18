@@ -853,6 +853,7 @@
   "wallet.delegation.transaction.explanationLine2": "您可以随时将您的资金委托至另一个权益池",
   "wallet.delegation.transaction.explanationLine3": "你可以随时取消委托",
   "wallet.delegation.transaction.generation": "创建交易",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "权益池ID",
   "wallet.delegation.transaction.stakePoolName": "权益池名称",
   "wallet.delegation.transaction.success.button.label": "总览页面",
