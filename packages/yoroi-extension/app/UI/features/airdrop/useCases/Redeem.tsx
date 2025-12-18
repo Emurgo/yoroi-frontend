@@ -17,6 +17,7 @@ export default function Redeem(props: {
   const strings = useStrings();
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
+  const [isWaitingForReorgTxToConfirm, setIsWaitingForReorgTxToConfirm] = useState<boolean>(false);
 
   const updateCollateralUtxos = async () => {
     const result = await getCollateralUtxos(props.wallet);
@@ -53,7 +54,14 @@ export default function Redeem(props: {
     content = spinner;
   } else if (getCollateralUtxosResult.state === 'exist') {
     if (!redemptionTxBuildingResponse) {
-      content = spinner;
+      content = isWaitingForReorgTxToConfirm ? (
+        <Box>
+          <Typography sx={{ textAlign: 'center' }}>
+            {strings.waitingForReorg}
+          </Typography>
+          <LoadingSpinner />
+        </Box>
+      ) : spinner;
     } else {
       content = (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -84,6 +92,7 @@ export default function Redeem(props: {
           onClick={async () => {
             await props.onReorg(getCollateralUtxosResult.signRequest);
             setGetCollateralUtxosResult(null);
+            setIsWaitingForReorgTxToConfirm(true);
             updateCollateralUtxos();
           }}
         >

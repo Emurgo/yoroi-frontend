@@ -249,6 +249,10 @@ export const messages = Object.freeze(
       id: 'airdrop.redeem.ready',
       defaultMessage: '!!!Ready to redeem {amount} NIGHT',
     },
+    waitingForReorg: {
+      id: 'airdrop.redeem.waitingForReorg',
+      defaultMessage: '!!!Waiting for the re-organization transaction to be confirmed',
+    },
   })
 );
 
@@ -324,6 +328,7 @@ export const useStrings = () => {
     redeemErrorGettingCollaterals: (message: string) => intl.formatMessage(messages.redeemErrorGettingCollaterals, { message }),
     confirm: intl.formatMessage(globalMessages.confirm),
     redeemReady: (amount: string) => intl.formatMessage(messages.redeemReady, { amount }),
+    waitingForReorg: intl.formatMessage(messages.waitingForReorg),
     // Global messages (re-exported for convenience)
     close: intl.formatMessage(globalMessages.close),
     continue: intl.formatMessage(globalMessages.continue),
