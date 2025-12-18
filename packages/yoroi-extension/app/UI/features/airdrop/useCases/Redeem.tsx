@@ -28,7 +28,7 @@ export default function Redeem(props: {
           props.endpoint,
           result.fundingUtxoAddr,
           result.collateralUtxoIds,
-          [result.fundingUtxoId],
+          [result.fundingUtxo],
         );
         setRedemptionTxBuildingResponse(resp);
       } catch (err: any) {

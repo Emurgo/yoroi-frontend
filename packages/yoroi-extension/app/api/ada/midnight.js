@@ -18,6 +18,7 @@ import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
 import { asAddressedUtxo } from './transactions/utils';
 import { NotEnoughMoneyToSendError } from '../common/errors';
+import { cardanoUtxoHexFromRemoteFormat } from './transactions/utils';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -254,6 +255,7 @@ export async function scanAddressesForThaws(
     .filter(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && a.address.IsUsed)
     .sort((addr1, addr2) => addr2.path[4] - addr1.path[4])
     .map(addr => addressHexToBech32(addr.address.Hash));
+
   const unusedAddr1 = addressHexToBech32(
     forceNonNull(
       wallet.allAddresses.utxoAddresses.find(a => a.address.Type === CoreAddressTypes.CARDANO_BASE && !a.address.IsUsed)
@@ -273,11 +275,12 @@ export async function scanAddressesForThaws(
 const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
 const MAX_COLLATERAL_COUNT: number = 3;
 const COLLATERAL_AMOUNT = '2000000';
-const FUNDING_AMOUNT = '2000000';
+// by observation, 2000000 may not work
+const FUNDING_AMOUNT = '3000000';
 
 async function pickCollateralUtxos(
   wallet: WalletState
-): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxoId: string, fundingUtxoAddr: string, |}> {
+): Promise<?{| utxosToUse: Array<CardanoAddressedUtxo>, fundingUtxo: string, fundingUtxoAddr: string, |}> {
   const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
@@ -302,18 +305,18 @@ async function pickCollateralUtxos(
     await adaApi._addressedUtxosWithSubmittedTxs(utxos, wallet.publicDeriverId, wallet.allUtxoAddresses, submittedTxs)
   ).filter(utxo => utxo.assets.length === 0);
   utxosToConsider.sort((utxo1, utxo2) => new BigNumber(utxo1.amount).comparedTo(utxo2.amount));
-  let fundingUtxoId = null;
+  let fundingUtxo = null;
   let fundingUtxoAddr = null;
   for (let i = 0; i < utxosToConsider.length; i++) {
     const utxo = utxosToConsider[i];
     if (new BigNumber(utxo.amount).gte(FUNDING_AMOUNT)) {
-      fundingUtxoId = utxo.utxo_id;
+      fundingUtxo = cardanoUtxoHexFromRemoteFormat(utxo);
       fundingUtxoAddr = addressHexToBech32(utxo.receiver);
       utxosToConsider.splice(i, 1);
       break;
     }
   }
-  if (!fundingUtxoId) {
+  if (!fundingUtxo) {
     return null;
   }
   utxosToConsider = utxosToConsider.filter(utxo => new BigNumber(utxo.amount).lt(maxViableUtxoAmount));
@@ -345,7 +348,7 @@ async function pickCollateralUtxos(
         break;
       }
     }
-    return { utxosToUse, fundingUtxoId, fundingUtxoAddr };
+    return { utxosToUse: utxosToUse.map(cardanoUtxoHexFromRemoteFormat), fundingUtxo, fundingUtxoAddr };
   }
 
   return null;
@@ -377,7 +380,7 @@ type GetCollateralUtxosResponse =
   | {|
       state: 'exist',
       collateralUtxoIds: Array<string>,
-      fundingUtxoId: string,
+      fundingUtxo: string,
       fundingUtxoAddr: string,
     |}
   | {|
@@ -397,8 +400,8 @@ export async function getCollateralUtxos(wallet: WalletState): Promise<GetCollat
   if (getCollateralUtxosResult) {
     return {
       state: 'exist',
-      collateralUtxoIds: getCollateralUtxosResult.utxosToUse.map(utxo => utxo.utxo_id),
-      fundingUtxoId: getCollateralUtxosResult.fundingUtxoId,
+      collateralUtxoIds: getCollateralUtxosResult.utxosToUse,
+      fundingUtxo: getCollateralUtxosResult.fundingUtxo,
       fundingUtxoAddr: getCollateralUtxosResult.fundingUtxoAddr,
     };
   }
