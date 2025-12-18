@@ -14,8 +14,6 @@ export const StakePoolDelegated = observer((): ReactNode => {
 
   const currentPool = delegationStore.getDelegatedPoolId(selectedWallet.publicDeriverId);
 
-  console.log('currentPool', currentPool);
-
   if (currentPool == null) return null;
 
   const poolMeta = delegationStore.getLocalPoolInfo(selectedWallet.networkId, currentPool);

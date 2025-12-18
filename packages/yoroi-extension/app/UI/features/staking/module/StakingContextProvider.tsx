@@ -43,7 +43,23 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
     throw new Error(`Page opened for non-reward wallet`);
   }
 
+  // Extract rewardHistory result to make it observable in the dependency array
+  const rewardHistoryResult = delegationRequests.rewardHistory.result;
+
+  // Reset graphData when wallet changes
   React.useEffect(() => {
+    setGraphData(null);
+  }, [selectedWallet.publicDeriverId]);
+
+  // Generate graph data when reward history is available
+  React.useEffect(() => {
+    // Only generate graph data if rewardHistory.result is available
+    // This prevents generating graph data with null result which causes infinite loading
+    if (rewardHistoryResult == null) {
+      setGraphData(null);
+      return;
+    }
+
     const historyGraphData = generateGraphData({
       delegationRequests,
       currentEpoch: stores.substores.ada.time.getCurrentTimeRequests(selectedWallet).currentEpoch,
@@ -54,7 +70,18 @@ export const StakingContextProvider = observer(({ children, stores }: StakingPro
       defaultTokenId: selectedWallet.defaultTokenId,
     });
     setGraphData(historyGraphData);
-  }, [delegationRequests, selectedWallet, currentlyDelegating]);
+  }, [
+    delegationRequests,
+    rewardHistoryResult,
+    selectedWallet.publicDeriverId,
+    selectedWallet.networkId,
+    selectedWallet.defaultTokenId,
+    currentlyDelegating,
+    stores.profile.shouldHideBalance,
+    stores.substores.ada.time,
+    stores.delegation.getLocalPoolInfo,
+    stores.tokenInfoStore.tokenInfo,
+  ]);
 
   const totalDelegated = () => {
     if (!showRewardAmount) return undefined;

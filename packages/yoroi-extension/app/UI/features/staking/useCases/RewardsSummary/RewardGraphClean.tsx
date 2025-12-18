@@ -39,7 +39,7 @@ const RewardGraphClean: React.FC<Props> = ({
 }) => {
   const theme: any = useTheme();
 
-  const formatYAxis = (value: number): string | number => (!hideYAxis ? value : '∗∗∗ ');
+  const formatYAxis = (value: number): string | number => (!hideYAxis ? value : '∗∗∗');
 
   const GraphTooltip: React.FC<GraphTooltipProps> = ({ active, payload, label }) => {
     if (active && payload != null && payload.length > 0 && label != null) {
