@@ -1,13 +1,11 @@
 import { GovernanceApi } from '@emurgo/yoroi-lib/dist/governance/emurgo-api';
 import * as React from 'react';
-
 import { RustModule } from '../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { dRepNormalize } from '../../../../api/ada/lib/cardanoCrypto/utils';
 import { unwrapStakingKey } from '../../../../api/ada/lib/storage/bridge/utils';
 import { getPrivateStakingKey } from '../../../../api/thunk';
 import { DREP_ALWAYS_ABSTAIN, DREP_ALWAYS_NO_CONFIDENCE } from '../common/constants';
-import { getFormattedPairingValue } from '../common/helpers';
-import { useGovernanceManagerMaker } from '../common/useGovernanceManagerMaker';
+import { useGovernanceManagerMaker } from '../common/hooks/useGovernanceManagerMaker';
 import { GovernanceActionType, GovernanceReducer, defaultGovernanceActions, defaultGovernanceState } from './state';
 
 type drepDelegation = { status: string | null; drep: string | null };
@@ -22,7 +20,6 @@ const initialGovernanceProvider = {
   txDelegationResult: null,
   txDelegationError: null,
   tokenInfo: null,
-  getFormattedPairingAmount: (_amount: string) => Response,
   isHardwareWallet: false,
   createDrepDelegationTransaction: async (_drepCredential: string) => Response,
   signDelegationTransaction: async (_params: any) => Response,
@@ -59,7 +56,6 @@ export const GovernanceContextProvider = ({
   signDelegationTransaction,
   tokenInfo,
   triggerBuySellAdaDialog,
-  getCurrentPrice,
 }: GovernanceProviderProps) => {
   if (!currentWallet?.selectedWallet) throw new Error(`requires a wallet to be selected`);
   const [state, dispatch] = React.useReducer(GovernanceReducer, {
@@ -73,8 +69,6 @@ export const GovernanceContextProvider = ({
     currentPool,
     selectedWallet,
     backendService,
-    defaultTokenInfo,
-    unitOfAccount,
     isHardwareWallet,
     walletAdaBalance,
     backendServiceZero,
@@ -162,8 +156,6 @@ export const GovernanceContextProvider = ({
     tokenInfo,
     isHardwareWallet,
     walletAdaBalance,
-    getFormattedPairingAmount: (amount: string) =>
-      getFormattedPairingValue(getCurrentPrice, defaultTokenInfo, unitOfAccount, amount),
     triggerBuySellAdaDialog,
     recentTransactions,
     submitedTransactions,

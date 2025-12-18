@@ -60,7 +60,7 @@ function TopBarLayout({
               flex: '0 1 auto',
               height: '100%',
             }),
-            overflow: 'scroll',
+            overflow: 'auto',
           }}
         >
           {

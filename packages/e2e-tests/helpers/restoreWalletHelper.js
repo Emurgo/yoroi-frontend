@@ -14,7 +14,7 @@ import CreateWalletStepTwo from '../pages/newWalletPages/createWalletSteps/creat
 import CreateWalletStepThree from '../pages/newWalletPages/createWalletSteps/createWalletStepThree.page.js';
 import { walletNameShortener } from '../utils/utils.js';
 import { extensionTabName, serviceWorkersLink, serviceWorkersTabName, WindowManager } from './windowManager.js';
-import { quarterSecond } from './timeConstants.js';
+import { fiveSeconds, quarterSecond } from './timeConstants.js';
 import NetworksInfoModal from '../pages/wallet/settingsTab/modals/networksInfoModal.page.js';
 import { WebDriver } from 'selenium-webdriver';
 import { Logger } from 'simple-node-logger';
@@ -143,12 +143,22 @@ export const preloadBrowserStorage = async (
   useGeneralStorageInfo = true,
   opts = {}
 ) => {
-  logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
   const addWalletPage = new AddNewWallet(webdriver, logger);
-  const state = await addWalletPage.isDisplayed();
-  expect(state, 'The Add new wallet page is not displayed').to.be.true;
-  await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
-  logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
+  logger.info(`--------------------- preloadBrowserStorage START ---------------------`);
+  try {
+    const state = await addWalletPage.isDisplayed();
+    expect(state, 'The Add new wallet page is not displayed').to.be.true;
+    await addWalletPage.prepareBrowserLocalStorage(templateName, useGeneralStorageInfo, opts);
+    logger.info(`--------------------- preloadBrowserStorage END ---------------------`);
+  } catch (error) {
+    logger.error(`RestoreWalletHelper::preloadBrowserStorage Error: ${error}`);
+    const prepareTime = Date.now();
+    await addWalletPage.getDriverLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.getBrowserLogs('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.takeScreenshot('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    await addWalletPage.takeSnapshot('PrepareExtensionError', `preloadBrowserStorage_${prepareTime}`);
+    throw error;
+  }
 };
 
 export const waitTxPage = async (webdriver, logger) => {
@@ -169,22 +179,58 @@ export const restartServiceWorker = async (webdriver, logger) => {
   await basepage.sleep(quarterSecond);
 
   const stopBtnLocator = {
-    locator: 'div.worker-controls > cr-button:nth-child(1)',
+    locator: 'cr-button[data-command="stop"]',
     method: 'css',
   };
   const startBtnLocator = {
-    locator: 'div.registration-controls > cr-button:nth-child(2)',
+    locator: 'cr-button[data-command="start"]',
+    method: 'css',
+  };
+  const runningStatusLocator = {
+    locator: 'div.serviceworker-running-status > span.value',
     method: 'css',
   };
 
   await basepage.waitPresentedAndAct(stopBtnLocator, async () => {
     await basepage.click(stopBtnLocator);
-    await basepage.sleep(500);
+    const stopped = await basepage.customWaiter(
+      async () => {
+        try {
+          const runningStatus = await basepage.getText(runningStatusLocator);
+          return runningStatus === 'STOPPED';
+        } catch (error) {
+          return false;
+        }
+      },
+      fiveSeconds,
+      quarterSecond
+    );
+    if (!stopped) {
+      const currentStatus = await basepage.getText(runningStatusLocator).catch(() => 'unknown');
+      throw new Error(`Service worker did not stop. Current status: ${currentStatus}`);
+    }
+    logger.info(`Service worker stopped successfully. Status: STOPPED`);
   });
 
   await basepage.waitPresentedAndAct(startBtnLocator, async () => {
     await basepage.click(startBtnLocator);
-    await basepage.sleep(500);
+    const started = await basepage.customWaiter(
+      async () => {
+        try {
+          const runningStatus = await basepage.getText(runningStatusLocator);
+          return runningStatus === 'RUNNING';
+        } catch (error) {
+          return false;
+        }
+      },
+      fiveSeconds,
+      quarterSecond
+    );
+    if (!started) {
+      const currentStatus = await basepage.getText(runningStatusLocator).catch(() => 'unknown');
+      throw new Error(`Service worker did not start. Current status: ${currentStatus}`);
+    }
+    logger.info(`Service worker started successfully. Status: RUNNING`);
   });
 
   await windowManager.closeTabWindow(serviceWorkersTabName, extensionTabName);

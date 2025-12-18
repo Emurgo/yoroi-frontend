@@ -60,6 +60,13 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     isVisible: existsSelectedWallet,
   },
   {
+    className: 'staking-revamp',
+    route: ROUTES.STAKING_REVAMP.ROOT,
+    icon: stakingIcon,
+    label: globalMessages.sidebarStaking,
+    isVisible: () => environment.isDev(),
+  },
+  {
     className: 'airdrop',
     route: ROUTES.AIRDROP,
     icon: airdropIcon,
@@ -68,13 +75,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   },
   {
     className: 'swap',
-    route: ROUTES.SWAP.ROOT,
-    icon: swapIcon,
-    label: globalMessages.sidebarSwap,
-    isVisible: isDev,
-  },
-  {
-    className: 'swap2',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
     icon: swapIcon,
     label: globalMessages.sidebarSwap,
@@ -135,13 +135,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
     icon: governanceIcon,
     label: globalMessages.sidebarGovernance,
     isVisible: existsSelectedWallet,
-  },
-  {
-    className: 'governance-revamp',
-    route: '/governance-status',
-    icon: governanceIcon,
-    label: globalMessages.sidebarGovernance,
-    isVisible: () => environment.isDev(),
   },
   {
     className: 'settings',

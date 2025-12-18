@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { RustModule } from '../../../../../api/ada/lib/cardanoCrypto/rustLoader';
 import { YoroiUnsignedTx } from '../../../../types/yoroi';
 import { TransactionBody } from '../types';
@@ -10,9 +10,9 @@ export const useTxBody = ({
   cbor?: string | null;
   unsignedTx?: YoroiUnsignedTx | null;
 }): TransactionBody | undefined => {
-  const query = useQuery(
-    ['useTxBody', cbor, unsignedTx],
-    async () => {
+  const query = useQuery({
+    queryKey: ['useTxBody', cbor, unsignedTx],
+    queryFn: async () => {
       if (cbor && typeof cbor === 'string') {
         return getCborTxBody(cbor);
       }
@@ -23,10 +23,8 @@ export const useTxBody = ({
 
       throw new Error('useTxBody: missing both cbor and unsignedTx');
     },
-    {
-      enabled: Boolean(cbor || unsignedTx),
-    }
-  );
+    enabled: Boolean(cbor || unsignedTx),
+  });
 
   return query.data;
 };
@@ -34,6 +32,7 @@ export const useTxBody = ({
 export const getCborTxBody = async (cbor: string) => {
   try {
     const txBody = RustModule.WalletV4.FixedTransaction.from_hex(cbor).body().to_json();
+
     return JSON.parse(txBody);
   } catch (e) {
     console.warn('getCborTxBody failed:', e);

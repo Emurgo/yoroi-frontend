@@ -41,8 +41,11 @@ export const ROUTES = {
   SEND_FROM_URI: {
     ROOT: '/send-from-uri',
   },
-  // revamp
   STAKING: '/staking',
+  // revamp
+  STAKING_REVAMP: {
+    ROOT: '/staking-revamp',
+  },
   ASSETS: {
     ROOT: '/assets',
     DETAILS: '/assets/tokens/:tokenId',
@@ -83,15 +86,9 @@ export const ROUTES = {
     // $FlowIgnore
     ERROR: '/swap-revamp' + PAGE_ERROR_SUBROUTE,
   },
-  Governance: {
+  GOVERNANCE: {
     ROOT: '/governance',
-    DELEGATE: '/governance/delagation',
-    SUBMITTED: '/governance/submitted',
-    FAIL: '/governance/failed',
-  },
-  GOVERNANCE_REVAMP: {
-    ROOT: '/governance-status',
-    OPTIONS: '/governance-status/options',
+    OPTIONS: '/governance/options',
   },
   PORTFOLIO: {
     ROOT: '/portfolio',

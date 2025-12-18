@@ -3,13 +3,20 @@ import AddWalletBase from './addWalletBase.page.js';
 class WalletDetails extends AddWalletBase {
   defaultMessage = 'Use a combination of letters, numbers and symbols to make your password stronger';
   // locators
-  // add learnMoreLink
   tipsModalLocator = {
     locator: 'infoDialog',
     method: 'id',
   };
-  tipModalContinueButtonLocator = {
+  tipsModalLearnMoreLinkLocator = {
+    locator: 'infoDialog-learnMore-link',
+    method: 'id',
+  };
+  tipsModalContinueButtonLocator = {
     locator: 'infoDialogContinueButton',
+    method: 'id',
+  };
+  openTipsBtnLocator = {
+    locator: 'walletDetails-tips-button',
     method: 'id',
   };
   // wallet name
@@ -54,10 +61,25 @@ class WalletDetails extends AddWalletBase {
     this.logger.info(`WalletDetails::closeTipsModalWindow is called`);
     await this.waitPresentedAndAct(this.tipsModalLocator, async () => {
       await this.waitPresentedAndAct(
-        this.tipModalContinueButtonLocator,
-        async () => await this.click(this.tipModalContinueButtonLocator)
+        this.tipsModalContinueButtonLocator,
+        async () => await this.click(this.tipsModalContinueButtonLocator)
       );
     });
+  }
+  async getTipsModalLearMoreLink() {
+    this.logger.info(`WalletDetails::getTipsModalLearMoreLink is called`);
+    const linkElement = await this.findElement(this.tipsModalLearnMoreLinkLocator);
+    const result = await linkElement.getAttribute('href');
+    this.logger.info(`WalletDetails::getTipsModalLearMoreLink::result ${result}`);
+    return result;
+  }
+  async openTipsModalLearMoreLink() {
+    this.logger.info(`WalletDetails::openTipsModalLearMoreLink is called`);
+    await this.click(this.tipsModalLearnMoreLinkLocator);
+  }
+  async openTipsModal() {
+    this.logger.info(`WalletDetails::openTipsModal is called`);
+    await this.click(this.openTipsBtnLocator);
   }
   async enterWalletName(walletName) {
     this.logger.info(`WalletDetails::enterWalletName is called`);

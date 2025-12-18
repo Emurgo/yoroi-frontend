@@ -12,7 +12,7 @@ import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
@@ -45,17 +45,9 @@ import { CatalystRegistrationContextProvider } from './UI/features/catalyst-regi
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
 // $FlowIgnore: suppressing this error
-import GovernanceDelegationFormPage from './UI/pages/Governance/GovernanceDelegationFormPage';
-// $FlowIgnore: suppressing this error
-import GovernanceRevampStatusPage from './UI/pages/Governance-Revamp/GovernanceRevampStatusPage';
-// $FlowIgnore: suppressing this error
-import GovernanceOptionsPage from './UI/pages/Governance-Revamp/GovernanceOptionsPage';
+import GovernanceOptionsPage from './UI/pages/Governance/GovernanceOptionsPage';
 // $FlowIgnore: suppressing this error
 import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionFailedPage from './UI/pages/Governance/GovernanceTransactionFailedPage';
-// $FlowIgnore: suppressing this error
-import GovernanceTransactionSubmittedPage from './UI/pages/Governance/GovernanceTransactionSubmittedPage';
 // $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
@@ -78,9 +70,12 @@ import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
 import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
+// $FlowIgnore: suppressing this error
+import StakingPageRevamp from './UI/pages/Staking/StakingPage';
+// $FlowIgnore: suppressing this error
+import { StakingContextProvider } from './UI/features/staking/module/StakingContextProvider';
 
 // $FlowIgnore: suppressing this error
-// import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
@@ -181,6 +176,7 @@ export const LazyLoadPromises: Array<() => any> = [
 
 export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
@@ -207,6 +203,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route path={ROUTES.DAPP_CONNECTOR.CONNECTED_WEBSITES} element={<ConnectedWebsitesPage stores={stores} />} />
           <Route element={<DappCenterSubpages stores={stores} />}>
             <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
+          </Route>
+          <Route element={<StakingSubpages stores={stores} />}>
+            <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
           </Route>
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
@@ -254,21 +253,15 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
-            <Route path={ROUTES.Governance.ROOT} element={<GovernanceStatusPage stores={stores} />} />
-            <Route path={ROUTES.Governance.DELEGATE} element={<GovernanceDelegationFormPage stores={stores} />} />
-            <Route path={ROUTES.Governance.SUBMITTED} element={<GovernanceTransactionSubmittedPage stores={stores} />} />
-            <Route path={ROUTES.Governance.FAIL} element={<GovernanceTransactionFailedPage stores={stores} />} />
-          </Route>
-          <Route element={<GovernanceRevampSubpages stores={stores} />}>
-            <Route path={ROUTES.GOVERNANCE_REVAMP.ROOT} element={<GovernanceRevampStatusPage stores={stores} />} />
-            <Route path={ROUTES.GOVERNANCE_REVAMP.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
           </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DAPPS} element={<PortfolioDappsPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DETAILS} element={<PortfolioDetailPage stores={stores} />} />
           </Route>
-          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
+
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
           <Route path={ROUTES.AIRDROP} element={<AirdropPage stores={stores} />} />
         </Routes>
@@ -314,7 +307,6 @@ const SwapSubpages = ({ stores }) => {
     </FullscreenLayout>
   );
   return (
-    // <QueryClientProvider client={queryClient}>
     <SwapProvider publicDeriver={stores.wallets.selected} key={stores.wallets.selected?.publicDeriverId}>
       <SwapPageContainer stores={stores}>
         <Suspense fallback={loader}>
@@ -322,7 +314,6 @@ const SwapSubpages = ({ stores }) => {
         </Suspense>
       </SwapPageContainer>
     </SwapProvider>
-    // </QueryClientProvider>
   );
 };
 
@@ -375,6 +366,14 @@ const DappCenterSubpages = ({ stores }) => (
   </DappCenterContextProvider>
 );
 
+const StakingSubpages = ({ stores }) => (
+  <StakingContextProvider stores={stores}>
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
+  </StakingContextProvider>
+);
+
 const CatalystRegistrationSubpages = ({ stores }) => (
   <CatalystRegistrationContextProvider stores={stores}>
     <Suspense fallback={null}>
@@ -383,35 +382,7 @@ const CatalystRegistrationSubpages = ({ stores }) => (
   </CatalystRegistrationContextProvider>
 );
 
-// NEW UI - TODO: to be refactred
 const GovernanceSubpages = ({ stores }) => {
-  const { unitOfAccount } = stores.profile;
-  const currentWalletInfo = createCurrrentWalletInfo(stores);
-  const { delegationTransaction } = stores.substores.ada;
-  const delegationTxResult = delegationTransaction.createDelegationTx.result;
-  const delegationTxError = delegationTransaction.createDelegationTx.error;
-
-  return (
-    <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
-      <GovernanceContextProvider
-        currentWallet={currentWalletInfo}
-        createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
-        signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
-        txDelegationResult={delegationTxResult}
-        txDelegationError={delegationTxError}
-        tokenInfo={stores.tokenInfoStore.tokenInfo}
-        triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
-        getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
-      >
-        <Suspense fallback={null}>
-          <Outlet />
-        </Suspense>
-      </GovernanceContextProvider>
-    </CurrencyProvider>
-  );
-};
-
-const GovernanceRevampSubpages = ({ stores }) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
   const { delegationTransaction } = stores.substores.ada;

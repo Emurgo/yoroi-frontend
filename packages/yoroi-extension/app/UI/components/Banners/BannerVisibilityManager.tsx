@@ -2,7 +2,6 @@ import { useBannerQueue } from '../../common/hooks/useBannersQueue';
 import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 import { primaryTokenInfoMainnet } from '../../utils/network-config';
 import { DrepPromotionBanner } from '../DrepPromotionBanner/DrepPromotionBanner';
-import { SurveyBanner } from './SurveyBanner';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from '../../../containers/wallet/WalletEmptyBanner';
 import { BannerType } from '../../common/constants';
@@ -23,7 +22,6 @@ export const BannerVisibilityManager = ({ stores, intl }) => {
   return (
     <>
       {visible === BannerType.MidnightPhase2 && <MidnightPhase2Banner onClose={() => dismiss(BannerType.MidnightPhase2)} />}
-      {visible === BannerType.Survey && <SurveyBanner onClose={() => dismiss(BannerType.Survey)} />}
       {visible === BannerType.DRep && (
         <DrepPromotionBanner onClose={() => dismiss(BannerType.DRep)} stores={stores} intl={intl} />
       )}
