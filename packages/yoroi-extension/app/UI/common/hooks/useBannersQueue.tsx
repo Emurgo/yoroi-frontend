@@ -25,7 +25,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
     }
 
     return null;
-  }, [bannersRemoteConfig, walletBalance]);
+  }, [bannersRemoteConfig, walletBalance, showRewardBanner]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
