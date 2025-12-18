@@ -77,7 +77,7 @@ interface Props {
       currentLocale: string;
     };
     transactionProcessingStore: {
-      adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<void>;
+      adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<{ txId: string }>;
     };
   };
 }
@@ -132,19 +132,21 @@ function AirdropPage({ stores }: Readonly<Props>) {
 
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
   const onReorg = async (signRequest: any) => {
-    await new Promise<void>(resolve => {
+    return new Promise<string>((resolve, reject) => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async password => {
           try {
             startLoadingTxReview();
 
-            await stores.transactionProcessingStore.adaSendAndRefresh({
+            const { txId } = await stores.transactionProcessingStore.adaSendAndRefresh({
               wallet,
               signRequest,
               password,
               callback: closeTxReviewModal,
             });
+
+            resolve(txId);
           } catch (error) {
             console.log('Send Sign Error', error);
             let transactionResult;
@@ -156,8 +158,8 @@ function AirdropPage({ stores }: Readonly<Props>) {
               transactionResult = TransactionResult.FAIL;
             }
             showTxResultModal(transactionResult);
+            reject(error);
           }
-          resolve();
         },
         operations: {
           kind: 'send',

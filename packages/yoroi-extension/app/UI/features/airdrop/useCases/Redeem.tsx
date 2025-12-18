@@ -10,7 +10,7 @@ export default function Redeem(props: {
   address: string;
   wallet: any;
   onClose: () => void;
-  onReorg: (signRequest: any) => void;
+  onReorg: (signRequest: any) => Promise<string>;
   onRedeem: (unsignedTxHex: string) => Promise<void>;
   endpoint: string;
 }) {
@@ -19,10 +19,19 @@ export default function Redeem(props: {
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
   const [isWaitingForReorgTxToConfirm, setIsWaitingForReorgTxToConfirm] = useState<boolean>(false);
 
-  const updateCollateralUtxos = async () => {
+  const updateCollateralUtxos = async (reorgTxId?: string) => {
     const result = await getCollateralUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
     if (result.state === 'exist') {
+      // we just submitted the re-org tx, wait for it to be confirmed
+      if (reorgTxId) {
+        for (;;) {
+          if (props.wallet.utxos.find(utxo => utxo.output.Transaction.Hash === reorgTxId)) {
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 10*1000));
+        }
+      }
       for (;;) {
         try {
           const resp = await getRedemptionTransaction(
@@ -93,10 +102,10 @@ export default function Redeem(props: {
           color="primary"
           sx={{ margin: '0 auto', display: 'block' }}
           onClick={async () => {
-            await props.onReorg(getCollateralUtxosResult.signRequest);
+            const txId = await props.onReorg(getCollateralUtxosResult.signRequest);
             setGetCollateralUtxosResult(null);
             setIsWaitingForReorgTxToConfirm(true);
-            updateCollateralUtxos();
+            updateCollateralUtxos(txId);
           }}
         >
           {strings.confirm}
