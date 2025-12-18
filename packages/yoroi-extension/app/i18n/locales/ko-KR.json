@@ -853,6 +853,7 @@
   "wallet.delegation.transaction.explanationLine2": "언제나 다른 풀로 위임을 변경할 수 있습니다.",
   "wallet.delegation.transaction.explanationLine3": "언제나 위임을 취소할 수 있습니다.",
   "wallet.delegation.transaction.generation": "거래 생성",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "Stake pool id",
   "wallet.delegation.transaction.stakePoolName": "스테이킹 풀 이름",
   "wallet.delegation.transaction.success.button.label": "대시보드 페이지",

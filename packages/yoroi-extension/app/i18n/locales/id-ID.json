@@ -853,6 +853,7 @@
   "wallet.delegation.transaction.explanationLine2": "Anda dapat mengganti pendelegasian ke stake pool yang berbeda kapan saja",
   "wallet.delegation.transaction.explanationLine3": "Anda dapat membatalkan delegasi Anda kapan saja",
   "wallet.delegation.transaction.generation": "Menghasilkan transaksi",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "ID stake pool",
   "wallet.delegation.transaction.stakePoolName": "Nama stake pool",
   "wallet.delegation.transaction.success.button.label": "Halaman dasbor",
