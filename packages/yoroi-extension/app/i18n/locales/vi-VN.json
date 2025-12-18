@@ -853,6 +853,7 @@
   "wallet.delegation.transaction.explanationLine2": "Bạn có thể chuyển sang ủy quyền cho nhóm cổ phần khác bất kỳ lúc nào",
   "wallet.delegation.transaction.explanationLine3": "Bạn có thể hủy ủy quyền của mình bất cứ lúc nào",
   "wallet.delegation.transaction.generation": "Đang tạo giao dịch",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "Id nhóm cổ phần",
   "wallet.delegation.transaction.stakePoolName": "Tên nhóm cổ phần",
   "wallet.delegation.transaction.success.button.label": "Trang bảng điều khiển",
