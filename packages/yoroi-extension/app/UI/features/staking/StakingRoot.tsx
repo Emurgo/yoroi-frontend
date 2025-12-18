@@ -3,7 +3,7 @@ import { PoolList } from './useCases/PoolList/PoolList';
 import { RewardsSummaryCard } from './useCases/RewardsSummary/RewardsSummaryCard';
 import { StakePoolDelegated } from './useCases/DelegatedStakePoolInfo/StakePoolDelegated';
 import EpochProgress from './useCases/EpochProgress/EpochProgress';
-import { LegacyDialogs } from './useCases/LegacyDialogs/LegacyDialogs.tsx';
+import { LegacyDialogs } from './useCases/LegacyDialogs/LegacyDialogs';
 import { useStaking } from './module/StakingContextProvider';
 import BuySellDialog from '../../../components/buySell/BuySellDialog';
 import WalletEmptyBanner from './common/components/EmptyWalletBanner';
