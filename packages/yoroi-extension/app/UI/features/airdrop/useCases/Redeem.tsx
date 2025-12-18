@@ -26,7 +26,8 @@ export default function Redeem(props: {
       // we just submitted the re-org tx, wait for it to be confirmed
       if (reorgTxId) {
         for (;;) {
-          if (props.wallet.utxos.find(utxo => utxo.output.Transaction.Hash === reorgTxId)) {
+          // HACK
+          if (yoroi.stores.wallets.selected.utxos.find(utxo => utxo.output.Transaction.Hash === reorgTxId)) {
             break;
           }
           await new Promise(resolve => setTimeout(resolve, 10*1000));
