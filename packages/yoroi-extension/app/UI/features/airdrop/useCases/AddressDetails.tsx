@@ -32,10 +32,9 @@ interface Props {
   onRedeem: () => void;
   redeemableAmount: string;
   address: string;
-  networkId: number;
 }
 
-export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
+export default function AddressDetails({ schedule, redeemableAmount, address, isRedeemable, onRedeem }: Props) {
   const strings = useStrings();
   const theme: any = useTheme();
   const intl = useIntl();
