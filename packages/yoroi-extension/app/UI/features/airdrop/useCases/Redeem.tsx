@@ -17,24 +17,24 @@ export default function Redeem(props: {
   const strings = useStrings();
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
-  void error;
 
   const updateCollateralUtxos = async () => {
     const result = await getCollateralUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
     if (result.state === 'exist') {
-      try {
-        const resp = await getRedemptionTransaction(
-          props.address,
-          props.endpoint,
-          result.fundingUtxoAddr,
-          result.collateralUtxoIds,
-          [result.fundingUtxo],
-        );
-        setRedemptionTxBuildingResponse(resp);
-      } catch (err: any) {
-        setError(err.message);
+      for (;;) {
+        try {
+          const resp = await getRedemptionTransaction(
+            props.address,
+            props.endpoint,
+            result.fundingUtxoAddr,
+            result.collateralUtxos,
+            [result.fundingUtxo],
+          );
+          setRedemptionTxBuildingResponse(resp);
+        } catch {
+        }
+        await new Promise(resolve => setTimeout(resolve, 10*1000));
       }
     }
   };

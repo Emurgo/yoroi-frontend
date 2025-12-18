@@ -379,7 +379,7 @@ async function createReorgTransaction(wallet: WalletState): Promise<HaskellShell
 type GetCollateralUtxosResponse =
   | {|
       state: 'exist',
-      collateralUtxoIds: Array<string>,
+      collateralUtxos: Array<string>,
       fundingUtxo: string,
       fundingUtxoAddr: string,
     |}
@@ -400,7 +400,7 @@ export async function getCollateralUtxos(wallet: WalletState): Promise<GetCollat
   if (getCollateralUtxosResult) {
     return {
       state: 'exist',
-      collateralUtxoIds: getCollateralUtxosResult.utxosToUse,
+      collateralUtxos: getCollateralUtxosResult.utxosToUse,
       fundingUtxo: getCollateralUtxosResult.fundingUtxo,
       fundingUtxoAddr: getCollateralUtxosResult.fundingUtxoAddr,
     };
@@ -442,7 +442,7 @@ export async function getRedemptionTransaction(
   destAddr: string,
   thawEndpoint: string,
   changeAddr: string,
-  collateralUtxoIds: Array<string>,
+  collateralUtxos: Array<string>,
   fundingUtxos: Array<string>
 ): Promise<Object> {
   const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions/build`, {
@@ -453,7 +453,7 @@ export async function getRedemptionTransaction(
     body: JSON.stringify(
       {
         change_address: changeAddr,
-        collateral_utxos: collateralUtxoIds,
+        collateral_utxos: collateralUtxos,
         funding_utxos: fundingUtxos,
       },
     ),
