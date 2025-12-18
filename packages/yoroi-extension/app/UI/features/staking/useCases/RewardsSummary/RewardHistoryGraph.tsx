@@ -2,15 +2,16 @@ import React from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, CircularProgress, Stack, Typography } from '@mui/material';
 import RewardGraphClean from './RewardGraphClean';
-// import VerticallyCenteredLayout from '../../../layout/VerticallyCenteredLayout'; // --- IGNORE ---
 import MuiAccordion, { AccordionProps as MuiAccordionProps } from '@mui/material/Accordion';
 import MuiAccordionSummary, { AccordionSummaryProps as MuiAccordionSummaryProps } from '@mui/material/AccordionSummary';
 import MuiAccordionDetails from '@mui/material/AccordionDetails';
 import { getAvatarFromPoolId } from '../../common/helpers';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GraphData } from '../../common/types';
+import { useStaking } from '../../module/StakingContextProvider';
 
-/* ---------- Types ---------- */
+import RewardHistoryDialog from '../../../../../components/wallet/staking/dashboard-revamp/RewardHistoryDialog';
+import { observer } from 'mobx-react';
 
 type RewardHistoryEntry = {
   type: string;
@@ -27,12 +28,12 @@ type RewardHistoryItemProps = {
 
 type RewardHistoryGraphProps = {
   graphData: GraphData;
-  onOpenRewardList: () => void;
 };
 
 /* ---------- RewardHistoryItem ---------- */
 
 export const RewardHistoryItem: React.FC<RewardHistoryItemProps> = ({ poolId, poolName, poolAvatar, historyList }) => {
+  const strings = useStrings();
   const avatarGenerated = getAvatarFromPoolId(poolId);
 
   return (
@@ -41,7 +42,7 @@ export const RewardHistoryItem: React.FC<RewardHistoryItemProps> = ({ poolId, po
         <Box>
           <Box display="block">
             <Typography component="div" color="var(--yoroi-palette-gray-600)">
-              Stake Pool
+              {strings.stakePoolLabel}
             </Typography>
           </Box>
           <Box display="flex">
@@ -138,11 +139,15 @@ const AccordionSummary = styled((props: MuiAccordionSummaryProps) => (
   },
 }));
 
-const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOpenRewardList }) => {
+const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = observer(({ graphData }) => {
   const strings = useStrings();
+  const { stores } = useStaking();
   const { rewardsGraphData } = graphData;
   const rewardList = rewardsGraphData.items?.perEpochRewards;
   const title = strings.rewardHistoryLabel;
+  const isRewardListArray = Array.isArray(rewardList);
+  const hasError = rewardsGraphData.error && !rewardsGraphData.items;
+  const isLoading = !isRewardListArray && !hasError;
 
   return (
     <Box
@@ -166,16 +171,20 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
         </Typography>
         <Button
           // @ts-ignore
-          variant="primary"
+          variant="tertiary"
           size="medium"
-          onClick={onOpenRewardList}
+          onClick={() =>
+            stores.uiDialogs.open({
+              dialog: RewardHistoryDialog,
+            })
+          }
           sx={{ lineHeight: '21px' }}
         >
           {title}
         </Button>
       </Box>
 
-      {rewardsGraphData.error && !rewardsGraphData.items && (
+      {hasError && (
         <div>
           <Typography variant="body2" color="ds.text_error">
             {strings.errorLabel}
@@ -183,9 +192,9 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
         </div>
       )}
 
-      {!Array.isArray(rewardList) ? (
-        <CircularProgress />
-      ) : (
+      {isLoading && <CircularProgress />}
+
+      {isRewardListArray && (
         <Box ml="-50px">
           <RewardGraphClean
             epochTitle={strings.epochLabel}
@@ -200,6 +209,6 @@ const RewardHistoryGraph: React.FC<RewardHistoryGraphProps> = ({ graphData, onOp
       )}
     </Box>
   );
-};
+});
 
 export default RewardHistoryGraph;

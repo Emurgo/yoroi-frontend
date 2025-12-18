@@ -4,8 +4,11 @@ import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxPro
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useStrings } from '../../common/hooks/useStrings';
 import { useStaking } from '../../module/StakingContextProvider';
+import React from 'react';
 
-export const WithdrawButton = ({ govStatusFetched, isDisabled }) => {
+export const WithdrawButton = ({ isDisabled }) => {
+  const [govStatusFetched, setStatusFetched] = React.useState(false);
+
   const { openTxReviewModal, stopLoadingTxReview, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
   const strings = useStrings();
   const { stores } = useStaking();
@@ -13,6 +16,18 @@ export const WithdrawButton = ({ govStatusFetched, isDisabled }) => {
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
   const wallet = stores.wallets.selected;
   const isStakeRegistered = stores.delegation.isStakeRegistered(wallet.publicDeriverId);
+
+  React.useEffect(() => {
+    stores.delegation
+      .checkGovernanceStatus(wallet)
+      .then(() => {
+        setStatusFetched(true);
+        return null;
+      })
+      .catch(e => {
+        console.error('Failed to fetch governance status', e);
+      });
+  }, []);
 
   const handleRewardsWithdrawal = async () => {
     if (!isParticipatingToGovernance) {
