@@ -384,7 +384,7 @@ const StakingSubpages = ({ stores }) => (
 
 const GovernanceSubpages = ({ stores }) => <StakingAndGovernancePagesWrapper stores={stores} />;
 
-const StakingAndGovernancePagesWrapper = ({ stores, wrapOutlet }) => {
+const StakingAndGovernancePagesWrapper = ({ stores, wrapOutlet }: any) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
 

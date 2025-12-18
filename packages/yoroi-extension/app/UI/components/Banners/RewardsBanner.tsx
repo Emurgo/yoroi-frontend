@@ -17,7 +17,6 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
     onClose && onClose();
   };
 
-
   return (
     <BaseBanner
       noClose
