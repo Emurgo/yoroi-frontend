@@ -15,8 +15,6 @@ export const BannerVisibilityManager = ({ stores, intl }) => {
   const currentlyDelegating = stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
 
-  console.log('BannerVisibilityManager', { currentlyDelegating, isParticipatingToGovernance });
-
   const { data } = useYoroiRemoteConfig();
   const { visible, dismiss } = useBannerQueue({
     walletBalance: Number(

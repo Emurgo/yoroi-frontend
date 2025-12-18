@@ -8,7 +8,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
   const [evaluationKey, setEvaluationKey] = useState(0);
 
   const resolveBanner = useCallback(async () => {
-    if (walletBalance > 0 || showRewardBanner) {
+    if (showRewardBanner && walletBalance > 5) {
       return BannerType.Rewards;
     }
     if (
