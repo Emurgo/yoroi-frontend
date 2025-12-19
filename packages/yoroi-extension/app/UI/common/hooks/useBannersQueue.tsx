@@ -3,7 +3,7 @@ import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 import { useLocation } from 'react-router';
 
-export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardBanner }) {
+export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardBanner, currentlyDelegating }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
@@ -27,12 +27,11 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
     }
 
     return null;
-  }, [bannersRemoteConfig, walletBalance, showRewardBanner, location.pathname]);
+  }, [bannersRemoteConfig, walletBalance, showRewardBanner, currentlyDelegating, location.pathname]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
-  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner, showRewardBanner]);
-
+  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner, showRewardBanner, currentlyDelegating]);
   const dismiss = async type => {
     switch (type) {
       case BannerType.Rewards:

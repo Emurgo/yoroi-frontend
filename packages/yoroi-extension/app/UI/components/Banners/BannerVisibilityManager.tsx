@@ -9,8 +9,9 @@ import { BringBanner } from './BringBanner';
 import { UsdaBanner } from './UsdaBanner';
 import { MidnightPhase2Banner } from './MidnightPhase2Banner';
 import { RewardsBanner } from './RewardsBanner';
+import { observer } from 'mobx-react';
 
-export const BannerVisibilityManager = ({ stores, intl }) => {
+export const BannerVisibilityManager = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
   const currentlyDelegating = stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
   const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
@@ -22,6 +23,7 @@ export const BannerVisibilityManager = ({ stores, intl }) => {
     ),
     bannersRemoteConfig: data?.banners,
     showRewardBanner: !currentlyDelegating && !isParticipatingToGovernance,
+    currentlyDelegating,
   });
 
   return (
@@ -41,4 +43,4 @@ export const BannerVisibilityManager = ({ stores, intl }) => {
       {visible === BannerType.Usda && <UsdaBanner onClose={() => dismiss(BannerType.DRep)} />}
     </>
   );
-};
+});
