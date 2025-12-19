@@ -458,7 +458,17 @@ export async function getRedemptionTransaction(
     ),
   });
   if (!resp.ok) {
-    throw new Error('error when querying the redemption transaction building endpoint');
+    let errMessage;
+    try {
+      const errRespJson = await resp.json();
+      errMessage = errRespJson.message;
+      if (typeof errMessage !== 'string') {
+        throw new Error('expect an error message');
+      }
+    } catch {
+      throw new Error('error when querying the redemption transaction building endpoint');
+    }
+    throw new Error(`error returned from Midnight API: ${errMessage}`);
   }
   const respBody = await resp.json();
   return {

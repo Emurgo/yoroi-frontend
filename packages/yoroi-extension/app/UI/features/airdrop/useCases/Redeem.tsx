@@ -18,6 +18,7 @@ export default function Redeem(props: {
   const [getCollateralUtxosResult, setGetCollateralUtxosResult] = useState<any>(null);
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
   const [isWaitingForReorgTxToConfirm, setIsWaitingForReorgTxToConfirm] = useState<boolean>(false);
+  const [error, setError] = useState<null | string>(null);
 
   const updateCollateralUtxos = async (reorgTxId?: string) => {
     const result = await getCollateralUtxos(props.wallet);
@@ -41,9 +42,11 @@ export default function Redeem(props: {
             result.collateralUtxos,
             [result.fundingUtxo],
           );
+          setError(null);
           setRedemptionTxBuildingResponse(resp);
           break;
-        } catch {
+        } catch (error) {
+          setError((error as Error).message);
         }
         await new Promise(resolve => setTimeout(resolve, 10*1000));
       }
@@ -63,15 +66,23 @@ export default function Redeem(props: {
   if (getCollateralUtxosResult === null) {
     content = spinner;
   } else if (getCollateralUtxosResult.state === 'exist') {
+    const errorAndSpinner = (
+      <>
+        {error && (
+          <Typography color="error">{error}</Typography>
+        )}
+        {spinner}
+      </>
+    );
     if (!redemptionTxBuildingResponse) {
       content = isWaitingForReorgTxToConfirm ? (
         <Box>
           <Typography sx={{ textAlign: 'center' }}>
             {strings.waitingForReorg}
           </Typography>
-          {spinner}
+          {errorAndSpinner}
         </Box>
-      ) : spinner;
+      ) : errorAndSpinner;
     } else {
       content = (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
