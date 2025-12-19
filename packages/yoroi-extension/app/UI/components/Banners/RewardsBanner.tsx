@@ -17,6 +17,10 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
   const yoroiPoolID = data?.banners?.earnRewardsWithYoroi?.poolId;
   const yoroiPoolName = data?.banners?.earnRewardsWithYoroi?.poolName;
 
+  // TODO: read from config when merged
+  const yoroiDrepID = '220655f3a1c76788d839212adc459b188b84e680f30ae944c593fa18ae';
+  const yoroiDrepName = 'Yoroi W₳llet';
+
   const handleClose = () => {
     onClose && onClose();
   };
@@ -47,9 +51,11 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
           stores={stores}
           label={rewardsButton}
           disabled={false}
-          poolName={yoroiPoolName || ''}
-          socialMediaInfo={undefined}
           poolID={yoroiPoolID || ''}
+          poolName={yoroiPoolName || ''}
+          dRepID={yoroiDrepID || ''}
+          dRepName={yoroiDrepName || ''}
+          socialMediaInfo={undefined}
         />
       }
     />

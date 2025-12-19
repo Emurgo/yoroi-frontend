@@ -287,21 +287,25 @@ export default class DelegationStore extends Store<StoresMap> {
     }
   };
 
-  createDelegationTransaction: string => Promise<any> = async poolId => {
-    this.stores.delegation.poolInfoQuery.reset();
-    try {
-      await this.stores.delegation.poolInfoQuery.execute([poolId]);
-    } catch (error) {
-      Logger.error(`${nameof(DelegationStore)}::${nameof(this.createDelegationTransaction)} error: ` + stringifyError(error));
-    }
-    return await this.stores.substores.ada.delegationTransaction.createTransaction({
-      poolRequest: poolId,
-      wallet: this.stores.wallets.selectedOrFail,
-    });
+  createDelegationTransaction: string => Promise<any> = async (poolId) => {
+    return await this.createPoolOrDrepDelegationTransaction({ poolId });
   };
 
   createDrepDelegationTransaction: string => Promise<any> = async drepCredential => {
+    return await this.createPoolOrDrepDelegationTransaction({ drepCredential });
+  };
+
+  createPoolOrDrepDelegationTransaction: ({| poolId?: string, drepCredential?: string |}) => Promise<any> = async ({ poolId, drepCredential }) => {
+    if (poolId) {
+      this.stores.delegation.poolInfoQuery.reset();
+      try {
+        await this.stores.delegation.poolInfoQuery.execute([poolId]);
+      } catch (error) {
+        Logger.error(`${nameof(DelegationStore)}::${nameof(this.createDelegationTransaction)} error: ` + stringifyError(error));
+      }
+    }
     return await this.stores.substores.ada.delegationTransaction.createTransaction({
+      poolRequest: poolId,
       drepCredential,
       wallet: this.stores.wallets.selectedOrFail,
     });

@@ -10,6 +10,7 @@ import { SocialLinks } from '../../common/types';
 import { useGovernanceStatusState } from '../../../governace/common/hooks/useGovernanceStatusState';
 import { useModal } from '../../../../components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
+import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 
 type SocialMediaInfo = {
   socialLinks?: SocialLinks;
@@ -20,9 +21,11 @@ type DelegateButtonProps = {
   stores: any;
   label: React.ReactNode;
   disabled?: boolean;
-  poolName: string;
-  socialMediaInfo?: SocialMediaInfo;
   poolID: string;
+  poolName: string;
+  dRepID: string;
+  dRepName: string;
+  socialMediaInfo?: SocialMediaInfo;
   btnVariant?: 'primary' | 'secondary';
 };
 
@@ -40,9 +43,11 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   stores,
   label,
   disabled = false,
-  poolName,
-  socialMediaInfo,
   poolID,
+  poolName,
+  dRepID,
+  dRepName,
+  socialMediaInfo,
   btnVariant = 'primary',
 }) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
@@ -86,9 +91,18 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   };
 
   const onDelegate = async (): Promise<void> => {
-    const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
+    const delegatingPoolId = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
+    const delegatingDRepId = isTestnet ? '232285cccbf305ca26e6098be9a13b45e3911d881d84c3502f82320cca' : dRepID;
 
-    const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
+    const drepCredential = dRepToMaybeCredentialHex(delegatingDRepId);
+    if (!drepCredential) {
+      console.error('Cannot convert DRep ID to a valid credential', delegatingDRepId);
+    }
+
+    const { signTxRequest } = await stores.delegation.createPoolOrDrepDelegationTransaction({
+      poolId: delegatingPoolId,
+      drepCredential,
+    });
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -139,7 +153,7 @@ type OperationsDetailsProps = {
   socialMediaInfo?: SocialMediaInfo;
 };
 
-const OperationsDetails: React.FC<OperationsDetailsProps> = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
+const OperationsDetails: React.FC<OperationsDetailsProps> = ({avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
   const strings = useStrings();
 
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
