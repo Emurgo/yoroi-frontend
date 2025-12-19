@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
+import { useLocation } from 'react-router';
 
 export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardBanner }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
+  const location = useLocation();
+  console.log('location', location.pathname);
 
   const resolveBanner = useCallback(async () => {
     if (showRewardBanner && walletBalance > 5 && bannersRemoteConfig?.earnRewardsWithYoroi?.display === true) {
@@ -25,7 +28,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
     }
 
     return null;
-  }, [bannersRemoteConfig, walletBalance, showRewardBanner]);
+  }, [bannersRemoteConfig, walletBalance, showRewardBanner, location.pathname]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
