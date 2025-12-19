@@ -31,6 +31,10 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
     route: ROUTES.STAKING,
   },
   {
+    id: 'staking_center',
+    route: ROUTES.STAKING_REVAMP.ROOT,
+  },
+  {
     id: 'swap',
     route: ROUTES.SWAP_REVAMP.ASSET_SWAP,
   },

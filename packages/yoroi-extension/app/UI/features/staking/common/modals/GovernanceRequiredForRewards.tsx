@@ -43,7 +43,8 @@ export const GovernanceRequiredForRewards = ({ onDelegate }) => {
       >
         {strings.delegateToYoroiDRep}
       </Button>
-      <Button variant="outlined" fullWidth onClick={handleStake}>
+      {/* @ts-ignore */}
+      <Button variant="secondary" fullWidth onClick={handleStake}>
         {strings.delegateStakeOnly}
       </Button>
     </Stack>

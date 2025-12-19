@@ -53,13 +53,6 @@ export const allCategoriesRevamp: Array<SidebarCategoryRevamp> = [
   // If user didn't restored any wallets, it should redirect to the add wallet page.
   makeWalletCategory(ROUTES.WALLETS.ADD, ({ hasAnyWallets }) => !hasAnyWallets),
   {
-    className: 'staking',
-    route: ROUTES.STAKING,
-    icon: stakingIcon,
-    label: globalMessages.sidebarStaking,
-    isVisible: existsSelectedWallet,
-  },
-  {
     className: 'staking-revamp',
     route: ROUTES.STAKING_REVAMP.ROOT,
     icon: stakingIcon,

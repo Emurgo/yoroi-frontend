@@ -86,7 +86,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   };
 
   const onDelegate = async (): Promise<void> => {
-    const id = isTestnet ? (poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349') : poolID;
+    const id = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
 
     const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
 

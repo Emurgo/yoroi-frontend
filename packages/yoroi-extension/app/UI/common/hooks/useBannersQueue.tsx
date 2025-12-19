@@ -8,7 +8,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
   const [evaluationKey, setEvaluationKey] = useState(0);
 
   const resolveBanner = useCallback(async () => {
-    if (showRewardBanner && walletBalance > 5) {
+    if (showRewardBanner && walletBalance > 5 && bannersRemoteConfig?.earnRewardsWithYoroi?.display === true) {
       return BannerType.Rewards;
     }
     if (

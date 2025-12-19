@@ -2,6 +2,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { DelegateButton } from '../../features/staking/useCases/DelegatedStakePoolInfo/DelegateButton';
 import { BaseBanner } from './BaseBanner';
 import type { StoresMap } from '../../../stores';
+import { useYoroiRemoteConfig } from '../../common/hooks/useYoroiRemoteConfig';
 
 interface UsdaBannerProps {
   onClose?: () => void;
@@ -12,6 +13,9 @@ interface UsdaBannerProps {
 
 export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: UsdaBannerProps) => {
   const { rewardsButton, earnRewards, delegateRewards } = useStrings();
+  const { data } = useYoroiRemoteConfig();
+  const yoroiPoolID = data?.banners?.earnRewardsWithYoroi?.poolId;
+  const yoroiPoolName = data?.banners?.earnRewardsWithYoroi?.poolName;
 
   const handleClose = () => {
     onClose && onClose();
@@ -43,9 +47,9 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
           stores={stores}
           label={rewardsButton}
           disabled={false}
-          poolName="[EMUR7] Emurgo #7"
+          poolName={yoroiPoolName || ''}
           socialMediaInfo={undefined}
-          poolID="8efb053977341471256685b1069d67f4aca7166bc3f94e27ebad217f"
+          poolID={yoroiPoolID || ''}
         />
       }
     />
