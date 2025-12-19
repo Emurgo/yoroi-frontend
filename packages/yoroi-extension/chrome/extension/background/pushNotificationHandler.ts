@@ -28,10 +28,6 @@ const REDIRECTIONS: { id: Screen; route: string }[] = [
   },
   {
     id: 'staking_center',
-    route: ROUTES.STAKING,
-  },
-  {
-    id: 'staking_center',
     route: ROUTES.STAKING_REVAMP.ROOT,
   },
   {
