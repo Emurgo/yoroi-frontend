@@ -69,7 +69,7 @@ export default function Redeem(props: {
           <Typography sx={{ textAlign: 'center' }}>
             {strings.waitingForReorg}
           </Typography>
-          <LoadingSpinner />
+          {spinner}
         </Box>
       ) : spinner;
     } else {
