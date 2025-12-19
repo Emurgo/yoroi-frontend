@@ -55,7 +55,13 @@ export default function Redeem(props: {
 
   useEffect(() => {
     updateCollateralUtxos();
-  }, [props.address]);
+    return () => {
+      setGetCollateralUtxosResult(null);
+      setRedemptionTxBuildingResponse(null);
+      setIsWaitingForReorgTxToConfirm(false);
+      setError(null);
+    };
+  }, [props.address, props.wallet.publicDeriverId]);
 
   let content;
   const spinner = (
