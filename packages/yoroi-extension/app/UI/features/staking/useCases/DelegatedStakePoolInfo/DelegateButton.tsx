@@ -153,7 +153,7 @@ type OperationsDetailsProps = {
   socialMediaInfo?: SocialMediaInfo;
 };
 
-const OperationsDetails: React.FC<OperationsDetailsProps> = ({avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
+const OperationsDetails: React.FC<OperationsDetailsProps> = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
   const strings = useStrings();
 
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
