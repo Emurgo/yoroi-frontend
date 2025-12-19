@@ -15,9 +15,8 @@ import BigNumber from 'bignumber.js';
 import { forceNonNull } from '../../coreUtils.js';
 import { getProtocolParameters } from '../thunk';
 import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
-import { asAddressedUtxo } from './transactions/utils';
+import { cardanoUtxoHexFromRemoteFormat, asAddressedUtxo } from './transactions/utils';
 import { NotEnoughMoneyToSendError } from '../common/errors';
-import { cardanoUtxoHexFromRemoteFormat } from './transactions/utils';
 
 const localStorageApi = new LocalStorageApi();
 
