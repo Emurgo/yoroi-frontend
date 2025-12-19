@@ -35,7 +35,7 @@ export const UndelegateButton = ({ poolTransition, delegateToSpecificPool, poolI
       openModal({
         modalId: 'governance',
         title: 'Governance updates',
-        content: <StakeWithdrawUpdates />,
+        content: <StakeWithdrawUpdates titlte={strings.participationInGovUndelegate} description={strings.undelegateInfo} />,
         width: '612px',
         height: '628px',
       });

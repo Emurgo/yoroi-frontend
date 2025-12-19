@@ -145,6 +145,15 @@ export const messages = Object.freeze(
       id: 'staking.dialog.delegateStakeOnly',
       defaultMessage: '!!Delegate stake only',
     },
+    participationInGovUndelegate: {
+      id: 'staking.dialog.participationInGovUndelegate',
+      defaultMessage: '!!Participation in governance is required to undelegate',
+    },
+    undelegateInfo: {
+      id: 'staking.dialog.undelegateInfo',
+      defaultMessage:
+        '!!Undelegating causes any pending staking  rewards to be withdrawn and participating in governance is required to withdraw rewards on Cardano. First, delegate your ADA in the governance center. Once your delegation is confirmed, you will then be able to undelegate.',
+    },
   })
 );
 
@@ -186,5 +195,7 @@ export const useStrings = () => {
     toReceiveRewards: intl.formatMessage(messages.toReceiveRewards),
     delegateToYoroiDRep: intl.formatMessage(messages.delegateToYoroiDRep),
     delegateStakeOnly: intl.formatMessage(messages.delegateStakeOnly),
+    participationInGovUndelegate: intl.formatMessage(messages.participationInGovUndelegate),
+    undelegateInfo: intl.formatMessage(messages.undelegateInfo),
   }).current;
 };

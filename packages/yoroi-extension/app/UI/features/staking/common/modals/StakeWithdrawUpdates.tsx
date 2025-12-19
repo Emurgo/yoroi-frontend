@@ -4,7 +4,7 @@ import { useNavigateTo } from '../hooks/useNavigateTo';
 import { useStrings } from '../hooks/useStrings';
 import { useModal } from '../../../../components/modals/ModalContext';
 
-export const StakeWithdrawUpdates = () => {
+export const StakeWithdrawUpdates = ({ titlte, description }: { titlte?: string; description?: string }) => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
   const { closeModal } = useModal();
@@ -20,10 +20,10 @@ export const StakeWithdrawUpdates = () => {
           <GovUpdatesIlustration />
         </Stack>
         <Typography variant="h5" color="ds.text_gray_medium" mb={8} textAlign={'center'}>
-          {strings.participationInGovernance}
+          {titlte ?? strings.participationInGovernance}
         </Typography>
         <Typography variant="body1" color="ds.text_gray_medium" textAlign={'center'}>
-          {strings.participationInfo}
+          {description ?? strings.participationInfo}
         </Typography>
       </Stack>
       {/* @ts-ignore */}

@@ -618,6 +618,8 @@
   "swap.testnet.message": "Switch networks to be able to use Swap in Yoroi",
   "swap.testnet.switch": "SWITCH NETWORK",
   "swap.testnet.title": "Swap is only available on the mainnet",
+  "staking.dialog.participationInGovUndelegate": "Participation in governance is required to undelegate",
+  "staking.dialog.undelegateInfo": "Undelegating causes any pending staking  rewards to be withdrawn and participating in governance is required to withdraw rewards on Cardano. First, delegate your ADA in the governance center. Once your delegation is confirmed, you will then be able to undelegate.",
   "staking.dialog.participationInGovernance": "Participation in governance is required to withdraw",
   "staking.dialog.governanceRequired": "Governance Required for Rewards",
   "staking.dialog.toReceiveRewards": "To receive rewards from your stake delegation, you must also delegate your voting power. Save time and fees by delegating to our Yoroi DRep now, alongside your stake pool delegation.",
