@@ -21,7 +21,6 @@ import links from '../links';
 import { captureEvent } from '../../posthog';
 // $FlowIgnore: suppressing this error
 import { createCurrrentWalletInfo } from '../UI/utils/createCurrentWalletInfo';
-import Transaction from '../components/wallet/transactions/Transaction';
 
 export const NETWORK_BADGES: {| [number]: {| color: string, text: string |} |} = Object.freeze({
   [networks.CardanoPreprodTestnet.NetworkId]: {
