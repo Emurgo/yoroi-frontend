@@ -88,7 +88,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
       openModal({
         modalId: 'governance',
         title: 'Governance updates',
-        content: <GovernanceRequiredForRewards onDelegate={delegateToDrep} />,
+        content: <GovernanceRequiredForRewards onDelegate={delegateToDrep(dRepID)} />,
         width: '612px',
         height: '628px',
       });
