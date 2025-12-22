@@ -64,6 +64,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const isRewardWallet = delegation.isRewardWallet(newWalletId);
     const isStakingPage = routing.currentRoute === ROUTES.STAKING;
     const isSwapPage = routing.currentRoute.startsWith(ROUTES.SWAP_REVAMP.ASSET_SWAP);
+    const isTransactionPage = routing.currentRoute.startsWith(ROUTES.WALLETS.TRANSACTIONS);
     this.props.stores.wallets.setActiveWallet({ publicDeriverId: newWalletId });
     const selectedWallet = this.props.stores.wallets.selected;
     if (selectedWallet) {
@@ -72,6 +73,8 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     const route = !isRewardWallet && isStakingPage ? ROUTES.WALLETS.ROOT : routing.currentRoute;
     if (isSwapPage) {
       this.props.stores.routing.goToRoute({ route: ROUTES.SWAP_REVAMP.ASSET_SWAP, query: { newWallet: true } });
+    } else if (isTransactionPage) {
+      this.props.stores.routing.goToRoute({ route, query: { newWallet: String(newWalletId) } });
     } else {
       this.props.stores.routing.goToRoute({ route });
     }
