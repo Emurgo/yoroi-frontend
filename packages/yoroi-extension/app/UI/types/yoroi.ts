@@ -63,6 +63,7 @@ export type YoroiRemoteConfig = {
       display: boolean;
       poolId: string;
       poolName: string;
+      drepId: string;
     };
   };
   popups?: {

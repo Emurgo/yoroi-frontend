@@ -16,8 +16,7 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
   const { data } = useYoroiRemoteConfig();
   const yoroiPoolID = data?.banners?.earnRewardsWithYoroi?.poolId;
   const yoroiPoolName = data?.banners?.earnRewardsWithYoroi?.poolName;
-  // TODO: read from config when merged
-  const yoroiDrepID = '220655f3a1c76788d839212adc459b188b84e680f30ae944c593fa18ae';
+  const yoroiDrepID = data?.banners?.earnRewardsWithYoroi?.drepId;
 
   const handleClose = () => {
     onClose && onClose();
