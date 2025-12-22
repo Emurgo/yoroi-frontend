@@ -278,7 +278,7 @@ const FUNDING_AMOUNT = '3000000';
 
 async function pickCollateralUtxos(
   wallet: WalletState
-): Promise<?{| utxosToUse: Array<string>, fundingUtxo: string, fundingUtxoAddr: string, |}> {
+): Promise<?{| utxosToUse: Array<string>, fundingUtxo: string, fundingUtxoAddr: string |}> {
   const required = new BigNumber(COLLATERAL_AMOUNT);
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
@@ -448,13 +448,11 @@ export async function getRedemptionTransaction(
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(
-      {
-        change_address: changeAddr,
-        collateral_utxos: collateralUtxos,
-        funding_utxos: fundingUtxos,
-      },
-    ),
+    body: JSON.stringify({
+      change_address: changeAddr,
+      collateral_utxos: collateralUtxos,
+      funding_utxos: fundingUtxos,
+    }),
   });
   if (!resp.ok) {
     let errMessage;
