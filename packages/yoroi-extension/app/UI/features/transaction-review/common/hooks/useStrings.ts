@@ -212,6 +212,10 @@ export const messages = Object.freeze(
       id: 'transaction.review.delegateToYoroi',
       defaultMessage: '!!!Delegate to Yoroi DRep below',
     },
+    delegateVoting: {
+      id: 'transaction.review.delegateVoting',
+      defaultMessage: '!!!Delegating voting to',
+    },
   })
 );
 
@@ -269,5 +273,6 @@ export const useStrings = () => {
     dontHaveId: intl.formatMessage(messages.dontHaveId),
     findDrepHere: intl.formatMessage(messages.findDrepHere),
     delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
+    delegateVoting: intl.formatMessage(messages.delegateVoting),
   }).current;
 };

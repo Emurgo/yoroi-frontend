@@ -11,6 +11,8 @@ import { useGovernanceStatusState } from '../../../governace/common/hooks/useGov
 import { useModal } from '../../../../components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
+import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
+import { gap } from '../../../../../styles/themes/atoms/atoms';
 
 type SocialMediaInfo = {
   socialLinks?: SocialLinks;
@@ -24,9 +26,9 @@ type DelegateButtonProps = {
   poolID: string;
   poolName: string;
   dRepID: string;
-  dRepName: string;
   socialMediaInfo?: SocialMediaInfo;
   btnVariant?: 'primary' | 'secondary';
+  delegateAndStake?: boolean;
 };
 
 const StyledLink: any = styled(Link)(({ theme }: any) => ({
@@ -46,13 +48,15 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   poolID,
   poolName,
   dRepID,
-  dRepName,
+  delegateAndStake,
   socialMediaInfo,
   btnVariant = 'primary',
 }) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
   const { governanceStatus } = useGovernanceStatusState();
+  const { delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+
   const { openModal } = useModal();
 
   const isTestnet = networkId !== 0;
@@ -77,20 +81,24 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   };
 
   const handleOnDelegate = async () => {
+    if (delegateAndStake) {
+      await onDelegateAndStake();
+      return;
+    }
     if (governanceStatus.status === 'none') {
       openModal({
         modalId: 'governance',
         title: 'Governance updates',
-        content: <GovernanceRequiredForRewards onDelegate={onDelegate} />,
+        content: <GovernanceRequiredForRewards onDelegate={delegateToDrep} />,
         width: '612px',
         height: '628px',
       });
     } else {
-      await onDelegate();
+      await onDelegateAndStake();
     }
   };
 
-  const onDelegate = async (): Promise<void> => {
+  const onDelegateAndStake = async (): Promise<void> => {
     const delegatingPoolId = isTestnet ? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349' : poolID;
     const delegatingDRepId = isTestnet ? '232285cccbf305ca26e6098be9a13b45e3911d881d84c3502f82320cca' : dRepID;
 
@@ -118,6 +126,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
                   .shiftedBy(-primaryTokenInfo.decimals)
                   .toString()} ${primaryTokenInfo.name}`}
                 socialMediaInfo={socialMediaInfo}
+                drepId={delegatingDRepId}
               />
             ),
             duplicated: false,
@@ -151,9 +160,16 @@ type OperationsDetailsProps = {
   poolName: string;
   stakeKeyDeposit: string;
   socialMediaInfo?: SocialMediaInfo;
+  drepId: string;
 };
 
-const OperationsDetails: React.FC<OperationsDetailsProps> = ({ avatarGenerated, poolName, stakeKeyDeposit, socialMediaInfo }) => {
+const OperationsDetails: React.FC<OperationsDetailsProps> = ({
+  avatarGenerated,
+  poolName,
+  stakeKeyDeposit,
+  socialMediaInfo,
+  drepId,
+}) => {
   const strings = useStrings();
 
   const { socialLinks, websiteUrl } = socialMediaInfo ?? {};
@@ -166,6 +182,16 @@ const OperationsDetails: React.FC<OperationsDetailsProps> = ({ avatarGenerated, 
         <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
         <Typography color="ds.text_gray_medium">{stakeKeyDeposit}</Typography>
       </Stack>
+      {drepId && (
+        <Stack direction="row" justifyContent="space-between" gap={16}>
+          <Typography color="ds.text_gray_low" sx={{ width: '151px' }}>
+            {strings.delegateVoting}
+          </Typography>
+          <Typography color="ds.text_gray_medium" sx={{ maxWidth: '300px', wordBreak: 'break-all' }}>
+            {drepId}
+          </Typography>
+        </Stack>
+      )}
 
       <Stack direction="row" justifyContent="space-between">
         <Typography color="ds.text_gray_low">{strings.stakeWalletBalance}</Typography>
