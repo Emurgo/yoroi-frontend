@@ -1,26 +1,20 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { GovUpdatesIlustration } from './GovUpdatesIlustration';
 import { useStrings } from '../hooks/useStrings';
-import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useModal } from '../../../../components/modals/ModalContext';
-import { useGovernance } from '../../../governace/module/GovernanceContextProvider';
-import { YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../../governace/common/constants';
 
-export const GovernanceRequiredForRewards = ({ onDelegate }) => {
+export const GovernanceRequiredForRewards = ({ onDelegateToDrep, onStake }) => {
   const strings = useStrings();
-  const { delegateToDrep } = useGovernanceDelegationToYoroiDrep();
-  const { isTestnet } = useGovernance();
-  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
   const { closeModal } = useModal();
 
   const handleStake = () => {
     closeModal();
-    onDelegate();
+    onStake();
   };
   const handleVote = () => {
     closeModal();
-    delegateToDrep(yoroiDrepId);
+    onDelegateToDrep();
   };
 
   return (

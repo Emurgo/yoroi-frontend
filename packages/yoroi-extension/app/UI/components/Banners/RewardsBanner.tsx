@@ -16,7 +16,6 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
   const { data } = useYoroiRemoteConfig();
   const yoroiPoolID = data?.banners?.earnRewardsWithYoroi?.poolId;
   const yoroiPoolName = data?.banners?.earnRewardsWithYoroi?.poolName;
-  const yoroiDrepID = data?.banners?.earnRewardsWithYoroi?.drepId;
 
   const handleClose = () => {
     onClose && onClose();
@@ -50,7 +49,6 @@ export const RewardsBanner = ({ onClose, stores, displayIllustration = false }: 
           disabled={false}
           poolID={yoroiPoolID || ''}
           poolName={yoroiPoolName || ''}
-          dRepID={yoroiDrepID || ''}
           socialMediaInfo={undefined}
           delegateAndStake
         />

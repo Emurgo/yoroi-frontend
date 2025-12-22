@@ -10,7 +10,12 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, c
   const location = useLocation();
 
   const resolveBanner = useCallback(async () => {
-    if (governanceStatus.status === 'none' && walletBalance > 5 && bannersRemoteConfig?.earnRewardsWithYoroi?.display === true) {
+    if (
+      governanceStatus.status === 'none' &&
+      !currentlyDelegating &&
+      walletBalance > 5 &&
+      bannersRemoteConfig?.earnRewardsWithYoroi?.display === true
+    ) {
       return BannerType.Rewards;
     }
     if (

@@ -12,6 +12,7 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useYoroiRemoteConfig } from '../../../../common/hooks/useYoroiRemoteConfig';
 
 type SocialMediaInfo = {
   socialLinks?: SocialLinks;
@@ -46,7 +47,6 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   disabled = false,
   poolID,
   poolName,
-  dRepID,
   delegateAndStake,
   socialMediaInfo,
   btnVariant = 'primary',
@@ -54,7 +54,8 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
   const { governanceStatus } = useGovernanceStatusState();
-  const { delegateToDrep } = useGovernanceDelegationToYoroiDrep();
+  const { data } = useYoroiRemoteConfig();
+  const dRepID = data?.banners?.earnRewardsWithYoroi?.drepId;
 
   const { openModal } = useModal();
 
@@ -79,6 +80,35 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
     }
   };
 
+  const onDelegateToStakePool = async () => {
+    const id = isTestnet ? (poolID ?? '7facad662e180ce45e5c504957cd1341940c72a708728f7ecfc6e349') : poolID;
+    const { signTxRequest } = await stores.delegation.createDelegationTransaction(id);
+
+    openTxReviewModal({
+      modalView: 'transactionReview',
+      submitTx: passswordInput => submitTx(passswordInput),
+      operations: {
+        components: [
+          {
+            component: (
+              <OperationsDetails
+                avatarGenerated={avatarGenerated}
+                poolName={poolName}
+                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${
+                  primaryTokenInfo.name
+                }`}
+                socialMediaInfo={socialMediaInfo}
+              />
+            ),
+            duplicated: false,
+          },
+        ],
+        kind: 'delegate',
+      },
+      unsignedTx: signTxRequest.unsignedTx,
+    });
+  };
+
   const handleOnDelegate = async () => {
     if (delegateAndStake) {
       await onDelegateAndStake();
@@ -88,7 +118,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
       openModal({
         modalId: 'governance',
         title: 'Governance updates',
-        content: <GovernanceRequiredForRewards onDelegate={delegateToDrep(dRepID)} />,
+        content: <GovernanceRequiredForRewards onStake={onDelegateToStakePool} onDelegateToDrep={onDelegateAndStake} />,
         width: '612px',
         height: '628px',
       });
@@ -159,7 +189,7 @@ type OperationsDetailsProps = {
   poolName: string;
   stakeKeyDeposit: string;
   socialMediaInfo?: SocialMediaInfo;
-  drepId: string;
+  drepId?: string;
 };
 
 const OperationsDetails: React.FC<OperationsDetailsProps> = ({
