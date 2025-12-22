@@ -287,7 +287,7 @@ export default class DelegationStore extends Store<StoresMap> {
     }
   };
 
-  createDelegationTransaction: string => Promise<any> = async (poolId) => {
+  createDelegationTransaction: string => Promise<any> = async poolId => {
     return await this.createPoolOrDrepDelegationTransaction({ poolId });
   };
 
@@ -295,7 +295,10 @@ export default class DelegationStore extends Store<StoresMap> {
     return await this.createPoolOrDrepDelegationTransaction({ drepCredential });
   };
 
-  createPoolOrDrepDelegationTransaction: ({| poolId?: string, drepCredential?: string |}) => Promise<any> = async ({ poolId, drepCredential }) => {
+  createPoolOrDrepDelegationTransaction: ({| poolId?: string, drepCredential?: string |}) => Promise<any> = async ({
+    poolId,
+    drepCredential,
+  }) => {
     if (poolId) {
       this.stores.delegation.poolInfoQuery.reset();
       try {
