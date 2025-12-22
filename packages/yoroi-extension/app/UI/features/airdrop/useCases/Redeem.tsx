@@ -32,7 +32,7 @@ export default function Redeem(props: {
           if (props.wallet.utxos.find(utxo => utxo.output.Transaction.Hash === reorgTxId)) {
             break;
           }
-          await new Promise(resolve => setTimeout(resolve, 10*1000));
+          await new Promise(resolve => setTimeout(resolve, 10 * 1000));
         }
       }
       for (;;) {
@@ -45,7 +45,7 @@ export default function Redeem(props: {
             props.endpoint,
             result.fundingUtxoAddr,
             result.collateralUtxos,
-            [result.fundingUtxo],
+            [result.fundingUtxo]
           );
           if (abort.current) {
             return;
@@ -56,7 +56,7 @@ export default function Redeem(props: {
         } catch (error) {
           setError((error as Error).message);
         }
-        await new Promise(resolve => setTimeout(resolve, 10*1000));
+        await new Promise(resolve => setTimeout(resolve, 10 * 1000));
       }
     }
   };
@@ -74,7 +74,7 @@ export default function Redeem(props: {
 
   let content;
   const spinner = (
-    <Box sx={{ height: '36px' /* to supress a bug in <Dialog> that shows the vertical scroll bar */}}>
+    <Box sx={{ height: '36px' /* to supress a bug in <Dialog> that shows the vertical scroll bar */ }}>
       <LoadingSpinner />
     </Box>
   );
@@ -83,21 +83,19 @@ export default function Redeem(props: {
   } else if (getCollateralUtxosResult.state === 'exist') {
     const errorAndSpinner = (
       <>
-        {error && (
-          <Typography color="error">{error}</Typography>
-        )}
+        {error && <Typography color="error">{error}</Typography>}
         {spinner}
       </>
     );
     if (!redemptionTxBuildingResponse) {
       content = isWaitingForReorgTxToConfirm ? (
         <Box>
-          <Typography sx={{ textAlign: 'center' }}>
-            {strings.waitingForReorg}
-          </Typography>
+          <Typography sx={{ textAlign: 'center' }}>{strings.waitingForReorg}</Typography>
           {errorAndSpinner}
         </Box>
-      ) : errorAndSpinner;
+      ) : (
+        errorAndSpinner
+      );
     } else {
       content = (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -109,12 +107,12 @@ export default function Redeem(props: {
             color="primary"
             sx={{ margin: '0 auto', display: 'block' }}
             onClick={async () => {
-                await props.onRedeem(redemptionTxBuildingResponse.transaction);
-                // todo: error handling
-                props.onClose();
-              }}
-            >
-              {strings.redeemButton}
+              await props.onRedeem(redemptionTxBuildingResponse.transaction);
+              // todo: error handling
+              props.onClose();
+            }}
+          >
+            {strings.redeemButton}
           </Button>
         </Box>
       );
@@ -139,11 +137,7 @@ export default function Redeem(props: {
       </Box>
     );
   } else if (getCollateralUtxosResult.state === 'not-enough') {
-    content = (
-      <Box sx={{ minHeight: '17px', textAlign: 'center' }}>
-        {strings.redeemNotEnoughBalance}
-      </Box>
-    );
+    content = <Box sx={{ minHeight: '17px', textAlign: 'center' }}>{strings.redeemNotEnoughBalance}</Box>;
   } else {
     content = (
       <Box sx={{ minHeight: '17px', textAlign: 'center' }}>

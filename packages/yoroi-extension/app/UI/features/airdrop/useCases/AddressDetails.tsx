@@ -43,7 +43,7 @@ export default function AddressDetails({ schedule, redeemableAmount, address, is
         gap: '16px',
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
         <Box>
           {/*  @ts-ignore */}
           <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>

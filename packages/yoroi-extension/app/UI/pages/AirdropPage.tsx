@@ -281,7 +281,9 @@ function AirdropPage({ stores }: Readonly<Props>) {
           {selectedAddressData && (
             <AddressDetails
               isRedeemable={getRedeemableAmount(selectedAddressData.schedule) != 0}
-              onRedeem={() => { startRedeem(selectedAddressData.address); }}
+              onRedeem={() => {
+                startRedeem(selectedAddressData.address);
+              }}
               address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
               redeemableAmount={getRedeemable(selectedAddressData.schedule)}
@@ -290,7 +292,14 @@ function AirdropPage({ stores }: Readonly<Props>) {
         </Box>
       </Box>
       {redeemingAddr && (
-        <Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} onRedeem={onRedeem} endpoint={thawEndpoint} />
+        <Redeem
+          address={redeemingAddr}
+          wallet={wallet}
+          onClose={closeRedeem}
+          onReorg={onReorg}
+          onRedeem={onRedeem}
+          endpoint={thawEndpoint}
+        />
       )}
     </>
   );
