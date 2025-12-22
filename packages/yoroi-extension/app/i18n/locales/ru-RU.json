@@ -853,6 +853,7 @@
   "wallet.delegation.transaction.explanationLine2": "Вы можете в любое время переключиться и делегировать в другой стейк-пул",
   "wallet.delegation.transaction.explanationLine3": "Вы можете отменить свое делегирование в любое время",
   "wallet.delegation.transaction.generation": "Генерация транзакции",
+  "wallet.delegation.transaction.stakePoolLabel": "Stake pool",
   "wallet.delegation.transaction.stakePoolHash": "Stake pool id",
   "wallet.delegation.transaction.stakePoolName": "Имя стейк-пула",
   "wallet.delegation.transaction.success.button.label": "Информационная панель",
