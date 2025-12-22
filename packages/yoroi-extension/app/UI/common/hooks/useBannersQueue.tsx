@@ -3,14 +3,14 @@ import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 import { useLocation } from 'react-router';
 
-export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardBanner, currentlyDelegating }) {
+export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, currentlyDelegating, governanceStatus }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
   const location = useLocation();
 
   const resolveBanner = useCallback(async () => {
-    if (showRewardBanner && walletBalance > 5 && bannersRemoteConfig?.earnRewardsWithYoroi?.display === true) {
+    if (governanceStatus.status === 'none' && walletBalance > 5 && bannersRemoteConfig?.earnRewardsWithYoroi?.display === true) {
       return BannerType.Rewards;
     }
     if (
@@ -27,11 +27,21 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, showRewardB
     }
 
     return null;
-  }, [bannersRemoteConfig, walletBalance, showRewardBanner, currentlyDelegating, location.pathname]);
+  }, [bannersRemoteConfig, governanceStatus.status, walletBalance, currentlyDelegating, location.search]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
-  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner, showRewardBanner, currentlyDelegating]);
+  }, [
+    bannersRemoteConfig,
+    walletId,
+    walletBalance,
+    evaluationKey,
+    resolveBanner,
+    currentlyDelegating,
+    location.search,
+    governanceStatus.status,
+  ]);
+
   const dismiss = async type => {
     switch (type) {
       case BannerType.Rewards:

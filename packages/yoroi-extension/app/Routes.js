@@ -79,6 +79,8 @@ import { StakingContextProvider } from './UI/features/staking/module/StakingCont
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
+import { ModalProvider } from './UI/components/modals/ModalContext';
+import { ReviewTxProvider } from './UI/features/transaction-review/module/ReviewTxProvider';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -271,11 +273,32 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
   );
 };
 
-const WalletsSubpages = ({ stores }) => (
-  <Wallet stores={stores}>
-    <Outlet />
-  </Wallet>
-);
+const WalletsSubpages = ({ stores }) => {
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+
+  const { delegationTransaction } = stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  return (
+    <ReviewTxProvider stores={stores}>
+      <Wallet stores={stores}>
+        <GovernanceContextProvider
+          currentWallet={currentWalletInfo}
+          createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+          signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+          txDelegationResult={delegationTxResult}
+          txDelegationError={delegationTxError}
+          tokenInfo={stores.tokenInfoStore.tokenInfo}
+          triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
+        >
+          <Outlet />
+        </GovernanceContextProvider>
+      </Wallet>
+    </ReviewTxProvider>
+  );
+};
 
 const NftGallerySubPages = ({ stores }) => (
   <NftGalleryContextProvider stores={stores}>

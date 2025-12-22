@@ -11,10 +11,12 @@ import { MidnightPhase2Banner } from './MidnightPhase2Banner';
 import { RewardsBanner } from './RewardsBanner';
 import { observer } from 'mobx-react';
 
+import { useGovernanceStatusState } from '../../features/governace/common/hooks/useGovernanceStatusState';
+
 export const BannerVisibilityManager = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
   const currentlyDelegating = stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
-  const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
+  const { governanceStatus } = useGovernanceStatusState();
 
   const { data } = useYoroiRemoteConfig();
   const { visible, dismiss } = useBannerQueue({
@@ -22,8 +24,9 @@ export const BannerVisibilityManager = observer(({ stores, intl }) => {
       selectedWallet.balance.getDefaultEntry().amount.shiftedBy(-primaryTokenInfoMainnet.decimals).toString()
     ),
     bannersRemoteConfig: data?.banners,
-    showRewardBanner: !currentlyDelegating && !isParticipatingToGovernance,
     currentlyDelegating,
+    walletId: selectedWallet.publicDeriverId,
+    governanceStatus,
   });
 
   return (
