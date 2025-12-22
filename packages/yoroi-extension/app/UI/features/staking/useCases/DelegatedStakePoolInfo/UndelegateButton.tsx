@@ -7,11 +7,16 @@ import { asQuantity } from '../../../../utils/createCurrentWalletInfo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { useStaking } from '../../module/StakingContextProvider';
 import { TransactionResult } from '../../../transaction-review/common/types';
+import { useGovernanceStatusState } from '../../../governace/common/hooks/useGovernanceStatusState';
+import { useModal } from '../../../../components/modals/ModalContext';
+import { StakeWithdrawUpdates } from '../../common/modals/StakeWithdrawUpdates';
 
 export const UndelegateButton = ({ poolTransition, delegateToSpecificPool, poolId, poolName, socialMediaInfo }) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, stakingRewards } =
     useTxReviewModal();
   const { selectedWallet, stores } = useStaking();
+  const { governanceStatus } = useGovernanceStatusState();
+  const { openModal } = useModal();
   const strings = useStrings();
   const avatarSource = toSvg(poolId, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
@@ -26,33 +31,45 @@ export const UndelegateButton = ({ poolTransition, delegateToSpecificPool, poolI
   }
 
   const handleUndelegate = async () => {
-    stores.substores.ada.delegationTransaction.setShouldDeregister(true);
-    const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({ wallet: selectedWallet });
+    if (governanceStatus.status === 'none') {
+      openModal({
+        modalId: 'governance',
+        title: 'Governance updates',
+        content: <StakeWithdrawUpdates titlte={strings.participationInGovUndelegate} description={strings.undelegateInfo} />,
+        width: '612px',
+        height: '628px',
+      });
+    } else {
+      stores.substores.ada.delegationTransaction.setShouldDeregister(true);
+      const unsignedTx = await stores.substores.ada.delegationTransaction.createWithdrawalTxForWallet({
+        wallet: selectedWallet,
+      });
 
-    openTxReviewModal({
-      modalView: 'transactionReview',
-      submitTx: passswordInput => submitTx(passswordInput),
-      operations: {
-        components: [
-          {
-            component: (
-              <OperationsDetails
-                avatarGenerated={avatarGenerated}
-                poolName={poolName}
-                stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
-                  primaryTokenInfo.name
-                }`}
-                stakingRewards={`${asQuantity(stakingRewards)} ${primaryTokenInfo.name}`}
-                socialMediaInfo={socialMediaInfo}
-              />
-            ),
-            duplicated: false,
-          },
-        ],
-        kind: 'undelegate',
-      },
-      unsignedTx: unsignedTx.unsignedTx,
-    });
+      openTxReviewModal({
+        modalView: 'transactionReview',
+        submitTx: passswordInput => submitTx(passswordInput),
+        operations: {
+          components: [
+            {
+              component: (
+                <OperationsDetails
+                  avatarGenerated={avatarGenerated}
+                  poolName={poolName}
+                  stakeKeyDeposit={`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals).toString()} ${
+                    primaryTokenInfo.name
+                  }`}
+                  stakingRewards={`${asQuantity(stakingRewards)} ${primaryTokenInfo.name}`}
+                  socialMediaInfo={socialMediaInfo}
+                />
+              ),
+              duplicated: false,
+            },
+          ],
+          kind: 'undelegate',
+        },
+        unsignedTx: unsignedTx.unsignedTx,
+      });
+    }
   };
 
   const submitTx = async password => {

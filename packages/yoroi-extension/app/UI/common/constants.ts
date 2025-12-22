@@ -12,6 +12,7 @@ export enum BannerType {
   BuyAda = 'buyAdaBanner',
   Bring = 'bringBanner',
   Usda = 'usdaBanner',
+  Rewards = 'rewardsBanner',
 }
 
 export const SUPPORT_CRISP_CHATBOX_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
