@@ -12,7 +12,6 @@ import { useModal } from '../../../../components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
-import { gap } from '../../../../../styles/themes/atoms/atoms';
 
 type SocialMediaInfo = {
   socialLinks?: SocialLinks;

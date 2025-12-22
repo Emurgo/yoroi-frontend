@@ -75,7 +75,7 @@ export default class NavBarContainerRevamp extends Component<{| ...StoresProps, 
     if (isSwapPage) {
       this.props.stores.routing.goToRoute({ route: ROUTES.SWAP_REVAMP.ASSET_SWAP, query: { newWallet: true } });
     } else if (isTransactionPage) {
-      this.props.stores.routing.goToRoute({ route, query: { newWallet: selectedWallet.publicDeriverId } });
+      this.props.stores.routing.goToRoute({ route, query: { newWallet: String(newWalletId) } });
     } else {
       this.props.stores.routing.goToRoute({ route });
     }
