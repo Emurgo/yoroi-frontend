@@ -122,7 +122,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
         height: '628px',
       });
     } else {
-      await onDelegateAndStake();
+      await onDelegateToStakePool();
     }
   };
 
