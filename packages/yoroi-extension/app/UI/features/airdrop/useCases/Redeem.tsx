@@ -1,6 +1,6 @@
 import Dialog from '../../../../components/widgets/Dialog';
 import { Typography, Box, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
 import { useStrings } from '../common/hooks/useStrings';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
@@ -20,6 +20,8 @@ export default function Redeem(props: {
   const [isWaitingForReorgTxToConfirm, setIsWaitingForReorgTxToConfirm] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
 
+  const abort = useRef(false);
+
   const updateCollateralUtxos = async (reorgTxId?: string) => {
     const result = await getCollateralUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
@@ -35,6 +37,9 @@ export default function Redeem(props: {
       }
       for (;;) {
         try {
+          if (abort.current) {
+            return;
+          }
           const resp = await getRedemptionTransaction(
             props.address,
             props.endpoint,
@@ -42,6 +47,9 @@ export default function Redeem(props: {
             result.collateralUtxos,
             [result.fundingUtxo],
           );
+          if (abort.current) {
+            return;
+          }
           setError(null);
           setRedemptionTxBuildingResponse(resp);
           break;
@@ -56,6 +64,7 @@ export default function Redeem(props: {
   useEffect(() => {
     updateCollateralUtxos();
     return () => {
+      abort.current = true;
       setGetCollateralUtxosResult(null);
       setRedemptionTxBuildingResponse(null);
       setIsWaitingForReorgTxToConfirm(false);
