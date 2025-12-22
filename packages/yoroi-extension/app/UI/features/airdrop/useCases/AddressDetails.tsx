@@ -1,4 +1,4 @@
-import { Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
+import { Button, Box, Chip as MuiChip, Stack, Typography, useTheme } from '@mui/material';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { type Schedule, formatNumber } from '../../../../api/ada/midnightRedemption';
 import { Collapsible } from '../../../components/Collapsible/Collapsible';
@@ -21,12 +21,13 @@ function getRedeemedSoFar(schedule: Schedule): number {
 
 interface Props {
   schedule: Schedule;
+  isRedeemable: boolean;
+  onRedeem: () => void;
   redeemableAmount: string;
   address: string;
-  networkId: number;
 }
 
-export default function AddressDetails({ schedule, redeemableAmount, address }: Props) {
+export default function AddressDetails({ schedule, redeemableAmount, address, isRedeemable, onRedeem }: Props) {
   const strings = useStrings();
   const theme: any = useTheme();
 
@@ -42,15 +43,22 @@ export default function AddressDetails({ schedule, redeemableAmount, address }: 
         gap: '16px',
       }}
     >
-      <Box>
+      <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <Box>
+          {/*  @ts-ignore */}
+          <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
+            {strings.statusLabel}
+          </Typography>
+          {/*  @ts-ignore */}
+          <Typography variant="body1">
+            <FormattedMessage {...messages.subTitle} values={{ strong }} />
+          </Typography>
+        </Box>
         {/*  @ts-ignore */}
-        <Typography variant="heading-4-regular" sx={{ fontWeight: 500, fontSize: '20px', lineHeight: '28px' }}>
-          {strings.statusLabel}
-        </Typography>
-        {/*  @ts-ignore */}
-        <Typography variant="body1">
-          <FormattedMessage {...messages.subTitle} values={{ strong }} />
-        </Typography>
+
+        <Button variant="primary" onClick={onRedeem} disabled={!isRedeemable}>
+          {strings.redeemButton}
+        </Button>
       </Box>
 
       <Box

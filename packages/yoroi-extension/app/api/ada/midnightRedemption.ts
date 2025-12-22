@@ -19,8 +19,12 @@ export function formatNumber(n: number): string {
   return new BigNumber(n).shiftedBy(-NUMBER_OF_NIGHT_DECIMALS).toFixed(2);
 }
 
+export function formatNumberExactly(n: number): string {
+  return new BigNumber(n).shiftedBy(-NUMBER_OF_NIGHT_DECIMALS).toString();
+}
+
 // guesswork
-function getRedeemableAmount(schedule: Schedule): number {
+export function getRedeemableAmount(schedule: Schedule): number {
   return schedule.thaws
     .slice(schedule.numberOfClaimedAllocations)
     .filter(thaw => thaw.status === 'redeemable')

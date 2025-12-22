@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
 import { scanAddressesForThaws } from '../../api/ada/midnight';
-import { type Schedule, getRedeemable, getStatus, getTotal } from '../../api/ada/midnightRedemption';
+import { type Schedule, getRedeemable, getStatus, getTotal, getRedeemableAmount } from '../../api/ada/midnightRedemption';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
 import LoadingSpinner from '../../components/widgets/LoadingSpinner';
@@ -77,7 +77,7 @@ interface Props {
       currentLocale: string;
     };
     transactionProcessingStore: {
-      adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<void>;
+      adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<{ txId: string }>;
     };
   };
 }
@@ -87,6 +87,9 @@ const THAW_ENDPOINT_PREPROD = 'https://preprod.gd.midnighttge.io';
 
 function AirdropPage({ stores }: Readonly<Props>) {
   const wallet = stores.wallets.selectedOrFail;
+
+  const isMainnet = wallet.networkId === 0;
+  const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
 
   const [queryingThaws, setQueryingThaws] = useState(true);
   // one element for each redeemable address
@@ -101,7 +104,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
   const startRedeem = addr => {
     setRedeemingAddr(addr);
   };
-  void startRedeem;
 
   const closeRedeem = () => {
     setRedeemingAddr(null);
@@ -110,8 +112,6 @@ function AirdropPage({ stores }: Readonly<Props>) {
   useEffect(() => {
     let abort = false;
     (async () => {
-      const isMainnet = wallet.networkId === 0;
-      const thawEndpoint = isMainnet ? THAW_ENDPOINT_MAINNET : THAW_ENDPOINT_PREPROD;
       await scanAddressesForThaws(thawEndpoint, wallet, data => {
         if (abort) {
           return false;
@@ -132,19 +132,21 @@ function AirdropPage({ stores }: Readonly<Props>) {
 
   const { openTxReviewModal, startLoadingTxReview, showTxResultModal, closeTxReviewModal } = useTxReviewModal();
   const onReorg = async (signRequest: any) => {
-    await new Promise<void>(resolve => {
+    return new Promise<string>((resolve, reject) => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async password => {
           try {
             startLoadingTxReview();
 
-            await stores.transactionProcessingStore.adaSendAndRefresh({
+            const { txId } = await stores.transactionProcessingStore.adaSendAndRefresh({
               wallet,
               signRequest,
               password,
               callback: closeTxReviewModal,
             });
+
+            resolve(txId);
           } catch (error) {
             console.log('Send Sign Error', error);
             let transactionResult;
@@ -156,8 +158,8 @@ function AirdropPage({ stores }: Readonly<Props>) {
               transactionResult = TransactionResult.FAIL;
             }
             showTxResultModal(transactionResult);
+            reject(error);
           }
-          resolve();
         },
         operations: {
           kind: 'send',
@@ -278,16 +280,26 @@ function AirdropPage({ stores }: Readonly<Props>) {
         <Box sx={{ flexGrow: 1, padding: '24px', borderLeft: '1px solid var(--grayscale-200, #DCE0E9)' }}>
           {selectedAddressData && (
             <AddressDetails
+              isRedeemable={getRedeemableAmount(selectedAddressData.schedule) != 0}
+              onRedeem={() => {
+                startRedeem(selectedAddressData.address);
+              }}
               address={selectedAddressData.address}
               schedule={selectedAddressData.schedule}
               redeemableAmount={getRedeemable(selectedAddressData.schedule)}
-              networkId={wallet.networkId}
             />
           )}
         </Box>
       </Box>
       {redeemingAddr && (
-        <Redeem address={redeemingAddr} wallet={wallet} onClose={closeRedeem} onReorg={onReorg} onRedeem={onRedeem} />
+        <Redeem
+          address={redeemingAddr}
+          wallet={wallet}
+          onClose={closeRedeem}
+          onReorg={onReorg}
+          onRedeem={onRedeem}
+          endpoint={thawEndpoint}
+        />
       )}
     </>
   );

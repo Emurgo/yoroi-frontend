@@ -265,7 +265,7 @@ const MyWalletTokens = ({ tx, notOwnedOutputs, operationFee }) => {
           </Box>
           {notPrimaryTokenSent.length > 0 &&
             notPrimaryTokenSent.map(item => {
-              const decimals = item.tokenInfo.info ? item.tokenInfo.info.numberOfDecimals : item.tokenInfo.numberOfDecimals;
+              const decimals = item.tokenInfo.info ? item.tokenInfo.info.numberOfDecimals : item.tokenInfo.decimals;
               const tokenName = item.tokenInfo.info ? item.tokenInfo.info.name : item.tokenInfo.name;
 
               return (
