@@ -122,7 +122,7 @@ export const messages = Object.freeze(
     },
     participationInfo: {
       id: 'staking.dialog.participationInfo',
-      defaultMessage: '!!!Participation in governance is required to withdraw',
+      defaultMessage: '!!!Participating in governance is required to withdraw rewards on Cardano. First, delegate your ADA in the governance center. Once your delegation is confirmed, you will then be able to withdraw your rewards.',
     },
     goToGovernance: {
       id: 'staking.dialog.goToGovernance',
