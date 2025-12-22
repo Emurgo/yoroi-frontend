@@ -59,6 +59,12 @@ export type YoroiRemoteConfig = {
     midnightAnnouncement?: {
       display: boolean;
     };
+    earnRewardsWithYoroi?: {
+      display: boolean;
+      poolId: string;
+      poolName: string;
+      drepId: string;
+    };
   };
   popups?: {
     midnightDistribution?: {

@@ -1,19 +1,21 @@
 import { Button, Stack, Typography } from '@mui/material';
-import { GovernanceParticipateDialog } from '../../../../../containers/wallet/dialogs/GovernanceParticipateDialog';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useStrings } from '../../common/hooks/useStrings';
 import { useStaking } from '../../module/StakingContextProvider';
 import React from 'react';
+import { useGovernanceStatusState } from '../../../governace/common/hooks/useGovernanceStatusState';
+import { StakeWithdrawUpdates } from '../../common/modals/StakeWithdrawUpdates';
+import { useModal } from '../../../../components/modals/ModalContext';
 
 export const WithdrawButton = ({ isDisabled }) => {
   const [govStatusFetched, setStatusFetched] = React.useState(false);
+  const { governanceStatus } = useGovernanceStatusState();
+  const { openModal } = useModal();
 
   const { openTxReviewModal, stopLoadingTxReview, startLoadingTxReview, showTxResultModal } = useTxReviewModal();
   const strings = useStrings();
   const { stores } = useStaking();
-
-  const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
   const wallet = stores.wallets.selected;
   const isStakeRegistered = stores.delegation.isStakeRegistered(wallet.publicDeriverId);
 
@@ -30,13 +32,17 @@ export const WithdrawButton = ({ isDisabled }) => {
   }, []);
 
   const handleRewardsWithdrawal = async () => {
-    if (!isParticipatingToGovernance) {
-      stores.uiDialogs.open({
-        dialog: GovernanceParticipateDialog,
+    if (governanceStatus.status === 'none') {
+      openModal({
+        modalId: 'governance',
+        title: 'Governance updates',
+        content: <StakeWithdrawUpdates />,
+        width: '612px',
+        height: '628px',
       });
-      return;
+    } else {
+      return createWithdrawalTx();
     }
-    return createWithdrawalTx();
   };
 
   const createWithdrawalTx = async () => {
