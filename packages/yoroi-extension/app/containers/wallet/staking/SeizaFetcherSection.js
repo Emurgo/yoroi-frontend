@@ -53,7 +53,6 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
     const delegatingDRepId = isTestnet ? '232285cccbf305ca26e6098be9a13b45e3911d881d84c3502f82320cca' : dRepID;
     const avatarSource = toSvg(poolId, 36, { padding: 0 });
     const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
-    const selectedPool = await stores.delegation.getLocalPoolInfo(networkId, poolId);
 
     const drepCredential = dRepToMaybeCredentialHex(delegatingDRepId);
     if (!drepCredential) {
@@ -64,6 +63,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
       poolId,
       drepCredential,
     });
+    const selectedPool = await stores.delegation.getLocalPoolInfo(networkId, poolId);
 
     openTxReviewModal({
       modalView: 'transactionReview',
@@ -74,8 +74,8 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
             component: (
               <OperationsDetails
                 avatarGenerated={avatarGenerated}
-                poolName={selectedPool?.info.name}
-                website={selectedPool.info.homepage}
+                poolName={selectedPool?.info?.name}
+                website={selectedPool.info?.homepage}
                 drepId={delegatingDRepId}
               />
             ),
