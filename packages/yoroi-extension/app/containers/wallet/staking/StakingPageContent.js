@@ -189,7 +189,7 @@ export default class StakingPageContent extends Component<StoresProps, State> {
     const delegatedRewards = stores.delegation.getRewardBalanceOrZero(wallet);
 
     const isParticipatingToGovernance = stores.delegation.governanceStatus?.drepDelegation !== null;
-    console.log('CONFIG.poolExplorer.simpleTemplate', CONFIG.poolExplorer.simpleTemplate);
+
     return (
       <Box>
         {isWalletWithNoFunds ? (
