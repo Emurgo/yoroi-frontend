@@ -9,11 +9,17 @@ import { StyledLink } from '../../../components/wallet/staking/dashboard-revamp/
 import { useGovernanceStatusState } from '../../../UI/features/governace/common/hooks/useGovernanceStatusState';
 import { useModal } from '../../../UI/components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../../UI/features/staking/common/modals/GovernanceRequiredForRewards';
+import { useYoroiRemoteConfig } from '../../../UI/common/hooks/useYoroiRemoteConfig';
+import { dRepToMaybeCredentialHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal, stakeKeyDeposit, primaryTokenInfo } =
+    useTxReviewModal();
   const { governanceStatus } = useGovernanceStatusState();
   const { openModal } = useModal();
+  const isTestnet = networkId !== 0;
+  const { data } = useYoroiRemoteConfig();
+  const dRepID = data?.banners?.earnRewardsWithYoroi?.drepId;
 
   const onDelegate = async poolID => {
     const avatarSource = toSvg(poolID, 36, { padding: 0 });
@@ -32,6 +38,45 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
                 avatarGenerated={avatarGenerated}
                 poolName={selectedPool?.info.name}
                 website={selectedPool.info.homepage}
+              />
+            ),
+            duplicated: false,
+          },
+        ],
+        kind: 'delegate',
+      },
+      unsignedTx: signTxRequest.unsignedTx,
+    });
+  };
+
+  const onDelegateAndStake = async poolId => {
+    const delegatingDRepId = isTestnet ? '232285cccbf305ca26e6098be9a13b45e3911d881d84c3502f82320cca' : dRepID;
+    const avatarSource = toSvg(poolId, 36, { padding: 0 });
+    const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+    const selectedPool = await stores.delegation.getLocalPoolInfo(networkId, poolId);
+
+    const drepCredential = dRepToMaybeCredentialHex(delegatingDRepId);
+    if (!drepCredential) {
+      console.error('Cannot convert DRep ID to a valid credential', delegatingDRepId);
+    }
+
+    const { signTxRequest } = await stores.delegation.createPoolOrDrepDelegationTransaction({
+      poolId,
+      drepCredential,
+    });
+
+    openTxReviewModal({
+      modalView: 'transactionReview',
+      submitTx: passwordInput => submitTx(passwordInput),
+      operations: {
+        components: [
+          {
+            component: (
+              <OperationsDetails
+                avatarGenerated={avatarGenerated}
+                poolName={selectedPool?.info.name}
+                website={selectedPool.info.homepage}
+                drepId={delegatingDRepId}
               />
             ),
             duplicated: false,
@@ -73,7 +118,12 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
             openModal({
               modalId: 'governance',
               title: 'Governance updates',
-              content: <GovernanceRequiredForRewards onDelegate={() => onDelegate(poolId)} />,
+              content: (
+                <GovernanceRequiredForRewards
+                  onStake={() => onDelegate(poolId)}
+                  onDelegateToDrep={() => onDelegateAndStake(poolId)}
+                />
+              ),
               width: '612px',
               height: '628px',
             });
@@ -84,7 +134,7 @@ export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolL
   );
 };
 
-const OperationsDetails = ({ avatarGenerated, poolName, website }) => {
+const OperationsDetails = ({ avatarGenerated, poolName, website, drepId }) => {
   const { isStakeRegistered, stakeKeyDeposit, primaryTokenInfo } = useTxReviewModal();
   const strings = useStrings();
   return (
@@ -94,6 +144,16 @@ const OperationsDetails = ({ avatarGenerated, poolName, website }) => {
           <Typography color="ds.text_gray_low">{strings.registerStakingKey}</Typography>
           <Typography color="ds.text_gray_medium">
             {`${new BigNumber(stakeKeyDeposit).shiftedBy(-primaryTokenInfo.decimals)} ${primaryTokenInfo.name}`}
+          </Typography>
+        </Stack>
+      )}
+      {drepId && (
+        <Stack direction="row" justifyContent="space-between" gap={16}>
+          <Typography color="ds.text_gray_low" sx={{ width: '151px' }}>
+            {strings.delegateVoting}
+          </Typography>
+          <Typography color="ds.text_gray_medium" sx={{ maxWidth: '300px', wordBreak: 'break-all' }}>
+            {drepId}
           </Typography>
         </Stack>
       )}

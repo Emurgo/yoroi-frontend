@@ -11,7 +11,6 @@ import { useGovernanceStatusState } from '../../../governace/common/hooks/useGov
 import { useModal } from '../../../../components/modals/ModalContext';
 import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
-import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useYoroiRemoteConfig } from '../../../../common/hooks/useYoroiRemoteConfig';
 
 type SocialMediaInfo = {
@@ -25,7 +24,7 @@ type DelegateButtonProps = {
   disabled?: boolean;
   poolID: string;
   poolName: string;
-  dRepID: string;
+  dRepID?: string;
   socialMediaInfo?: SocialMediaInfo;
   btnVariant?: 'primary' | 'secondary';
   delegateAndStake?: boolean;
