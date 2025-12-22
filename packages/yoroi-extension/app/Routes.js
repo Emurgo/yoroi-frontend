@@ -80,8 +80,6 @@ import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
 // $FlowIgnore: suppressing this error
-import { ModalProvider } from './UI/components/modals/ModalContext';
-// $FlowIgnore: suppressing this error
 import { ReviewTxProvider } from './UI/features/transaction-review/module/ReviewTxProvider';
 
 // PAGES
