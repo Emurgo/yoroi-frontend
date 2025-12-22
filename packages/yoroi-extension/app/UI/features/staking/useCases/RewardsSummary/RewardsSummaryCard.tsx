@@ -1,8 +1,6 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { Box, styled } from '@mui/system';
 import { Divider, Typography } from '@mui/material';
-// import loadingSpinnerStyles from '../dashboard/LoadingSpinner.scss'
-// import LoadingSpinner from '../../../widgets/LoadingSpinner'
 import RewardHistoryGraph from './RewardHistoryGraph';
 import LoadingSpinner from '../../../../../components/widgets/LoadingSpinner';
 import { WithdrawButton } from './WithdrawButton';
@@ -10,6 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { maybe, useStaking } from '../../module/StakingContextProvider';
 import { HIDDEN_AMOUNT } from '../../../../common/constants';
 import { truncateToken } from '../../../../../utils/formatters';
+import { getTokenName } from '../../../../../stores/stateless/tokenHelpers';
 import { Icon } from '../../../../components';
 
 const StakingIconWrapper = styled(Box)(({ theme }) => ({
@@ -57,9 +56,7 @@ const InfoDetails = styled(Box)({});
 
 export const RewardsSummaryCard: React.FC = () => {
   const strings = useStrings();
-  const { getTokenInfo, onOpenRewardList, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } =
-    useStaking();
-  const govStatusFetched = true; // TODO: get from governance provider
+  const { getTokenInfo, totalRewards, totalDelegated, shouldHideBalance, historyGraphData, toUnitOfAccount } = useStaking();
 
   const formatTokenEntry = (tokenEntry): ReactNode => {
     const tokenInfo = getTokenInfo(tokenEntry);
@@ -82,7 +79,7 @@ export const RewardsSummaryCard: React.FC = () => {
     return (
       <>
         <span>{amountNode} </span>
-        {truncateToken(tokenInfo?.assetName || '', 12)}
+        {truncateToken(getTokenName(tokenInfo))}
       </>
     );
   };
@@ -98,8 +95,7 @@ export const RewardsSummaryCard: React.FC = () => {
     );
   };
 
-  // TODO: enable later
-  // const hasNoRewards = (token?: any | null): boolean => (totalRewards ? token?.getDefaultEntry()?.amount?.isZero() : true);
+  const hasNoRewards = token => maybe(token, t => t.getDefaultEntry()?.amount?.isZero?.()) ?? false;
 
   return (
     <Card
@@ -123,7 +119,7 @@ export const RewardsSummaryCard: React.FC = () => {
           {strings.rewardsSummary}
         </Typography>
 
-        <WithdrawButton govStatusFetched={govStatusFetched} isDisabled={totalRewards === undefined} />
+        <WithdrawButton isDisabled={hasNoRewards(totalRewards)} />
       </Box>
 
       <Divider sx={{ borderColor: 'ds.gray_200' }} />
@@ -135,16 +131,19 @@ export const RewardsSummaryCard: React.FC = () => {
           </StakingIconWrapper>
 
           <InfoDetails>
-            <Typography variant="caption" color="ds.gray_600" sx={{ textTransform: 'uppercase' }}>
+            {/*@ts-ignore */}
+            <Typography variant="caption1" color="ds.gray_600" sx={{ textTransform: 'uppercase' }}>
               {strings.totalRewardsLabel}
             </Typography>
           </InfoDetails>
 
           <InfoDetails>
-            <Typography variant="h2" color="ds.text_gray_medium" fontWeight={500}>
-              {totalRewards ? renderAmount(totalRewards) : <LoadingSpinner small />}
+            <Typography component="div" variant="h2" color="ds.text_gray_medium" fontWeight={500}>
+              {renderAmount(totalRewards)}
             </Typography>
-            <Typography variant="body1" color="ds.gray_600" fontWeight={500}></Typography>
+            <Typography component="div" variant="body1" color="grayscale.600" fontWeight={500}>
+              {renderAmountWithUnitOfAccount(totalRewards)}
+            </Typography>
           </InfoDetails>
         </InfoRow>
 
@@ -154,7 +153,8 @@ export const RewardsSummaryCard: React.FC = () => {
           </TotalDelegatedIconWrapper>
 
           <InfoDetails>
-            <Typography variant="caption" color="ds.gray_600" marginBottom="4px" sx={{ textTransform: 'uppercase' }}>
+            {/*@ts-ignore */}
+            <Typography variant="caption1" color="ds.gray_600" marginBottom="4px" sx={{ textTransform: 'uppercase' }}>
               {strings.totalDelegated}
             </Typography>
           </InfoDetails>
@@ -178,7 +178,7 @@ export const RewardsSummaryCard: React.FC = () => {
         </InfoRow>
       </Box>
 
-      {historyGraphData && <RewardHistoryGraph onOpenRewardList={onOpenRewardList} graphData={historyGraphData} />}
+      {historyGraphData && <RewardHistoryGraph graphData={historyGraphData} />}
     </Card>
   );
 };

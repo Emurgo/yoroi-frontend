@@ -48,6 +48,74 @@ export const messages = Object.freeze(
       id: 'global.labels.error',
       defaultMessage: '!!!Error',
     },
+    stakePoolDelegated: {
+      id: 'wallet.dashboard.upcomingRewards.stakePoolDelegated',
+      defaultMessage: '!!!Stake Pool Delegated',
+    },
+    roa30dLabel: {
+      id: 'wallet.staking.banner.roa30d',
+      defaultMessage: '!!!ROA 30d',
+    },
+    poolSizeLabel: {
+      id: 'wallet.staking.pool.size',
+      defaultMessage: '!!!Pool size',
+    },
+    poolSaturation: {
+      id: 'wallet.staking.pool.saturation',
+      defaultMessage: '!!!Saturation',
+    },
+    updatePoolLabel: {
+      id: 'global.updatePool',
+      defaultMessage: '!!!  UPDATE POOL',
+    },
+    undelegatePool: {
+      id: 'transaction.review.undelegatePool',
+      defaultMessage: '!!!Unstake entire wallet balance from',
+    },
+    undelegateLabel: {
+      id: 'global.labael.undelegate',
+      defaultMessage: '!!!Undelegate',
+    },
+    deregisteringStakingKey: {
+      id: 'transaction.review.deregisteringStakingKey',
+      defaultMessage: '!!!Undelegating from the pool',
+    },
+    epochProgress: {
+      id: 'wallet.staking.epochProgress',
+      defaultMessage: '!!!Epoch Progress',
+    },
+    welcomeMessage: {
+      id: 'wallet.emptyWalletMessage',
+      defaultMessage: '!!!Your wallet is empty',
+    },
+    welcomeMessageSubtitle: {
+      id: 'wallet.emptyWalletMessageSubtitle',
+      defaultMessage: '!!!Top up your wallet safely using our trusted partners',
+    },
+    welcomeMessageTestnet: {
+      id: 'wallet.emptyWalletMessage.testnet',
+      defaultMessage: '!!!Learn Cardano with test ADA ⭐',
+    },
+    welcomeMessageSubtitleTestnet: {
+      id: 'wallet.emptyWalletMessageSubtitle.testnet',
+      defaultMessage: '!!!Stake your test ADA by participating in our testnet staking program.',
+    },
+    welcomeMessageSubtitleTestnetExtra: {
+      id: 'wallet.emptyWalletMessageSubtitle.testnetExtra',
+      defaultMessage: "!!!Get your TADA. It's your key to testing a new world of possibilities.",
+    },
+    goToFaucetButton: {
+      id: 'wallet.emptyWalletMessage.goToFaucet',
+      defaultMessage: '!!!ADD TEST ADA',
+    },
+    buyAda: {
+      id: 'button.buyAda',
+      defaultMessage: '!!!Buy ADA',
+    },
+    stakePoolLabel: {
+      id: 'wallet.delegation.transaction.stakePoolLabel',
+      defaultMessage: '!!!Stake pool',
+    },
   })
 );
 
@@ -65,5 +133,22 @@ export const useStrings = () => {
     rewardValue: intl.formatMessage(messages.rewardValue),
     rewardsLabel: intl.formatMessage(messages.rewardsLabel),
     errorLabel: intl.formatMessage(messages.errorLabel),
+    stakePoolDelegated: intl.formatMessage(messages.stakePoolDelegated),
+    roa30dLabel: intl.formatMessage(messages.roa30dLabel),
+    poolSizeLabel: intl.formatMessage(messages.poolSizeLabel),
+    poolSaturation: intl.formatMessage(messages.poolSaturation),
+    updatePoolLabel: intl.formatMessage(messages.updatePoolLabel),
+    undelegatePool: intl.formatMessage(messages.undelegatePool),
+    undelegateLabel: intl.formatMessage(messages.undelegateLabel),
+    deregisteringStakingKey: intl.formatMessage(messages.deregisteringStakingKey),
+    epochProgress: intl.formatMessage(messages.epochProgress),
+    welcomeMessage: intl.formatMessage(messages.welcomeMessage),
+    welcomeMessageSubtitle: intl.formatMessage(messages.welcomeMessageSubtitle),
+    welcomeMessageTestnet: intl.formatMessage(messages.welcomeMessageTestnet),
+    welcomeMessageSubtitleTestnet: intl.formatMessage(messages.welcomeMessageSubtitleTestnet),
+    welcomeMessageSubtitleTestnetExtra: intl.formatMessage(messages.welcomeMessageSubtitleTestnetExtra),
+    goToFaucetButton: intl.formatMessage(messages.goToFaucetButton),
+    buyAda: intl.formatMessage(messages.buyAda),
+    stakePoolLabel: intl.formatMessage(messages.stakePoolLabel),
   }).current;
 };

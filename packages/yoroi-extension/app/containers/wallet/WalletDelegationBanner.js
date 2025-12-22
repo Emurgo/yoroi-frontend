@@ -1,5 +1,6 @@
 // @flow
 import type { Node, ComponentType } from 'react';
+import { useState, useEffect } from 'react';
 import { Box, styled } from '@mui/system';
 import { Button, Typography, Link } from '@mui/material';
 
@@ -74,6 +75,14 @@ const messages = defineMessages({
 });
 
 function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, ticker, poolInfo, stores }: Props & Intl): Node {
+  const avatar = poolInfo?.avatar;
+  const [avatarLoadError, setAvatarLoadError] = useState(false);
+
+  // Reset error state when avatar changes
+  useEffect(() => {
+    setAvatarLoadError(false);
+  }, [avatar]);
+
   if (poolInfo == null) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" py="40px">
@@ -81,10 +90,12 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
       </Box>
     );
   }
-  const { id, name, avatar, websiteUrl, roa: estimatedRoa30d, socialLinks } = poolInfo || {};
+  const { id, name, websiteUrl, roa: estimatedRoa30d, socialLinks } = poolInfo || {};
 
   const avatarSource = toSvg(id, 36, { padding: 0 });
   const avatarGenerated = `data:image/svg+xml;utf8,${encodeURIComponent(avatarSource)}`;
+
+  const shouldUseAvatar = avatar && !avatarLoadError;
 
   return isOpen ? (
     <WrapperBanner
@@ -104,7 +115,11 @@ function WalletDelegationBanner({ isOpen, isWalletWithNoFunds, isTestnet, intl, 
         </Typography>
         <Box sx={{ display: 'flex', mb: '16px', mt: '24px' }}>
           <AvatarWrapper>
-            {avatar ? <AvatarImg src={avatar} alt={name} /> : <AvatarImg src={avatarGenerated} alt={name} />}
+            {shouldUseAvatar ? (
+              <AvatarImg src={avatar} alt={name} onError={() => setAvatarLoadError(true)} />
+            ) : (
+              <AvatarImg src={avatarGenerated} alt={name} />
+            )}
           </AvatarWrapper>
           <Typography component="div" color="ds.text_gray_medium" variant="body1" fontWeight={500}>
             {name}
