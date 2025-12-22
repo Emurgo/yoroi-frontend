@@ -13,8 +13,7 @@ import { useYoroiRemoteConfig } from '../../../UI/common/hooks/useYoroiRemoteCon
 import { dRepToMaybeCredentialHex } from '../../../api/ada/lib/cardanoCrypto/utils';
 
 export const SeizaFetcherSection = ({ urlTemplate, locale, bias, totalAda, poolList, setFirstPool, stores }) => {
-  const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal, stakeKeyDeposit, primaryTokenInfo } =
-    useTxReviewModal();
+  const { openTxReviewModal, startLoadingTxReview, networkId, showTxResultModal } = useTxReviewModal();
   const { governanceStatus } = useGovernanceStatusState();
   const { openModal } = useModal();
   const isTestnet = networkId !== 0;
