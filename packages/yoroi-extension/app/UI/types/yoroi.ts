@@ -59,13 +59,20 @@ export type YoroiRemoteConfig = {
     midnightAnnouncement?: {
       display: boolean;
     };
+    earnRewardsWithYoroi?: {
+      display: boolean;
+      poolId: string;
+      poolName: string;
+      drepId: string;
+    };
   };
   popups?: {
     midnightDistribution?: {
       display: boolean;
     };
-    cardanoCardAnnouncement: {
+    stakingUpdate?: {
       display: boolean;
+      affectedPools: Array<string>;
     };
     firefoxSupportAnnouncement: {
       display: boolean;

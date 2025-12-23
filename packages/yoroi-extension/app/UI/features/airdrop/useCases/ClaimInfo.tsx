@@ -1,38 +1,8 @@
-import { Box, Button, Typography, Stack, Divider } from '@mui/material';
-import { useIntl, defineMessages } from 'react-intl';
+import { Box, Button, Typography, Stack, Divider, useTheme } from '@mui/material';
 import { InfoTooltip } from '../../../../components/widgets/InfoTooltip';
 import CopyableText from '../../../components/CopyableText';
-import globalMessages from '../../../../i18n/global-messages';
 import { constructPlate } from '../../../../components/topbar/WalletCard';
-
-const messages = defineMessages({
-  phase1Allocation: {
-    id: 'airdrop.phase1Allocation',
-    defaultMessage: '!!!Phase 1: Your successfully claimed allocation',
-  },
-  destinationAddress: {
-    id: 'airdrop.destinationAddress',
-    defaultMessage: '!!!Your destination address',
-  },
-  allocationTooltip: {
-    id: 'airdrop.tooltip.allocation',
-    defaultMessage: '!!!This is the NIGHT token allocation entitlement for this claim based on the current wallet.',
-  },
-  destAddrTooltip: {
-    id: 'airdrop.tooltop.destinationAddress',
-    defaultMessage:
-      '!!!A Destination address is the registered location for the Redemption of your NIGHT allocations -- that is, for receiving your redeemed tokens as they thaw. It must be an unused Cardano address -- i.e., must have no transaction history.',
-  },
-  phase2Title: {
-    id: 'airdrop.phase2Title',
-    defaultMessage: '!!!🧩  Phase 2 of midnight airdrop has started',
-  },
-  phase2Text: {
-    id: 'airdrop.phase2Text',
-    defaultMessage:
-      '!!!The 2nd phase of midnight claiming called “Scavenger mine” has now started. Navigate to the midnight portal and connect your yoroi wallet to start earning NIGHT',
-  },
-});
+import { useStrings } from '../common/hooks/useStrings';
 
 interface Props2 {
   alloc: string;
@@ -43,7 +13,8 @@ interface Props2 {
 }
 
 export function ClaimInfo2(props: Readonly<Props2>) {
-  const intl = useIntl();
+  const strings = useStrings();
+  const theme: any = useTheme();
   const { alloc, destAddrBech32, destAddrError, walletPlate, walletName } = props;
   const [accountPlateId, iconComponent] = constructPlate(walletPlate, {
     saturationFactor: 0,
@@ -58,8 +29,8 @@ export function ClaimInfo2(props: Readonly<Props2>) {
       <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', borderRadius: '8px' }}>
         <Stack spacing="16px" sx={{ padding: '16px' }}>
           <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
-            {intl.formatMessage(messages.phase1Allocation)}
-            <InfoTooltip content={intl.formatMessage(messages.allocationTooltip)} />
+            {strings.phase1Allocation}
+            <InfoTooltip content={strings.allocationTooltip} />
           </Typography>
           <Box>
             <Typography variant="h2" component="span">
@@ -74,7 +45,7 @@ export function ClaimInfo2(props: Readonly<Props2>) {
         <Divider />
         <Box sx={{ padding: '16px', display: 'flex', flexDirection: 'row' }}>
           <Typography variant="body1" color="ds.text_gray_low">
-            {intl.formatMessage(globalMessages.walletLabel)}
+            {strings.walletLabel}
           </Typography>
           <div style={{ width: '18px' }} />
           {iconComponent}
@@ -87,8 +58,8 @@ export function ClaimInfo2(props: Readonly<Props2>) {
       <Box sx={{ border: '1px solid', borderColor: 'ds.gray_200', padding: '16px', borderRadius: '8px' }}>
         <Stack spacing="16px">
           <Typography variant="h5" sx={{ svg: { verticalAlign: 'bottom', marginLeft: '8px' } }}>
-            {intl.formatMessage(messages.destinationAddress)}
-            <InfoTooltip content={intl.formatMessage(messages.destAddrTooltip)} />
+            {strings.destinationAddress}
+            <InfoTooltip content={strings.destAddrTooltip} />
           </Typography>
           {destAddrError ? (
             <Typography variant="body1" color="red">
@@ -97,7 +68,7 @@ export function ClaimInfo2(props: Readonly<Props2>) {
           ) : (
             <Box>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                {intl.formatMessage(globalMessages.addressLabel)}
+                {strings.addressLabel}
               </Typography>
               <CopyableText value={destAddrBech32} copyButtonFollowText>
                 <Typography variant="body1" color="ds.text_gray_low" sx={{ wordBreak: 'break-all' }}>
@@ -114,18 +85,18 @@ export function ClaimInfo2(props: Readonly<Props2>) {
           flexDirection: 'column',
           gap: '16px',
           borderRadius: '8px',
-          background: 'var(--light-theme-gradients-bg-gradient-1, linear-gradient(312deg, #C6F7ED 0%, #E4E8F7 70.58%))',
+          background: theme.palette.ds.bg_gradient_1,
           padding: '24px',
         }}
       >
-        <Typography variant="h5">{intl.formatMessage(messages.phase2Title)}</Typography>
-        <Typography>{intl.formatMessage(messages.phase2Text)}</Typography>
+        <Typography variant="h5">{strings.phase2Title}</Typography>
+        <Typography>{strings.phase2Text}</Typography>
         <Button
           variant="outlined"
           style={{ border: '2px solid' }}
           onClick={() => window.open('https://www.midnight.gd/', '_blank', 'noopener,noreferrer')}
         >
-          {intl.formatMessage(globalMessages.goToMidnightApp)}
+          {strings.goToMidnightApp}
         </Button>
       </Box>
     </Stack>

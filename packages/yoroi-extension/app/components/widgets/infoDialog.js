@@ -37,6 +37,7 @@ const Transition = React.forwardRef((props, ref) => {
 
 function InfoDialog(props: Props & Intl): Node {
   const { open, onClose, children, intl } = props;
+  const pathId = 'infoDialog';
 
   return (
     <Dialog
@@ -63,7 +64,7 @@ function InfoDialog(props: Props & Intl): Node {
           backgroundColor: 'transparent',
         },
       }}
-      id="infoDialog"
+      id={pathId}
     >
       <IconButton
         aria-label="close"
@@ -124,6 +125,7 @@ function InfoDialog(props: Props & Intl): Node {
             textAlign: 'center',
             py: '24px',
           }}
+          id={`${pathId}-learnMore-link`}
         >
           {intl.formatMessage(messages.learnMore)}
         </Link>

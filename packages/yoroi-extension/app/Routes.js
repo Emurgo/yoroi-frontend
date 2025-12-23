@@ -12,7 +12,7 @@ import { ROUTES } from './routes-config';
 import type { StoresMap } from './stores/index';
 // Todo: Add lazy loading
 import { Stack } from '@mui/material';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import FullscreenLayout from './components/layout/FullscreenLayout';
 import LoadingSpinner from './components/widgets/LoadingSpinner';
 import LoadingPage from './containers/LoadingPage';
@@ -70,12 +70,17 @@ import SwapOrdersRevampPage from './UI/pages/Swap-New/SwapOrdersPage';
 import SwapReviewRevampPage from './UI/pages/Swap-New/SwapReviewPage';
 // $FlowIgnore: suppressing this error
 import AirdropPage from './UI/pages/AirdropPage';
+// $FlowIgnore: suppressing this error
+import StakingPageRevamp from './UI/pages/Staking/StakingPage';
+// $FlowIgnore: suppressing this error
+import { StakingContextProvider } from './UI/features/staking/module/StakingContextProvider';
 
 // $FlowIgnore: suppressing this error
-// import DappCenterPage from './UI/pages/dapp-center/DappCenterPage';
 import BuySellDialog from './components/buySell/BuySellDialog';
 // $FlowIgnore: suppressing this error
 import TransactionReviewFailedPage from './UI/pages/TransactionReview/TransactionReviewFailedPage';
+// $FlowIgnore: suppressing this error
+import { ReviewTxProvider } from './UI/features/transaction-review/module/ReviewTxProvider';
 
 // PAGES
 const LanguageSelectionPagePromise = () => import('./containers/profile/LanguageSelectionPage');
@@ -173,6 +178,7 @@ export const LazyLoadPromises: Array<() => any> = [
 
 export const YoroiRoutes = (stores: StoresMap): Node => {
   const queryClient = new QueryClient();
+
   return (
     <QueryClientProvider client={queryClient}>
       <Suspense fallback={null}>
@@ -200,6 +206,7 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           <Route element={<DappCenterSubpages stores={stores} />}>
             <Route path={ROUTES.DAPP_CONNECTOR.DAPP_CENTER} element={<DappCenterPage stores={stores} />} />
           </Route>
+
           <Route element={<WalletsSubpages stores={stores} />}>
             <Route path={ROUTES.WALLETS.TRANSACTIONS} element={<WalletSummaryPage stores={stores} />} />
             <Route path={ROUTES.WALLETS.SEND} element={<WalletSendPage stores={stores} />} />
@@ -249,12 +256,15 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
             <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
           </Route>
+          <Route element={<StakingSubpages stores={stores} />}>
+            <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
+          </Route>
           <Route element={<PortfolioSubpages stores={stores} />}>
             <Route path={ROUTES.PORTFOLIO.ROOT} element={<PortfolioPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DAPPS} element={<PortfolioDappsPage stores={stores} />} />
             <Route path={ROUTES.PORTFOLIO.DETAILS} element={<PortfolioDetailPage stores={stores} />} />
           </Route>
-          <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
+
           <Route path={ROUTES.TX_REVIEW.FAIL} element={<TransactionReviewFailedPage stores={stores} />} />
           <Route path={ROUTES.AIRDROP} element={<AirdropPage stores={stores} />} />
         </Routes>
@@ -263,11 +273,32 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
   );
 };
 
-const WalletsSubpages = ({ stores }) => (
-  <Wallet stores={stores}>
-    <Outlet />
-  </Wallet>
-);
+const WalletsSubpages = ({ stores }) => {
+  const currentWalletInfo = createCurrrentWalletInfo(stores);
+
+  const { delegationTransaction } = stores.substores.ada;
+  const delegationTxResult = delegationTransaction.createDelegationTx.result;
+  const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  return (
+    <ReviewTxProvider stores={stores}>
+      <Wallet stores={stores}>
+        <GovernanceContextProvider
+          currentWallet={currentWalletInfo}
+          createDrepDelegationTransaction={request => stores.delegation.createDrepDelegationTransaction(request)}
+          signDelegationTransaction={request => stores.substores.ada.delegationTransaction.signTransaction(request)}
+          txDelegationResult={delegationTxResult}
+          txDelegationError={delegationTxError}
+          tokenInfo={stores.tokenInfoStore.tokenInfo}
+          triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
+          getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
+        >
+          <Outlet />
+        </GovernanceContextProvider>
+      </Wallet>
+    </ReviewTxProvider>
+  );
+};
 
 const NftGallerySubPages = ({ stores }) => (
   <NftGalleryContextProvider stores={stores}>
@@ -300,7 +331,6 @@ const SwapSubpages = ({ stores }) => {
     </FullscreenLayout>
   );
   return (
-    // <QueryClientProvider client={queryClient}>
     <SwapProvider publicDeriver={stores.wallets.selected} key={stores.wallets.selected?.publicDeriverId}>
       <SwapPageContainer stores={stores}>
         <Suspense fallback={loader}>
@@ -308,7 +338,6 @@ const SwapSubpages = ({ stores }) => {
         </Suspense>
       </SwapPageContainer>
     </SwapProvider>
-    // </QueryClientProvider>
   );
 };
 
@@ -369,12 +398,28 @@ const CatalystRegistrationSubpages = ({ stores }) => (
   </CatalystRegistrationContextProvider>
 );
 
-const GovernanceSubpages = ({ stores }) => {
+const StakingSubpages = ({ stores }) => (
+  <StakingAndGovernancePagesWrapper
+    stores={stores}
+    wrapOutlet={node => <StakingContextProvider stores={stores}>{node}</StakingContextProvider>}
+  />
+);
+
+const GovernanceSubpages = ({ stores }) => <StakingAndGovernancePagesWrapper stores={stores} />;
+
+const StakingAndGovernancePagesWrapper = ({ stores, wrapOutlet }: any) => {
   const { unitOfAccount } = stores.profile;
   const currentWalletInfo = createCurrrentWalletInfo(stores);
+
   const { delegationTransaction } = stores.substores.ada;
   const delegationTxResult = delegationTransaction.createDelegationTx.result;
   const delegationTxError = delegationTransaction.createDelegationTx.error;
+
+  const outlet = (
+    <Suspense fallback={null}>
+      <Outlet />
+    </Suspense>
+  );
 
   return (
     <CurrencyProvider currency={unitOfAccount.currency || 'USD'}>
@@ -388,9 +433,7 @@ const GovernanceSubpages = ({ stores }) => {
         triggerBuySellAdaDialog={() => stores.uiDialogs.open({ dialog: BuySellDialog })}
         getCurrentPrice={stores.coinPriceStore.getCurrentPrice}
       >
-        <Suspense fallback={null}>
-          <Outlet />
-        </Suspense>
+        {wrapOutlet ? wrapOutlet(outlet) : outlet}
       </GovernanceContextProvider>
     </CurrencyProvider>
   );

@@ -1,23 +1,28 @@
 import { useState, useEffect, useCallback } from 'react';
-import LocalStorageApi, { createStorageFlag } from '../../../api/localStorage';
+import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
+import { useLocation } from 'react-router';
 
-const surveyDismissed = createStorageFlag('SURVEY_DISMISSED', false);
-
-export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
+export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, currentlyDelegating, governanceStatus }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
+  const location = useLocation();
 
   const resolveBanner = useCallback(async () => {
+    if (
+      governanceStatus.status === 'none' &&
+      !currentlyDelegating &&
+      walletBalance > 5 &&
+      bannersRemoteConfig?.earnRewardsWithYoroi?.display === true
+    ) {
+      return BannerType.Rewards;
+    }
     if (
       (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
       bannersRemoteConfig?.midnightPhase2Announcement.display === true
     ) {
       return BannerType.MidnightPhase2;
-    }
-    if (!(await surveyDismissed.get())) {
-      return BannerType.Survey;
     }
     if (walletBalance === 0) {
       return BannerType.BuyAda;
@@ -27,22 +32,29 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance }) {
     }
 
     return null;
-  }, [bannersRemoteConfig, walletBalance]);
+  }, [bannersRemoteConfig, governanceStatus.status, walletBalance, currentlyDelegating, location.search]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
-  }, [bannersRemoteConfig, walletBalance, evaluationKey, resolveBanner]);
+  }, [
+    bannersRemoteConfig,
+    walletId,
+    walletBalance,
+    evaluationKey,
+    resolveBanner,
+    currentlyDelegating,
+    location.search,
+    governanceStatus.status,
+  ]);
 
   const dismiss = async type => {
     switch (type) {
+      case BannerType.Rewards:
+        setVisible(null);
+        break;
       case BannerType.MidnightPhase2:
         setVisible(null);
         await localStorage.setMidnightBannerPhase2Closed('true');
-        setEvaluationKey(prev => prev + 1);
-        break;
-      case BannerType.Survey:
-        surveyDismissed.set(true);
-        setVisible(null);
         setEvaluationKey(prev => prev + 1);
         break;
       case BannerType.BuyAda:

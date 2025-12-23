@@ -150,8 +150,9 @@ export default class GeneralSettingsPage extends Component<StoresProps> {
           )}
           <ThemeSettingsBlock />
           <EnableNotificationsSettings
+            permissionDenied={stores.pushNotificationStore.permissionDenied}
             isEnabled={stores.pushNotificationStore.isEnabled}
-            toggle={stores.pushNotificationStore.toggleEnabled}
+            setEnabled={stores.pushNotificationStore.setEnabled}
           />
           <AboutYoroiSettingsBlock
             wallet={stores.wallets.selected}

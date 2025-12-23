@@ -45,6 +45,7 @@ const storageKeys = {
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
   SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
+  STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED: 'STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -152,6 +153,16 @@ export default class LocalStorageApi {
   setBringBannerClosed: string => Promise<void> = closed => setLocalItem(storageKeys.BRING_BANNER_CLOSED, closed);
 
   unsetBringBannerClosed: void => Promise<void> = () => removeLocalItem(storageKeys.BRING_BANNER_CLOSED);
+
+  // ========== Staking Pool Update Fee Dialog ========== //
+  getStakingPoolFeeIncreaseModalClosed: void => Promise<?string> = () =>
+    getLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED);
+
+  setStakingPoolFeeIncreaseModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED, closed);
+
+  unsetStakingPoolFeeIncreaseModalClosed: void => Promise<void> = () =>
+    removeLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED);
 
   // ========== SWAP Disclaimer Modal ========== //
   getSwapDisclaimerModalClosed: void => Promise<?string> = () =>

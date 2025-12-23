@@ -21,7 +21,7 @@ class TrezorConnect extends BasePage {
   };
   exportAddressButtonLocator = {
     locator: 'button.confirm[data-testid="@export-address/confirm-button"]',
-    css: 'css',
+    method: 'css',
   };
   // functions
   async tickCheckbox() {

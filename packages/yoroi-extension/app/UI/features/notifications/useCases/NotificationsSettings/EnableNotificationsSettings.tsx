@@ -4,11 +4,13 @@ import { Switch } from '../../../../components/Switch/Switch';
 
 type Props = {
   isEnabled: boolean;
-  toggle: () => void;
+  permissionDenied: boolean;
+  setEnabled: (enable: boolean) => Promise<void>;
 };
 
-export default function EnableNotificationsSettings({ isEnabled, toggle }: Props) {
+export default function EnableNotificationsSettings({ isEnabled, permissionDenied, setEnabled }: Props) {
   const strings = useStrings();
+  const enabled = isEnabled && !permissionDenied;
 
   return (
     <Box>
@@ -21,7 +23,7 @@ export default function EnableNotificationsSettings({ isEnabled, toggle }: Props
         label={strings.enablePushNotificationsDesc}
         control={
           <Box sx={{ alignSelf: 'flex-start' }}>
-            <Switch checked={isEnabled} onChange={toggle} />
+            <Switch checked={enabled} onChange={() => setEnabled(!enabled)} />
           </Box>
         }
         labelPlacement="top"
@@ -32,6 +34,11 @@ export default function EnableNotificationsSettings({ isEnabled, toggle }: Props
           gap: '16px',
         }}
       />
+      {permissionDenied && (
+        <Typography color="ds.text_error" variant="caption" component="div">
+          {strings.permissionDenied}
+        </Typography>
+      )}
     </Box>
   );
 }

@@ -82,7 +82,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     signRequest: HaskellShelleyTxSignRequest,
     password: ?string,
     callback: () => Promise<void>,
-  |}) => Promise<void> = async request => {
+  |}) => Promise<{| txId: string |}> = async request => {
     const { wallet, signRequest, password, callback } = request;
 
     let broadcastRequest;
@@ -114,7 +114,7 @@ export default class TransactionProcessingStore extends Store<StoresMap> {
     } else {
       throw new Error(`${nameof(TransactionProcessingStore)}::${nameof(this.adaSendAndRefresh)} unhandled wallet type`);
     }
-    await this.sendAndRefresh({
+    return await this.sendAndRefresh({
       publicDeriverId: wallet.publicDeriverId,
       broadcastRequest,
       refreshWallet: callback,

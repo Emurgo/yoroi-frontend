@@ -44,11 +44,19 @@ class DriversManager {
   }
 
   async _prepareExtensionCommon(driver) {
-    const logger = getTestLogger(`DriversManager_Page_${Date.now()}`, 'DriversManager');
+    const prepareTime = Date.now();
+    const logger = getTestLogger(`DriversManager_Page_${prepareTime}`, 'DriversManager');
     const basePage = new BasePage(driver, logger);
-    await basePage.goToExtension();
     const initialStepsPage = new InitialStepsPage(driver, logger);
-    await initialStepsPage.skipInitialSteps();
+    try {
+      await basePage.goToExtension();
+      await initialStepsPage.skipInitialSteps();
+    } catch (error) {
+      logger.error(`DriversManager::_prepareExtensionCommon Error during extension preparation: ${error}`);
+      await basePage.takeScreenshot('PrepareExtensionError', `DriversManager_PrepareExtensionError_${prepareTime}`);
+      await basePage.takeSnapshot('PrepareExtensionError', `DriversManager_PrepareExtensionError_${prepareTime}`);
+      throw error;
+    }
   }
 
   /**
@@ -71,10 +79,32 @@ class DriversManager {
   }
 
   async getDriverFromPool() {
-    const driverObject = poolOfDrivers.shift();
+    let driverObject = poolOfDrivers.shift();
+    if (!driverObject) {
+      this.logger.warn(`DriversManager::getDriverFromPool No drivers in the pool of drivers`);
+      this.logger.warn(`DriversManager::getDriverFromPool Creating a new one`);
+      driverGlobalCounter++;
+      driverObject = {
+        driver: await this.getPreparedDriver(),
+        driverId: driverGlobalCounter,
+      };
+    }
     this.logger.info(`DriversManager::getDriverFromPool Returning driver ${driverObject.driverId}`);
-    const newDriverObject = this.addNewDriverToPool();
-    this.prepareExtension(newDriverObject);
+    const newDriver = getDriver();
+    driverGlobalCounter++;
+    const newDriverObject = {
+      driver: newDriver,
+      driverId: driverGlobalCounter,
+    };
+    this.prepareExtension(newDriverObject)
+      .then(() => {
+        poolOfDrivers.push(newDriverObject);
+        this.logger.info(`DriversManager::addNewDriverToPool A new driver is added. Driver ID: ${newDriverObject.driverId}`);
+      })
+      .catch(error => {
+        this.logger.error(`DriversManager::getDriverFromPool Failed to prepare new driver ${newDriverObject.driverId}: ${error}`);
+        newDriverObject.driver.close();
+      });
 
     return driverObject.driver;
   }

@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { Chain } from '@yoroi/types';
 
@@ -43,7 +43,7 @@ export const usePortfolioImage = ({
   } = useQuery({
     queryKey: cacheKey,
     staleTime: Infinity,
-    cacheTime: Infinity,
+    gcTime: Infinity, // v5: cacheTime -> gcTime
     queryFn: async () => {
       return `https://${network}.processed-media.yoroiwallet.com/${policy}/${name}?width=${w}&height=${h}&kind=${kind}&fit=${contentFit}`;
     },
