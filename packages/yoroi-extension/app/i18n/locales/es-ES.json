@@ -41,7 +41,7 @@
   "airdrop.ledgerClaimDialogTitle": "mensaje de firma { index } de { total }",
   "airdrop.messageLabel": "Mensaje",
   "airdrop.mnemonicClaimDialogText": "Por favor, firma el mensaje para probar la propiedad de tus activos. Firmar este mensaje no afectará el saldo de su billetera de ninguna manera y no requiere que usted pague ninguna comisión.",
-  "airdrop.phase1Allocation": "Fase 1: Tu asignación exitosamente",
+  "airdrop.phase1Allocation": "Phase 1: Your successfully claimed allocation",
   "airdrop.phase2Text": "La 2da fase de reclamación de Midnight llamada \"Scavenger mine\" ha comenzado. Navega al portal de Midnight y conecta tu billetera Yoroi para empezar a conseguir NIGHT",
   "airdrop.phase2Title": "🧩  La Fase 2 del airdrop de Midnight ha comenzado",
   "airdrop.redeem.button": "Redeem",
