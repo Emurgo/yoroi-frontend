@@ -51,6 +51,8 @@ export const CardanoCardDialog = () => {
 
     checkModalState();
   }, [data]);
+
+  return null;
 };
 
 const CardanoCardContent = ({ onClose }) => {
