@@ -148,6 +148,22 @@ export const messages = Object.freeze(
       id: 'banners.rewards.button',
       defaultMessage: '!!! Earn ADA',
     },
+    cardanoCard: {
+      id: 'banners.cardanoCard.desc',
+      defaultMessage: '!!!Pay. Earn. Borrow. Stake. Access the new era of crypto spending. Activate your Cardano Card today.',
+    },
+    cardanoCardTitle: {
+      id: 'banners.cardanoCard.title',
+      defaultMessage: '!!!Cardano Card',
+    },
+    cardanoCardSubtitle: {
+      id: 'banners.cardanoCard.subtitle',
+      defaultMessage: '!!!Cardano Card has arrived',
+    },
+    cardanoCardGetTheCard: {
+      id: 'banners.cardanoCard.getTheCard',
+      defaultMessage: '!!!Get the card',
+    },
   })
 );
 
@@ -193,5 +209,9 @@ export const useStrings = () => {
     earnRewards: intl.formatMessage(messages.earnRewards),
     delegateRewards: intl.formatMessage(messages.delegateRewards),
     rewardsButton: intl.formatMessage(messages.rewardsButton),
+    cardanoCard: intl.formatMessage(messages.cardanoCard),
+    cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
+    cardanoCardSubtitle: intl.formatMessage(messages.cardanoCardSubtitle),
+    cardanoCardGetTheCard: intl.formatMessage(messages.cardanoCardGetTheCard),
   }).current;
 };
