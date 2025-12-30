@@ -34,7 +34,9 @@ import { useYoroiRemoteConfig } from '../../UI/common/hooks/useYoroiRemoteConfig
 import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteConfig';
 // $FlowIgnore: suppressing this error
 import { StakepoolFeeIncrease } from '../../UI/components/Dialogs/StakepoolFeeIncrease';
+// $FlowIgnore: suppressing this error
 import { CardanoCardDialog } from '../../UI/components/Dialogs/CardanoCardDialog';
+
 type Props = {|
   +children: Node,
   +stores?: any,
