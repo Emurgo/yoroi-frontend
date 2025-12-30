@@ -1,7 +1,7 @@
 import { Typography, Button, Grid, Stack, Link } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useModal } from '../modals/ModalContext';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import CardanoCardImage from './CardanoCardImage.png';
 import LocalStorageApi from '../../../api/localStorage/index';
 import { useStrings } from '../../common/hooks/useStrings';
@@ -12,13 +12,17 @@ export const CardanoCardDialog = () => {
   const strings = useStrings();
   const { openModal, closeModal } = useModal();
   const { data } = useYoroiRemoteConfig();
+  const hasProcessedThisSession = useRef(false);
 
   useEffect(() => {
     const checkModalState = async () => {
       const localStorage = new LocalStorageApi();
       const appOpenedCount = await localStorage.getAppOpenedCount();
 
-      if (!data?.popups?.cardanoCardAnnouncement?.display) return;
+      if (!data?.popups?.cardanoCardAnnouncement?.display || hasProcessedThisSession.current) return;
+
+      // Mark as processed to prevent re-execution on data refetches
+      hasProcessedThisSession.current = true;
       if (appOpenedCount === undefined || appOpenedCount === null) {
         localStorage.setAppOpenedCount('1');
       } else {
