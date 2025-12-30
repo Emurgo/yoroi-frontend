@@ -158,7 +158,7 @@ export const messages = Object.freeze(
     },
     cardanoCardSubtitle: {
       id: 'banners.cardanoCard.subtitle',
-      defaultMessage: '!!!Cardano Card has arrived',
+      defaultMessage: '!!!Cardano Card Has Arrived',
     },
     cardanoCardGetTheCard: {
       id: 'banners.cardanoCard.getTheCard',

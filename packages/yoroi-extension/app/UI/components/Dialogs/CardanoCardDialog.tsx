@@ -59,7 +59,7 @@ const CardanoCardContent = ({ onClose }) => {
     <Stack>
       <Stack direction="column" alignItems="center" justifyContent="center" pb="24px">
         <Stack my={48}>
-          <img src={CardanoCardImage} alt="Midnight Illustration" />
+          <img src={CardanoCardImage} alt="Cardano Card Illustration" />
         </Stack>
 
         <Typography variant="h5" color="ds.text_gray_medium" fontWeight={500} mb="8px">
@@ -83,5 +83,6 @@ const CardanoCardContent = ({ onClose }) => {
 
 const CustomButton = styled(Button)(() => ({
   width: '100%',
-  fontSize: '14px',
+  fontSize: '16px',
+  lineHeight: '22px',
 }));
