@@ -158,9 +158,9 @@ function formatDate(dateString: string, locale: string): string {
 }
 
 function getCurrentThawIndex(schedule: Schedule): number {
-  const redeemableIndex = schedule.thaws.findIndex(thaw => thaw.status === 'redeemable');
+  const redeemableIndex = schedule.thaws.findIndex(thaw => thaw.status === 'redeemable' || thaw.status === 'failed');
   if (redeemableIndex >= 0) return redeemableIndex;
-  const upcomingIndex = schedule.thaws.findIndex(thaw => thaw.status === 'upcoming');
+  const upcomingIndex = schedule.thaws.findIndex(thaw => thaw.status === 'upcoming' || thaw.status === 'failed');
   if (upcomingIndex >= 0) return upcomingIndex;
   return 0;
 }
