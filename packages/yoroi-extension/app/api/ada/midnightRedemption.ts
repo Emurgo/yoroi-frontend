@@ -27,7 +27,7 @@ export function formatNumberExactly(n: number): string {
 export function getRedeemableAmount(schedule: Schedule): number {
   return schedule.thaws
     .slice(schedule.numberOfClaimedAllocations)
-    .filter(thaw => thaw.status === 'redeemable')
+    .filter(thaw => thaw.status === 'redeemable' || thaw.status === 'failed')
     .reduce((accu, thaw) => accu + thaw.amount, 0);
 }
 
