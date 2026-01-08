@@ -74,7 +74,7 @@ export default function NftDetails() {
   }
 
   return (
-    <>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Box sx={{ mb: '24px', width: '100%' }}>
         <Link to={ROUTES.NFT_GALLERY.ROOT}>
           <Button
@@ -88,11 +88,11 @@ export default function NftDetails() {
           </Button>
         </Link>
       </Box>
-      <Grid container columns={10}>
+      <Grid container columns={10} sx={{ flexGrow: 1, overflow: 'hidden' }}>
         <Grid item xs={4}>
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
-        <Grid item xs={6}>
+        <Grid item xs={6} sx={{ height: '100%', overflowX: 'hidden', overflowY: 'auto' }}>
           <Stack direction="row" mx="24px" justifyContent="space-between" spacing={16}>
             <Typography variant="h2" id={`${nftPathId}-nftName-text`}>
               {currentNft?.name}
@@ -141,6 +141,6 @@ export default function NftDetails() {
           />
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 }
