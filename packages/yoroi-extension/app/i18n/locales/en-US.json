@@ -52,6 +52,7 @@
   "airdrop.redeem.reorgMessage": "Please re-orgnize the wallet for collateral UTxOs",
   "airdrop.redeem.waitingForReorg": "Waiting for the re-organization transaction to be confirmed",
   "airdrop.schedule.currentThaw": "Current thaw: {current}/{total}",
+  "airdrop.schedule.failed": "Failed",
   "airdrop.schedule.notAvailable": "Not available yet",
   "airdrop.schedule.redeemable": "Redeemable",
   "airdrop.schedule.redeemed": "Redeemed",
