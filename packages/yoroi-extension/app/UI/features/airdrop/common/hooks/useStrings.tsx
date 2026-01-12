@@ -72,6 +72,10 @@ export const messages = Object.freeze(
       id: 'airdrop.schedule.redeemed',
       defaultMessage: '!!!Redeemed',
     },
+    failed: {
+      id: 'airdrop.schedule.failed',
+      defaultMessage: '!!!Failed',
+    },
     thawExplanation: {
       id: 'airdrop.schedule.thawExplanation',
       defaultMessage: '!!!Each thaw is 25% of your claimed NIGHT allocation',
@@ -279,6 +283,7 @@ export const useStrings = () => {
     thawTitle: (index: number, total: number) => intl.formatMessage(messages.thawTitle, { index, total }),
     notAvailable: intl.formatMessage(messages.notAvailable),
     redeemed: intl.formatMessage(messages.redeemed),
+    failed: intl.formatMessage(messages.failed),
     thawExplanation: intl.formatMessage(messages.thawExplanation),
     statusLabel: intl.formatMessage(messages.statusLabel),
     subTitle: intl.formatMessage(messages.subTitle),

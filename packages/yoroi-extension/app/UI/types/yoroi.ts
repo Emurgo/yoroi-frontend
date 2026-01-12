@@ -77,6 +77,9 @@ export type YoroiRemoteConfig = {
     firefoxSupportAnnouncement: {
       display: boolean;
     };
+    cardanoCardAnnouncement?: {
+      display: boolean;
+    };
   };
   dapps?: {
     recommended: {
