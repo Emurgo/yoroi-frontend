@@ -12,6 +12,7 @@ interface NftImageProps {
   maxWidth?: string;
   maxHeight?: string;
   contentHeight?: string;
+  contentWidth?: string;
   nftPathId: string;
   imageSx?: SxProps;
   onClickHandler?: () => void;
@@ -22,6 +23,7 @@ export default function NftImage({
   imageUrl,
   name,
   contentHeight,
+  contentWidth,
   nftPathId,
   width = 'auto',
   height = 'auto',
@@ -50,7 +52,11 @@ export default function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper height={contentHeight ? contentHeight : '100%'} id={`${nftPathId}-image-component`}>
+      <SvgWrapper
+        height={contentHeight ?? '100%'}
+        width={contentWidth ?? '100%'}
+        id={`${nftPathId}-image-component`}
+      >
         <DefaultNft />
       </SvgWrapper>
     );
@@ -63,7 +69,7 @@ export default function NftImage({
       sx={{
         width,
         height,
-        objectFit: 'cover',
+        objectFit: 'contain',
         display: 'inline-block',
         cursor,
         ...imageSx,
