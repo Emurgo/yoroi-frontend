@@ -46,6 +46,7 @@ const storageKeys = {
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
   SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
   STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED: 'STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED',
+  APP_OPENED_COUNT: 'APP_OPENED_COUNT',
 
   // ========== CONNECTOR   ========== //
   DAPP_CONNECTOR_WHITELIST: 'connector_whitelist',
@@ -213,6 +214,11 @@ export default class LocalStorageApi {
 
   setLastAnnouncedFeatureVersion: string => Promise<void> = version =>
     setLocalItem(storageKeys.LAST_ANNOUNCED_FEATURE_VERSION, String(version));
+
+  // ========== APP_OPENED_COUNT ========== //
+  getAppOpenedCount: void => Promise<?string> = () => getLocalItem(storageKeys.APP_OPENED_COUNT);
+
+  setAppOpenedCount: string => Promise<void> = count => setLocalItem(storageKeys.APP_OPENED_COUNT, count);
 
   // ========== Legacy Select Wallet ========== //
 

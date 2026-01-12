@@ -158,16 +158,17 @@ function formatDate(dateString: string, locale: string): string {
 }
 
 function getCurrentThawIndex(schedule: Schedule): number {
-  const redeemableIndex = schedule.thaws.findIndex(thaw => thaw.status === 'redeemable');
+  const redeemableIndex = schedule.thaws.findIndex(thaw => thaw.status === 'redeemable' || thaw.status === 'failed');
   if (redeemableIndex >= 0) return redeemableIndex;
-  const upcomingIndex = schedule.thaws.findIndex(thaw => thaw.status === 'upcoming');
+  const upcomingIndex = schedule.thaws.findIndex(thaw => thaw.status === 'upcoming' || thaw.status === 'failed');
   if (upcomingIndex >= 0) return upcomingIndex;
   return 0;
 }
 
-type ThawStatus = 'redeemable' | 'confirmed' | 'upcoming';
+type ThawStatus = 'redeemable' | 'confirmed' | 'upcoming' | 'failed';
 
 function getThawStatusType(status: string): ThawStatus {
+  if (status === 'failed') return 'failed';
   if (status === 'redeemable') return 'redeemable';
   if (status === 'confirmed') return 'confirmed';
   return 'upcoming';
@@ -202,6 +203,8 @@ function getStatusMessage(status: ThawStatus, strings: ReturnType<typeof useStri
       return strings.redeemable;
     case 'confirmed':
       return strings.redeemed;
+    case 'failed':
+      return strings.failed;
     default:
       return strings.notAvailable;
   }
@@ -238,6 +241,7 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
           const isCurrent = index === currentThawIndex;
           const isPast = index < currentThawIndex;
           const isLast = index === totalThaws - 1;
+          const isFailed = thaw.status === 'failed';
 
           return (
             <Box key={index} sx={{ flex: 1, position: 'relative' }}>
@@ -251,7 +255,13 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: isPast ? 'ds.primary_300' : isCurrent ? 'ds.primary_500' : 'ds.gray_200',
+                    backgroundColor: isFailed
+                      ? 'ds.gray_200'
+                      : isPast
+                        ? 'ds.primary_300'
+                        : isCurrent
+                          ? 'ds.primary_500'
+                          : 'ds.gray_200',
                     color: isPast || isCurrent ? 'ds.white_static' : 'ds.text_gray_min',
                     fontSize: '12px',
                     fontWeight: 500,
@@ -259,7 +269,16 @@ function ScheduleCard({ schedule }: { schedule: Schedule }) {
                     flexShrink: 0,
                   }}
                 >
-                  {isPast ? (
+                  {isFailed ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none">
+                      <path
+                        fill-rule="evenodd"
+                        clip-rule="evenodd"
+                        d="M4.29289 4.29289C4.68342 3.90237 5.31658 3.90237 5.70711 4.29289L8 6.58579L10.2929 4.29289C10.6834 3.90237 11.3166 3.90237 11.7071 4.29289C12.0976 4.68342 12.0976 5.31658 11.7071 5.70711L9.41421 8L11.7071 10.2929C12.0976 10.6834 12.0976 11.3166 11.7071 11.7071C11.3166 12.0976 10.6834 12.0976 10.2929 11.7071L8 9.41421L5.70711 11.7071C5.31658 12.0976 4.68342 12.0976 4.29289 11.7071C3.90237 11.3166 3.90237 10.6834 4.29289 10.2929L6.58579 8L4.29289 5.70711C3.90237 5.31658 3.90237 4.68342 4.29289 4.29289Z"
+                        fill="#FF0000"
+                      />
+                    </svg>
+                  ) : isPast ? (
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 16 16" fill="none">
                         <path
