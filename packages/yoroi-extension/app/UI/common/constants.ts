@@ -18,3 +18,4 @@ export enum BannerType {
 export const SUPPORT_CRISP_CHATBOX_URL = 'https://emurgo.github.io/yoroi-crisp-support/';
 export const MIDNIGHT_PHASE2_URL = 'https://www.midnight.gd/';
 export const HIDDEN_AMOUNT = '******';
+export const CARDANO_CARD_URL = 'https://cardanocard.io/';
