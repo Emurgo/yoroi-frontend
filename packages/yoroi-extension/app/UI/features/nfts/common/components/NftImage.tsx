@@ -52,11 +52,7 @@ export default function NftImage({
 
   if (error || url === null)
     return (
-      <SvgWrapper
-        height={contentHeight ?? '100%'}
-        width={contentWidth ?? '100%'}
-        id={`${nftPathId}-image-component`}
-      >
+      <SvgWrapper height={contentHeight ?? '100%'} width={contentWidth ?? '100%'} id={`${nftPathId}-image-component`}>
         <DefaultNft />
       </SvgWrapper>
     );
