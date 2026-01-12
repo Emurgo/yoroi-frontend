@@ -103,7 +103,11 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
             label: intl.formatMessage(category.label),
             route: category.route,
           }))}
-        onItemClick={route => stores.routing.goToRoute({ route })}
+        onItemClick={route => {
+          if (!stores.routing.currentRoute.startsWith(route)) {
+            stores.routing.goToRoute({ route });
+          }
+        }}
         isActiveItem={route => stores.routing.currentRoute.startsWith(route)}
         locationId="wallet"
       />
