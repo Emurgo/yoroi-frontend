@@ -89,7 +89,12 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
 
   const handleRequestSort = (property: string) => {
     const defaultDirection = defaultSortDirections[property] ?? 'asc';
-    const newOrder = property !== orderBy ? defaultDirection : order === 'asc' ? 'desc' : 'asc';
+    let newOrder: 'asc' | 'desc';
+    if (property === orderBy) {
+      newOrder = order === 'asc' ? 'desc' : 'asc';
+    } else {
+      newOrder = defaultDirection;
+    }
 
     setSortState({ order: newOrder, orderBy: property });
   };

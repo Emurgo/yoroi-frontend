@@ -10,12 +10,18 @@ import { bigNumberToBigInt } from './TableColumnsChip';
 
 export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data30d }) => {
   const { primaryTokenInfo } = usePortfolio();
-  const { data: ptTokenDataInterval7d } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.WEEK, {
-    info: { id: '' },
-  });
-  const { data: ptTokenDataInterval1M } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.MONTH, {
-    info: { id: '' },
-  });
+  const { data: ptTokenDataInterval7d } = useGetPortfolioTokenChart(
+    {
+      info: { id: '' },
+    },
+    TOKEN_CHART_INTERVAL.WEEK
+  );
+  const { data: ptTokenDataInterval1M } = useGetPortfolioTokenChart(
+    {
+      info: { id: '' },
+    },
+    TOKEN_CHART_INTERVAL.MONTH
+  );
 
   // Helper to calculate fiat value and unit price for a token
   const calculateTotalFiatForToken = token => {
@@ -33,10 +39,10 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
       .times(new BigNumber(ptActivity?.close.toString() || 1))
       .toNumber();
 
-    const unitPrice = parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
+    const unitPrice = Number.parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
     const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity?.close)));
 
-    const tokenValueDisplay = secondaryToken24Activity && secondaryToken24Activity[0] === 500 ? 0 : totalValue;
+    const tokenValueDisplay = secondaryToken24Activity?.[0] === 500 ? 0 : totalValue;
     return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : tokenValueDisplay, unitPrice };
   };
 
