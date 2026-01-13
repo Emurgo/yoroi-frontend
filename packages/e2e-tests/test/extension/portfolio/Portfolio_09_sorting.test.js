@@ -45,12 +45,6 @@ describe('Portfolio Sorting columns', function () {
 
   for (const columnName in Columns) {
     it(`Sort by column ${columnName} and check sorting`, async function () {
-      if (Columns[columnName] === Columns.Percentage) {
-        console.warn(
-          'Skipping sorting check on Percentage column until the issue https://emurgo.atlassian.net/browse/YOEXT-2289 is fixed'
-        );
-        this.skip();
-      }
       await portfolioMainPage.sortBy(Columns[columnName]);
       const arrowSortingDirection = await portfolioMainPage.getSortingArrowDirection(Columns[columnName]);
       const columnsRawValues = await portfolioMainPage.getColumnValues(Columns[columnName]);
