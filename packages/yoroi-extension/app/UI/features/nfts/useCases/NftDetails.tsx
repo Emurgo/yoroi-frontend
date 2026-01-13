@@ -18,13 +18,25 @@ const nftPathId = 'nftDetails';
 const ImageItem = ({ nftInfo, onClick }: { nftInfo: Nft | null; onClick: () => void }) => {
   if (!nftInfo) return null;
   return (
-    <Box sx={{ overflow: 'hidden', height: '100%' }}>
+    <Box
+      sx={{
+        overflow: 'hidden',
+        width: '100%',
+        maxWidth: '550px',
+        height: '550px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <NftImage
         imageSx={{ borderRadius: '8px' }}
         imageUrl={nftInfo.image}
         name={nftInfo.name || '-'}
         width="100%"
         height="100%"
+        maxWidth="550px"
+        maxHeight="550px"
         contentHeight="550px"
         nftPathId={nftPathId}
         onClickHandler={onClick}
@@ -74,7 +86,7 @@ export default function NftDetails() {
   }
 
   return (
-    <>
+    <Box>
       <Box sx={{ mb: '24px', width: '100%' }}>
         <Link to={ROUTES.NFT_GALLERY.ROOT}>
           <Button
@@ -88,7 +100,7 @@ export default function NftDetails() {
           </Button>
         </Link>
       </Box>
-      <Grid container columns={10}>
+      <Grid container columns={10} alignItems="flex-start">
         <Grid item xs={4}>
           <ImageItem onClick={openModal} nftInfo={currentNft} />
         </Grid>
@@ -141,6 +153,6 @@ export default function NftDetails() {
           />
         </Box>
       </Modal>
-    </>
+    </Box>
   );
 }
