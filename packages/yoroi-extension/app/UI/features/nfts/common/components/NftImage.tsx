@@ -17,6 +17,7 @@ interface NftImageProps {
   imageSx?: SxProps;
   onClickHandler?: () => void;
   cursor?: string;
+  fillBox?: boolean;
 }
 
 export default function NftImage({
@@ -30,6 +31,7 @@ export default function NftImage({
   imageSx = {},
   onClickHandler,
   cursor = 'default',
+  fillBox = false,
 }: NftImageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -65,7 +67,7 @@ export default function NftImage({
       sx={{
         width,
         height,
-        objectFit: 'contain',
+        objectFit: fillBox ? 'cover' : 'contain',
         display: 'inline-block',
         cursor,
         ...imageSx,

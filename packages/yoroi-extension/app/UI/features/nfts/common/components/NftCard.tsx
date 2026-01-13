@@ -16,7 +16,7 @@ export default function NftCard({ ipfsUrl, name, onClick, nftPathId }: NftCardPr
       id={`${nftPathId}-component-button`}
     >
       <Box sx={{ borderRadius: '4px', overflow: 'hidden', flex: '1 1 auto' }}>
-        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId} />
+        <NftImage imageUrl={ipfsUrl} name={name} width="100%" height="100%" nftPathId={nftPathId} fillBox={true} />
       </Box>
       <Box>
         <Typography
