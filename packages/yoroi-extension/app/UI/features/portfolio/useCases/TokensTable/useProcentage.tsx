@@ -63,7 +63,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
     return data
       .map(token => {
         const { totalValue, unitPrice } = tokenFiatValues[token.info.id] || {};
-        const percentage = totalPortfolioValue ? (totalValue / Number(totalPortfolioValue)) * 100 : 0;
+        const portfolioPercentage = totalPortfolioValue ? (totalValue / Number(totalPortfolioValue)) * 100 : 0;
         const isPrimaryToken = token.id === '-';
 
         const { open: open24, close: close24 } = getTokenActivityChange(token.info.id, data24h, isPrimaryToken);
@@ -76,7 +76,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
 
         return {
           ...token,
-          percentage,
+          portfolioPercentage,
           totalAmount: totalValue,
           price: totalValue === 0 ? 0 : unitPrice,
           '24h': changePercent24,
@@ -86,22 +86,22 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
         };
       })
       .sort((a, b) => {
-        // If both tokens have special names, sort them by percentage
+        // If both tokens have special names, sort them by portfolioPercents
         if (a.isSpecialName && b.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
+          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
         }
-        // If only one token has a special name but has percentage > 0, still sort it normally
-        if (a.isSpecialName && a.percentage > 0 && !b.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
+        // If only one token has a special name but has portfolioPercentage > 0, still sort it normally
+        if (a.isSpecialName && a.portfolioPercentage > 0 && !b.isSpecialName) {
+          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
         }
-        if (b.isSpecialName && b.percentage > 0 && !a.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
+        if (b.isSpecialName && b.portfolioPercentage > 0 && !a.isSpecialName) {
+          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
         }
-        // Move tokens with special names and 0 percentage to the bottom
-        if (a.isSpecialName && a.percentage === 0) return 1;
-        if (b.isSpecialName && b.percentage === 0) return -1;
-        // Default sorting by percentage
-        return Number(b.percentage) - Number(a.percentage);
+        // Move tokens with special names and 0 portfolioPercentage to the bottom
+        if (a.isSpecialName && a.portfolioPercentage === 0) return 1;
+        if (b.isSpecialName && b.portfolioPercentage === 0) return -1;
+        // Default sorting by portfolioPercentage
+        return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
       });
   }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo, ptTokenDataInterval7d, ptTokenDataInterval1M]);
 
