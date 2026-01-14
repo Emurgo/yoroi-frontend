@@ -19,18 +19,36 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
     name: 'desc',
     price: 'desc',
     totalAmount: 'desc',
-    portfolioPercents: 'desc',
+    portfolioPercentage: 'desc',
     '24h': 'desc',
     '1W': 'desc',
     '1M': 'desc',
   };
 
-  const compareValues = (a: any, b: any, sortType: TableSortType, sortOrder: 'asc' | 'desc', sortKey: string): number => {
-    const isInvalid = (val: any) => isNaN(Number(val));
+  const _compAB = (valueA: string | number, valueB: string | number) => {
+    if (valueA === valueB) return 0;
+    return valueA < valueB ? -1 : 1;
+  };
 
-    if (['price', 'portfolio', 'totalAmount', '24h', '1W', '1M'].includes(sortKey)) {
-      const aInvalid = isInvalid(a[sortKey]);
-      const bInvalid = isInvalid(b[sortKey]);
+  const _checkForWeirdSymbols = (tokenAName: string, tokenBName: string) => {
+    const startsWithSymbolOrNumber = (str: string) => /^[^a-zA-Z]/.test(str);
+
+    const aIsWeird = startsWithSymbolOrNumber(tokenAName);
+    const bIsWeird = startsWithSymbolOrNumber(tokenBName);
+
+    if (aIsWeird && !bIsWeird) return 1;
+    if (!aIsWeird && bIsWeird) return -1;
+    return undefined;
+  };
+
+  const compareValues = (a: any, b: any, sortType: TableSortType, sortOrder: 'asc' | 'desc', sortKey: string): number => {
+    const isInvalid = (val: any) => Number.isNaN(Number(val));
+    const valueA = a[sortKey];
+    const valueB = b[sortKey];
+
+    if (['price', 'portfolioPercentage', 'totalAmount', '24h', '1W', '1M'].includes(sortKey)) {
+      const aInvalid = isInvalid(valueA);
+      const bInvalid = isInvalid(valueB);
 
       if (aInvalid && !bInvalid) return 1;
       if (!aInvalid && bInvalid) return -1;
@@ -41,30 +59,21 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
 
     switch (sortType) {
       case 'numeric': {
-        const aValue = Number(a[sortKey]);
-        const bValue = Number(b[sortKey]);
-        comparison = aValue === bValue ? 0 : aValue < bValue ? -1 : 1;
+        comparison = _compAB(Number(valueA), Number(valueB));
         break;
       }
       case 'character': {
         const aName = String(a.info?.[sortKey] ?? '');
         const bName = String(b.info?.[sortKey] ?? '');
 
-        const startsWithSymbolOrNumber = (str: string) => /^[^a-zA-Z]/.test(str);
-
-        const aIsWeird = startsWithSymbolOrNumber(aName);
-        const bIsWeird = startsWithSymbolOrNumber(bName);
-
-        if (aIsWeird && !bIsWeird) return 1;
-        if (!aIsWeird && bIsWeird) return -1;
+        const checkResult = _checkForWeirdSymbols(aName, bName);
+        if (checkResult) return checkResult;
 
         comparison = aName.localeCompare(bName, undefined, { sensitivity: 'base' });
         break;
       }
       default: {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
-        comparison = aVal === bVal ? 0 : aVal < bVal ? -1 : 1;
+        comparison = _compAB(valueA, valueB);
       }
     }
 
@@ -80,7 +89,12 @@ const useTableSort = ({ order, orderBy, setSortState, headCells, data }: Props) 
 
   const handleRequestSort = (property: string) => {
     const defaultDirection = defaultSortDirections[property] ?? 'asc';
-    const newOrder = property !== orderBy ? defaultDirection : order === 'asc' ? 'desc' : 'asc';
+    let newOrder: 'asc' | 'desc';
+    if (property === orderBy) {
+      newOrder = order === 'asc' ? 'desc' : 'asc';
+    } else {
+      newOrder = defaultDirection;
+    }
 
     setSortState({ order: newOrder, orderBy: property });
   };
