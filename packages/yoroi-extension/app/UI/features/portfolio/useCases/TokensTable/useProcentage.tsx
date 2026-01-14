@@ -92,6 +92,11 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
         };
       })
       .sort((a, b) => {
+        // Handle case when both tokens have special names and 0 portfolioPercentage
+        // They should be considered equal to maintain comparator antisymmetry
+        if (a.isSpecialName && a.portfolioPercentage === 0 && b.isSpecialName && b.portfolioPercentage === 0) {
+          return 0;
+        }
         // Move tokens with special names and 0 portfolioPercentage to the bottom
         if (a.isSpecialName && a.portfolioPercentage === 0) return 1;
         if (b.isSpecialName && b.portfolioPercentage === 0) return -1;
