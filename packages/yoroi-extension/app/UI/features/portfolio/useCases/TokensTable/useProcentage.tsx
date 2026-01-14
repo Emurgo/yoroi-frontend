@@ -92,17 +92,6 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
         };
       })
       .sort((a, b) => {
-        // If both tokens have special names, sort them by portfolioPercents
-        if (a.isSpecialName && b.isSpecialName) {
-          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
-        }
-        // If only one token has a special name but has portfolioPercentage > 0, still sort it normally
-        if (a.isSpecialName && a.portfolioPercentage > 0 && !b.isSpecialName) {
-          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
-        }
-        if (b.isSpecialName && b.portfolioPercentage > 0 && !a.isSpecialName) {
-          return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
-        }
         // Move tokens with special names and 0 portfolioPercentage to the bottom
         if (a.isSpecialName && a.portfolioPercentage === 0) return 1;
         if (b.isSpecialName && b.portfolioPercentage === 0) return -1;
