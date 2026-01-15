@@ -270,19 +270,14 @@ export async function scanAddressesForThaws(
   }
 }
 
-const MAX_PER_UTXO_SURPLUS = new BigNumber('2000000');
-const MAX_COLLATERAL_COUNT: number = 3;
-const COLLATERAL_AMOUNT = '2000000';
-// by observation, 2000000 may not work
-const FUNDING_AMOUNT = '3000000';
+// by observation
+const FUNDING_AMOUNT = '4000000';
 
-async function pickCollateralUtxos(
-  wallet: WalletState
-): Promise<?{| utxosToUse: Array<string>, fundingUtxo: string, fundingUtxoAddr: string |}> {
-  const required = new BigNumber(COLLATERAL_AMOUNT);
+// return null if there is not enough
+async function pickUtxos(wallet: WalletState): Promise<?{| fundingUtxos: Array<string>, fundingUtxoAddr: string |}> {
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
-  const maxViableUtxoAmount = required.plus(MAX_PER_UTXO_SURPLUS);
+
   const utxos = wallet.utxos.map(utxo => ({
     utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
     tx_hash: utxo.output.Transaction.Hash,
@@ -299,128 +294,54 @@ async function pickCollateralUtxos(
       })),
     addressing: utxo.addressing,
   }));
-  let utxosToConsider = (
-    await adaApi._addressedUtxosWithSubmittedTxs(utxos, wallet.publicDeriverId, wallet.allUtxoAddresses, submittedTxs)
-  ).filter(utxo => utxo.assets.length === 0);
-  utxosToConsider.sort((utxo1, utxo2) => new BigNumber(utxo1.amount).comparedTo(utxo2.amount));
-  let fundingUtxo = null;
-  let fundingUtxoAddr = null;
-  for (let i = 0; i < utxosToConsider.length; i++) {
-    const utxo = utxosToConsider[i];
-    if (new BigNumber(utxo.amount).gte(FUNDING_AMOUNT)) {
-      fundingUtxo = cardanoUtxoHexFromRemoteFormat(utxo);
-      fundingUtxoAddr = addressHexToBech32(utxo.receiver);
-      utxosToConsider.splice(i, 1);
-      break;
+  utxos.sort((utxo1, utxo2) => {
+    // put pure utxos in the front
+    if (utxo1.assets.length === 0 && utxo2.assets.length !== 0) {
+      return -1;
     }
-  }
-  if (!fundingUtxo || !fundingUtxoAddr) {
-    return null;
-  }
-  utxosToConsider = utxosToConsider.filter(utxo => new BigNumber(utxo.amount).lt(maxViableUtxoAmount));
-  const utxosToUse = [];
+    if (utxo1.assets.length !== 0 && utxo2.assets.length === 0) {
+      return 1;
+    }
+    return new BigNumber(utxo1.amount).comparedTo(utxo2.amount);
+  });
   let sum = new BigNumber('0');
-  let enough = false;
-  for (const utxo of utxosToConsider) {
-    utxosToUse.push(utxo);
+  let fundingUtxos = [];
+  let fundingUtxoAddr = null;
+  for (let i = 0; i < utxos.length; i++) {
+    const utxo = utxos[i];
     sum = sum.plus(utxo.amount);
-    while (utxosToUse.length > MAX_COLLATERAL_COUNT || sum.minus(utxosToUse[0].amount).gte(required)) {
-      // Removing the first (hence the smallest) utxo from the list
-      const removedUtxo = utxosToUse.shift();
-      sum = sum.minus(removedUtxo.amount);
+    fundingUtxos.push(cardanoUtxoHexFromRemoteFormat(utxo));
+    if (!fundingUtxoAddr) {
+      fundingUtxoAddr = addressHexToBech32(utxo.receiver);
     }
-    if (sum.gte(required)) {
-      enough = true;
-      break;
+    if (sum.gte(FUNDING_AMOUNT)) {
+      return { fundingUtxos, fundingUtxoAddr };
     }
   }
-  if (enough) {
-    for (;;) {
-      const smallestUtxo = utxosToUse[0];
-      const potentialSum = sum.minus(smallestUtxo.amount);
-      if (potentialSum.gte(required)) {
-        // First utxo can be removed and still will be enough.
-        utxosToUse.shift();
-        sum = potentialSum;
-      } else {
-        break;
-      }
-    }
-    return { utxosToUse: utxosToUse.map(cardanoUtxoHexFromRemoteFormat), fundingUtxo, fundingUtxoAddr };
-  }
-
   return null;
 }
 
-async function createReorgTransaction(wallet: WalletState): Promise<HaskellShelleyTxSignRequest> {
-  const addressedUtxos = asAddressedUtxo(wallet.utxos);
-  const submittedTxs = wallet.submittedTransactions;
-  const firstExternalAddress = wallet.externalAddressesByType[CoreAddressTypes.CARDANO_BASE][0];
-  const protocolParameters = await getProtocolParameters(wallet);
-
-  const { unsignedTx } = await new AdaApi()._createReorgTx(
-    getNetworkById(wallet.networkId),
-    wallet.balance.getDefaults(),
-    wallet.publicDeriverId,
-    wallet.allUtxoAddresses,
-    wallet.receiveAddress,
-    [],
-    COLLATERAL_AMOUNT,
-    addressedUtxos,
-    submittedTxs,
-    firstExternalAddress.address,
-    protocolParameters
-  );
-  return unsignedTx;
-}
-
-type GetCollateralUtxosResponse =
+type GetUtxosResponse =
   | {|
       state: 'exist',
-      collateralUtxos: Array<string>,
-      fundingUtxo: string,
+      fundingUtxos: Array<string>,
       fundingUtxoAddr: string,
     |}
   | {|
-      state: 'need-reorg',
-      signRequest: HaskellShelleyTxSignRequest,
-    |}
-  | {|
       state: 'not-enough',
-    |}
-  | {|
-      state: 'error',
-      message: string,
     |};
-
-export async function getCollateralUtxos(wallet: WalletState): Promise<GetCollateralUtxosResponse> {
-  const getCollateralUtxosResult = await pickCollateralUtxos(wallet);
-  if (getCollateralUtxosResult) {
+export async function getRedemptionUtxos(wallet: WalletState): Promise<GetUtxosResponse> {
+  const getUtxosResult = await pickUtxos(wallet);
+  if (getUtxosResult) {
     return {
       state: 'exist',
-      collateralUtxos: getCollateralUtxosResult.utxosToUse,
-      fundingUtxo: getCollateralUtxosResult.fundingUtxo,
-      fundingUtxoAddr: getCollateralUtxosResult.fundingUtxoAddr,
+      fundingUtxos: getUtxosResult.fundingUtxos,
+      fundingUtxoAddr: getUtxosResult.fundingUtxoAddr,
     };
   }
-  try {
-    const signRequest = await createReorgTransaction(wallet);
-    return {
-      state: 'need-reorg',
-      signRequest,
-    };
-    // after submitting this tx, calling `getCollateralUtxos` again, `pickCollateralUtxos` should succeed
-  } catch (error) {
-    if (error instanceof NotEnoughMoneyToSendError) {
-      return {
-        state: 'not-enough',
-      };
-    }
-    return {
-      state: 'error',
-      message: error.message,
-    };
-  }
+  return {
+    state: 'not-enough',
+  };
 }
 
 async function getThawScheduleOfAddress(thawEndpoint: string, addr: string): Promise<null | ThawData> {
