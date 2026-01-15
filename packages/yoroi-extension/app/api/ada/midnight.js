@@ -13,10 +13,7 @@ import { CardanoDerivationType } from 'trezor-connect-flow';
 import LocalStorageApi, { loadSubmittedTransactions } from '../localStorage';
 import BigNumber from 'bignumber.js';
 import { forceNonNull } from '../../coreUtils.js';
-import { getProtocolParameters } from '../thunk';
-import type { HaskellShelleyTxSignRequest } from './transactions/shelley/HaskellShelleyTxSignRequest';
-import { cardanoUtxoHexFromRemoteFormat, asAddressedUtxo } from './transactions/utils';
-import { NotEnoughMoneyToSendError } from '../common/errors';
+import { cardanoUtxoHexFromRemoteFormat } from './transactions/utils';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -278,22 +275,27 @@ async function pickUtxos(wallet: WalletState): Promise<?{| fundingUtxos: Array<s
   const submittedTxs = (await loadSubmittedTransactions()) || [];
   const adaApi = new AdaApi();
 
-  const utxos = wallet.utxos.map(utxo => ({
-    utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
-    tx_hash: utxo.output.Transaction.Hash,
-    tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
-    receiver: utxo.address,
-    amount: forceNonNull(utxo.output.tokens.find(token => token.Token.Identifier === '')).TokenList.Amount,
-    assets: utxo.output.tokens
-      .filter(token => token.Token.Identifier !== '')
-      .map(token => ({
-        amount: token.TokenList.Amount,
-        assetId: token.Token.Identifier.split('.')[1],
-        policyId: token.Token.Identifier.split('.')[0],
-        name: token.Token.Metadata.assetName,
-      })),
-    addressing: utxo.addressing,
-  }));
+  const utxos = await adaApi._addressedUtxosWithSubmittedTxs(
+    wallet.utxos.map(utxo => ({
+      utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
+      tx_hash: utxo.output.Transaction.Hash,
+      tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
+      receiver: utxo.address,
+      amount: forceNonNull(utxo.output.tokens.find(token => token.Token.Identifier === '')).TokenList.Amount,
+      assets: utxo.output.tokens
+        .filter(token => token.Token.Identifier !== '')
+        .map(token => ({
+          amount: token.TokenList.Amount,
+          assetId: token.Token.Identifier.split('.')[1],
+          policyId: token.Token.Identifier.split('.')[0],
+          name: token.Token.Metadata.assetName,
+        })),
+      addressing: utxo.addressing,
+    })),
+    wallet.publicDeriverId,
+    wallet.allUtxoAddresses,
+    submittedTxs
+  );
   utxos.sort((utxo1, utxo2) => {
     // put pure utxos in the front
     if (utxo1.assets.length === 0 && utxo2.assets.length !== 0) {
