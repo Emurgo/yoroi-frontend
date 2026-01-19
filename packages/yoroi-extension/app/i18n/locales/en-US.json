@@ -987,6 +987,7 @@
   "wallet.receive.page.walletAddressLabel": "Your wallet address",
   "wallet.receive.page.walletReceiveInstructions": "Share this wallet address to receive payments.{newLine}To protect your privacy, new addresses are generated automatically once you use them.",
   "wallet.receive.page.rewardAddressesTitle": "Reward addresses",
+  "wallet.receive.page.singleAddress.walletReceiveInstructions": "Share this wallet address to receive payments.",
   "wallet.receive.page.internalAddressesTitle": "Internal addresses",
   "wallet.recovery.phrase.show.entry.dialog.button.labelClear": "Clear",
   "wallet.recovery.phrase.show.entry.dialog.button.labelConfirm": "Confirm",
@@ -1546,5 +1547,7 @@
   "transaction.fail.cancelByUser": "Transaction cancelled by user",
   "transaction.fail.error": "Your transaction has not been processed properly due to technical issues.",
   "transaction.success.title": "Transaction signed",
-  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
+  "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions.",
+  "singleAddress.settings.title": "Single address mode",
+  "singleAddress.settings.description": "Single address mode means your wallet will only maintain one address, use it for all transactions both as input and return change, and never generate other addresses. This simplifies interaction with some dApps."
 }

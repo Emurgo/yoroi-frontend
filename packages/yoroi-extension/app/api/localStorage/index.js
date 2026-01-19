@@ -43,6 +43,7 @@ const storageKeys = {
   WALLET_LIST_ORDER: networkForLocalStorage + '-WALLET_LIST_ORDER',
   SELECTED_WALLET_PUBLIC_KEY: networkForLocalStorage + '_SELECTED_WALLET_PUBLIC_KEY',
   NFTS_GRID_VIEW_STATE: 'NFTS_GRID_VIEW_STATE',
+  SINGLE_ADDRESS_MODE: 'SINGLE_ADDRESS_MODE',
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
   SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
   STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED: 'STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED',
@@ -87,6 +88,10 @@ type WalletClaimResult = {|
   destAddr: string,
   claimId: string,
   amount: number,
+|};
+
+export type SingleAddressMode = {|
+  [publicDeriverId: string]: boolean,
 |};
 
 /**
@@ -174,6 +179,19 @@ export default class LocalStorageApi {
 
   unsetSwapDisclaimerModalClosed: void => Promise<void> = () =>
     removeLocalItem(storageKeys.SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED);
+
+  // ========== SINGLE_ADDRESS Mode ========== //
+
+  getSingleAddressMode: void => Promise<SingleAddressMode> = async () => {
+    const raw = await getLocalItem(storageKeys.SINGLE_ADDRESS_MODE);
+    if (!raw) {
+      return {};
+    }
+    return JSON.parse(raw);
+  };
+
+  setSingleAddressMode: SingleAddressMode => Promise<void> = mode =>
+    setLocalItem(storageKeys.SINGLE_ADDRESS_MODE, JSON.stringify(mode));
 
   // ========== Midnight Banner Announcement ========== //
   getMidnightBannerPhase2Closed: void => Promise<?string> = () => getLocalItem(storageKeys.MIDNIGHT_BANNER_PHASE2_CLOSED);

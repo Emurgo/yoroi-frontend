@@ -41,6 +41,8 @@ import { PortfolioContextProvider } from './UI/features/portfolio/module/Portfol
 // $FlowIgnore: suppressing this error
 import { NftGalleryContextProvider } from './UI/features/nfts/module/NftGalleryContextProvider';
 // $FlowIgnore: suppressing this error
+import { ReceiveContextProvider } from './UI/features/receive-address/module/ReceiveContextProvider';
+// $FlowIgnore: suppressing this error
 import { CatalystRegistrationContextProvider } from './UI/features/catalyst-registration/module/CatalystRegistrationContextProvider';
 // $FlowIgnore: suppressing this error
 import { DappCenterContextProvider } from './UI/features/dapp-center/module/DappCenterContextProvider';
@@ -213,9 +215,11 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
             <Route
               path={ROUTES.WALLETS.RECEIVE.ROOT + '/*'}
               element={
-                <Receive stores={stores}>
-                  <WalletReceivePage stores={stores} />
-                </Receive>
+                <ReceiveContextProvider stores={stores}>
+                  <Receive stores={stores}>
+                    <WalletReceivePage stores={stores} />
+                  </Receive>
+                </ReceiveContextProvider>
               }
             />
 

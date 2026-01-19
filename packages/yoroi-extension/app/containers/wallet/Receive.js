@@ -9,6 +9,8 @@ import { routeForStore, allAddressSubgroups } from '../../stores/stateless/addre
 import { Box } from '@mui/material';
 import ReceiveWithNavigation from '../../components/wallet/layouts/ReceiveWithNavigation';
 import type { StoresProps } from '../../stores';
+// $FlowFixMe[cannot-resolve-module]
+import SingleAddressMode from '../../UI/features/receive-address/useCases/SingleAddressMode/SingleAddressMode';
 
 type LocalProps = {|
   +children?: Node,
@@ -24,6 +26,11 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
     const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
+
+    if (stores.wallets.isSelectedWalletSingleAddress) {
+      return;
+    }
+
     const rootRoute = buildRoute(ROUTES.WALLETS.RECEIVE.ROOT);
 
     const storesForWallet = allAddressSubgroups.filter(store => store.isRelated());
@@ -51,6 +58,9 @@ export default class Receive extends Component<{| ...StoresProps, ...LocalProps 
     const { stores } = this.props;
     const publicDeriver = stores.wallets.selected;
     if (publicDeriver == null) throw new Error(`${nameof(Receive)} no public deriver`);
+    if (stores.wallets.isSelectedWalletSingleAddress) {
+      return <SingleAddressMode />;
+    }
 
     const storesForWallet = allAddressSubgroups
       .filter(store => store.isRelated())
