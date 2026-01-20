@@ -3,241 +3,241 @@ import { defineMessages } from 'react-intl';
 import { useIntl } from 'react-intl';
 
 export const messages = Object.freeze(
-         defineMessages({
-           tolatValue: {
-             id: 'transaction.review.tolatValue',
-             defaultMessage: '!!!Total wallet value',
-           },
-           confirmHardware: {
-             id: 'transaction.review.confirmHardware',
-             defaultMessage: '!!!Confirm on your hardware wallet',
-           },
-           takeHardwareWallet: {
-             id: 'transaction.review.takeHardwareWallet',
-             defaultMessage:
-               '!!!Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.',
-           },
-           enterPassword: {
-             id: 'transaction.review.enterPassword',
-             defaultMessage: '!!!Enter password to sign this transaction',
-           },
-           password: {
-             id: 'global.labels.password',
-             defaultMessage: '!!!password',
-           },
-           wrongPassword: {
-             id: 'global.labels.wrongPassword',
-             defaultMessage: '!!!wrong password',
-           },
-           wallet: {
-             id: 'settings.menu.wallet.link.label',
-             defaultMessage: '!!!wallet',
-           },
-           metadata: {
-             id: 'wallet.nftGallary.details.metadata',
-             defaultMessage: '!!!metadata',
-           },
-           missingMetadata: {
-             id: 'wallet.nftGallary.details.missingMetadata',
-             defaultMessage: '!!!Metadata is missing',
-           },
-           addressToLabel: {
-             id: 'wallet.send.confirmationDialog.addressToLabel',
-             defaultMessage: '!!!To',
-           },
-           send: {
-             id: 'wallet.send.confirmationDialog.submit',
-             defaultMessage: '!!!send',
-           },
-           inputsLabel: {
-             id: 'transaction.review.inputsLabel',
-             defaultMessage: '!!!Inputs',
-           },
-           outputsLabel: {
-             id: 'transaction.review.outputsLabel',
-             defaultMessage: '!!!Outputs',
-           },
-           yourAddressLabel: {
-             id: 'transaction.review.yourAddressLabel',
-             defaultMessage: '!!!Your Address',
-           },
-           feeLabel: {
-             id: 'wallet.transaction.fee',
-             defaultMessage: '!!!fee',
-           },
-           interactWithOperations: {
-             id: 'transaction.review.interactWithOperations',
-             defaultMessage:
-               '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
-           },
-           learnMore: {
-             id: 'global.labels.LearnMore',
-             defaultMessage: '!!!Learn more',
-           },
-           collateralInfo: {
-             id: 'transaction.review.collateralInfo',
-             defaultMessage:
-               '!!!Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.',
-           },
-           addCollateral: {
-             id: 'connector.signin.reorg.title',
-             defaultMessage: '!!!Add collateral',
-           },
-           identifyDrep: {
-             id: 'transaction.review.identifyDrep',
-             defaultMessage: '!!!Identify your preferred DRep and enter their ID below to delegate your vote:',
-           },
-           confirmLabel: {
-             id: 'global.labels.confirm',
-             defaultMessage: '!!!confirm',
-           },
-           registerStakingKey: {
-             id: 'transaction.review.registerStakingKey',
-             defaultMessage: '!!!Register Staking key deposit',
-           },
-           stakeWalletBalance: {
-             id: 'transaction.review.stakeWalletBalance',
-             defaultMessage: '!!!Stake entire wallet balance to',
-           },
-           trezorConfirm: {
-             id: 'transaction.review.trezorConfirm',
-             defaultMessage: '!!!Confirm using Trezor',
-           },
-           ledgerConfirm: {
-             id: 'transaction.review.ledgerConfirm',
-             defaultMessage: '!!!Confirm using Ledger',
-           },
-           submitLabel: {
-             id: 'global.labels.submit',
-             defaultMessage: '!!!submit',
-           },
-           cancelLabel: {
-             id: 'global.labels.cancel',
-             defaultMessage: '!!!cancel',
-           },
-           transactionReview: {
-             id: 'transaction.review.transactionReview',
-             defaultMessage: '!!!Transaction Review',
-           },
-           walletDetails: {
-             id: 'transaction.review.walletDetails',
-             defaultMessage: '!!!Wallet Details',
-           },
-           submitTransaction: {
-             id: 'transaction.review.submitTransaction',
-             defaultMessage: '!!!Submit Transaction',
-           },
-           chooseDrep: {
-             id: 'governance.chooseDrep',
-             defaultMessage: '!!!Choose your Drep',
-           },
-           operations: {
-             id: 'governance.operations',
-             defaultMessage: '!!!operations',
-           },
-           attentionLabel: {
-             id: 'transfer.instructions.attention.title.label',
-             defaultMessage: '!!!Attention',
-           },
-           rewardsWithdraw: {
-             id: 'transaction.review.rewardsWithdraw',
-             defaultMessage:
-               '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
-           },
-           associatedAddress: {
-             id: 'transaction.review.associatedAddress',
-             defaultMessage: '!!!Associated address',
-           },
-           yourWallet: {
-             id: 'global.label.yourWallet',
-             defaultMessage: '!!!Your Wallet',
-           },
-           receiveLabel: {
-             id: 'global.receive',
-             defaultMessage: '!!!receive',
-           },
-           forgotPassword: {
-             id: 'transaction.review.forgotPassword',
-             defaultMessage: '!!!Forgot your password?',
-           },
-           howToRestorePassword: {
-             id: 'transaction.review.howToRestorePassword',
-             defaultMessage: '!!!how to restore it.',
-           },
-           failTitle: {
-             id: 'transaction.fail.title',
-             defaultMessage: '!!!Transaction failed',
-           },
-           failCancelByUser: {
-             id: 'transaction.fail.cancelByUser',
-             defaultMessage: '!!!Transaction cancelled by user.',
-           },
-           failError: {
-             id: 'transaction.fail.error',
-             defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
-           },
-           failClose: {
-             id: 'global.labels.close',
-             defaultMessage: '!!!Close',
-           },
-           failLedgerAppNotRunning: {
-             id: 'wallet.hw.ledger.app.not.running',
-             defaultMessage: '!!!The Cardano App is not running on your Ledger',
-           },
-           successTitle: {
-             id: 'transaction.success.title',
-             defaultMessage: '!!!Transaction signed',
-           },
-           successDescription: {
-             id: 'transaction.success.description',
-             defaultMessage: '!!!It may take a few minutes to display it in the list of wallet transactions.',
-           },
-           successClose: {
-             id: 'global.labels.close',
-             defaultMessage: '!!!Close',
-           },
-           findPreferredDrep: {
-             id: 'governance.findPreferredDrep',
-             defaultMessage: '!!!Find your preferred DRep and enter their ID below to delegate your vote:',
-           },
-           dontHaveId: {
-             id: 'transaction.review.dontHaveId',
-             defaultMessage: '!!!Don’t have an ID?',
-           },
-           findDrepHere: {
-             id: 'transaction.review.findDrepHere',
-             defaultMessage: '!!!Find a DRep here',
-           },
-           delegateToYoroi: {
-             id: 'transaction.review.delegateToYoroi',
-             defaultMessage: '!!!Delegate to Yoroi DRep below',
-           },
-           delegateVoting: {
-             id: 'transaction.review.delegateVoting',
-             defaultMessage: '!!!Delegating voting to',
-           },
-           handleNoDrep: {
-             id: 'transaction.drep.handleNoDrep',
-             defaultMessage: '!!!This ADA handle does not have a DRep ID assigned.',
-           },
-           handleLookupFailed: {
-             id: 'transaction.drep.handleLookupFailed',
-             defaultMessage: '!!!Unable to verify ADA handle. Please try again.',
-           },
-           invalidFormat: {
-             id: 'transaction.drep.invalidFormat',
-             defaultMessage: '!!!Invalid DRep ID or ADA handle format.',
-           },
-           adaHandleNotFound: {
-             id: 'transaction.drep.adaHandleNotFound',
-             defaultMessage: '!!!ADA handle not found.',
-           },
-           drepOrAdaHandle: {
-             id: 'transaction.drep.drepOrAdaHandle',
-             defaultMessage: '!!!DRep ID or ADA handle',
-           },
-         })
-       );
+  defineMessages({
+    tolatValue: {
+      id: 'transaction.review.tolatValue',
+      defaultMessage: '!!!Total wallet value',
+    },
+    confirmHardware: {
+      id: 'transaction.review.confirmHardware',
+      defaultMessage: '!!!Confirm on your hardware wallet',
+    },
+    takeHardwareWallet: {
+      id: 'transaction.review.takeHardwareWallet',
+      defaultMessage:
+        '!!!Take your hardware wallet device and follow the instructions there. Make sure you confirm a trusted action.',
+    },
+    enterPassword: {
+      id: 'transaction.review.enterPassword',
+      defaultMessage: '!!!Enter password to sign this transaction',
+    },
+    password: {
+      id: 'global.labels.password',
+      defaultMessage: '!!!password',
+    },
+    wrongPassword: {
+      id: 'global.labels.wrongPassword',
+      defaultMessage: '!!!wrong password',
+    },
+    wallet: {
+      id: 'settings.menu.wallet.link.label',
+      defaultMessage: '!!!wallet',
+    },
+    metadata: {
+      id: 'wallet.nftGallary.details.metadata',
+      defaultMessage: '!!!metadata',
+    },
+    missingMetadata: {
+      id: 'wallet.nftGallary.details.missingMetadata',
+      defaultMessage: '!!!Metadata is missing',
+    },
+    addressToLabel: {
+      id: 'wallet.send.confirmationDialog.addressToLabel',
+      defaultMessage: '!!!To',
+    },
+    send: {
+      id: 'wallet.send.confirmationDialog.submit',
+      defaultMessage: '!!!send',
+    },
+    inputsLabel: {
+      id: 'transaction.review.inputsLabel',
+      defaultMessage: '!!!Inputs',
+    },
+    outputsLabel: {
+      id: 'transaction.review.outputsLabel',
+      defaultMessage: '!!!Outputs',
+    },
+    yourAddressLabel: {
+      id: 'transaction.review.yourAddressLabel',
+      defaultMessage: '!!!Your Address',
+    },
+    feeLabel: {
+      id: 'wallet.transaction.fee',
+      defaultMessage: '!!!fee',
+    },
+    interactWithOperations: {
+      id: 'transaction.review.interactWithOperations',
+      defaultMessage:
+        '!!!You are about to interact with operations, which are key components used in governance and various blockchain activities. These include Cardano Governance Certificates, as outlined in CIP-0095, which facilitate governance transactions.',
+    },
+    learnMore: {
+      id: 'global.labels.LearnMore',
+      defaultMessage: '!!!Learn more',
+    },
+    collateralInfo: {
+      id: 'transaction.review.collateralInfo',
+      defaultMessage:
+        '!!!Collateral is mandatory when interacting with certain smart contracts on Cardano. ADA will only be deduced from your collateral if transaction validation fails.',
+    },
+    addCollateral: {
+      id: 'connector.signin.reorg.title',
+      defaultMessage: '!!!Add collateral',
+    },
+    identifyDrep: {
+      id: 'transaction.review.identifyDrep',
+      defaultMessage: '!!!Identify your preferred DRep and enter their ID below to delegate your vote:',
+    },
+    confirmLabel: {
+      id: 'global.labels.confirm',
+      defaultMessage: '!!!confirm',
+    },
+    registerStakingKey: {
+      id: 'transaction.review.registerStakingKey',
+      defaultMessage: '!!!Register Staking key deposit',
+    },
+    stakeWalletBalance: {
+      id: 'transaction.review.stakeWalletBalance',
+      defaultMessage: '!!!Stake entire wallet balance to',
+    },
+    trezorConfirm: {
+      id: 'transaction.review.trezorConfirm',
+      defaultMessage: '!!!Confirm using Trezor',
+    },
+    ledgerConfirm: {
+      id: 'transaction.review.ledgerConfirm',
+      defaultMessage: '!!!Confirm using Ledger',
+    },
+    submitLabel: {
+      id: 'global.labels.submit',
+      defaultMessage: '!!!submit',
+    },
+    cancelLabel: {
+      id: 'global.labels.cancel',
+      defaultMessage: '!!!cancel',
+    },
+    transactionReview: {
+      id: 'transaction.review.transactionReview',
+      defaultMessage: '!!!Transaction Review',
+    },
+    walletDetails: {
+      id: 'transaction.review.walletDetails',
+      defaultMessage: '!!!Wallet Details',
+    },
+    submitTransaction: {
+      id: 'transaction.review.submitTransaction',
+      defaultMessage: '!!!Submit Transaction',
+    },
+    chooseDrep: {
+      id: 'governance.chooseDrep',
+      defaultMessage: '!!!Choose your Drep',
+    },
+    operations: {
+      id: 'governance.operations',
+      defaultMessage: '!!!operations',
+    },
+    attentionLabel: {
+      id: 'transfer.instructions.attention.title.label',
+      defaultMessage: '!!!Attention',
+    },
+    rewardsWithdraw: {
+      id: 'transaction.review.rewardsWithdraw',
+      defaultMessage:
+        '!!!Your rewards will automatically get withdrawn once you undelegate from a stake pool. You will also receive back your staking deposit of 2 ADA. If you wish to choose another stake pool, you can change your preference without undelegation.',
+    },
+    associatedAddress: {
+      id: 'transaction.review.associatedAddress',
+      defaultMessage: '!!!Associated address',
+    },
+    yourWallet: {
+      id: 'global.label.yourWallet',
+      defaultMessage: '!!!Your Wallet',
+    },
+    receiveLabel: {
+      id: 'global.receive',
+      defaultMessage: '!!!receive',
+    },
+    forgotPassword: {
+      id: 'transaction.review.forgotPassword',
+      defaultMessage: '!!!Forgot your password?',
+    },
+    howToRestorePassword: {
+      id: 'transaction.review.howToRestorePassword',
+      defaultMessage: '!!!how to restore it.',
+    },
+    failTitle: {
+      id: 'transaction.fail.title',
+      defaultMessage: '!!!Transaction failed',
+    },
+    failCancelByUser: {
+      id: 'transaction.fail.cancelByUser',
+      defaultMessage: '!!!Transaction cancelled by user.',
+    },
+    failError: {
+      id: 'transaction.fail.error',
+      defaultMessage: '!!!Your transaction has not been processed properly due to technical issues.',
+    },
+    failClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
+    failLedgerAppNotRunning: {
+      id: 'wallet.hw.ledger.app.not.running',
+      defaultMessage: '!!!The Cardano App is not running on your Ledger',
+    },
+    successTitle: {
+      id: 'transaction.success.title',
+      defaultMessage: '!!!Transaction signed',
+    },
+    successDescription: {
+      id: 'transaction.success.description',
+      defaultMessage: '!!!It may take a few minutes to display it in the list of wallet transactions.',
+    },
+    successClose: {
+      id: 'global.labels.close',
+      defaultMessage: '!!!Close',
+    },
+    findPreferredDrep: {
+      id: 'governance.findPreferredDrep',
+      defaultMessage: '!!!Find your preferred DRep and enter their ID below to delegate your vote:',
+    },
+    dontHaveId: {
+      id: 'transaction.review.dontHaveId',
+      defaultMessage: '!!!Don’t have an ID?',
+    },
+    findDrepHere: {
+      id: 'transaction.review.findDrepHere',
+      defaultMessage: '!!!Find a DRep here',
+    },
+    delegateToYoroi: {
+      id: 'transaction.review.delegateToYoroi',
+      defaultMessage: '!!!Delegate to Yoroi DRep below',
+    },
+    delegateVoting: {
+      id: 'transaction.review.delegateVoting',
+      defaultMessage: '!!!Delegating voting to',
+    },
+    handleNoDrep: {
+      id: 'transaction.drep.handleNoDrep',
+      defaultMessage: '!!!This ADA handle does not have a DRep ID assigned.',
+    },
+    handleLookupFailed: {
+      id: 'transaction.drep.handleLookupFailed',
+      defaultMessage: '!!!Unable to verify ADA handle. Please try again.',
+    },
+    invalidFormat: {
+      id: 'transaction.drep.invalidFormat',
+      defaultMessage: '!!!Invalid DRep ID or ADA handle format.',
+    },
+    adaHandleNotFound: {
+      id: 'transaction.drep.adaHandleNotFound',
+      defaultMessage: '!!!ADA handle not found.',
+    },
+    drepOrAdaHandle: {
+      id: 'transaction.drep.drepOrAdaHandle',
+      defaultMessage: '!!!DRep ID or ADA handle',
+    },
+  })
+);
 
 export const useStrings = () => {
   const intl = useIntl();
