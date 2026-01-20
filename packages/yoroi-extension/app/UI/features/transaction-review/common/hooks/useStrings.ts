@@ -216,6 +216,26 @@ export const messages = Object.freeze(
       id: 'transaction.review.delegateVoting',
       defaultMessage: '!!!Delegating voting to',
     },
+    handleNoDrep: {
+      id: 'transaction.drep.handleNoDrep',
+      defaultMessage: '!!!This ADA handle does not have a DRep ID assigned.',
+    },
+    handleLookupFailed: {
+      id: 'transaction.drep.handleLookupFailed',
+      defaultMessage: '!!!Unable to verify ADA handle. Please try again.',
+    },
+    invalidFormat: {
+      id: 'transaction.drep.invalidFormat',
+      defaultMessage: '!!!Invalid DRep ID or ADA handle format.',
+    },
+    adaHandleNotFound: {
+      id: 'transaction.drep.adaHandleNotFound',
+      defaultMessage: '!!!ADA handle not found.',
+    },
+    drepOrAdaHandle: {
+      id: 'transaction.drep.drepOrAdaHandle',
+      defaultMessage: '!!!DRep ID or ADA handle',
+    },
   })
 );
 
@@ -274,5 +294,10 @@ export const useStrings = () => {
     findDrepHere: intl.formatMessage(messages.findDrepHere),
     delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
     delegateVoting: intl.formatMessage(messages.delegateVoting),
+    handleNoDrep: intl.formatMessage(messages.handleNoDrep),
+    handleLookupFailed: intl.formatMessage(messages.handleLookupFailed),
+    invalidFormat: intl.formatMessage(messages.invalidFormat),
+    adaHandleNotFound: intl.formatMessage(messages.adaHandleNotFound),
+    drepOrAdaHandle: intl.formatMessage(messages.drepOrAdaHandle),
   }).current;
 };
