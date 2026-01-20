@@ -66,7 +66,7 @@ export const TokenPriceChangeChip = ({
   timeInterval,
   pathId,
 }: TokenPriceChangeChipProps) => {
-  const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart(timeInterval, { info: { id: '' } });
+  const { data: ptTokenDataInterval, isFetching } = useGetPortfolioTokenChart({ info: { id: '' } }, timeInterval);
   const pathIdInterval = timeInterval ? timeInterval.replace(' ', '') : '24h';
   const fullPathId = `${pathId}-${pathIdInterval}_priceChanges-text`;
 
@@ -79,13 +79,9 @@ export const TokenPriceChangeChip = ({
     return <Skeleton variant="text" width="60px" height="30px" />;
   }
 
-  const tokenPriceClose = isPrimaryToken
-    ? primaryTokenActivity?.close
-    : secondaryTokenActivity && secondaryTokenActivity[1].price?.close;
+  const tokenPriceClose = isPrimaryToken ? primaryTokenActivity?.close : secondaryTokenActivity?.[1]?.price?.close;
 
-  const tokenPriceOpen = isPrimaryToken
-    ? primaryTokenActivity?.open
-    : secondaryTokenActivity && secondaryTokenActivity[1].price?.open;
+  const tokenPriceOpen = isPrimaryToken ? primaryTokenActivity?.open : secondaryTokenActivity?.[1]?.price?.open;
 
   const { changePercent, variantPnl } = priceChange(tokenPriceOpen, tokenPriceClose);
 
@@ -183,7 +179,7 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
     ptActivity: { close: ptPrice },
   } = useCurrencyPairing();
 
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
+  const tokenPrice = secondaryToken24Activity?.[1]?.price?.close;
   const tokenQuantityAsBigInt = bigNumberToBigInt(token.quantity);
 
   const showingAda = accountPair?.from.name === primaryTokenInfo.name;
@@ -234,10 +230,10 @@ export const TokenPriceTotal = observer(({ token, secondaryToken24Activity, stor
 export const TokenPrice = ({ secondaryToken24Activity, ptActivity, token, pathId }) => {
   const { unitOfAccount } = usePortfolio();
   const isPrimaryToken = token.id === '-';
-  const tokenPrice = secondaryToken24Activity && secondaryToken24Activity[1].price?.close;
+  const tokenPrice = secondaryToken24Activity?.[1]?.price?.close;
   const ptPrice = ptActivity?.close;
   const ptUnitPrice = tokenPrice * ptPrice;
-  const priceDisplay = parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4);
+  const priceDisplay = Number.parseFloat(isPrimaryToken ? ptPrice : ptUnitPrice).toFixed(4);
 
   const noDataToDisplay = priceDisplay === 'NaN';
 
@@ -254,7 +250,7 @@ export const TokenProcentage = ({ procentage, pathId }) => {
 
   return (
     <Typography variant="body2" color="ds.text_gray_medium" id={`${pathId}-percentage-text`}>
-      {showWelcomeBanner ? 0 : parseFloat(procentage).toFixed(2)}%
+      {showWelcomeBanner ? 0 : Number.parseFloat(procentage).toFixed(2)}%
     </Typography>
   );
 };

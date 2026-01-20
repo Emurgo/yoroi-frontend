@@ -12,8 +12,8 @@ export const Columns = Object.freeze({
   Day: '24h',
   Week: '1W',
   Month: '1M',
+  Percentage: 'portfolioPercentage',
   Total: 'totalAmount',
-  Percentage: 'portfolioPercents',
 });
 export const RedirectionButtons = Object.freeze({
   Receive: 'receive',
