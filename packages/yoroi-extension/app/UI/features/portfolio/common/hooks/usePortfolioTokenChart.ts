@@ -1,6 +1,5 @@
 import { isRight } from '@yoroi/common';
 import { useQuery, UseQueryOptions } from '@tanstack/react-query';
-// import { useLanguage } from '../../../kernel/i18n';
 import { supportedCurrencies, time } from '../../../../utils/constants';
 import { fetchPtPriceActivity } from '../../../../utils/usePrimaryTokenActivity';
 import { usePortfolio } from '../../module/PortfolioContextProvider';
@@ -20,11 +19,10 @@ type TokenChartData = {
 type TokenChartQueryKey = ['useGetPortfolioTokenChart', string, TokenChartInterval, string | undefined];
 
 export const useGetPortfolioTokenChart = (
-  timeInterval = TOKEN_CHART_INTERVAL.DAY as TokenChartInterval,
   tokenInfo: any,
+  timeInterval = TOKEN_CHART_INTERVAL.DAY as TokenChartInterval,
   options: Omit<UseQueryOptions<TokenChartData[], Error, TokenChartData[], TokenChartQueryKey>, 'queryKey' | 'queryFn'> = {}
 ) => {
-  // const { currency } = useCurrencyPairing();
   const { unitOfAccount, primaryTokenInfo } = usePortfolio();
 
   const currency = unitOfAccount;

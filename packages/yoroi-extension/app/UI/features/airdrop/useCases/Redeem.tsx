@@ -1,7 +1,7 @@
 import Dialog from '../../../../components/widgets/Dialog';
 import { Typography, Box, Button } from '@mui/material';
 import { useEffect, useState, useRef } from 'react';
-import { getCollateralUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
+import { getRedemptionUtxos, getRedemptionTransaction } from '../../../../api/ada/midnight';
 import { useStrings } from '../common/hooks/useStrings';
 import LoadingSpinner from '../../../../components/widgets/LoadingSpinner';
 import { formatNumberExactly } from '../../../../api/ada/midnightRedemption';
@@ -23,7 +23,7 @@ export default function Redeem(props: {
   const abort = useRef(false);
 
   const updateCollateralUtxos = async (reorgTxId?: string) => {
-    const result = await getCollateralUtxos(props.wallet);
+    const result = await getRedemptionUtxos(props.wallet);
     setGetCollateralUtxosResult(result);
     if (result.state === 'exist') {
       // we just submitted the re-org tx, wait for it to be confirmed
@@ -44,8 +44,8 @@ export default function Redeem(props: {
             props.address,
             props.endpoint,
             result.fundingUtxoAddr,
-            result.collateralUtxos,
-            [result.fundingUtxo]
+            [],
+            result.fundingUtxos
           );
           if (abort.current) {
             return;
