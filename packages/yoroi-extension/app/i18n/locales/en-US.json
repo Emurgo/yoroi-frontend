@@ -1550,5 +1550,6 @@
   "transaction.drep.handleLookupFailed": "Unable to verify ADA handle. Please try again.",
   "transaction.drep.invalidFormat": "Invalid DRep ID or ADA handle format.",
   "transaction.drep.adaHandleNotFound": "ADA handle not found.",
+  "transaction.drep.drepOrAdaHandle": "DRep ID or ADA handle",
   "transaction.success.description": "It may take a few minutes to display it in the list of wallet transactions."
 }

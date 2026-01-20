@@ -128,7 +128,7 @@ export const ChooseOtherDrepId = () => {
           <Box>
             <TextInput
               id="setDrepValueId"
-              label="DRep ID or ADA handle"
+              label={strings.drepOrAdaHandle}
               variant="outlined"
               onChange={event => {
                 setDrepIdInput(event.target.value);
