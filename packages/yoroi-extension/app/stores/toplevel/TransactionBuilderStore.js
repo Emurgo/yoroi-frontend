@@ -392,6 +392,16 @@ export default class TransactionBuilderStore extends Store<StoresMap> {
     const publicDeriver = this.stores.wallets.selected;
     if (!publicDeriver) throw new Error(`${nameof(this.updateAmount)} requires wallet to be selected`);
     const selectedToken = this.selectedToken ?? this.stores.tokenInfoStore.getDefaultTokenInfo(publicDeriver.networkId);
+    if (value?.toString() === '0') {
+      const idx = this.plannedTxInfoMap.findIndex(({ token }) => token.Identifier === selectedToken.Identifier);
+      if (idx !== -1) {
+        runInAction(() => {
+          this.plannedTxInfoMap.splice(idx, 1);
+        });
+      }
+      return;
+    }
+
     const tokenTxInfo = this.plannedTxInfoMap.find(({ token }) => token.Identifier === selectedToken.Identifier);
 
     if (!tokenTxInfo) {
