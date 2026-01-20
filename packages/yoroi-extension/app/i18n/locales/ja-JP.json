@@ -1546,5 +1546,10 @@
   "transaction.fail.cancelByUser": "取引はユーザーによってキャンセルされました",
   "transaction.fail.error": "技術的な問題により、取引を正常に処理できませんでした。",
   "transaction.success.title": "取引が完了しました",
+  "transaction.drep.handleNoDrep": "This ADA handle does not have a DRep ID assigned.",
+  "transaction.drep.handleLookupFailed": "Unable to verify ADA handle. Please try again.",
+  "transaction.drep.invalidFormat": "Invalid DRep ID or ADA handle format.",
+  "transaction.drep.adaHandleNotFound": "ADA handle not found.",
+  "transaction.drep.drepOrAdaHandle": "DRep ID or ADA handle",
   "transaction.success.description": "取引一覧に反映されるまで数分かかる場合があります。"
 }

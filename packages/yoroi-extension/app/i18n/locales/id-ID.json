@@ -1546,5 +1546,10 @@
   "transaction.fail.cancelByUser": "Transaksi dibatalkan oleh pengguna",
   "transaction.fail.error": "Transaksi Anda tidak diproses dengan benar karena masalah teknis.",
   "transaction.success.title": "Transaksi ditandatangani",
+  "transaction.drep.handleNoDrep": "This ADA handle does not have a DRep ID assigned.",
+  "transaction.drep.handleLookupFailed": "Unable to verify ADA handle. Please try again.",
+  "transaction.drep.invalidFormat": "Invalid DRep ID or ADA handle format.",
+  "transaction.drep.adaHandleNotFound": "ADA handle not found.",
+  "transaction.drep.drepOrAdaHandle": "DRep ID or ADA handle",
   "transaction.success.description": "Mungkin butuh waktu beberapa menit untuk menampilkannya dalam daftar transaksi."
 }
