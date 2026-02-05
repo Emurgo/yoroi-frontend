@@ -64,7 +64,7 @@ export const TokenChartInterval = ({ tokenInfo, pathId = '' }: Props): React.Rea
 
   // Fetch data based on the selected interval
   const [timeInterval, setTimeInterval] = useState<any>(TOKEN_CHART_INTERVAL.DAY);
-  const { data, isFetching } = useGetPortfolioTokenChart(timeInterval, tokenInfo);
+  const { data, isFetching } = useGetPortfolioTokenChart(tokenInfo, timeInterval);
 
   const handlePeriodChange = (id: string) => {
     setTimeInterval(TOKEN_CHART_INTERVAL[id]);
@@ -119,7 +119,7 @@ export const TokenChartInterval = ({ tokenInfo, pathId = '' }: Props): React.Rea
               height: '160px',
             }}
           >
-            {!data ? null : (
+            {data && (
               <ResponsiveContainer width={'100%'} height="100%">
                 <LineChart
                   margin={{ top: 10, left: -16, right: 0, bottom: 0 }}

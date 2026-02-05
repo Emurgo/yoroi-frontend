@@ -10,12 +10,18 @@ import { bigNumberToBigInt } from './TableColumnsChip';
 
 export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data30d }) => {
   const { primaryTokenInfo } = usePortfolio();
-  const { data: ptTokenDataInterval7d } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.WEEK, {
-    info: { id: '' },
-  });
-  const { data: ptTokenDataInterval1M } = useGetPortfolioTokenChart(TOKEN_CHART_INTERVAL.MONTH, {
-    info: { id: '' },
-  });
+  const { data: ptTokenDataInterval7d } = useGetPortfolioTokenChart(
+    {
+      info: { id: '' },
+    },
+    TOKEN_CHART_INTERVAL.WEEK
+  );
+  const { data: ptTokenDataInterval1M } = useGetPortfolioTokenChart(
+    {
+      info: { id: '' },
+    },
+    TOKEN_CHART_INTERVAL.MONTH
+  );
 
   // Helper to calculate fiat value and unit price for a token
   const calculateTotalFiatForToken = token => {
@@ -33,10 +39,10 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
       .times(new BigNumber(ptActivity?.close.toString() || 1))
       .toNumber();
 
-    const unitPrice = parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
+    const unitPrice = Number.parseFloat((tokenPrice * ptActivity?.close || 1).toFixed(4));
     const primaryTokenFiatTotalAmount = formatValue(primaryTokenInfo.quantity.multipliedBy(String(ptActivity?.close)));
 
-    const tokenValueDisplay = secondaryToken24Activity && secondaryToken24Activity[0] === 500 ? 0 : totalValue;
+    const tokenValueDisplay = secondaryToken24Activity?.[0] === 500 ? 0 : totalValue;
     return { totalValue: isPrimaryToken ? primaryTokenFiatTotalAmount : tokenValueDisplay, unitPrice };
   };
 
@@ -63,7 +69,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
     return data
       .map(token => {
         const { totalValue, unitPrice } = tokenFiatValues[token.info.id] || {};
-        const percentage = totalPortfolioValue ? (totalValue / Number(totalPortfolioValue)) * 100 : 0;
+        const portfolioPercentage = totalPortfolioValue ? (totalValue / Number(totalPortfolioValue)) * 100 : 0;
         const isPrimaryToken = token.id === '-';
 
         const { open: open24, close: close24 } = getTokenActivityChange(token.info.id, data24h, isPrimaryToken);
@@ -76,7 +82,7 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
 
         return {
           ...token,
-          percentage,
+          portfolioPercentage,
           totalAmount: totalValue,
           price: totalValue === 0 ? 0 : unitPrice,
           '24h': changePercent24,
@@ -86,22 +92,16 @@ export const useProcessedTokenData = ({ data, ptActivity, data24h, data7d, data3
         };
       })
       .sort((a, b) => {
-        // If both tokens have special names, sort them by percentage
-        if (a.isSpecialName && b.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
+        // Handle case when both tokens have special names and 0 portfolioPercentage
+        // They should be considered equal to maintain comparator antisymmetry
+        if (a.isSpecialName && a.portfolioPercentage === 0 && b.isSpecialName && b.portfolioPercentage === 0) {
+          return 0;
         }
-        // If only one token has a special name but has percentage > 0, still sort it normally
-        if (a.isSpecialName && a.percentage > 0 && !b.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
-        }
-        if (b.isSpecialName && b.percentage > 0 && !a.isSpecialName) {
-          return Number(b.percentage) - Number(a.percentage);
-        }
-        // Move tokens with special names and 0 percentage to the bottom
-        if (a.isSpecialName && a.percentage === 0) return 1;
-        if (b.isSpecialName && b.percentage === 0) return -1;
-        // Default sorting by percentage
-        return Number(b.percentage) - Number(a.percentage);
+        // Move tokens with special names and 0 portfolioPercentage to the bottom
+        if (a.isSpecialName && a.portfolioPercentage === 0) return 1;
+        if (b.isSpecialName && b.portfolioPercentage === 0) return -1;
+        // Default sorting by portfolioPercentage
+        return Number(b.portfolioPercentage) - Number(a.portfolioPercentage);
       });
   }, [data, ptActivity, data24h, data7d, data30d, primaryTokenInfo, ptTokenDataInterval7d, ptTokenDataInterval1M]);
 

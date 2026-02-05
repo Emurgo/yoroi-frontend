@@ -59,7 +59,7 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
     { id: '1W', label: strings['1W'], align: 'left', sortType: 'numeric' },
     { id: '1M', label: strings['1M'], align: 'left', sortType: 'numeric' },
     {
-      id: 'portfolioPercents',
+      id: 'portfolioPercentage',
       label: `${strings.portfolio} %`,
       align: 'left',
       sortType: 'numeric',
@@ -137,7 +137,7 @@ const StatsTable = ({ data, stores }: Props): React.ReactNode => {
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
-            <TokenProcentage procentage={row.percentage} pathId={tokenPathId(rowIndex)} />
+            <TokenProcentage procentage={row.portfolioPercentage} pathId={tokenPathId(rowIndex)} />
           </STableCell>
 
           <STableCell sx={{ padding: '16.8px 1rem' }}>
