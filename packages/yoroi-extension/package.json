@@ -1,6 +1,6 @@
 {
   "name": "yoroi",
-  "version": "5.20.0",
+  "version": "5.21.0",
   "description": "Cardano ADA wallet",
   "scripts": {
     "dev:main": "NODE_OPTIONS=--openssl-legacy-provider babel-node scripts/dev main --env mainnet",
@@ -163,7 +163,7 @@
     "@tanstack/react-query": "^5.90.11",
     "@yoroi/exchange": "2.0.1",
     "@yoroi/explorers": "^1.0.2",
-    "@yoroi/portfolio": "1.0.3",
+    "@yoroi/portfolio": "2.0.0",
     "@yoroi/resolver": "6.0.2",
     "@yoroi/staking": "^1.6.0",
     "@yoroi/swap": "7.2.0",
