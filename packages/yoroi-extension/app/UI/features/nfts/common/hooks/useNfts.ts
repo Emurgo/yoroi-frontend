@@ -21,7 +21,7 @@ export const useNfts = () => {
   const params = useParams<{ nftId: string | undefined }>();
   const network = getNetworkById(selectedWallet?.networkId);
   const isHaskell = isCardanoHaskell(network);
-  const networkUrl: NetworkUrl = isHaskell ? getNetworkUrl(network) : null;
+  const networkUrl: NetworkUrl = isHaskell ? getNetworkUrl(selectedWallet?.networkId) : null;
 
   useEffect(() => {
     if (spendableBalance == null) {
