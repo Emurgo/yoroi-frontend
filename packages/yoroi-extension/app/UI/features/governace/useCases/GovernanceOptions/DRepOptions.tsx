@@ -42,7 +42,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       title: strings.delegateToDRep,
       description: strings.identifyDrep,
       buttonText: isDelegationToDrep ? strings.changeToDrep : strings.delegateLabel,
-      variant: 'outlined' as const,
       icon: <Icon.VotingDrep />,
       onAction: () => openDelegateModalForCustomDrep(),
       status: cardState,
@@ -54,7 +53,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       title: strings.abstain,
       description: strings.chooseAbstain,
       buttonText: isAbstain ? strings.changeToDrep : strings.delegateLabel,
-      variant: 'outlined' as const,
       icon: <Icon.VotingAbstain />,
       onAction: () => (isAbstain ? openDelegateModalForCustomDrep() : delegateToAbstain()),
       status: cardState,
@@ -66,7 +64,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
       title: strings.noConfidence,
       description: strings.chooseNoConfidence,
       buttonText: isNoConfidence ? strings.changeToDrep : strings.delegateLabel,
-      variant: 'outlined' as const,
       icon: <Icon.VotingNoConfidence />,
       onAction: () => (isNoConfidence ? openDelegateModalForCustomDrep() : delegateToNoConfidence()),
       status: cardState,
@@ -99,7 +96,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
               title={option.title}
               description={option.description}
               buttonText={option.buttonText}
-              variant={option.variant}
               icon={option.icon}
               onAction={option.onAction}
               status={option.status}
