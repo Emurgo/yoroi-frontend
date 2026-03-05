@@ -34,11 +34,10 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   const strings = useStrings();
   const theme: any = useTheme();
 
-  const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep, drepID } = useGovernanceDelegationStatus({
+  const { isAbstain, isNoConfidence, isDelegationToDrep, drepID } = useGovernanceDelegationStatus({
     governanceStatus,
     isDelegated,
   });
-  const isDelegationToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
   const showDrepStatus = isDelegationToDrep || !isParticipating;
   const showDrepId = isDelegationToDrep;

@@ -26,11 +26,10 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
 
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
-  const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep } = useGovernanceDelegationStatus({
+  const { isAbstain, isNoConfidence, isDelegationToDrep } = useGovernanceDelegationStatus({
     governanceStatus,
     isDelegated,
   });
-  const isDelegationToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
 
   const onBack = () => {
     navigateTo.selectRevampStatus();
