@@ -23,20 +23,21 @@ export const useGovernanceDelegationStatus = ({
 
   return React.useMemo(() => {
     const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
-    const drepID = governanceStatus?.drep ? governanceStatus?.drep : yoroiDrepId;
+    const drepID = governanceStatus?.drep ?? null;
 
     const isAbstain = isDelegated && governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_ABSTAIN;
     const isNoConfidence =
       isDelegated && governanceStatus?.drep === null && governanceStatus?.status === DREP_ALWAYS_NO_CONFIDENCE;
-    const isDelegationToYoroiDrep = isDelegated && !(isAbstain || isNoConfidence) && drepID === yoroiDrepId;
-    const isDelegationToOtherDrep = isDelegated && !(isAbstain || isNoConfidence) && drepID !== yoroiDrepId;
+    const hasDrepSelection = isDelegated && !(isAbstain || isNoConfidence) && drepID != null;
+    const isDelegationToYoroiDrep = hasDrepSelection && drepID === yoroiDrepId;
+    const isDelegationToOtherDrep = hasDrepSelection && drepID !== yoroiDrepId;
 
     return {
       isAbstain,
       isNoConfidence,
       isDelegationToYoroiDrep,
       isDelegationToOtherDrep,
-      drepID,
+      drepID: drepID ?? '',
     };
   }, [governanceStatus?.status, governanceStatus?.drep, isDelegated, isTestnet]);
 };

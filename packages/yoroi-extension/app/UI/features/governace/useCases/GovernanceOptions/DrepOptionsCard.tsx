@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Stack, Link } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
@@ -13,7 +13,6 @@ interface ActionCardProps {
   variant: 'primary' | 'outlined';
   icon?: React.ReactNode;
   onAction: () => void;
-  onViewDetails?: () => void;
   status: GovernanceStatusState;
   drepId: string | null;
   isDelegated: boolean;
@@ -27,14 +26,11 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   variant,
   icon,
   onAction,
-  onViewDetails,
   status,
   drepId,
   isDelegated,
   pending = false,
 }) => {
-  const strings = useStrings();
-
   return (
     <ActionCardContainer variant={variant} status={status} isCardDelegated={isDelegated} pending={pending}>
       <CardWrapper>
@@ -51,30 +47,11 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
       </CardWrapper>
 
       <CTASet>
-        {variant === 'primary' ? (
-          <Stack direction="column" spacing={12} width="100%">
-            {(status === GOVERNANCE_STATUS.DELEGATED || drepId === null) && !isDelegated && (
-              // @ts-ignore
-              <LoadingButton variant="primary" onClick={onAction} fullWidth height="40px">
-                {buttonText}
-              </LoadingButton>
-            )}
-
-            {onViewDetails && (
-              <Link
-                textAlign="center"
-                onClick={e => {
-                  e.stopPropagation();
-                  onViewDetails();
-                }}
-                rel="noopener"
-                underline="hover"
-                sx={{ cursor: 'pointer' }}
-              >
-                {strings.yoroiVotingRecord}
-              </Link>
-            )}
-          </Stack>
+        {(status === GOVERNANCE_STATUS.DELEGATED || drepId === null) && !isDelegated && variant === 'primary' ? (
+          // @ts-ignore
+          <LoadingButton variant="primary" onClick={onAction} fullWidth height="40px">
+            {buttonText}
+          </LoadingButton>
         ) : (
           // @ts-ignore
           <Button height="40px" variant="secondary" onClick={onAction} fullWidth sx={{ padding: '13px 10px !important' }}>

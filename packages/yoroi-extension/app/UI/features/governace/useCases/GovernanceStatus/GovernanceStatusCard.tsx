@@ -1,14 +1,13 @@
 import React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import { Box, Typography, Link, Stack } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { CopyButton, Icon } from '../../../../components';
 import { useStrings } from '../../common/hooks/useStrings';
 import { LoadingButton } from '@mui/lab';
-import { GOVERNANCE_STATUS, GovernanceStatusState, YOROI_VOTING_RECORD_LINK } from '../../common/constants';
+import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
-import { useGovernance } from '../../module/GovernanceContextProvider';
 
 interface GovernanceStatusCardProps {
   state: GovernanceStatusState;
@@ -32,7 +31,6 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   const isDisabled = state === GOVERNANCE_STATUS.DISABLED || pending;
   const isDelegated = state === GOVERNANCE_STATUS.DELEGATED;
   const { isParticipating } = useIsGovernanceAllowed();
-  const { isTestnet } = useGovernance();
   const strings = useStrings();
   const theme: any = useTheme();
 
@@ -40,13 +38,13 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
     governanceStatus,
     isDelegated,
   });
+  const isDelegationToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
   const primaryButtonLabel = forModal ? strings.delegateLabel : isDelegated ? strings.changeToDrep : strings.delegateLabel;
-  const showDrepStatus = isDelegationToOtherDrep || isDelegationToYoroiDrep || !isParticipating;
-  const showDrepId = isDelegationToOtherDrep || isDelegationToYoroiDrep;
+  const showDrepStatus = isDelegationToDrep || !isParticipating;
+  const showDrepId = isDelegationToDrep;
   const showDelegatingLabel = isParticipating && !forModal;
   const showDelegateToOtherDrepButton = isAbstain || isNoConfidence;
-  const showDelegateToYoroiDrepButton = !isParticipating || forModal || (state === GOVERNANCE_STATUS.IDLE && !isDelegated);
-  const showVotingRecordLink = !forModal && !isAbstain && !isNoConfidence && !isDelegationToOtherDrep && !isTestnet;
+  const showDelegateButton = !isParticipating || forModal || (state === GOVERNANCE_STATUS.IDLE && !isDelegated);
 
   const handleDelegateClick = () => {
     if (isDisabled) return;
@@ -54,17 +52,10 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
   };
 
   const handleCardInfo = () => {
-    if (isDelegationToYoroiDrep) {
-      return {
-        icon: <Icon.YoroiLogo width={forModal ? 16 : 24} height={forModal ? 16 : 24} fill={theme.palette.ds.gray_min} />,
-        title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
-        description: strings.yoroiDRepInfo,
-      };
-    }
-    if (isDelegationToOtherDrep) {
+    if (isDelegationToDrep) {
       return {
         icon: <Icon.VotingDrep width={24} height={24} fill={theme.palette.ds.gray_max} />,
-        title: strings.otherDReps,
+        title: strings.delegateToDRep,
         description: strings.designatedSomeoneElse,
       };
     }
@@ -83,9 +74,9 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
       };
     }
     return {
-      icon: <Icon.YoroiLogo width={24} height={24} fill={theme.palette.ds.gray_min} />,
-      title: isTestnet ? strings.yoroiTestnetDRep : strings.yoroiDRep,
-      description: strings.yoroiDRepInfo,
+      icon: <Icon.VotingDrep width={24} height={24} fill={theme.palette.ds.gray_max} />,
+      title: strings.delegateToDRep,
+      description: strings.identifyDrep,
     };
   };
 
@@ -100,8 +91,6 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
       <TitleRow>
         <Avatar
           forModal={forModal}
-          state={state}
-          isDelegationToYoroiDrep={isDelegationToYoroiDrep}
           isParticipating={isParticipating}
         >
           {handleCardInfo().icon}
@@ -178,7 +167,7 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
             {strings.changeToDrep}
           </LoadingButton>
         )}
-        {showDelegateToYoroiDrepButton && (
+        {showDelegateButton && (
           <LoadingButton
             fullWidth
             loading={btnLoading}
@@ -190,20 +179,6 @@ export const GovernanceStatusCard: React.FC<GovernanceStatusCardProps> = ({
           >
             {primaryButtonLabel}
           </LoadingButton>
-        )}
-        {showVotingRecordLink && (
-          <Stack direction="row" justifyContent="center" alignItems="flex-start" width="100%">
-            <Link
-              onClick={event => event.stopPropagation()}
-              href={YOROI_VOTING_RECORD_LINK}
-              rel="noopener"
-              target="_blank"
-              underline="hover"
-              sx={{ cursor: 'pointer' }}
-            >
-              <Typography variant="body1">{strings.yoroiVotingRecord}</Typography>
-            </Link>
-          </Stack>
         )}
       </CtaSet>
     </Root>
@@ -281,10 +256,8 @@ const TitleRow = styled(Box)(() => ({
 
 const Avatar = styled(Box)<{
   forModal: boolean;
-  state: GovernanceStatusState;
-  isDelegationToYoroiDrep: boolean;
   isParticipating: boolean;
-}>(({ isDelegationToYoroiDrep, forModal, theme, isParticipating }: any) => ({
+}>(({ forModal, theme, isParticipating }: any) => ({
   width: forModal ? '24px' : '48px',
   height: forModal ? '24px' : '48px',
   borderRadius: '1200px',
@@ -292,7 +265,7 @@ const Avatar = styled(Box)<{
   alignItems: 'center',
   justifyContent: 'center',
   flexShrink: 0,
-  background: !isParticipating || isDelegationToYoroiDrep ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200,
+  background: !isParticipating ? theme.palette.ds.primary_500 : theme.palette.ds.secondary_200,
 }));
 
 const ItemsGroup = styled(Box)(() => ({
