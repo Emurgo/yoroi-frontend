@@ -8,7 +8,6 @@ import { BannerType } from '../../common/constants';
 import { BringBanner } from './BringBanner';
 import { UsdaBanner } from './UsdaBanner';
 import { MidnightPhase2Banner } from './MidnightPhase2Banner';
-import { RewardsBanner } from './RewardsBanner';
 import { observer } from 'mobx-react';
 
 import { useGovernanceStatusState } from '../../features/governace/common/hooks/useGovernanceStatusState';
@@ -31,7 +30,6 @@ export const BannerVisibilityManager = observer(({ stores, intl }) => {
 
   return (
     <>
-      {visible === BannerType.Rewards && <RewardsBanner stores={stores} onClose={() => dismiss(BannerType.Rewards)} />}
       {visible === BannerType.MidnightPhase2 && <MidnightPhase2Banner onClose={() => dismiss(BannerType.MidnightPhase2)} />}
       {visible === BannerType.DRep && (
         <DrepPromotionBanner onClose={() => dismiss(BannerType.DRep)} stores={stores} intl={intl} />
