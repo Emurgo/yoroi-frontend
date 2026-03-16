@@ -11,14 +11,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, c
 
   const resolveBanner = useCallback(async () => {
     if (
-      governanceStatus.status === 'none' &&
-      !currentlyDelegating &&
-      walletBalance > 5 &&
-      bannersRemoteConfig?.earnRewardsWithYoroi?.display === true
-    ) {
-      return BannerType.Rewards;
-    }
-    if (
       (await localStorage.getMidnightBannerPhase2Closed()) === undefined &&
       bannersRemoteConfig?.midnightPhase2Announcement.display === true
     ) {
@@ -32,7 +24,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, c
     }
 
     return null;
-  }, [bannersRemoteConfig, governanceStatus.status, walletBalance, currentlyDelegating, location.search]);
+  }, [bannersRemoteConfig, walletBalance, location.search]);
 
   useEffect(() => {
     resolveBanner().then(setVisible);
@@ -49,9 +41,6 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, c
 
   const dismiss = async type => {
     switch (type) {
-      case BannerType.Rewards:
-        setVisible(null);
-        break;
       case BannerType.MidnightPhase2:
         setVisible(null);
         await localStorage.setMidnightBannerPhase2Closed('true');
