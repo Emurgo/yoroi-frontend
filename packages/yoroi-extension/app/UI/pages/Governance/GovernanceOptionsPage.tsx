@@ -9,14 +9,9 @@ type Props = {
 };
 
 const GovernanceOptionsPage = (props: Props): any => {
-
   const { isNotAllowed } = useIsGovernanceAllowed();
 
-  return (
-    <GovernanceLayout {...props}>
-      {isNotAllowed ? <NotAllowedInGovernance /> : <DRepOptions />}
-    </GovernanceLayout>
-  );
+  return <GovernanceLayout {...props}>{isNotAllowed ? <NotAllowedInGovernance /> : <DRepOptions />}</GovernanceLayout>;
 };
 
 export default GovernanceOptionsPage;

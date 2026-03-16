@@ -28,14 +28,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId })
 
   useEffect(() => {
     resolveBanner().then(setVisible);
-  }, [
-    bannersRemoteConfig,
-    walletId,
-    walletBalance,
-    evaluationKey,
-    resolveBanner,
-    location.search,
-  ]);
+  }, [bannersRemoteConfig, walletId, walletBalance, evaluationKey, resolveBanner, location.search]);
 
   const dismiss = async type => {
     switch (type) {
