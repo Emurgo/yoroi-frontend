@@ -159,7 +159,8 @@ export const messages = Object.freeze(
     },
     chooseDelegationOption: {
       id: 'governance.chooseDelegationOption',
-      defaultMessage: '!!!Your delegation to DReps helps shaping Cardano’s future. You may change your governance status at any time.',
+      defaultMessage:
+        '!!!Your delegation to DReps helps shaping Cardano’s future. You may change your governance status at any time.',
     },
     exploreOtherDRepsOrAbstain: {
       id: 'governance.exploreOtherDRepsOrAbstain',

@@ -32,9 +32,7 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
     <ActionCardContainer status={status} isCardDelegated={isDelegated} pending={pending}>
       <CardWrapper>
         <CardTitleRow>
-          <CardIcon isDelegated={isDelegated}>
-            {icon}
-          </CardIcon>
+          <CardIcon isDelegated={isDelegated}>{icon}</CardIcon>
           <Typography variant="h5">{title}</Typography>
         </CardTitleRow>
 
