@@ -42,10 +42,6 @@ const messages = defineMessages({
     id: 'wallet.revampAnnouncement.updates.4new',
     defaultMessage: '!!!Cashback service integration',
   },
-  update5: {
-    id: 'wallet.revampAnnouncement.updates.5new',
-    defaultMessage: '!!!Yoroi DRep vote delegation',
-  },
   update6: {
     id: 'wallet.revampAnnouncement.updates.6new',
     defaultMessage: '!!!Network Switch feature (can use wallets on Cardano Preprod testing network with test TADA)',
@@ -78,7 +74,6 @@ const ANNOUNCEMENT_MESSAGES: Array<[string, Object]> = [
   ['5.5.0', messages.update2],
   ['5.5.0', messages.update3],
   ['5.6.0', messages.update4],
-  ['5.6.0', messages.update5],
   ['5.7.0', messages.update6],
   ['5.7.0', messages.update7],
   ['5.8.0', messages.update8],
