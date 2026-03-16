@@ -6,7 +6,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { useTheme } from '@mui/material/styles';
 import { DrepOptionsCard } from './DrepOptionsCard';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegation';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
 import { GOVERNANCE_STATUS } from '../../common/constants';
@@ -21,7 +21,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
 
   const { submitedTransactions } = useGovernance();
   const { loadingUnsignTx, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
-    useGovernanceDelegationToYoroiDrep();
+    useGovernanceDelegation();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();

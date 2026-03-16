@@ -4,7 +4,7 @@ import { GovernanceStatusCard } from './GovernanceStatusCard';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS } from '../../common/constants';
-import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegation';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
@@ -14,7 +14,7 @@ import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 export const GovernanceStatus = () => {
   const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const { loadingUnsignTx, error, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
+  const { loadingUnsignTx, error, openDelegateModalForCustomDrep } = useGovernanceDelegation();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const { submitedTransactions } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();

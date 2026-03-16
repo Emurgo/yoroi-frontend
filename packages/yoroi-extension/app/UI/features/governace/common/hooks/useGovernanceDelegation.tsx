@@ -22,7 +22,7 @@ type UseGovernanceDelegationResult = {
   delegateToNoConfidence: () => Promise<void>;
 };
 
-export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationResult => {
+export const useGovernanceDelegation = (): UseGovernanceDelegationResult => {
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
 
@@ -37,7 +37,6 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     stopLoadingTxReview,
     changePasswordInputValue,
     showTxResultModal,
-    setDrepId,
     setUnsignedTx,
     drepCredentialHex,
   } = useTxReviewModal();
