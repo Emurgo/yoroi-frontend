@@ -10,22 +10,15 @@ import { UsdaBanner } from './UsdaBanner';
 import { MidnightPhase2Banner } from './MidnightPhase2Banner';
 import { observer } from 'mobx-react';
 
-import { useGovernanceStatusState } from '../../features/governace/common/hooks/useGovernanceStatusState';
-
 export const BannerVisibilityManager = observer(({ stores, intl }) => {
   const selectedWallet = stores.wallets.selectedOrFail;
-  const currentlyDelegating = stores.delegation.isCurrentlyDelegating(selectedWallet.publicDeriverId);
-  const { governanceStatus } = useGovernanceStatusState();
-
   const { data } = useYoroiRemoteConfig();
   const { visible, dismiss } = useBannerQueue({
     walletBalance: Number(
       selectedWallet.balance.getDefaultEntry().amount.shiftedBy(-primaryTokenInfoMainnet.decimals).toString()
     ),
     bannersRemoteConfig: data?.banners,
-    currentlyDelegating,
     walletId: selectedWallet.publicDeriverId,
-    governanceStatus,
   });
 
   return (

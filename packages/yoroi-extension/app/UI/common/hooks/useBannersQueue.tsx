@@ -3,7 +3,7 @@ import LocalStorageApi from '../../../api/localStorage';
 import { BannerType, DREP_BANNER_MIN_ADA } from '../constants';
 import { useLocation } from 'react-router';
 
-export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, currentlyDelegating, governanceStatus }) {
+export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId }) {
   const localStorage = new LocalStorageApi();
   const [visible, setVisible] = useState<BannerType | null>(null);
   const [evaluationKey, setEvaluationKey] = useState(0);
@@ -34,9 +34,7 @@ export function useBannerQueue({ bannersRemoteConfig, walletBalance, walletId, c
     walletBalance,
     evaluationKey,
     resolveBanner,
-    currentlyDelegating,
     location.search,
-    governanceStatus.status,
   ]);
 
   const dismiss = async type => {
