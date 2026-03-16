@@ -7,9 +7,6 @@ import { TransactionResult } from '../../../transaction-review/common/types';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
 import { useStrings } from '../../../transaction-review/common/hooks/useStrings';
 import { SocialLinks } from '../../common/types';
-import { useGovernanceStatusState } from '../../../governace/common/hooks/useGovernanceStatusState';
-import { useModal } from '../../../../components/modals/ModalContext';
-import { GovernanceRequiredForRewards } from '../../common/modals/GovernanceRequiredForRewards';
 import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useYoroiRemoteConfig } from '../../../../common/hooks/useYoroiRemoteConfig';
 
@@ -52,11 +49,8 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
 }) => {
   const { openTxReviewModal, startLoadingTxReview, stakeKeyDeposit, primaryTokenInfo, showTxResultModal, networkId } =
     useTxReviewModal();
-  const { governanceStatus } = useGovernanceStatusState();
   const { data } = useYoroiRemoteConfig();
   const dRepID = data?.banners?.earnRewardsWithYoroi?.drepId;
-
-  const { openModal } = useModal();
 
   const isTestnet = networkId !== 0;
 
@@ -113,17 +107,7 @@ export const DelegateButton: React.FC<DelegateButtonProps> = ({
       await onDelegateAndStake();
       return;
     }
-    if (governanceStatus.status === 'none') {
-      openModal({
-        modalId: 'governance',
-        title: 'Governance updates',
-        content: <GovernanceRequiredForRewards onStake={onDelegateToStakePool} onDelegateToDrep={onDelegateAndStake} />,
-        width: '612px',
-        height: '628px',
-      });
-    } else {
-      await onDelegateToStakePool();
-    }
+    await onDelegateToStakePool();
   };
 
   const onDelegateAndStake = async (): Promise<void> => {
