@@ -1,12 +1,10 @@
-import { Box, Typography, Stack } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import { Icon } from '../../../../components';
-import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
-import { useTheme } from '@mui/material/styles';
 import { DrepOptionsCard } from './DrepOptionsCard';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegation';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
 import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
 import { GOVERNANCE_STATUS } from '../../common/constants';
@@ -15,13 +13,11 @@ import { OptionsSkeletonScreen } from '../../common/SkeletonCardLoaders';
 interface DRepOptionsScreenProps {}
 
 export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
-  const theme: any = useTheme();
 
   const { submitedTransactions } = useGovernance();
   const { loadingUnsignTx, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
-    useGovernanceDelegationToYoroiDrep();
+    useGovernanceDelegation();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
@@ -30,10 +26,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
     governanceStatus,
     isDelegated,
   });
-
-  const onBack = () => {
-    navigateTo.selectRevampStatus();
-  };
 
   const drepOptionsConfig = [
     {
@@ -73,13 +65,6 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
 
   return (
     <Container>
-      <Stack direction="row" alignSelf="flex-start" spacing={6} sx={{ cursor: 'pointer' }} onClick={onBack}>
-        <Icon.LeftArrow fill={theme.palette.ds.el_gray_medium} />
-        <Typography variant="body1" fontWeight={500} textTransform="uppercase">
-          {strings.backToDashboard}
-        </Typography>
-      </Stack>
-
       <TitleSection>
         <Typography variant="h5">{strings.chooseVotingPower}</Typography>
         <Typography variant="body1" color="ds.text_gray_low">

@@ -106,15 +106,6 @@ export const messages = Object.freeze(
       defaultMessage:
         '!!!You are designating someone else to cast your vote on your behalf for all proposals now and in the future.',
     },
-    delegateToYoroi: {
-      id: 'governance.delegateToYoroi',
-      defaultMessage:
-        '!!!Support the Commercial and Technical adoption of the Cardano roadmap.\nPlease note Yoroi is part of the EMURGO Group.',
-    },
-    yoroiVotingRecordLink: {
-      id: 'governance.yoroiVotingRecordLink',
-      defaultMessage: '!!!See Yoroi’s voting record',
-    },
     total: {
       id: 'wallet.send.confirmationDialog.totalLabel',
       defaultMessage: '!!!Total',
@@ -168,7 +159,8 @@ export const messages = Object.freeze(
     },
     chooseDelegationOption: {
       id: 'governance.chooseDelegationOption',
-      defaultMessage: '!!!Your delegation to DReps helps shaping Cardano’s future. You may change your governance status at any time.',
+      defaultMessage:
+        '!!!Your delegation to DReps helps shaping Cardano’s future. You may change your governance status at any time.',
     },
     exploreOtherDRepsOrAbstain: {
       id: 'governance.exploreOtherDRepsOrAbstain',
@@ -182,26 +174,9 @@ export const messages = Object.freeze(
       id: 'governance.learnMoreLabel',
       defaultMessage: '!!!Learn more about delegation options',
     },
-    yoroiDRep: {
-      id: 'governance.yoroiDRep',
-      defaultMessage: '!!!Yoroi DRep',
-    },
-    yoroiTestnetDRep: {
-      id: 'governance.yoroiTestnetDRep',
-      defaultMessage: '!!!Testnet DRep',
-    },
-    yoroiDRepInfo: {
-      id: 'governance.yoroiDRepInfo',
-      defaultMessage:
-        '!!!Support the Commercial and Technical adoption of the Cardano roadmap. Please note Yoroi is part of the EMURGO Group.',
-    },
     drepStatus: {
       id: 'governance.drepStatus',
       defaultMessage: '!!!DRep Status',
-    },
-    yoroiVotingRecord: {
-      id: 'governance.yoroiVotingRecord',
-      defaultMessage: '!!!Yoroi Voting Record',
     },
     backToDashboard: {
       id: 'governance.backToDashboard',
@@ -211,18 +186,9 @@ export const messages = Object.freeze(
       id: 'governance.chooseVotingPower',
       defaultMessage: '!!!Choose How to Use Your Voting Power',
     },
-    letYoroiDRepVoteForYou: {
-      id: 'governance.letYoroiDRepVoteForYou',
-      defaultMessage:
-        '!!!You can let Yoroi’s DRep vote for you, pick another DRep using their ID, or choose to abstain or show no confidence.',
-    },
     delegateLabel: {
       id: 'global.labels.delegate',
       defaultMessage: '!!!Delegate',
-    },
-    otherDReps: {
-      id: 'governance.otherDReps',
-      defaultMessage: '!!!Other DReps',
     },
     designatedSomeoneElse: {
       id: 'governance.designatedSomeoneElse',
@@ -240,10 +206,6 @@ export const messages = Object.freeze(
     changeToDrep: {
       id: 'governance.changeToDrep',
       defaultMessage: '!!!Change to DRep',
-    },
-    delegateToOtherDrep: {
-      id: 'governance.delegateToOtherDrep',
-      defaultMessage: '!!!Delegate to other DRep',
     },
     delegatingLabel: {
       id: 'governance.delegatingLabel',
@@ -306,32 +268,23 @@ export const useStrings = () => {
     goToGovernance: intl.formatMessage(messages.goToGovernance),
     goToFaucet: intl.formatMessage(globalMessages.goToFaucetButton),
     notEnoughMoneyToSendError: intl.formatMessage(globalMessages.notEnoughMoneyToSendError),
-    delegateToYoroi: intl.formatMessage(messages.delegateToYoroi),
-    yoroiVotingRecordLink: intl.formatMessage(messages.yoroiVotingRecordLink),
     // New Strings
     delegationOptions: intl.formatMessage(messages.delegationOptions),
     chooseDelegationOption: intl.formatMessage(messages.chooseDelegationOption),
     exploreOtherDRepsOrAbstain: intl.formatMessage(messages.exploreOtherDRepsOrAbstain),
     browseAdditionalDelegation: intl.formatMessage(messages.browseAdditionalDelegation),
     learnMoreLabel: intl.formatMessage(messages.learnMoreLabel),
-    yoroiDRep: intl.formatMessage(messages.yoroiDRep),
-    yoroiDRepInfo: intl.formatMessage(messages.yoroiDRepInfo),
     drepStatus: intl.formatMessage(messages.drepStatus),
-    yoroiVotingRecord: intl.formatMessage(messages.yoroiVotingRecord),
     backToDashboard: intl.formatMessage(messages.backToDashboard),
     chooseVotingPower: intl.formatMessage(messages.chooseVotingPower),
-    letYoroiDRepVoteForYou: intl.formatMessage(messages.letYoroiDRepVoteForYou),
     delegateLabel: intl.formatMessage(messages.delegateLabel),
-    otherDReps: intl.formatMessage(messages.otherDReps),
     designatedSomeoneElse: intl.formatMessage(messages.designatedSomeoneElse),
     chooseAbstain: intl.formatMessage(messages.chooseAbstain),
     chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
     changeToDrep: intl.formatMessage(messages.changeToDrep),
-    delegateToOtherDrep: intl.formatMessage(messages.delegateToOtherDrep),
     delegatingLabel: intl.formatMessage(messages.delegatingLabel),
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
-    yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
     delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
   }).current;
 };
