@@ -16,7 +16,7 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
   const strings = useStrings();
 
   const { submitedTransactions } = useGovernance();
-  const { loadingUnsignTx, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
+  const { loadingUnsignTx, error, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
     useGovernanceDelegation();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
 
@@ -92,6 +92,11 @@ export const DRepOptions: React.FC<DRepOptionsScreenProps> = () => {
           <OptionsSkeletonScreen />
         )}
       </CardsRow>
+      {error != null && (
+        <Typography variant="body1" color="ds.sys_magenta_500">
+          {error}
+        </Typography>
+      )}
     </Container>
   );
 };
