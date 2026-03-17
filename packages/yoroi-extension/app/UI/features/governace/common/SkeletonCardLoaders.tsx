@@ -53,7 +53,7 @@ export const StatusSkeletonScreen = () => {
 export const OptionsSkeletonScreen = () => {
   return (
     <CardsRow>
-      {[...Array(4)].map((_, idx) => (
+      {[...Array(3)].map((_, idx) => (
         <Stack
           width={294}
           height={320}

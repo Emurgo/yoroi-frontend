@@ -1,8 +1,7 @@
-import { Box, Typography, Button, Stack, Link } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { styled } from '@mui/system';
 import { useStrings } from '../../common/hooks/useStrings';
 import { GOVERNANCE_STATUS, GovernanceStatusState } from '../../common/constants';
-import { LoadingButton } from '@mui/lab';
 import { CopyButton } from '../../../../components';
 import { truncateFormatter } from '../../../../common/helpers/formatters';
 
@@ -10,10 +9,8 @@ interface ActionCardProps {
   title: string;
   description: string;
   buttonText: string;
-  variant: 'primary' | 'outlined';
   icon?: React.ReactNode;
   onAction: () => void;
-  onViewDetails?: () => void;
   status: GovernanceStatusState;
   drepId: string | null;
   isDelegated: boolean;
@@ -24,24 +21,18 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
   title,
   description,
   buttonText,
-  variant,
   icon,
   onAction,
-  onViewDetails,
   status,
   drepId,
   isDelegated,
   pending = false,
 }) => {
-  const strings = useStrings();
-
   return (
-    <ActionCardContainer variant={variant} status={status} isCardDelegated={isDelegated} pending={pending}>
+    <ActionCardContainer status={status} isCardDelegated={isDelegated} pending={pending}>
       <CardWrapper>
         <CardTitleRow>
-          <CardIcon variant={variant} isDelegated={isDelegated}>
-            {icon}
-          </CardIcon>
+          <CardIcon isDelegated={isDelegated}>{icon}</CardIcon>
           <Typography variant="h5">{title}</Typography>
         </CardTitleRow>
 
@@ -51,36 +42,15 @@ export const DrepOptionsCard: React.FC<ActionCardProps> = ({
       </CardWrapper>
 
       <CTASet>
-        {variant === 'primary' ? (
-          <Stack direction="column" spacing={12} width="100%">
-            {(status === GOVERNANCE_STATUS.DELEGATED || drepId === null) && !isDelegated && (
-              // @ts-ignore
-              <LoadingButton variant="primary" onClick={onAction} fullWidth height="40px">
-                {buttonText}
-              </LoadingButton>
-            )}
-
-            {onViewDetails && (
-              <Link
-                textAlign="center"
-                onClick={e => {
-                  e.stopPropagation();
-                  onViewDetails();
-                }}
-                rel="noopener"
-                underline="hover"
-                sx={{ cursor: 'pointer' }}
-              >
-                {strings.yoroiVotingRecord}
-              </Link>
-            )}
-          </Stack>
-        ) : (
-          // @ts-ignore
-          <Button height="40px" variant="secondary" onClick={onAction} fullWidth sx={{ padding: '13px 10px !important' }}>
-            {buttonText}
-          </Button>
-        )}
+        <Button
+          fullWidth
+          onClick={onAction}
+          sx={{ height: '40px', padding: '13px 10px !important' }}
+          /* @ts-ignore */
+          variant="secondary"
+        >
+          {buttonText}
+        </Button>
       </CTASet>
     </ActionCardContainer>
   );
@@ -147,18 +117,15 @@ const DelegatingLabel = () => {
   );
 };
 
-type ActionCardVariant = 'primary' | 'outlined';
-
 interface ActionCardContainerProps {
-  variant: ActionCardVariant;
   status: GovernanceStatusState;
   isCardDelegated?: boolean;
   pending?: boolean;
 }
 
 export const ActionCardContainer = styled(Box, {
-  shouldForwardProp: prop => prop !== 'variant' && prop !== 'status' && prop !== 'isCardDelegated' && prop !== 'pending',
-})<ActionCardContainerProps>(({ pending, theme, variant, status, isCardDelegated }: any) => {
+  shouldForwardProp: prop => prop !== 'status' && prop !== 'isCardDelegated' && prop !== 'pending',
+})<ActionCardContainerProps>(({ pending, theme, status, isCardDelegated }: any) => {
   const base: React.CSSProperties = {
     boxSizing: 'border-box',
     display: 'flex',
@@ -166,7 +133,7 @@ export const ActionCardContainer = styled(Box, {
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     padding: '16px',
-    gap: variant === 'primary' ? '16px' : '12px',
+    gap: '12px',
     width: '294px',
     height: '320px',
     borderRadius: '8px',
@@ -189,15 +156,6 @@ export const ActionCardContainer = styled(Box, {
     return {
       ...base,
       background: theme.palette.ds.bg_gradient_2,
-    };
-  }
-  if (variant === 'primary') {
-    return {
-      ...base,
-      backgroundImage: theme.palette.ds.bg_gradient_1,
-      '&:hover': {
-        backgroundImage: theme.palette.ds.bg_gradient_2,
-      },
     };
   }
 
@@ -240,16 +198,11 @@ const CardTitleRow = styled(Box)(() => ({
 }));
 
 const CardIcon = styled(Box, {
-  shouldForwardProp: prop => prop !== 'variant' && prop !== 'isDelegated',
-})<{ variant: 'primary' | 'outlined'; isDelegated?: boolean }>(({ variant, isDelegated, theme }: any) => ({
+  shouldForwardProp: prop => prop !== 'isDelegated',
+})<{ isDelegated?: boolean }>(({ isDelegated, theme }: any) => ({
   width: '48px',
   height: '48px',
-  background:
-    variant === 'primary'
-      ? theme.palette.ds.primary_500
-      : isDelegated
-        ? theme.palette.ds.secondary_200
-        : theme.palette.ds.gray_100,
+  background: isDelegated ? theme.palette.ds.secondary_200 : theme.palette.ds.gray_100,
   borderRadius: '1200px',
   display: 'flex',
   alignItems: 'center',
