@@ -178,11 +178,28 @@ function AirdropPage({ stores }: Readonly<Props>) {
         submitTx: async password => {
           startLoadingTxReview();
 
-          const { signedTxHex } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
-            wallet,
-            transactionHex: unsignedTxHex,
-            password,
-          });
+          let signedTxHex;
+          try {
+            const signResult = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+              wallet,
+              transactionHex: unsignedTxHex,
+              password,
+            });
+            signedTxHex = signResult.signedTxHex;
+          } catch (error) {
+            console.log('Send Sign Error', error);
+            let transactionResult;
+            if (isTxCancelledByUser(error)) {
+              transactionResult = TransactionResult.CANCEL;
+            } else if (isCardanoAppNotRunning(error)) {
+              transactionResult = TransactionResult.NO_CARDANO_RUNNING;
+            } else {
+              transactionResult = TransactionResult.FAIL;
+            }
+            showTxResultModal(transactionResult);
+            return;
+          }
+
           const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
           closeTxReviewModal();
           resolve(errorOrNull);
