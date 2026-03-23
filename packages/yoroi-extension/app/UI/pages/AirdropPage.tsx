@@ -176,39 +176,57 @@ function AirdropPage({ stores }: Readonly<Props>) {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async password => {
-          startLoadingTxReview();
+          try {
+            startLoadingTxReview();
 
-          const { signedTxHex } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
-            wallet,
-            transactionHex: unsignedTxHex,
-            password,
-          });
-          const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
-          closeTxReviewModal();
-          resolve(errorOrNull);
-          setAddressThawsData(orig =>
-            orig.map(thaws => {
-              if (thaws.address === redeemingAddr) {
-                return {
-                  address: redeemingAddr,
-                  schedule: {
-                    numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations - 1,
-                    thaws: thaws.schedule.thaws.map(thaw => ({
-                      ...thaw,
-                      status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
-                    })),
-                  },
-                };
-              } else {
-                return thaws;
-              }
-            })
-          );
+            const { signedTxHex } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+              wallet,
+              transactionHex: unsignedTxHex,
+              password,
+            });
+            const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
+            closeTxReviewModal();
+            resolve(errorOrNull);
+            if (errorOrNull === null) {
+              setAddressThawsData(orig =>
+                orig.map(thaws => {
+                  if (thaws.address === redeemingAddr) {
+                    return {
+                      address: redeemingAddr,
+                      schedule: {
+                        numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations + 1,
+                        thaws: thaws.schedule.thaws.map(thaw => ({
+                          ...thaw,
+                          status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
+                        })),
+                      },
+                    };
+                  } else {
+                    return thaws;
+                  }
+                })
+              );
+            }
+          } catch (error) {
+            console.log('Send Sign Error', error);
+            let transactionResult;
+            if (isTxCancelledByUser(error)) {
+              transactionResult = TransactionResult.CANCEL;
+            } else if (isCardanoAppNotRunning(error)) {
+              transactionResult = TransactionResult.NO_CARDANO_RUNNING;
+            } else {
+              transactionResult = TransactionResult.FAIL;
+            }
+            showTxResultModal(transactionResult);
+            const errorMessage =
+              error instanceof Error && error.message ? error.message : 'Failed to submit redemption transaction';
+            resolve(errorMessage);
+          }
         },
         operations: {
           kind: 'send',
         },
-        unsignedTx: unsignedTxHex,
+        cborTx: unsignedTxHex,
       });
     });
   };
