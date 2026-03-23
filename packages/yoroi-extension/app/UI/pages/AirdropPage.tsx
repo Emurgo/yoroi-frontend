@@ -186,29 +186,31 @@ function AirdropPage({ stores }: Readonly<Props>) {
           const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
           closeTxReviewModal();
           resolve(errorOrNull);
-          setAddressThawsData(orig =>
-            orig.map(thaws => {
-              if (thaws.address === redeemingAddr) {
-                return {
-                  address: redeemingAddr,
-                  schedule: {
-                    numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations - 1,
-                    thaws: thaws.schedule.thaws.map(thaw => ({
-                      ...thaw,
-                      status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
-                    })),
-                  },
-                };
-              } else {
-                return thaws;
-              }
-            })
-          );
+          if (errorOrNull === null) {
+            setAddressThawsData(orig =>
+              orig.map(thaws => {
+                if (thaws.address === redeemingAddr) {
+                  return {
+                    address: redeemingAddr,
+                    schedule: {
+                      numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations + 1,
+                      thaws: thaws.schedule.thaws.map(thaw => ({
+                        ...thaw,
+                        status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
+                      })),
+                    },
+                  };
+                } else {
+                  return thaws;
+                }
+              })
+            );
+          }
         },
         operations: {
           kind: 'send',
         },
-        unsignedTx: unsignedTxHex,
+        cborTx: unsignedTxHex,
       });
     });
   };
