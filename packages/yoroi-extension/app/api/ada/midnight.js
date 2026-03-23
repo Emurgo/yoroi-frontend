@@ -14,6 +14,7 @@ import LocalStorageApi, { loadSubmittedTransactions } from '../localStorage';
 import BigNumber from 'bignumber.js';
 import { forceNonNull } from '../../coreUtils.js';
 import { cardanoUtxoHexFromRemoteFormat } from './transactions/utils';
+import { RustModule } from './lib/cardanoCrypto/rustLoader';
 
 const localStorageApi = new LocalStorageApi();
 
@@ -324,7 +325,7 @@ async function pickUtxos(wallet: WalletState): Promise<?{| fundingUtxos: Array<s
   }
   return {
     fundingUtxos: selectedUtxos.map(cardanoUtxoHexFromRemoteFormat),
-    fundingUtxoAddr: selectedUtxos[0].receiver,
+    fundingUtxoAddr: addressHexToBech32(selectedUtxos[0].receiver),
   };
 }
 
@@ -402,4 +403,27 @@ export async function getRedemptionTransaction(
     transaction: respBody.transaction,
     transactionId: respBody.transactionId,
   };
+}
+
+export async function submitRedemptionTransaction(
+  thawEndpoint: string,
+  destAddr: string,
+  txHex: string,
+): Promise<string /* error message */| null /* ok */> {
+  const witnessSet = RustModule.WalletV4.Transaction.from_hex(txHex).witness_set().to_hex();
+
+  const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      transaction: txHex,
+      transaction_witness_set: witnessSet,
+    }),
+  });
+  if (resp.ok) {
+    return null
+  }
+  return await resp.text();
 }

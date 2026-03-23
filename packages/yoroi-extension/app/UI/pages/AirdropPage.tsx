@@ -1,8 +1,7 @@
 import { Box } from '@mui/material';
-import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useIntl } from 'react-intl';
-import { scanAddressesForThaws } from '../../api/ada/midnight';
+import { scanAddressesForThaws, submitRedemptionTransaction } from '../../api/ada/midnight';
 import { type Schedule, getRedeemable, getStatus, getTotal, getRedeemableAmount } from '../../api/ada/midnightRedemption';
 import TopBarLayout from '../../components/layout/TopBarLayout';
 import NavBarTitle from '../../components/topbar/NavBarTitle';
@@ -22,10 +21,6 @@ import { ModalProvider } from '../components/modals/ModalContext';
 import { ModalManager } from '../components/modals/ModalManager';
 import { ReviewTxProvider } from '../features/transaction-review/module/ReviewTxProvider';
 import { ReviewTxModal } from '../features/transaction-review/useCases/ReviewTx';
-//import TextField from '../../components/common/TextField';
-import { RustModule } from '../../api/ada/lib/cardanoCrypto/rustLoader';
-import { HaskellShelleyTxSignRequest } from '../../api/ada/transactions/shelley/HaskellShelleyTxSignRequest';
-import { /*broadcastTransaction, */ getProtocolParameters } from '../../api/thunk';
 import { AddressCard, AddressesTitle } from '../features/airdrop/useCases/AddressCard';
 import AddressDetails from '../features/airdrop/useCases/AddressDetails';
 import Redeem from '../features/airdrop/useCases/Redeem';
@@ -78,6 +73,7 @@ interface Props {
     };
     transactionProcessingStore: {
       adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<{ txId: string }>;
+      adaSignTransactionHexFromWallet: (params: { wallet: any; password: string; transactionHex: string }) => Promise<{ signedTxHex: string }>;
     };
   };
 }
@@ -171,79 +167,46 @@ function AirdropPage({ stores }: Readonly<Props>) {
 
   const onRedeem = async (unsignedTxHex: string) => {
     // todo: validate the transaction
-    const protocolParameters = await getProtocolParameters(wallet);
-    const tx = RustModule.WalletV4.Transaction.from_hex(unsignedTxHex);
-    const senderUtxos: any = [];
-    const inputs = tx.body().inputs();
-    for (let i = 0; i < inputs.len(); i++) {
-      const input = inputs.get(i);
-      for (const utxo of wallet.utxos) {
-        if (
-          utxo.output.Transaction.Hash === input.transaction_id().to_hex() &&
-          utxo.output.UtxoTransactionOutput.OutputIndex === input.index()
-        ) {
-          senderUtxos.push({
-            utxo_id: `${utxo.output.Transaction.Hash}${utxo.output.UtxoTransactionOutput.OutputIndex}`,
-            tx_hash: utxo.output.Transaction.Hash,
-            tx_index: utxo.output.UtxoTransactionOutput.OutputIndex,
-            receiver: utxo.address,
-            amount: '0', // not used
-            assets: [], // not used
-            addressing: utxo.addressing,
-          });
-          break;
-        }
-      }
-    }
-    const signRequest = new HaskellShelleyTxSignRequest({
-      senderUtxos,
-      // $FlowIgnore: by type definition RustModule.WalletV4.TransactionBuilder is expected here but we can get away with what will actually be used
-      unsignedTx: {
-        build_tx() {
-          return tx;
-        },
-      },
-      changeAddr: [], // no used
-      metadata: tx.auxiliary_data(),
-      networkSettingSnapshot: {
-        ChainNetworkId: 0, // incorrect, but unused
-        KeyDeposit: new BigNumber(protocolParameters.keyDeposit),
-        PoolDeposit: new BigNumber(protocolParameters.poolDeposit),
-        NetworkId: wallet.networkId,
-      },
-    });
 
-    await new Promise<void>(resolve => {
+    return await new Promise<null | string>(resolve => {
       openTxReviewModal({
         modalView: 'transactionReview',
         submitTx: async password => {
-          try {
-            startLoadingTxReview();
+          startLoadingTxReview();
 
-            await stores.transactionProcessingStore.adaSendAndRefresh({
-              wallet,
-              signRequest,
-              password,
-              callback: closeTxReviewModal,
-            });
-          } catch (error) {
-            console.log('Send Sign Error', error);
-            let transactionResult;
-            if (isTxCancelledByUser(error)) {
-              transactionResult = TransactionResult.CANCEL;
-            } else if (isCardanoAppNotRunning(error)) {
-              transactionResult = TransactionResult.NO_CARDANO_RUNNING;
+          const { signedTxHex } = await stores.transactionProcessingStore.adaSignTransactionHexFromWallet({
+            wallet,
+            transactionHex: unsignedTxHex,
+            password,
+          });
+          const errorOrNull = await submitRedemptionTransaction(
+            thawEndpoint,
+            redeemingAddr,
+            signedTxHex
+          );
+          closeTxReviewModal();
+          resolve(errorOrNull);
+          setAddressThawsData(orig => orig.map(thaws => {
+            if (thaws.address === redeemingAddr) {
+              return {
+                address: redeemingAddr,
+                schedule: {
+                  numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations - 1,
+                  thaws: thaws.schedule.thaws.map(thaw => ({
+                    ...thaw,
+                    status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
+                  })),
+                },
+              };
             } else {
-              transactionResult = TransactionResult.FAIL;
+              return thaws;
             }
-            showTxResultModal(transactionResult);
-          }
-          resolve();
+          }));
         },
         operations: {
           kind: 'send',
         },
-        unsignedTx: signRequest.unsignedTx,
+        unsignedTx: unsignedTxHex,
       });
     });
   };

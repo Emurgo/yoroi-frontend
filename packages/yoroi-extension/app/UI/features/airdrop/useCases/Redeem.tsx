@@ -11,7 +11,7 @@ export default function Redeem(props: {
   wallet: any;
   onClose: () => void;
   onReorg: (signRequest: any) => Promise<string>;
-  onRedeem: (unsignedTxHex: string) => Promise<void>;
+  onRedeem: (unsignedTxHex: string) => Promise<null | string>;
   endpoint: string;
 }) {
   const strings = useStrings();
@@ -19,6 +19,7 @@ export default function Redeem(props: {
   const [redemptionTxBuildingResponse, setRedemptionTxBuildingResponse] = useState<any>(null);
   const [isWaitingForReorgTxToConfirm, setIsWaitingForReorgTxToConfirm] = useState<boolean>(false);
   const [error, setError] = useState<null | string>(null);
+  const [submissionError, setSubmissionError] = useState<null | string>(null);
 
   const abort = useRef(false);
 
@@ -78,7 +79,9 @@ export default function Redeem(props: {
       <LoadingSpinner />
     </Box>
   );
-  if (getCollateralUtxosResult === null) {
+  if (submissionError) {
+    content = (<Typography color="error">{submissionError}</Typography>)
+  } else if (getCollateralUtxosResult === null) {
     content = spinner;
   } else if (getCollateralUtxosResult.state === 'exist') {
     const errorAndSpinner = (
@@ -107,9 +110,12 @@ export default function Redeem(props: {
             color="primary"
             sx={{ margin: '0 auto', display: 'block' }}
             onClick={async () => {
-              await props.onRedeem(redemptionTxBuildingResponse.transaction);
-              // todo: error handling
-              props.onClose();
+              const errorOrNull = await props.onRedeem(redemptionTxBuildingResponse.transaction);
+              if (errorOrNull) {
+                setSubmissionError(errorOrNull);
+              } else {
+                props.onClose();
+              }
             }}
           >
             {strings.redeemButton}
