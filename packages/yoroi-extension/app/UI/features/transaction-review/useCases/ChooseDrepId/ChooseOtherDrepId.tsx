@@ -10,7 +10,9 @@ import { useGovernance } from '../../../governace/module/GovernanceContextProvid
 
 const HANDLE_API = 'https://api.handle.me/handles';
 
-type DrepError = null | 'INVALID_FORMAT' | 'HANDLE_NO_DREP' | 'HANDLE_NOT_FOUND' | 'HANDLE_LOOKUP_FAILED';
+const YOROI_DREP_ID = 'drep1ygr9tuapcanc3kpeyy4dc3vmrz9cfe5q7v9wj3x9j0ap3tswtre9j';
+
+type DrepError = null | 'INVALID_FORMAT' | 'HANDLE_NO_DREP' | 'HANDLE_NOT_FOUND' | 'HANDLE_LOOKUP_FAILED' | 'YOROI_DREP_PAUSED';
 
 const sanitizeHandle = (raw: string) => raw.trim().replace(/^\$/, '');
 
@@ -72,6 +74,8 @@ export const ChooseOtherDrepId = () => {
         return strings.handleLookupFailed;
       case 'INVALID_FORMAT':
         return strings.invalidFormat;
+      case 'YOROI_DREP_PAUSED':
+        return strings.yoroiDrepPaused;
       default:
         return ' ';
     }
@@ -121,8 +125,13 @@ export const ChooseOtherDrepId = () => {
               label={strings.drepOrAdaHandle}
               variant="outlined"
               onChange={event => {
-                setDrepIdInput(event.target.value);
-                if (error) setError(null);
+                const value = event.target.value || '';
+                setDrepIdInput(value);
+                if (value.trim() === YOROI_DREP_ID) {
+                  setError('YOROI_DREP_PAUSED');
+                } else if (error) {
+                  setError(null);
+                }
               }}
               value={drepIdInput}
               error={Boolean(error)}
@@ -150,7 +159,7 @@ export const ChooseOtherDrepId = () => {
           variant="primary"
           sx={{ width: '100%' }}
           onClick={confirmDRep}
-          disabled={!drepIdInput.trim()}
+          disabled={!drepIdInput.trim() || error != null}
           loading={isLoading}
         >
           {strings.confirmLabel}
