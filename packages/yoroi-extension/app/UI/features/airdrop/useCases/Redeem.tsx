@@ -80,7 +80,7 @@ export default function Redeem(props: {
     </Box>
   );
   if (submissionError) {
-    content = (<Typography color="error">{submissionError}</Typography>)
+    content = <Typography color="error">{submissionError}</Typography>;
   } else if (getCollateralUtxosResult === null) {
     content = spinner;
   } else if (getCollateralUtxosResult.state === 'exist') {

@@ -73,7 +73,11 @@ interface Props {
     };
     transactionProcessingStore: {
       adaSendAndRefresh: (params: { wallet: any; signRequest: any; password: any; callback: any }) => Promise<{ txId: string }>;
-      adaSignTransactionHexFromWallet: (params: { wallet: any; password: string; transactionHex: string }) => Promise<{ signedTxHex: string }>;
+      adaSignTransactionHexFromWallet: (params: {
+        wallet: any;
+        password: string;
+        transactionHex: string;
+      }) => Promise<{ signedTxHex: string }>;
     };
   };
 }
@@ -179,29 +183,27 @@ function AirdropPage({ stores }: Readonly<Props>) {
             transactionHex: unsignedTxHex,
             password,
           });
-          const errorOrNull = await submitRedemptionTransaction(
-            thawEndpoint,
-            redeemingAddr,
-            signedTxHex
-          );
+          const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
           closeTxReviewModal();
           resolve(errorOrNull);
-          setAddressThawsData(orig => orig.map(thaws => {
-            if (thaws.address === redeemingAddr) {
-              return {
-                address: redeemingAddr,
-                schedule: {
-                  numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations - 1,
-                  thaws: thaws.schedule.thaws.map(thaw => ({
-                    ...thaw,
-                    status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
-                  })),
-                },
-              };
-            } else {
-              return thaws;
-            }
-          }));
+          setAddressThawsData(orig =>
+            orig.map(thaws => {
+              if (thaws.address === redeemingAddr) {
+                return {
+                  address: redeemingAddr,
+                  schedule: {
+                    numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations - 1,
+                    thaws: thaws.schedule.thaws.map(thaw => ({
+                      ...thaw,
+                      status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
+                    })),
+                  },
+                };
+              } else {
+                return thaws;
+              }
+            })
+          );
         },
         operations: {
           kind: 'send',

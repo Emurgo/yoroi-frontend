@@ -302,7 +302,7 @@ async function pickUtxos(wallet: WalletState): Promise<?{| fundingUtxos: Array<s
     return new BigNumber(utxo1.amount).comparedTo(utxo2.amount);
   });
   const pureUtxos = utxos.filter(utxo => utxo.assets.length === 0);
-  const selectUtxos = (candidates) => {
+  const selectUtxos = candidates => {
     const selected = [];
     let sum = new BigNumber('0');
     for (const utxo of candidates) {
@@ -318,7 +318,7 @@ async function pickUtxos(wallet: WalletState): Promise<?{| fundingUtxos: Array<s
       }
     }
     return null;
-  }
+  };
   const selectedUtxos = selectUtxos(pureUtxos) || selectUtxos(utxos);
   if (!selectedUtxos) {
     return null;
@@ -408,8 +408,8 @@ export async function getRedemptionTransaction(
 export async function submitRedemptionTransaction(
   thawEndpoint: string,
   destAddr: string,
-  txHex: string,
-): Promise<string /* error message */| null /* ok */> {
+  txHex: string
+): Promise<string /* error message */ | null /* ok */> {
   const witnessSet = RustModule.WalletV4.Transaction.from_hex(txHex).witness_set().to_hex();
 
   const resp = await fetch(`${thawEndpoint}/thaws/${destAddr}/transactions`, {
@@ -423,7 +423,7 @@ export async function submitRedemptionTransaction(
     }),
   });
   if (resp.ok) {
-    return null
+    return null;
   }
   return await resp.text();
 }
