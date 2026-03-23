@@ -236,6 +236,10 @@ export const messages = Object.freeze(
       id: 'transaction.drep.drepOrAdaHandle',
       defaultMessage: '!!!DRep ID or ADA handle',
     },
+    yoroiDrepPaused: {
+      id: 'transaction.drep.yoroiDrepPaused',
+      defaultMessage: '!!!Drep delegation to Yoroi is currently paused. Please select another Drep ID.',
+    },
   })
 );
 
@@ -299,5 +303,6 @@ export const useStrings = () => {
     invalidFormat: intl.formatMessage(messages.invalidFormat),
     adaHandleNotFound: intl.formatMessage(messages.adaHandleNotFound),
     drepOrAdaHandle: intl.formatMessage(messages.drepOrAdaHandle),
+    yoroiDrepPaused: intl.formatMessage(messages.yoroiDrepPaused),
   }).current;
 };
