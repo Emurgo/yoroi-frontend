@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
-import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
@@ -13,20 +12,17 @@ type UseGovernanceDelegationResult = {
   error: string | null;
   setError: (value: string | null) => void;
 
-  // 1) direct delegation to a specific DRep (Yoroi or any other)
-  delegateToDrep: (drepID: string) => Promise<void>;
-
-  // 2) open modal to choose DRep id & delegate
+  // 1) open modal to choose DRep id & delegate
   openDelegateModalForCustomDrep: () => void;
 
-  // 3) always abstain
+  // 2) always abstain
   delegateToAbstain: () => Promise<void>;
 
-  // 4) always no-confidence
+  // 3) always no-confidence
   delegateToNoConfidence: () => Promise<void>;
 };
 
-export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationResult => {
+export const useGovernanceDelegation = (): UseGovernanceDelegationResult => {
   const [error, setError] = React.useState<string | null>(null);
   const [loadingUnsignTx, setLoadingUnsignTx] = React.useState<boolean>(false);
 
@@ -41,7 +37,6 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     stopLoadingTxReview,
     changePasswordInputValue,
     showTxResultModal,
-    setDrepId,
     setUnsignedTx,
     drepCredentialHex,
   } = useTxReviewModal();
@@ -105,20 +100,7 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     [createDrepDelegationTransaction, openTxReviewModal, signGovernanceTx, strings]
   );
 
-  /** 1) Delegate to a specific DRep (Yoroi or any other) */
-  const delegateToDrep = React.useCallback(
-    async (drepID: string) => {
-      const vote: Vote = { kind: 'delegate', drepID };
-      const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
-
-      governanceVoteChanged(vote);
-      setDrepId({ drepID });
-      await createUnsignTx(dRepCredentialHex);
-    },
-    [governanceVoteChanged, setDrepId, createUnsignTx]
-  );
-
-  /** 2) Open modal to choose a custom DRep */
+  /** 1) Open modal to choose a custom DRep */
   const openDelegateModalForCustomDrep = React.useCallback(() => {
     if (!governanceManager) {
       return;
@@ -161,7 +143,7 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     signGovernanceTx,
   ]);
 
-  /** 3) Always abstain */
+  /** 2) Always abstain */
   const delegateToAbstain = React.useCallback(async () => {
     const vote: Vote = { kind: DREP_ALWAYS_ABSTAIN };
 
@@ -170,7 +152,7 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     await createUnsignTx(DREP_ALWAYS_ABSTAIN);
   }, [governanceVoteChanged, createUnsignTx]);
 
-  /** 4) Always no-confidence */
+  /** 3) Always no-confidence */
   const delegateToNoConfidence = React.useCallback(async () => {
     const vote: Vote = { kind: DREP_ALWAYS_NO_CONFIDENCE };
 
@@ -182,7 +164,6 @@ export const useGovernanceDelegationToYoroiDrep = (): UseGovernanceDelegationRes
     loadingUnsignTx,
     error,
     setError,
-    delegateToDrep,
     openDelegateModalForCustomDrep,
     delegateToAbstain,
     delegateToNoConfidence,

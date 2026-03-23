@@ -5,15 +5,7 @@ import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCryp
 import { TextInput } from '../../../../components';
 import { useTxReviewModal } from '../../module/ReviewTxProvider';
 import { useStrings } from '../../common/hooks/useStrings';
-import {
-  GOVERNANCE_STATUS,
-  YOROI_DREP_ID,
-  FIND_DREPS_LINK,
-  FIND_DREPS_LINK_TESTNET,
-  YOROI_DREP_ID_TESTNET,
-} from '../../../governace/common/constants';
-import { GovernanceStatusCard } from '../../../governace/useCases/GovernanceStatus/GovernanceStatusCard';
-import { useGovernanceDelegationToYoroiDrep } from '../../../governace/common/hooks/useGovernanceDelegationToYoroiDrep';
+import { FIND_DREPS_LINK, FIND_DREPS_LINK_TESTNET } from '../../../governace/common/constants';
 import { useGovernance } from '../../../governace/module/GovernanceContextProvider';
 
 const HANDLE_API = 'https://api.handle.me/handles';
@@ -62,12 +54,10 @@ const resolveDrepIdFromHandle = async (raw: string): Promise<{ drepId: string | 
 
 export const ChooseOtherDrepId = () => {
   const { isLoading, changeModalView, createUnsignedTx, setDrepId } = useTxReviewModal();
-  const { delegateToDrep } = useGovernanceDelegationToYoroiDrep();
   const { isTestnet } = useGovernance();
   const strings = useStrings();
 
   const findDrepLink = isTestnet ? FIND_DREPS_LINK_TESTNET : FIND_DREPS_LINK;
-  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
   const [drepIdInput, setDrepIdInput] = React.useState('');
   const [error, setError] = React.useState<DrepError>(null);
@@ -151,19 +141,6 @@ export const ChooseOtherDrepId = () => {
               {strings.findDrepHere}
             </Link>
           </Stack>
-
-          <Typography variant="body1" color="ds.text_gray_medium">
-            {strings.delegateToYoroi}
-          </Typography>
-        </Stack>
-
-        <Stack p={24}>
-          <GovernanceStatusCard
-            state={GOVERNANCE_STATUS.DELEGATED}
-            governanceStatus={{ status: GOVERNANCE_STATUS.IDLE, drep: yoroiDrepId }}
-            forModal
-            onDelegateClick={() => delegateToDrep(yoroiDrepId)}
-          />
         </Stack>
       </Stack>
 

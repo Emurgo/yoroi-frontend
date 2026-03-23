@@ -4,12 +4,13 @@ import { useGovernance } from '../../module/GovernanceContextProvider';
 export const useIsGovernanceAllowed = () => {
   const { governanceStatus, walletAdaBalance, networkId } = useGovernance();
 
-  const isParticipating = governanceStatus.status != null && governanceStatus.status !== 'none';
+  const isLoading = governanceStatus.status === null;
+  const isParticipating = !isLoading && governanceStatus.status !== 'none';
 
   const hasZeroAda = walletAdaBalance !== null && walletAdaBalance === 0;
   const isTestnet = networkId !== networks.CardanoMainnet.NetworkId;
 
-  const isNotAllowed = !isParticipating && hasZeroAda;
+  const isNotAllowed = !isLoading && !isParticipating && hasZeroAda;
 
   return {
     isNotAllowed,
