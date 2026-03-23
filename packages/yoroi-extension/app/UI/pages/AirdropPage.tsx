@@ -200,28 +200,33 @@ function AirdropPage({ stores }: Readonly<Props>) {
             return;
           }
 
-          const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
-          closeTxReviewModal();
-          resolve(errorOrNull);
-          if (errorOrNull === null) {
-            setAddressThawsData(orig =>
-              orig.map(thaws => {
-                if (thaws.address === redeemingAddr) {
-                  return {
-                    address: redeemingAddr,
-                    schedule: {
-                      numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations + 1,
-                      thaws: thaws.schedule.thaws.map(thaw => ({
-                        ...thaw,
-                        status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
-                      })),
-                    },
-                  };
-                } else {
-                  return thaws;
-                }
-              })
-            );
+          try {
+            const errorOrNull = await submitRedemptionTransaction(thawEndpoint, redeemingAddr, signedTxHex);
+            closeTxReviewModal();
+            resolve(errorOrNull);
+            if (errorOrNull === null) {
+              setAddressThawsData(orig =>
+                orig.map(thaws => {
+                  if (thaws.address === redeemingAddr) {
+                    return {
+                      address: redeemingAddr,
+                      schedule: {
+                        numberOfClaimedAllocations: thaws.schedule.numberOfClaimedAllocations + 1,
+                        thaws: thaws.schedule.thaws.map(thaw => ({
+                          ...thaw,
+                          status: thaw.status === 'redeemable' ? 'confirmed' : thaw.status,
+                        })),
+                      },
+                    };
+                  } else {
+                    return thaws;
+                  }
+                })
+              );
+            }
+          } catch (submitError) {
+            closeTxReviewModal();
+            resolve((submitError as Error).message || 'Failed to submit redemption transaction');
           }
         },
         operations: {

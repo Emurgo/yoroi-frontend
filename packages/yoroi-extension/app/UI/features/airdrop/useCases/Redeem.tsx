@@ -111,7 +111,7 @@ export default function Redeem(props: {
             sx={{ margin: '0 auto', display: 'block' }}
             onClick={async () => {
               const errorOrNull = await props.onRedeem(redemptionTxBuildingResponse.transaction);
-              if (errorOrNull) {
+              if (errorOrNull !== null) {
                 setSubmissionError(errorOrNull);
               } else {
                 props.onClose();
