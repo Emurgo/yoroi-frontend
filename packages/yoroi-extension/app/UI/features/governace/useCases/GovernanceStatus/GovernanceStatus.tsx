@@ -1,28 +1,36 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Link } from '@mui/material';
 import { useLocation } from 'react-router';
-import { GovernanceStatusCard } from './GovernanceStatusCard';
-import { useNavigateTo } from '../../common/useNavigateTo';
-import { useStrings } from '../../common/hooks/useStrings';
-import { GOVERNANCE_STATUS, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
+import { Icon } from '../../../../components';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
+import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
-import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useStrings } from '../../common/hooks/useStrings';
+import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
+import { DrepOptionsCard } from '../GovernanceOptions/DrepOptionsCard';
+import { GOVERNANCE_STATUS, LEARN_MORE_LINK, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
 
 export const GovernanceStatus = () => {
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
   const location = useLocation();
-  const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep } = useGovernanceDelegationToYoroiDrep();
+  const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
+    useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
   const { submitedTransactions, isTestnet } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+  const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
   const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+
+  const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep } = useGovernanceDelegationStatus({
+    governanceStatus,
+    isDelegated,
+  });
+  const isDelegatedToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
 
   React.useEffect(() => {
     if (location.search.includes('delegateToYoroiDrep=true')) {
@@ -30,26 +38,56 @@ export const GovernanceStatus = () => {
     }
   }, [useLocation]);
 
-  const onExploreMore = () => {
-    navigateTo.selectRevampOptions();
-  };
+  if (isNotAllowed) return <NotAllowedInGovernance />;
+  if (governanceStatus.status === null) return <StatusSkeletonScreen />;
 
-  if (isNotAllowed) {
-    return <NotAllowedInGovernance />;
-  }
-
-  if (governanceStatus.status === null) {
-    return <StatusSkeletonScreen />;
-  }
+  const cardConfigs = [
+    {
+      key: 'dreps',
+      title: strings.dreps,
+      description: strings.designatedSomeoneElse,
+      buttonText: isDelegatedToDrep ? strings.delegateToOtherDrep : strings.delegateLabel,
+      variant: 'outlined' as const,
+      icon: <Icon.VotingDrep />,
+      onAction: () => openDelegateModalForCustomDrep(),
+      status: cardState,
+      drepId: isDelegatedToDrep ? governanceStatus.drep : null,
+      isDelegated: isDelegatedToDrep,
+    },
+    {
+      key: 'abstain',
+      title: strings.abstain,
+      description: strings.chooseAbstain,
+      buttonText: isAbstain ? strings.changeToDrep : strings.delegateLabel,
+      variant: 'outlined' as const,
+      icon: <Icon.VotingAbstain />,
+      onAction: () => (isAbstain ? openDelegateModalForCustomDrep() : delegateToAbstain()),
+      status: cardState,
+      drepId: null,
+      isDelegated: isAbstain,
+    },
+    {
+      key: 'noConfidence',
+      title: strings.noConfidence,
+      description: strings.chooseNoConfidence,
+      buttonText: isNoConfidence ? strings.changeToDrep : strings.delegateLabel,
+      variant: 'outlined' as const,
+      icon: <Icon.VotingNoConfidence />,
+      onAction: () => (isNoConfidence ? openDelegateModalForCustomDrep() : delegateToNoConfidence()),
+      status: cardState,
+      drepId: null,
+      isDelegated: isNoConfidence,
+    },
+  ];
 
   return (
     <Container>
       <TitleSection>
-        <Typography variant="h5" color="ds.text_gray_medium" id="governance-title-text">
-          {isParticipating ? strings.delegatingInGovernance : strings.delegationOptions}
+        <Typography variant="h5" color="ds.text_gray_medium" textAlign="center" id="governance-title-text">
+          {strings.chooseVotingPower}
         </Typography>
-        <Typography variant="body1" color="ds.text_gray_low" textAlign={'center'} id="governance-description-text">
-          {cardState === GOVERNANCE_STATUS.IDLE ? strings.chooseDelegationOption : strings.votingPowerInfo}
+        <Typography variant="body1" color="ds.text_gray_low" textAlign="center" id="governance-description-text">
+          {isParticipating ? strings.governanceDelegationSubtitle : strings.governanceNotRegisteredSubtitle}
         </Typography>
       </TitleSection>
 
@@ -59,27 +97,27 @@ export const GovernanceStatus = () => {
         </Typography>
       )}
 
-      <CardsContainer>
-        <GovernanceStatusCard
-          state={cardState}
-          governanceStatus={governanceStatus}
-          onDelegateClick={() => delegateToDrep(yoroiDrepId)}
-          btnLoading={loadingUnsignTx}
-          openDelegateModalForCustomDrep={openDelegateModalForCustomDrep}
-          pending={isPendingDrepDelegationTx}
-        />
+      <CardsRow>
+        {cardConfigs.map(option => (
+          <DrepOptionsCard
+            key={option.key}
+            title={option.title}
+            description={option.description}
+            buttonText={option.buttonText}
+            variant={option.variant}
+            icon={option.icon}
+            onAction={option.onAction}
+            status={option.status}
+            drepId={option.drepId}
+            isDelegated={option.isDelegated}
+            pending={isPendingDrepDelegationTx || loadingUnsignTx}
+          />
+        ))}
+      </CardsRow>
 
-        <OtherActionsCard onClick={onExploreMore} id="governance-otherOptions-button">
-          <TextContent>
-            <Typography variant="body1" fontWeight={500} color="ds.gray_max">
-              {strings.exploreOtherDRepsOrAbstain}
-            </Typography>
-            <Typography variant="body2" color="ds.text_gray_medium">
-              {strings.browseAdditionalDelegation}
-            </Typography>
-          </TextContent>
-        </OtherActionsCard>
-      </CardsContainer>
+      <Link href={LEARN_MORE_LINK} rel="noopener" target="_blank" underline="hover" sx={{ cursor: 'pointer' }}>
+        <Typography variant="body1">{strings.learnMore}</Typography>
+      </Link>
     </Container>
   );
 };
@@ -90,8 +128,6 @@ const Container = styled(Box)(() => ({
   alignItems: 'center',
   padding: '0px',
   gap: '24px',
-  width: '612px',
-  margin: '0 auto',
   marginTop: '24px',
 }));
 
@@ -101,41 +137,12 @@ const TitleSection = styled(Box)(() => ({
   alignItems: 'center',
   padding: '0px',
   gap: '8px',
-  width: '612px',
 }));
 
-const CardsContainer = styled(Box)(() => ({
+const CardsRow = styled(Box)(() => ({
   display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
   padding: '0px',
-  gap: '16px',
-  width: '612px',
-}));
-
-const OtherActionsCard = styled(Button)(({ theme }: any) => ({
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  padding: '16px',
-  gap: '4px',
-  width: '612px',
-  border: `1px solid ${theme.palette.ds.gray_200}`,
-  borderRadius: '8px',
-  cursor: 'pointer',
-  textTransform: 'none',
-  '&:hover': {
-    background: theme.palette.background.paper,
-    borderColor: theme.palette.ds.primary_500,
-  },
-}));
-
-const TextContent = styled(Box)(() => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  padding: '0px',
-  gap: '4px',
-  width: '580px',
+  gap: '24px',
 }));

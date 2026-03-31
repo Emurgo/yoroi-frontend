@@ -262,6 +262,18 @@ export const messages = Object.freeze(
       id: 'gouvernace.delegatingInGovernance',
       defaultMessage: '!!!Delegating in Governance',
     },
+    dreps: {
+      id: 'governance.dreps',
+      defaultMessage: '!!!DReps',
+    },
+    governanceNotRegisteredSubtitle: {
+      id: 'governance.notRegisteredSubtitle',
+      defaultMessage: '!!!You can pick a DRep using their ID, choose to abstain or show no confidence.',
+    },
+    governanceDelegationSubtitle: {
+      id: 'governance.delegationSubtitle',
+      defaultMessage: "!!!Your delegation to DReps helps shaping Cardano's future. You may change your governance status at any time.",
+    },
   })
 );
 
@@ -333,5 +345,8 @@ export const useStrings = () => {
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
     yoroiTestnetDRep: intl.formatMessage(messages.yoroiTestnetDRep),
     delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
+    dreps: intl.formatMessage(messages.dreps),
+    governanceNotRegisteredSubtitle: intl.formatMessage(messages.governanceNotRegisteredSubtitle),
+    governanceDelegationSubtitle: intl.formatMessage(messages.governanceDelegationSubtitle),
   }).current;
 };
