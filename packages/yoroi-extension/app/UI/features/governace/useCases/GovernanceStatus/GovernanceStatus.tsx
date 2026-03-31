@@ -1,7 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Link } from '@mui/material';
-import { useLocation } from 'react-router';
 import { Icon } from '../../../../components';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
@@ -12,31 +11,23 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 import { DrepOptionsCard } from '../GovernanceOptions/DrepOptionsCard';
-import { GOVERNANCE_STATUS, LEARN_MORE_LINK, YOROI_DREP_ID, YOROI_DREP_ID_TESTNET } from '../../common/constants';
+import { GOVERNANCE_STATUS, LEARN_MORE_LINK } from '../../common/constants';
 
 export const GovernanceStatus = () => {
   const strings = useStrings();
-  const location = useLocation();
   const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
     useGovernanceDelegationToYoroiDrep();
   const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-  const { submitedTransactions, isTestnet } = useGovernance();
+  const { submitedTransactions } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
   const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
   const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
-  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
 
   const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep } = useGovernanceDelegationStatus({
     governanceStatus,
     isDelegated,
   });
   const isDelegatedToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
-
-  React.useEffect(() => {
-    if (location.search.includes('delegateToYoroiDrep=true')) {
-      delegateToDrep(yoroiDrepId);
-    }
-  }, [useLocation]);
 
   if (isNotAllowed) return <NotAllowedInGovernance />;
   if (governanceStatus.status === null) return <StatusSkeletonScreen />;
