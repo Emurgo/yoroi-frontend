@@ -3,31 +3,49 @@ import { styled } from '@mui/material/styles';
 import { Box, Typography, Link } from '@mui/material';
 import { Icon } from '../../../../components';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
-import { useGovernanceStatusState } from '../../common/hooks/useGovernanceStatusState';
-import { useGovernanceDelegationStatus } from '../../common/hooks/useGovernanceDelegationStatus';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useStrings } from '../../common/hooks/useStrings';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
 import { DrepOptionsCard } from '../GovernanceOptions/DrepOptionsCard';
-import { GOVERNANCE_STATUS, LEARN_MORE_LINK } from '../../common/constants';
+import {
+  DREP_ALWAYS_ABSTAIN,
+  DREP_ALWAYS_NO_CONFIDENCE,
+  GOVERNANCE_STATUS,
+  GovernanceStatusState,
+  LEARN_MORE_LINK,
+  YOROI_DREP_ID,
+  YOROI_DREP_ID_TESTNET,
+} from '../../common/constants';
 
 export const GovernanceStatus = () => {
   const strings = useStrings();
-  const { loadingUnsignTx, error, delegateToDrep, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
+  const { loadingUnsignTx, error, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
     useGovernanceDelegationToYoroiDrep();
-  const { governanceStatusState: cardState, governanceStatus } = useGovernanceStatusState();
-  const { submitedTransactions } = useGovernance();
+  const { governanceStatus, submitedTransactions, isTestnet } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
-  const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
-  const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
 
-  const { isAbstain, isNoConfidence, isDelegationToYoroiDrep, isDelegationToOtherDrep } = useGovernanceDelegationStatus({
-    governanceStatus,
-    isDelegated,
-  });
-  const isDelegatedToDrep = isDelegationToYoroiDrep || isDelegationToOtherDrep;
+  const yoroiDrepId = isTestnet ? YOROI_DREP_ID_TESTNET : YOROI_DREP_ID;
+  const isPendingDrepDelegationTx = submitedTransactions.length > 0 && submitedTransactions[0]?.isDrepDelegation === true;
+
+  const cardState: GovernanceStatusState = React.useMemo(() => {
+    if (governanceStatus.status === 'none' && governanceStatus.drep === null) return GOVERNANCE_STATUS.IDLE;
+    if (governanceStatus.status === 'delegate' && governanceStatus.drep !== null) return GOVERNANCE_STATUS.DELEGATED;
+    if (
+      (governanceStatus.status === DREP_ALWAYS_ABSTAIN || governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE) &&
+      governanceStatus.drep === null
+    )
+      return GOVERNANCE_STATUS.DELEGATED;
+    if (isPendingDrepDelegationTx) return GOVERNANCE_STATUS.DISABLED;
+    return GOVERNANCE_STATUS.IDLE;
+  }, [governanceStatus.status, governanceStatus.drep, isPendingDrepDelegationTx]);
+
+  const isDelegated = cardState === GOVERNANCE_STATUS.DELEGATED;
+  const drepID = governanceStatus.drep ?? yoroiDrepId;
+  const isAbstain = isDelegated && governanceStatus.drep === null && governanceStatus.status === DREP_ALWAYS_ABSTAIN;
+  const isNoConfidence = isDelegated && governanceStatus.drep === null && governanceStatus.status === DREP_ALWAYS_NO_CONFIDENCE;
+  const isDelegatedToDrep = isDelegated && !(isAbstain || isNoConfidence);
 
   if (isNotAllowed) return <NotAllowedInGovernance />;
   if (governanceStatus.status === null) return <StatusSkeletonScreen />;
