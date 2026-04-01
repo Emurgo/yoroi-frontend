@@ -31,8 +31,8 @@ function getDrepName(drep: any): string {
 
 function getTwitterUrl(drep: any): string | null {
   const refs: any[] = drep.metadata?.references ?? [];
-  const ref = refs.find(r => r.uri?.includes('twitter.com') || r.uri?.includes('x.com'));
-  return ref?.uri ?? null;
+  const ref = refs.find(r => r.uri?.['@value']?.includes('twitter.com') || r.uri?.['@value']?.includes('x.com'));
+  return ref?.uri['@value'] ?? null;
 }
 
 function formatVotingPower(lovelace: number): string {
@@ -137,7 +137,7 @@ export const DRepList = () => {
 
   React.useEffect(() => {
     if (!backendServiceZero) return;
-    fetch(`${backendServiceZero}/dreps/active?page=1&pageSize=1000`)
+    fetch(`https://yoroi-backend-zero-mainnet-staging.emurgornd.com/dreps/active?page=1&pageSize=1000`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
