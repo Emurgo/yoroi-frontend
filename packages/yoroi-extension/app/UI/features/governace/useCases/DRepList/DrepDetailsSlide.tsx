@@ -92,9 +92,10 @@ type Props = {
   onDelegate: () => void;
   isCurrentDrep: boolean;
   delegateDisabled: boolean;
+  error: string | null;
 };
 
-export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, delegateDisabled }: Props) => {
+export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, delegateDisabled, error }: Props) => {
   const strings = useStrings();
 
   const legacyId = React.useMemo(() => {
@@ -212,6 +213,11 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
 
           {/* ── Footer ── */}
           <SlideFooter>
+            {error != null && (
+              <Typography variant="body2" color="error" sx={{ mb: '8px' }}>
+                {error}
+              </Typography>
+            )}
             <DelegateButton
               onClick={isCurrentDrep || delegateDisabled ? undefined : onDelegate}
               sx={{
@@ -270,12 +276,13 @@ const SlideBody = styled(Box)(() => ({
 }));
 
 const SlideFooter = styled(Box)(({ theme }: any) => ({
-  height: '96px',
+  minHeight: '96px',
   padding: '24px',
   borderTop: `1px solid ${theme.palette.ds.gray_200}`,
   flexShrink: 0,
   display: 'flex',
-  alignItems: 'center',
+  flexDirection: 'column',
+  justifyContent: 'flex-end',
 }));
 
 const DelegateButton = styled(Box)(() => ({

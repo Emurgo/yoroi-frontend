@@ -165,7 +165,7 @@ export const DRepList = () => {
     // then strip 3 bytes cbor header
     return credHex ? credHex.slice(8) : null;
   }, [governanceStatus.status, governanceStatus.drep]);
-  const { delegateToDrep, loadingUnsignTx } = useGovernanceDelegationToYoroiDrep();
+  const { delegateToDrep, loadingUnsignTx, error, setError } = useGovernanceDelegationToYoroiDrep();
   const strings = useStrings();
 
   const [dreps, setDreps] = React.useState<DrepRow[]>([]);
@@ -403,7 +403,7 @@ export const DRepList = () => {
                     </Typography>
                   </ActionButton>
                   <ActionButton
-                    onClick={() => delegateToDrep(drep.bech32Id)}
+                    onClick={() => { setSelectedDrep(drep); delegateToDrep(drep.bech32Id); }}
                     sx={{
                       pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined,
                       opacity: isCurrent || loadingUnsignTx ? 0.5 : 1,
@@ -438,15 +438,11 @@ export const DRepList = () => {
 
       <DrepDetailsSlide
         drep={selectedDrep}
-        onClose={() => setSelectedDrep(null)}
-        onDelegate={() => {
-          if (selectedDrep) {
-            delegateToDrep(selectedDrep.bech32Id);
-            setSelectedDrep(null);
-          }
-        }}
+        onClose={() => { setSelectedDrep(null); setError(null); }}
+        onDelegate={() => { if (selectedDrep) delegateToDrep(selectedDrep.bech32Id); }}
         isCurrentDrep={selectedDrep?.id === currentDrepId}
         delegateDisabled={loadingUnsignTx}
+        error={selectedDrep != null ? error : null}
       />
     </>
   );
