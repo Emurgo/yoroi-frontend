@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useGovernance } from '../../module/GovernanceContextProvider';
-import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
+import { dRepToMaybeCredentialHex, dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
@@ -14,7 +14,8 @@ type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount' | 'rando
 type SortOrder = 'asc' | 'desc';
 
 interface DrepRow {
-  id: string;
+  id: string;       // raw hex hash from API (used for matching currentDrepId)
+  bech32Id: string; // CIP-129 bech32 (used for signing)
   name: string;
   stake: number;
   registeredDate: string | null;
@@ -177,6 +178,7 @@ export const DRepList = () => {
           .filter(d => d.type === 'registered')
           .map(d => ({
             id: d.id,
+            bech32Id: dRepNormalize(d.id, d.type === 'scripthash' ? 'scripthash' : 'keyhash'),
             name: getDrepName(d),
             stake: d.stake ?? 0,
             registeredDate: d.registeredDate ?? null,
@@ -358,7 +360,7 @@ export const DRepList = () => {
                 {strings.viewDetails}
               </Typography>
             </ActionButton>
-            <ActionButton onClick={() => delegateToDrep(drep.id)} disabled={isCurrent || loadingUnsignTx}>
+            <ActionButton onClick={() => delegateToDrep(drep.bech32Id)} disabled={isCurrent || loadingUnsignTx}>
               <Typography variant="body2" fontWeight={500} sx={{ letterSpacing: '0.5px', textTransform: 'uppercase', color: isCurrent ? '#a0b3f2' : 'ds.text_primary_medium' }}>
                 {strings.delegateLabel}
               </Typography>
