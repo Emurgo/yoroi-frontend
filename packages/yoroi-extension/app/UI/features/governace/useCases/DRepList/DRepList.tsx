@@ -201,7 +201,7 @@ export const DRepList = () => {
           .filter(d => d.type === 'registered')
           .map(d => ({
             id: d.id,
-            bech32Id: dRepNormalize(d.id, d.type === 'scripthash' ? 'scripthash' : 'keyhash'),
+            bech32Id: dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash'),
             name: getDrepName(d),
             stake: d.stake ?? 0,
             registeredDate: d.registeredDate ?? null,
