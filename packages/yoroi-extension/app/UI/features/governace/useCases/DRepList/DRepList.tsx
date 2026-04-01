@@ -7,21 +7,26 @@ import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovern
 import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
+import { DrepDetailsSlide } from './DrepDetailsSlide';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
 type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount' | 'random';
 type SortOrder = 'asc' | 'desc';
 
-interface DrepRow {
-  id: string;       // raw hex hash from API (used for matching currentDrepId)
-  bech32Id: string; // CIP-129 bech32 (used for signing)
+export interface DrepRow {
+  id: string;           // raw hex hash from API (used for matching currentDrepId)
+  bech32Id: string;     // CIP-129 bech32 (used for signing)
   name: string;
   stake: number;
   registeredDate: string | null;
   delegatorCount: number;
   imageUrl: string | null;
   twitterUrl: string | null;
+  motivations: string | null;
+  qualifications: string | null;
+  references: Array<{ label: string | null; uri: string }>;
+  metadataVerified: boolean;
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -36,6 +41,23 @@ function getTwitterUrl(drep: any): string | null {
   const refs: any[] = drep.metadata?.references ?? [];
   const ref = refs.find(r => r.uri?.['@value']?.includes('twitter.com') || r.uri?.['@value']?.includes('x.com'));
   return ref?.uri['@value'] ?? null;
+}
+
+function getMetadataText(value: any): string | null {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    const en = value.find((v: any) => v['@language'] === 'en') ?? value[0];
+    return en?.['@value'] ?? null;
+  }
+  return value['@value'] ?? null;
+}
+
+function getReferences(drep: any): Array<{ label: string | null; uri: string }> {
+  const refs: any[] = drep.metadata?.references ?? [];
+  return refs
+    .map(r => ({ label: getMetadataText(r.label) ?? null, uri: r.uri?.['@value'] ?? r.uri ?? null }))
+    .filter(r => r.uri != null);
 }
 
 function formatVotingPower(lovelace: number): string {
@@ -87,7 +109,7 @@ const RandomSortIcon = ({ active }: { active: boolean }) => (
 
 // ── Avatar ───────────────────────────────────────────────────────────────────
 
-const DrepAvatar = ({ imageUrl, name }: { imageUrl: string | null; name: string }) => {
+export const DrepAvatar = ({ imageUrl, name }: { imageUrl: string | null; name: string }) => {
   const theme: any = useTheme();
   if (imageUrl) {
     return (
@@ -154,6 +176,7 @@ export const DRepList = () => {
   const [sortField, setSortField] = React.useState<SortField>('name');
   const [sortOrder, setSortOrder] = React.useState<SortOrder>('asc');
   const [randomSeed, setRandomSeed] = React.useState(0);
+  const [selectedDrep, setSelectedDrep] = React.useState<DrepRow | null>(null);
 
   React.useEffect(() => {
     if (!backendServiceZero) return;
@@ -185,6 +208,11 @@ export const DRepList = () => {
             delegatorCount: d.delegatorCount ?? 0,
             imageUrl: d.metadata?.image?.contentUrl ?? null,
             twitterUrl: getTwitterUrl(d),
+            motivations: getMetadataText(d.metadata?.motivations),
+            qualifications: getMetadataText(d.metadata?.qualifications),
+            references: getReferences(d),
+            // metadataStatus: 'valid' | 'invalid' | undefined — treat absent or 'valid' as verified
+            metadataVerified: d.metadataStatus == null || d.metadataStatus === 'valid' || d.metadataStatus === 'verified',
           }));
         setDreps(rows);
       })
@@ -257,6 +285,7 @@ export const DRepList = () => {
   }
 
   return (
+    <>
     <TableContainer>
       {/* ── Header ── */}
       <TableHeader>
@@ -355,7 +384,7 @@ export const DRepList = () => {
 
           {/* View details + Delegate (aligns with Random header) */}
           <DataCell flex={1} sx={{ gap: '8px' }}>
-            <ActionButton onClick={() => {/* VIEW DETAILS – unhandled */}}>
+            <ActionButton onClick={() => setSelectedDrep(drep)}>
               <Typography variant="body2" fontWeight={500} color="ds.text_gray_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
                 {strings.viewDetails}
               </Typography>
@@ -379,6 +408,15 @@ export const DRepList = () => {
       )}
       </RowsContainer>
     </TableContainer>
+
+    <DrepDetailsSlide
+      drep={selectedDrep}
+      onClose={() => setSelectedDrep(null)}
+      onDelegate={() => { if (selectedDrep) { delegateToDrep(selectedDrep.bech32Id); setSelectedDrep(null); } }}
+      isCurrentDrep={selectedDrep?.id === currentDrepId}
+      delegateDisabled={loadingUnsignTx}
+    />
+    </>
   );
 };
 

@@ -23,7 +23,7 @@ import {
 export const GovernanceStatus = () => {
   const strings = useStrings();
   const navigateTo = useNavigateTo();
-  const { loadingUnsignTx, error, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
+  const { loadingUnsignTx, error, delegateToAbstain, delegateToNoConfidence } =
     useGovernanceDelegationToYoroiDrep();
   const { governanceStatus, submitedTransactions, isTestnet } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
@@ -72,7 +72,7 @@ export const GovernanceStatus = () => {
       buttonText: isAbstain ? strings.changeToDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingAbstain />,
-      onAction: () => (isAbstain ? openDelegateModalForCustomDrep() : delegateToAbstain()),
+      onAction: () => (isAbstain ? navigateTo.selectDrepList() : delegateToAbstain()),
       status: cardState,
       drepId: null,
       isDelegated: isAbstain,
@@ -84,7 +84,7 @@ export const GovernanceStatus = () => {
       buttonText: isNoConfidence ? strings.changeToDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingNoConfidence />,
-      onAction: () => (isNoConfidence ? openDelegateModalForCustomDrep() : delegateToNoConfidence()),
+      onAction: () => (isNoConfidence ? navigateTo.selectDrepList() : delegateToNoConfidence()),
       status: cardState,
       drepId: null,
       isDelegated: isNoConfidence,

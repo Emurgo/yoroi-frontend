@@ -310,6 +310,27 @@ export const messages = Object.freeze(
       id: 'governance.noDrepsFound',
       defaultMessage: '!!!No DReps found',
     },
+    legacyDrepId: {
+      id: 'governance.legacyDrepId',
+      defaultMessage: '!!!Legacy DRep ID (CIP-105)',
+    },
+    motivations: {
+      id: 'governance.motivations',
+      defaultMessage: '!!!Motivations',
+    },
+    qualifications: {
+      id: 'governance.qualifications',
+      defaultMessage: '!!!Qualifications',
+    },
+    unverifiedMetadataTitle: {
+      id: 'governance.unverifiedMetadataTitle',
+      defaultMessage: '!!!Unverified DRep metadata',
+    },
+    unverifiedMetadataMessage: {
+      id: 'governance.unverifiedMetadataMessage',
+      defaultMessage:
+        "!!!This information couldn't be verified against the blockchain and may have been altered. It has been hidden for your safety.",
+    },
   })
 );
 
@@ -393,5 +414,10 @@ export const useStrings = () => {
     drepColRandom: intl.formatMessage(messages.drepColRandom),
     viewDetails: intl.formatMessage(messages.viewDetails),
     noDrepsFound: intl.formatMessage(messages.noDrepsFound),
+    legacyDrepId: intl.formatMessage(messages.legacyDrepId),
+    motivations: intl.formatMessage(messages.motivations),
+    qualifications: intl.formatMessage(messages.qualifications),
+    unverifiedMetadataTitle: intl.formatMessage(messages.unverifiedMetadataTitle),
+    unverifiedMetadataMessage: intl.formatMessage(messages.unverifiedMetadataMessage),
   }).current;
 };
