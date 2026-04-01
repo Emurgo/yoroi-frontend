@@ -107,10 +107,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
   }, [drep?.bech32Id]);
 
   const nonSocialRefs = React.useMemo(
-    () =>
-      drep?.references.filter(
-        r => !r.uri.includes('twitter.com') && !r.uri.includes('x.com')
-      ) ?? [],
+    () => drep?.references.filter(r => !r.uri.includes('twitter.com') && !r.uri.includes('x.com')) ?? [],
     [drep?.references]
   );
 
@@ -147,12 +144,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
                   {drep.name}
                 </Typography>
                 {drep.twitterUrl && (
-                  <Box
-                    component="a"
-                    href={drep.twitterUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
+                  <Box component="a" href={drep.twitterUrl} target="_blank" rel="noopener noreferrer">
                     <XIcon />
                   </Box>
                 )}
@@ -222,7 +214,10 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
           <SlideFooter>
             <DelegateButton
               onClick={isCurrentDrep || delegateDisabled ? undefined : onDelegate}
-              sx={{ pointerEvents: isCurrentDrep || delegateDisabled ? 'none' : undefined, opacity: isCurrentDrep || delegateDisabled ? 0.6 : 1 }}
+              sx={{
+                pointerEvents: isCurrentDrep || delegateDisabled ? 'none' : undefined,
+                opacity: isCurrentDrep || delegateDisabled ? 0.6 : 1,
+              }}
             >
               <Typography
                 variant="body1"

@@ -21,8 +21,7 @@ import {
 export const GovernanceStatus = () => {
   const strings = useStrings();
   const navigateTo = useNavigateTo();
-  const { loadingUnsignTx, error, delegateToAbstain, delegateToNoConfidence } =
-    useGovernanceDelegationToYoroiDrep();
+  const { loadingUnsignTx, error, delegateToAbstain, delegateToNoConfidence } = useGovernanceDelegationToYoroiDrep();
   const { governanceStatus, submitedTransactions } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
 

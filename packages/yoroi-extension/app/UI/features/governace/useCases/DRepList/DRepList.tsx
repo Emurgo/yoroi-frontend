@@ -14,8 +14,8 @@ type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount' | 'rando
 type SortOrder = 'asc' | 'desc';
 
 export interface DrepRow {
-  id: string;           // raw hex hash from API (used for matching currentDrepId)
-  bech32Id: string;     // CIP-129 bech32 (used for signing)
+  id: string; // raw hex hash from API (used for matching currentDrepId)
+  bech32Id: string; // CIP-129 bech32 (used for signing)
   name: string;
   stake: number;
   registeredDate: string | null;
@@ -183,7 +183,9 @@ export const DRepList = () => {
       const accumulated: any[] = [];
       let page = 1;
       while (true) {
-        const res = await fetch(`https://yoroi-backend-zero-mainnet-staging.emurgornd.com/dreps/active?page=${page}&pageSize=${PAGE_SIZE}`);
+        const res = await fetch(
+          `https://yoroi-backend-zero-mainnet-staging.emurgornd.com/dreps/active?page=${page}&pageSize=${PAGE_SIZE}`
+        );
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: any[] = await res.json();
         accumulated.push(...data);
@@ -234,7 +236,9 @@ export const DRepList = () => {
 
   const displayed = React.useMemo(() => {
     const lower = searchText.toLowerCase();
-    const filtered = lower ? dreps.filter(d => d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower)) : dreps;
+    const filtered = lower
+      ? dreps.filter(d => d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower))
+      : dreps;
     let sorted: DrepRow[];
     if (sortField === 'random') {
       // Seeded shuffle: hash each item's index with the seed for a stable order per seed value
@@ -284,136 +288,166 @@ export const DRepList = () => {
 
   return (
     <>
-    <TableContainer>
-      {/* ── Header ── */}
-      <TableHeader>
-        <Typography variant="h5" color="ds.text_gray_medium">
-          {strings.activeDrepsCount(dreps.length)}
-        </Typography>
-        <SearchInput
-          placeholder={strings.searchDrep}
-          value={searchText}
-          onChange={e => setSearchText(e.target.value)}
-        />
-      </TableHeader>
+      <TableContainer>
+        {/* ── Header ── */}
+        <TableHeader>
+          <Typography variant="h5" color="ds.text_gray_medium">
+            {strings.activeDrepsCount(dreps.length)}
+          </Typography>
+          <SearchInput placeholder={strings.searchDrep} value={searchText} onChange={e => setSearchText(e.target.value)} />
+        </TableHeader>
 
-      {/* ── Column Headers ── */}
-      <ColumnHeaderRow>
-        <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {strings.drepColTickerAndName}
-          </Typography>
-          <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
-        </ColHeaderCell>
-        <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {strings.drepColVotingPower}
-          </Typography>
-          <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
-        </ColHeaderCell>
-        <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {strings.drepColRegistered}
-          </Typography>
-          <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
-        </ColHeaderCell>
-        <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {strings.drepColDelegators}
-          </Typography>
-          <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
-        </ColHeaderCell>
-        <ColHeaderCell flex={1} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer' }}>
-          <Typography variant="body2" color="ds.text_gray_low">
-            {strings.drepColRandom}
-          </Typography>
-          <RandomSortIcon active={sortField === 'random'} />
-        </ColHeaderCell>
-      </ColumnHeaderRow>
-
-      {/* ── Rows ── */}
-      <RowsContainer>
-      {displayed.map(drep => {
-        const isCurrent = drep.id === currentDrepId;
-        return (
-        <DataRow key={drep.id} sx={isCurrent ? { background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)', '&:hover': { background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)' } } : {}}>
-          {/* Ticker and name */}
-          <DataCell width={304} sx={{ gap: '16px' }}>
-            <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
-            <Stack gap="8px">
-              <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
-                {drep.name}
-              </Typography>
-              {drep.twitterUrl && (
-                <Box
-                  component="a"
-                  href={drep.twitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
-                >
-                  <XIcon />
-                </Box>
-              )}
-            </Stack>
-          </DataCell>
-
-          {/* Voting power */}
-          <DataCell width={226}>
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {formatVotingPower(drep.stake)}
+        {/* ── Column Headers ── */}
+        <ColumnHeaderRow>
+          <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {strings.drepColTickerAndName}
             </Typography>
-          </DataCell>
-
-          {/* Registered */}
-          <DataCell width={226}>
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {drep.registeredDate ? formatRelativeDate(drep.registeredDate) : '—'}
+            <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
+          </ColHeaderCell>
+          <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {strings.drepColVotingPower}
             </Typography>
-          </DataCell>
-
-          {/* Delegators */}
-          <DataCell width={226} sx={{ gap: '8px' }}>
-            <PieChartIcon />
-            <Typography variant="body1" color="ds.text_gray_medium">
-              {drep.delegatorCount.toLocaleString()}
+            <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
+          </ColHeaderCell>
+          <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {strings.drepColRegistered}
             </Typography>
-          </DataCell>
+            <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
+          </ColHeaderCell>
+          <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {strings.drepColDelegators}
+            </Typography>
+            <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
+          </ColHeaderCell>
+          <ColHeaderCell flex={1} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer' }}>
+            <Typography variant="body2" color="ds.text_gray_low">
+              {strings.drepColRandom}
+            </Typography>
+            <RandomSortIcon active={sortField === 'random'} />
+          </ColHeaderCell>
+        </ColumnHeaderRow>
 
-          {/* View details + Delegate (aligns with Random header) */}
-          <DataCell flex={1} sx={{ gap: '8px' }}>
-            <ActionButton onClick={() => setSelectedDrep(drep)}>
-              <Typography variant="body2" fontWeight={500} color="ds.text_gray_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                {strings.viewDetails}
+        {/* ── Rows ── */}
+        <RowsContainer>
+          {displayed.map(drep => {
+            const isCurrent = drep.id === currentDrepId;
+            return (
+              <DataRow
+                key={drep.id}
+                sx={
+                  isCurrent
+                    ? {
+                        background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)',
+                        '&:hover': { background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)' },
+                      }
+                    : {}
+                }
+              >
+                {/* Ticker and name */}
+                <DataCell width={304} sx={{ gap: '16px' }}>
+                  <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
+                  <Stack gap="8px">
+                    <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
+                      {drep.name}
+                    </Typography>
+                    {drep.twitterUrl && (
+                      <Box
+                        component="a"
+                        href={drep.twitterUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      >
+                        <XIcon />
+                      </Box>
+                    )}
+                  </Stack>
+                </DataCell>
+
+                {/* Voting power */}
+                <DataCell width={226}>
+                  <Typography variant="body1" color="ds.text_gray_medium">
+                    {formatVotingPower(drep.stake)}
+                  </Typography>
+                </DataCell>
+
+                {/* Registered */}
+                <DataCell width={226}>
+                  <Typography variant="body1" color="ds.text_gray_medium">
+                    {drep.registeredDate ? formatRelativeDate(drep.registeredDate) : '—'}
+                  </Typography>
+                </DataCell>
+
+                {/* Delegators */}
+                <DataCell width={226} sx={{ gap: '8px' }}>
+                  <PieChartIcon />
+                  <Typography variant="body1" color="ds.text_gray_medium">
+                    {drep.delegatorCount.toLocaleString()}
+                  </Typography>
+                </DataCell>
+
+                {/* View details + Delegate (aligns with Random header) */}
+                <DataCell flex={1} sx={{ gap: '8px' }}>
+                  <ActionButton onClick={() => setSelectedDrep(drep)}>
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      color="ds.text_gray_medium"
+                      sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}
+                    >
+                      {strings.viewDetails}
+                    </Typography>
+                  </ActionButton>
+                  <ActionButton
+                    onClick={() => delegateToDrep(drep.bech32Id)}
+                    sx={{
+                      pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined,
+                      opacity: isCurrent || loadingUnsignTx ? 0.5 : 1,
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      fontWeight={500}
+                      sx={{
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        color: isCurrent ? '#a0b3f2' : 'ds.text_primary_medium',
+                      }}
+                    >
+                      {strings.delegateLabel}
+                    </Typography>
+                  </ActionButton>
+                </DataCell>
+              </DataRow>
+            );
+          })}
+
+          {displayed.length === 0 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+              <Typography variant="body1" color="ds.text_gray_low">
+                {strings.noDrepsFound}
               </Typography>
-            </ActionButton>
-            <ActionButton onClick={() => delegateToDrep(drep.bech32Id)} sx={{ pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined, opacity: isCurrent || loadingUnsignTx ? 0.5 : 1 }}>
-              <Typography variant="body2" fontWeight={500} sx={{ letterSpacing: '0.5px', textTransform: 'uppercase', color: isCurrent ? '#a0b3f2' : 'ds.text_primary_medium' }}>
-                {strings.delegateLabel}
-              </Typography>
-            </ActionButton>
-          </DataCell>
-        </DataRow>
-        );
-      })}
+            </Box>
+          )}
+        </RowsContainer>
+      </TableContainer>
 
-      {displayed.length === 0 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
-          <Typography variant="body1" color="ds.text_gray_low">
-            {strings.noDrepsFound}
-          </Typography>
-        </Box>
-      )}
-      </RowsContainer>
-    </TableContainer>
-
-    <DrepDetailsSlide
-      drep={selectedDrep}
-      onClose={() => setSelectedDrep(null)}
-      onDelegate={() => { if (selectedDrep) { delegateToDrep(selectedDrep.bech32Id); setSelectedDrep(null); } }}
-      isCurrentDrep={selectedDrep?.id === currentDrepId}
-      delegateDisabled={loadingUnsignTx}
-    />
+      <DrepDetailsSlide
+        drep={selectedDrep}
+        onClose={() => setSelectedDrep(null)}
+        onDelegate={() => {
+          if (selectedDrep) {
+            delegateToDrep(selectedDrep.bech32Id);
+            setSelectedDrep(null);
+          }
+        }}
+        isCurrentDrep={selectedDrep?.id === currentDrepId}
+        delegateDisabled={loadingUnsignTx}
+      />
     </>
   );
 };
