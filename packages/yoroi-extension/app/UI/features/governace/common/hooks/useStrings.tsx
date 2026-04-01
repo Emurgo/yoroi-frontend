@@ -207,6 +207,10 @@ export const messages = Object.freeze(
       id: 'governance.changeToDrep',
       defaultMessage: '!!!Change to DRep',
     },
+    delegateToOtherDrep: {
+      id: 'governance.delegateToOtherDrep',
+      defaultMessage: '!!!Delegate to other DRep',
+    },
     delegatingLabel: {
       id: 'governance.delegatingLabel',
       defaultMessage: '!!!Delegateing',
@@ -352,6 +356,7 @@ export const useStrings = () => {
     chooseAbstain: intl.formatMessage(messages.chooseAbstain),
     chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
     changeToDrep: intl.formatMessage(messages.changeToDrep),
+    delegateToOtherDrep: intl.formatMessage(messages.delegateToOtherDrep),
     delegatingLabel: intl.formatMessage(messages.delegatingLabel),
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),

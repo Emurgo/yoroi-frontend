@@ -345,6 +345,7 @@
   "governance.chooseVotingPower": "Choose How to Use Your Voting Power",
   "governance.considerDelegating": "Consider delegating to Yoroi?",
   "governance.delegateToDRep": "Delegate to a DRep",
+  "governance.delegateToOtherDrep": "Delegate to other DRep",
   "governance.delegateToYoroiDRep": "Delegate to Yoroi DRep",
   "governance.delegatingLabel": "Delegateing",
   "governance.delegatingToDRep": "Delegating to a DRep",
