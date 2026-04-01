@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { dRepToMaybeCredentialHex, dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
@@ -404,8 +404,7 @@ export const DRepList = () => {
                   </ActionButton>
                   <ActionButton
                     onClick={() => {
-                      setSelectedDrep(drep);
-                      delegateToDrep(drep.bech32Id);
+                      void delegateToDrep(drep.bech32Id);
                     }}
                     sx={{
                       pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined,
@@ -452,6 +451,15 @@ export const DRepList = () => {
         delegateDisabled={loadingUnsignTx}
         error={selectedDrep != null ? error : null}
       />
+
+      <Dialog open={error != null && selectedDrep == null} onClose={() => setError(null)}>
+        <DialogContent>
+          <Typography variant="body1">{error}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setError(null)}>{strings.back}</Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
