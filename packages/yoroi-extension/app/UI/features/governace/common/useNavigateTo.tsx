@@ -8,5 +8,6 @@ export const useNavigateTo = () => {
   return React.useRef({
     selectRevampStatus: () => navigate(ROUTES.GOVERNANCE.ROOT),
     selectRevampOptions: () => navigate(ROUTES.GOVERNANCE.OPTIONS),
+    selectDrepList: () => navigate(ROUTES.GOVERNANCE.DREP_LIST),
   }).current;
 };

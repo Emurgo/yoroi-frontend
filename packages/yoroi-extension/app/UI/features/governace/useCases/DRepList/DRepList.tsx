@@ -1,0 +1,397 @@
+import React from 'react';
+import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { styled, useTheme } from '@mui/material/styles';
+import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useNavigateTo } from '../../common/useNavigateTo';
+import { SearchInput } from '../../../../components';
+
+// ── Types ───────────────────────────────────────────────────────────────────
+
+type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount';
+type SortOrder = 'asc' | 'desc';
+
+interface DrepRow {
+  id: string;
+  name: string;
+  stake: number;
+  registeredDate: string | null;
+  delegatorCount: number;
+  imageUrl: string | null;
+  twitterUrl: string | null;
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
+
+function getDrepName(drep: any): string {
+  if (!drep.metadata?.givenName) return drep.id;
+  const gn = drep.metadata.givenName;
+  return typeof gn === 'string' ? gn : (gn['@value'] ?? drep.id);
+}
+
+function getTwitterUrl(drep: any): string | null {
+  const refs: any[] = drep.metadata?.references ?? [];
+  const ref = refs.find(r => r.uri?.includes('twitter.com') || r.uri?.includes('x.com'));
+  return ref?.uri ?? null;
+}
+
+function formatVotingPower(lovelace: number): string {
+  const ada = lovelace / 1_000_000;
+  if (ada >= 1_000_000_000) return `₳ ${(ada / 1_000_000_000).toFixed(2)}B`;
+  if (ada >= 1_000_000) return `₳ ${(ada / 1_000_000).toFixed(2)}M`;
+  if (ada >= 1_000) return `₳ ${(ada / 1_000).toFixed(2)}K`;
+  return `₳ ${ada.toLocaleString()}`;
+}
+
+function formatRelativeDate(dateStr: string): string {
+  const ms = Date.now() - new Date(dateStr).getTime();
+  const totalDays = Math.floor(ms / 86_400_000);
+  const years = Math.floor(totalDays / 365);
+  const months = Math.floor((totalDays % 365) / 30);
+  const days = totalDays % 30;
+  const parts: string[] = [];
+  if (years > 0) parts.push(`${years}y`);
+  if (months > 0) parts.push(`${months}mo`);
+  if (days > 0 && years === 0) parts.push(`${days}d`);
+  return parts.length ? parts.join(' ') + ' ago' : 'today';
+}
+
+// ── Sort icon ────────────────────────────────────────────────────────────────
+
+const SortIcon = ({ field, sortField, sortOrder }: { field: SortField; sortField: SortField; sortOrder: SortOrder }) => {
+  const isActive = field === sortField;
+  const asc = isActive && sortOrder === 'asc';
+  const desc = isActive && sortOrder === 'desc';
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: '1px', flexShrink: 0 }}>
+      <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+        <path d="M4 0L7.46 4H0.54L4 0Z" fill={asc ? '#242838' : '#c4cad7'} />
+      </svg>
+      <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+        <path d="M4 5L0.54 1H7.46L4 5Z" fill={desc ? '#242838' : '#c4cad7'} />
+      </svg>
+    </Box>
+  );
+};
+
+// ── Avatar ───────────────────────────────────────────────────────────────────
+
+const DrepAvatar = ({ imageUrl, name }: { imageUrl: string | null; name: string }) => {
+  const theme: any = useTheme();
+  if (imageUrl) {
+    return (
+      <Box
+        component="img"
+        src={imageUrl}
+        alt={name}
+        sx={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+        onError={(e: any) => {
+          e.currentTarget.style.display = 'none';
+        }}
+      />
+    );
+  }
+  return (
+    <Box
+      sx={{
+        width: 56,
+        height: 56,
+        borderRadius: '50%',
+        background: theme.palette.ds.gray_100,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexShrink: 0,
+      }}
+    >
+      <Typography variant="body2" color="ds.text_gray_low" fontWeight={500}>
+        {name.slice(0, 2).toUpperCase()}
+      </Typography>
+    </Box>
+  );
+};
+
+// ── Twitter icon ─────────────────────────────────────────────────────────────
+
+const XIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.75l7.73-8.835-8.156-10.665h6.07l4.259 5.633L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
+      fill="#6b7384"
+    />
+  </svg>
+);
+
+// ── Main component ────────────────────────────────────────────────────────────
+
+export const DRepList = () => {
+  const { backendServiceZero } = useGovernance();
+  const { delegateToDrep, loadingUnsignTx } = useGovernanceDelegationToYoroiDrep();
+  const navigateTo = useNavigateTo();
+
+  const [dreps, setDreps] = React.useState<DrepRow[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [searchText, setSearchText] = React.useState('');
+  const [sortField, setSortField] = React.useState<SortField>('name');
+  const [sortOrder, setSortOrder] = React.useState<SortOrder>('asc');
+
+  React.useEffect(() => {
+    if (!backendServiceZero) return;
+    fetch(`${backendServiceZero}/dreps/active?page=1&pageSize=1000`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data: any[]) => {
+        const rows: DrepRow[] = data
+          .filter(d => d.type === 'registered')
+          .map(d => ({
+            id: d.id,
+            name: getDrepName(d),
+            stake: d.stake ?? 0,
+            registeredDate: d.registeredDate ?? null,
+            delegatorCount: d.delegatorCount ?? 0,
+            imageUrl: d.metadata?.image?.contentUrl ?? null,
+            twitterUrl: getTwitterUrl(d),
+          }));
+        setDreps(rows);
+      })
+      .catch(err => console.error('[DRepList] fetch error', err))
+      .finally(() => setLoading(false));
+  }, [backendServiceZero]);
+
+  const handleSortClick = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const displayed = React.useMemo(() => {
+    const lower = searchText.toLowerCase();
+    const filtered = lower ? dreps.filter(d => d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower)) : dreps;
+    return [...filtered].sort((a, b) => {
+      let cmp = 0;
+      switch (sortField) {
+        case 'name':
+          cmp = a.name.localeCompare(b.name);
+          break;
+        case 'stake':
+          cmp = a.stake - b.stake;
+          break;
+        case 'registeredDate':
+          cmp = new Date(a.registeredDate ?? 0).getTime() - new Date(b.registeredDate ?? 0).getTime();
+          break;
+        case 'delegatorCount':
+          cmp = a.delegatorCount - b.delegatorCount;
+          break;
+      }
+      return sortOrder === 'asc' ? cmp : -cmp;
+    });
+  }, [dreps, searchText, sortField, sortOrder]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <TableContainer>
+      {/* ── Header ── */}
+      <TableHeader>
+        <Typography variant="h5" color="ds.text_gray_medium">
+          Active DReps ({dreps.length})
+        </Typography>
+        <SearchInput
+          placeholder="Search DRep"
+          value={searchText}
+          onChange={e => setSearchText(e.target.value)}
+        />
+      </TableHeader>
+
+      {/* ── Column Headers ── */}
+      <ColumnHeaderRow>
+        <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
+          <Typography variant="body2" color="ds.text_gray_low">
+            Ticker and name
+          </Typography>
+          <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
+        </ColHeaderCell>
+        <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
+          <Typography variant="body2" color="ds.text_gray_low">
+            Voting power
+          </Typography>
+          <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
+        </ColHeaderCell>
+        <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
+          <Typography variant="body2" color="ds.text_gray_low">
+            Registered
+          </Typography>
+          <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
+        </ColHeaderCell>
+        <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
+          <Typography variant="body2" color="ds.text_gray_low">
+            Delegators
+          </Typography>
+          <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
+        </ColHeaderCell>
+        <ColHeaderCell flex={1} />
+      </ColumnHeaderRow>
+
+      {/* ── Rows ── */}
+      {displayed.map(drep => (
+        <DataRow key={drep.id}>
+          {/* Ticker and name */}
+          <DataCell width={304} sx={{ gap: '16px' }}>
+            <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
+            <Stack gap="8px">
+              <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
+                {drep.name}
+              </Typography>
+              {drep.twitterUrl && (
+                <Box
+                  component="a"
+                  href={drep.twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                >
+                  <XIcon />
+                </Box>
+              )}
+            </Stack>
+          </DataCell>
+
+          {/* Voting power */}
+          <DataCell width={226}>
+            <Typography variant="body1" color="ds.text_gray_medium">
+              {formatVotingPower(drep.stake)}
+            </Typography>
+          </DataCell>
+
+          {/* Registered */}
+          <DataCell width={226}>
+            <Typography variant="body1" color="ds.text_gray_medium">
+              {drep.registeredDate ? formatRelativeDate(drep.registeredDate) : '—'}
+            </Typography>
+          </DataCell>
+
+          {/* Delegators */}
+          <DataCell width={226} sx={{ gap: '8px' }}>
+            <PieChartIcon />
+            <Typography variant="body1" color="ds.text_gray_medium">
+              {drep.delegatorCount.toLocaleString()}
+            </Typography>
+          </DataCell>
+
+          {/* Actions */}
+          <DataCell flex={1} sx={{ justifyContent: 'flex-end', gap: '8px' }}>
+            <ActionButton onClick={() => {/* VIEW DETAILS – unhandled */}}>
+              <Typography variant="body2" fontWeight={500} color="ds.text_gray_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                View details
+              </Typography>
+            </ActionButton>
+            <ActionButton onClick={() => delegateToDrep(drep.id)} disabled={loadingUnsignTx}>
+              <Typography variant="body2" fontWeight={500} color="ds.text_primary_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                Delegate
+              </Typography>
+            </ActionButton>
+          </DataCell>
+        </DataRow>
+      ))}
+
+      {displayed.length === 0 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
+          <Typography variant="body1" color="ds.text_gray_low">
+            No DReps found
+          </Typography>
+        </Box>
+      )}
+    </TableContainer>
+  );
+};
+
+// ── Pie chart icon (inline SVG) ───────────────────────────────────────────────
+
+const PieChartIcon = () => (
+  <Box sx={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 2a8 8 0 1 0 8 8h-8V2Z" fill="#6b7384" opacity="0.5" />
+      <path d="M12 2.26A8.004 8.004 0 0 1 18 10h-6V2.26Z" fill="#6b7384" />
+    </svg>
+  </Box>
+);
+
+// ── Styled components ─────────────────────────────────────────────────────────
+
+const TableContainer = styled(Box)(({ theme }: any) => ({
+  width: '100%',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  border: `1px solid ${theme.palette.ds.gray_200}`,
+}));
+
+const TableHeader = styled(Box)(({ theme }: any) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '16px',
+  borderBottom: `1px solid ${theme.palette.ds.gray_200}`,
+}));
+
+const ColumnHeaderRow = styled(Box)(({ theme }: any) => ({
+  display: 'flex',
+  alignItems: 'center',
+  borderBottom: `1px solid ${theme.palette.ds.gray_200}`,
+  background: theme.palette.ds.bg_color_max,
+}));
+
+const ColHeaderCell = styled(Box)<{ width?: number; flex?: number }>(({ width, flex }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '16px',
+  width: width ? `${width}px` : undefined,
+  flex: flex ?? 'none',
+  flexShrink: 0,
+}));
+
+const DataRow = styled(Box)(({ theme }: any) => ({
+  display: 'flex',
+  alignItems: 'center',
+  borderBottom: `1px solid ${theme.palette.ds.gray_200}`,
+  background: theme.palette.ds.bg_color_max,
+  '&:last-of-type': {
+    borderBottom: 'none',
+  },
+  '&:hover': {
+    background: theme.palette.ds.gray_50 ?? theme.palette.ds.gray_100,
+  },
+}));
+
+const DataCell = styled(Box)<{ width?: number; flex?: number }>(({ width, flex }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: '16px',
+  width: width ? `${width}px` : undefined,
+  flex: flex ?? 'none',
+  flexShrink: 0,
+  alignSelf: 'stretch',
+}));
+
+const ActionButton = styled(Box)(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '9px 16px',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  '&:hover': {
+    background: 'rgba(0,0,0,0.04)',
+  },
+})) as typeof Box;

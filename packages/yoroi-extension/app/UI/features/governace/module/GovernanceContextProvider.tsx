@@ -31,6 +31,7 @@ const initialGovernanceProvider = {
   submitedTransactions: [] as Array<{ isDrepDelegation: Boolean }>,
   networkId: null,
   isTestnet: false,
+  backendServiceZero: null,
 };
 
 const GovernanceContext = React.createContext(initialGovernanceProvider);
@@ -160,6 +161,7 @@ export const GovernanceContextProvider = ({
     recentTransactions,
     submitedTransactions,
     isTestnet: selectedWallet.isTestnet,
+    backendServiceZero,
   };
 
   return <GovernanceContext.Provider value={context}>{children}</GovernanceContext.Provider>;

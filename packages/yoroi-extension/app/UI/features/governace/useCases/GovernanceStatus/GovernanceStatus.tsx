@@ -5,6 +5,7 @@ import { Icon } from '../../../../components';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { NotAllowedInGovernance } from './NotAllowedInGovernance';
 import { StatusSkeletonScreen } from '../../common/SkeletonCardLoaders';
@@ -21,6 +22,7 @@ import {
 
 export const GovernanceStatus = () => {
   const strings = useStrings();
+  const navigateTo = useNavigateTo();
   const { loadingUnsignTx, error, openDelegateModalForCustomDrep, delegateToAbstain, delegateToNoConfidence } =
     useGovernanceDelegationToYoroiDrep();
   const { governanceStatus, submitedTransactions, isTestnet } = useGovernance();
@@ -58,7 +60,7 @@ export const GovernanceStatus = () => {
       buttonText: isDelegatedToDrep ? strings.delegateToOtherDrep : strings.delegateLabel,
       variant: 'outlined' as const,
       icon: <Icon.VotingDrep />,
-      onAction: () => openDelegateModalForCustomDrep(),
+      onAction: () => navigateTo.selectDrepList(),
       status: cardState,
       drepId: isDelegatedToDrep ? governanceStatus.drep : null,
       isDelegated: isDelegatedToDrep,
