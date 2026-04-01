@@ -65,7 +65,9 @@ export const GovernanceStatus = () => {
       description: strings.chooseAbstain,
       buttonText: isAbstain ? strings.changeToDrep : strings.delegateLabel,
       icon: <Icon.VotingAbstain />,
-      onAction: () => { void (isAbstain ? navigateTo.selectDrepList() : delegateToAbstain()); },
+      onAction: () => {
+        void (isAbstain ? navigateTo.selectDrepList() : delegateToAbstain());
+      },
       status: cardState,
       drepId: null,
       isDelegated: isAbstain,
@@ -76,7 +78,9 @@ export const GovernanceStatus = () => {
       description: strings.chooseNoConfidence,
       buttonText: isNoConfidence ? strings.changeToDrep : strings.delegateLabel,
       icon: <Icon.VotingNoConfidence />,
-      onAction: () => { void (isNoConfidence ? navigateTo.selectDrepList() : delegateToNoConfidence()); },
+      onAction: () => {
+        void (isNoConfidence ? navigateTo.selectDrepList() : delegateToNoConfidence());
+      },
       status: cardState,
       drepId: null,
       isDelegated: isNoConfidence,

@@ -403,7 +403,10 @@ export const DRepList = () => {
                     </Typography>
                   </ActionButton>
                   <ActionButton
-                    onClick={() => { setSelectedDrep(drep); delegateToDrep(drep.bech32Id); }}
+                    onClick={() => {
+                      setSelectedDrep(drep);
+                      delegateToDrep(drep.bech32Id);
+                    }}
                     sx={{
                       pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined,
                       opacity: isCurrent || loadingUnsignTx ? 0.5 : 1,
@@ -438,8 +441,13 @@ export const DRepList = () => {
 
       <DrepDetailsSlide
         drep={selectedDrep}
-        onClose={() => { setSelectedDrep(null); setError(null); }}
-        onDelegate={() => { if (selectedDrep) delegateToDrep(selectedDrep.bech32Id); }}
+        onClose={() => {
+          setSelectedDrep(null);
+          setError(null);
+        }}
+        onDelegate={() => {
+          if (selectedDrep) delegateToDrep(selectedDrep.bech32Id);
+        }}
         isCurrentDrep={selectedDrep?.id === currentDrepId}
         delegateDisabled={loadingUnsignTx}
         error={selectedDrep != null ? error : null}
