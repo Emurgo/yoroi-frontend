@@ -2,13 +2,15 @@ import React from 'react';
 import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useGovernance } from '../../module/GovernanceContextProvider';
+import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
 import { useNavigateTo } from '../../common/useNavigateTo';
+import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
-type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount';
+type SortField = 'name' | 'stake' | 'registeredDate' | 'delegatorCount' | 'random';
 type SortOrder = 'asc' | 'desc';
 
 interface DrepRow {
@@ -74,6 +76,14 @@ const SortIcon = ({ field, sortField, sortOrder }: { field: SortField; sortField
   );
 };
 
+const RandomSortIcon = ({ active }: { active: boolean }) => (
+  <Box sx={{ display: 'flex', flexShrink: 0 }}>
+    <svg width="8" height="5" viewBox="0 0 8 5" fill="none">
+      <path d="M4 5L0.54 1H7.46L4 5Z" fill={active ? '#242838' : '#c4cad7'} />
+    </svg>
+  </Box>
+);
+
 // ── Avatar ───────────────────────────────────────────────────────────────────
 
 const DrepAvatar = ({ imageUrl, name }: { imageUrl: string | null; name: string }) => {
@@ -125,24 +135,44 @@ const XIcon = () => (
 // ── Main component ────────────────────────────────────────────────────────────
 
 export const DRepList = () => {
-  const { backendServiceZero } = useGovernance();
+  const { backendServiceZero, governanceStatus } = useGovernance();
+  const currentDrepId = React.useMemo(() => {
+    if (governanceStatus.status !== 'delegate' || !governanceStatus.drep) return null;
+    const credHex = dRepToMaybeCredentialHex(governanceStatus.drep);
+    // credHex has a 1-byte (2 hex char) kind prefix (22 = key, 23 = script); strip it to get the raw hash
+    // then strip 3 bytes cbor header
+    return credHex ? credHex.slice(8) : null;
+  }, [governanceStatus.status, governanceStatus.drep]);
   const { delegateToDrep, loadingUnsignTx } = useGovernanceDelegationToYoroiDrep();
   const navigateTo = useNavigateTo();
+  const strings = useStrings();
 
   const [dreps, setDreps] = React.useState<DrepRow[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [searchText, setSearchText] = React.useState('');
   const [sortField, setSortField] = React.useState<SortField>('name');
   const [sortOrder, setSortOrder] = React.useState<SortOrder>('asc');
+  const [randomSeed, setRandomSeed] = React.useState(0);
 
   React.useEffect(() => {
     if (!backendServiceZero) return;
-    fetch(`https://yoroi-backend-zero-mainnet-staging.emurgornd.com/dreps/active?page=1&pageSize=1000`)
-      .then(res => {
+    const PAGE_SIZE = 1000;
+    const fetchAllDreps = async () => {
+      const accumulated: any[] = [];
+      let page = 1;
+      while (true) {
+        const res = await fetch(`https://yoroi-backend-zero-mainnet-staging.emurgornd.com/dreps/active?page=${page}&pageSize=${PAGE_SIZE}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((data: any[]) => {
+        const data: any[] = await res.json();
+        accumulated.push(...data);
+        if (data.length < PAGE_SIZE) break;
+        page++;
+      }
+      return accumulated;
+    };
+
+    fetchAllDreps()
+      .then(data => {
         const rows: DrepRow[] = data
           .filter(d => d.type === 'registered')
           .map(d => ({
@@ -161,6 +191,11 @@ export const DRepList = () => {
   }, [backendServiceZero]);
 
   const handleSortClick = (field: SortField) => {
+    if (field === 'random') {
+      setSortField('random');
+      setRandomSeed(Math.random());
+      return;
+    }
     if (sortField === field) {
       setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -172,25 +207,44 @@ export const DRepList = () => {
   const displayed = React.useMemo(() => {
     const lower = searchText.toLowerCase();
     const filtered = lower ? dreps.filter(d => d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower)) : dreps;
-    return [...filtered].sort((a, b) => {
-      let cmp = 0;
-      switch (sortField) {
-        case 'name':
-          cmp = a.name.localeCompare(b.name);
-          break;
-        case 'stake':
-          cmp = a.stake - b.stake;
-          break;
-        case 'registeredDate':
-          cmp = new Date(a.registeredDate ?? 0).getTime() - new Date(b.registeredDate ?? 0).getTime();
-          break;
-        case 'delegatorCount':
-          cmp = a.delegatorCount - b.delegatorCount;
-          break;
+    let sorted: DrepRow[];
+    if (sortField === 'random') {
+      // Seeded shuffle: hash each item's index with the seed for a stable order per seed value
+      sorted = [...filtered].sort((a, b) => {
+        const ha = Math.sin(filtered.indexOf(a) + randomSeed * 9301) * 49297;
+        const hb = Math.sin(filtered.indexOf(b) + randomSeed * 9301) * 49297;
+        return ha - hb;
+      });
+    } else {
+      sorted = [...filtered].sort((a, b) => {
+        let cmp = 0;
+        switch (sortField) {
+          case 'name':
+            cmp = a.name.localeCompare(b.name);
+            break;
+          case 'stake':
+            cmp = a.stake - b.stake;
+            break;
+          case 'registeredDate':
+            cmp = new Date(a.registeredDate ?? 0).getTime() - new Date(b.registeredDate ?? 0).getTime();
+            break;
+          case 'delegatorCount':
+            cmp = a.delegatorCount - b.delegatorCount;
+            break;
+        }
+        return sortOrder === 'asc' ? cmp : -cmp;
+      });
+    }
+    // Always pin the currently delegated drep to the top
+    if (currentDrepId) {
+      const idx = sorted.findIndex(d => d.id === currentDrepId);
+      if (idx > 0) {
+        const [current] = sorted.splice(idx, 1);
+        sorted.unshift(current);
       }
-      return sortOrder === 'asc' ? cmp : -cmp;
-    });
-  }, [dreps, searchText, sortField, sortOrder]);
+    }
+    return sorted;
+  }, [dreps, searchText, sortField, sortOrder, randomSeed, currentDrepId]);
 
   if (loading) {
     return (
@@ -205,10 +259,10 @@ export const DRepList = () => {
       {/* ── Header ── */}
       <TableHeader>
         <Typography variant="h5" color="ds.text_gray_medium">
-          Active DReps ({dreps.length})
+          {strings.activeDrepsCount(dreps.length)}
         </Typography>
         <SearchInput
-          placeholder="Search DRep"
+          placeholder={strings.searchDrep}
           value={searchText}
           onChange={e => setSearchText(e.target.value)}
         />
@@ -218,34 +272,42 @@ export const DRepList = () => {
       <ColumnHeaderRow>
         <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
           <Typography variant="body2" color="ds.text_gray_low">
-            Ticker and name
+            {strings.drepColTickerAndName}
           </Typography>
           <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
         </ColHeaderCell>
         <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
           <Typography variant="body2" color="ds.text_gray_low">
-            Voting power
+            {strings.drepColVotingPower}
           </Typography>
           <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
         </ColHeaderCell>
         <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
           <Typography variant="body2" color="ds.text_gray_low">
-            Registered
+            {strings.drepColRegistered}
           </Typography>
           <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
         </ColHeaderCell>
         <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
           <Typography variant="body2" color="ds.text_gray_low">
-            Delegators
+            {strings.drepColDelegators}
           </Typography>
           <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
         </ColHeaderCell>
-        <ColHeaderCell flex={1} />
+        <ColHeaderCell flex={1} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer' }}>
+          <Typography variant="body2" color="ds.text_gray_low">
+            {strings.drepColRandom}
+          </Typography>
+          <RandomSortIcon active={sortField === 'random'} />
+        </ColHeaderCell>
       </ColumnHeaderRow>
 
       {/* ── Rows ── */}
-      {displayed.map(drep => (
-        <DataRow key={drep.id}>
+      <RowsContainer>
+      {displayed.map(drep => {
+        const isCurrent = drep.id === currentDrepId;
+        return (
+        <DataRow key={drep.id} sx={isCurrent ? { background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)', '&:hover': { background: 'linear-gradient(180deg, #93f5e1 0%, #c6f7ed 100%)' } } : {}}>
           {/* Ticker and name */}
           <DataCell width={304} sx={{ gap: '16px' }}>
             <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
@@ -289,29 +351,31 @@ export const DRepList = () => {
             </Typography>
           </DataCell>
 
-          {/* Actions */}
-          <DataCell flex={1} sx={{ justifyContent: 'flex-end', gap: '8px' }}>
+          {/* View details + Delegate (aligns with Random header) */}
+          <DataCell flex={1} sx={{ gap: '8px' }}>
             <ActionButton onClick={() => {/* VIEW DETAILS – unhandled */}}>
               <Typography variant="body2" fontWeight={500} color="ds.text_gray_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                View details
+                {strings.viewDetails}
               </Typography>
             </ActionButton>
-            <ActionButton onClick={() => delegateToDrep(drep.id)} disabled={loadingUnsignTx}>
-              <Typography variant="body2" fontWeight={500} color="ds.text_primary_medium" sx={{ letterSpacing: '0.5px', textTransform: 'uppercase' }}>
-                Delegate
+            <ActionButton onClick={() => delegateToDrep(drep.id)} disabled={isCurrent || loadingUnsignTx}>
+              <Typography variant="body2" fontWeight={500} sx={{ letterSpacing: '0.5px', textTransform: 'uppercase', color: isCurrent ? '#a0b3f2' : 'ds.text_primary_medium' }}>
+                {strings.delegateLabel}
               </Typography>
             </ActionButton>
           </DataCell>
         </DataRow>
-      ))}
+        );
+      })}
 
       {displayed.length === 0 && (
         <Box sx={{ display: 'flex', justifyContent: 'center', padding: '48px 0' }}>
           <Typography variant="body1" color="ds.text_gray_low">
-            No DReps found
+            {strings.noDrepsFound}
           </Typography>
         </Box>
       )}
+      </RowsContainer>
     </TableContainer>
   );
 };
@@ -330,10 +394,20 @@ const PieChartIcon = () => (
 // ── Styled components ─────────────────────────────────────────────────────────
 
 const TableContainer = styled(Box)(({ theme }: any) => ({
+  display: 'flex',
+  flexDirection: 'column',
   width: '100%',
+  flex: 1,
+  minHeight: 0,
   borderRadius: '8px',
   overflow: 'hidden',
   border: `1px solid ${theme.palette.ds.gray_200}`,
+}));
+
+const RowsContainer = styled(Box)(() => ({
+  overflowY: 'auto',
+  flex: 1,
+  minHeight: 0,
 }));
 
 const TableHeader = styled(Box)(({ theme }: any) => ({

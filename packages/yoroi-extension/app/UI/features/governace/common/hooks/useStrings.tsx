@@ -274,6 +274,42 @@ export const messages = Object.freeze(
       id: 'governance.delegationSubtitle',
       defaultMessage: "!!!Your delegation to DReps helps shaping Cardano's future. You may change your governance status at any time.",
     },
+    activeDrepsCount: {
+      id: 'governance.activeDrepsCount',
+      defaultMessage: '!!!Active DReps ({count})',
+    },
+    searchDrep: {
+      id: 'governance.searchDrep',
+      defaultMessage: '!!!Search DRep',
+    },
+    drepColTickerAndName: {
+      id: 'governance.drepColTickerAndName',
+      defaultMessage: '!!!Ticker and name',
+    },
+    drepColVotingPower: {
+      id: 'governance.drepColVotingPower',
+      defaultMessage: '!!!Voting power',
+    },
+    drepColRegistered: {
+      id: 'governance.drepColRegistered',
+      defaultMessage: '!!!Registered',
+    },
+    drepColDelegators: {
+      id: 'governance.drepColDelegators',
+      defaultMessage: '!!!Delegators',
+    },
+    drepColRandom: {
+      id: 'governance.drepColRandom',
+      defaultMessage: '!!!Random',
+    },
+    viewDetails: {
+      id: 'governance.viewDetails',
+      defaultMessage: '!!!View details',
+    },
+    noDrepsFound: {
+      id: 'governance.noDrepsFound',
+      defaultMessage: '!!!No DReps found',
+    },
   })
 );
 
@@ -348,5 +384,14 @@ export const useStrings = () => {
     dreps: intl.formatMessage(messages.dreps),
     governanceNotRegisteredSubtitle: intl.formatMessage(messages.governanceNotRegisteredSubtitle),
     governanceDelegationSubtitle: intl.formatMessage(messages.governanceDelegationSubtitle),
+    activeDrepsCount: (count: number) => intl.formatMessage(messages.activeDrepsCount, { count }),
+    searchDrep: intl.formatMessage(messages.searchDrep),
+    drepColTickerAndName: intl.formatMessage(messages.drepColTickerAndName),
+    drepColVotingPower: intl.formatMessage(messages.drepColVotingPower),
+    drepColRegistered: intl.formatMessage(messages.drepColRegistered),
+    drepColDelegators: intl.formatMessage(messages.drepColDelegators),
+    drepColRandom: intl.formatMessage(messages.drepColRandom),
+    viewDetails: intl.formatMessage(messages.viewDetails),
+    noDrepsFound: intl.formatMessage(messages.noDrepsFound),
   }).current;
 };
