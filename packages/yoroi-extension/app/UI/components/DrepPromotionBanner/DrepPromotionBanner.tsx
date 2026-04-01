@@ -2,11 +2,9 @@ import { Button, Stack, Typography, styled, useTheme } from '@mui/material';
 import BigNumber from 'bignumber.js';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { dRepNormalize } from '../../../api/ada/lib/cardanoCrypto/utils';
 import LocalStorageApi from '../../../api/localStorage/index';
 import globalMessages from '../../../i18n/global-messages';
 import { ROUTES } from '../../../routes-config';
-import { YOROI_DREP_ID } from '../../features/governace/common/constants';
 import { IconWrapper, Icons } from '../icons';
 import { Ilustration } from './Ilustration';
 
@@ -71,7 +69,6 @@ export const DrepPromotionBanner = observer(({ stores, onClose, intl }) => {
 
   const [governanceInfo, setGovernanceInfo] = useState({
     isParticipatingToGovernance: false,
-    isDelegatingToYoroiDrep: false,
   });
 
   useEffect(() => {
@@ -79,9 +76,7 @@ export const DrepPromotionBanner = observer(({ stores, onClose, intl }) => {
       const govInfo = stores.delegation.governanceStatus?.drepDelegation;
       if (govInfo) {
         const isParticipatingToGovernance = govInfo !== null;
-        const drepEncoded = dRepNormalize(govInfo?.drep, govInfo?.drepKind);
-        const isDelegatingToYoroiDrep = isParticipatingToGovernance && drepEncoded === YOROI_DREP_ID;
-        setGovernanceInfo({ isParticipatingToGovernance, isDelegatingToYoroiDrep });
+        setGovernanceInfo({ isParticipatingToGovernance });
       }
     };
 
@@ -126,10 +121,7 @@ export const DrepPromotionBanner = observer(({ stores, onClose, intl }) => {
             },
           }}
           onClick={() => {
-            stores.routing.goToRoute({
-              route: ROUTES.GOVERNANCE.ROOT,
-              query: { delegateToYoroiDrep: true },
-            });
+            stores.routing.goToRoute({ route: ROUTES.GOVERNANCE.ROOT });
           }}
         >
           {intl.formatMessage(globalMessages.delegateVote)}
