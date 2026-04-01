@@ -45,6 +45,17 @@ const XIcon = () => (
   </svg>
 );
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const safeHttpsUrl = (url: string): string | null => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' ? url : null;
+  } catch {
+    return null;
+  }
+};
+
 // ── ID field with copy ────────────────────────────────────────────────────────
 
 const IdField = ({ label, value }: { label: string; value: string }) => {
@@ -144,8 +155,8 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
                 <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
                   {drep.name}
                 </Typography>
-                {drep.twitterUrl && (
-                  <Box component="a" href={drep.twitterUrl} target="_blank" rel="noopener noreferrer">
+                {drep.twitterUrl && safeHttpsUrl(drep.twitterUrl) && (
+                  <Box component="a" href={safeHttpsUrl(drep.twitterUrl)!} target="_blank" rel="noopener noreferrer">
                     <XIcon />
                   </Box>
                 )}
@@ -179,20 +190,23 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
                 )}
                 {nonSocialRefs.length > 0 && (
                   <Stack gap="8px">
-                    {nonSocialRefs.map((ref, i) => (
-                      <Box
-                        key={i}
-                        component="a"
-                        href={ref.uri}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{ textDecoration: 'none' }}
-                      >
-                        <Typography variant="body1" color="ds.text_primary_medium">
-                          {ref.label ?? ref.uri}
-                        </Typography>
-                      </Box>
-                    ))}
+                    {nonSocialRefs.map((ref, i) => {
+                      const safeUri = safeHttpsUrl(ref.uri);
+                      return safeUri ? (
+                        <Box
+                          key={i}
+                          component="a"
+                          href={safeUri}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          sx={{ textDecoration: 'none' }}
+                        >
+                          <Typography variant="body1" color="ds.text_primary_medium">
+                            {ref.label ?? ref.uri}
+                          </Typography>
+                        </Box>
+                      ) : null;
+                    })}
                   </Stack>
                 )}
               </>

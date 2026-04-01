@@ -354,7 +354,7 @@ export const DRepList = () => {
                     <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
                       {drep.name}
                     </Typography>
-                    {drep.twitterUrl && (
+                    {drep.twitterUrl && /^https:\/\//.test(drep.twitterUrl) && (
                       <Box
                         component="a"
                         href={drep.twitterUrl}
