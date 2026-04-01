@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { NotEnoughMoneyToSendError } from '../../../../../api/common/errors';
+import { dRepToMaybeCredentialHex } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { TransactionResult } from '../../../transaction-review/common/types';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useTxReviewModal } from '../../../transaction-review/module/ReviewTxProvider';
@@ -12,13 +13,16 @@ type UseGovernanceDelegationResult = {
   error: string | null;
   setError: (value: string | null) => void;
 
-  // 1) open modal to choose DRep id & delegate
+  // 1) delegate to a specific DRep by bech32 ID
+  delegateToDrep: (drepID: string) => Promise<void>;
+
+  // 2) open modal to choose DRep id & delegate
   openDelegateModalForCustomDrep: () => void;
 
-  // 2) always abstain
+  // 3) always abstain
   delegateToAbstain: () => Promise<void>;
 
-  // 3) always no-confidence
+  // 4) always no-confidence
   delegateToNoConfidence: () => Promise<void>;
 };
 
@@ -37,6 +41,7 @@ export const useGovernanceDelegation = (): UseGovernanceDelegationResult => {
     stopLoadingTxReview,
     changePasswordInputValue,
     showTxResultModal,
+    setDrepId,
     setUnsignedTx,
     drepCredentialHex,
   } = useTxReviewModal();
@@ -100,7 +105,20 @@ export const useGovernanceDelegation = (): UseGovernanceDelegationResult => {
     [createDrepDelegationTransaction, openTxReviewModal, signGovernanceTx, strings]
   );
 
-  /** 1) Open modal to choose a custom DRep */
+  /** 1) Delegate to a specific DRep by bech32 ID */
+  const delegateToDrep = React.useCallback(
+    async (drepID: string) => {
+      const vote: Vote = { kind: 'delegate', drepID };
+      const dRepCredentialHex: string | null = dRepToMaybeCredentialHex(drepID);
+
+      governanceVoteChanged(vote);
+      setDrepId({ drepID });
+      await createUnsignTx(dRepCredentialHex);
+    },
+    [governanceVoteChanged, setDrepId, createUnsignTx]
+  );
+
+  /** 2) Open modal to choose a custom DRep */
   const openDelegateModalForCustomDrep = React.useCallback(() => {
     if (!governanceManager) {
       return;
@@ -164,6 +182,7 @@ export const useGovernanceDelegation = (): UseGovernanceDelegationResult => {
     loadingUnsignTx,
     error,
     setError,
+    delegateToDrep,
     openDelegateModalForCustomDrep,
     delegateToAbstain,
     delegateToNoConfidence,

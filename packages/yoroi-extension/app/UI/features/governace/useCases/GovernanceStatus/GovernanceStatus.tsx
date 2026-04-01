@@ -2,7 +2,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 import { Box, Typography, Link } from '@mui/material';
 import { Icon } from '../../../../components';
-import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegation';
 import { useIsGovernanceAllowed } from '../../common/hooks/useIsGovernanceAllowed';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { useNavigateTo } from '../../common/useNavigateTo';
@@ -21,7 +21,7 @@ import {
 export const GovernanceStatus = () => {
   const strings = useStrings();
   const navigateTo = useNavigateTo();
-  const { loadingUnsignTx, error, delegateToAbstain, delegateToNoConfidence } = useGovernanceDelegationToYoroiDrep();
+  const { loadingUnsignTx, error, delegateToAbstain, delegateToNoConfidence } = useGovernanceDelegation();
   const { governanceStatus, submitedTransactions } = useGovernance();
   const { isNotAllowed, isParticipating } = useIsGovernanceAllowed();
 

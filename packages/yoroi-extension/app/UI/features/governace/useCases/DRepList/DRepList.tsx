@@ -3,7 +3,7 @@ import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { dRepToMaybeCredentialHex, dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
-import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
+import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegation';
 import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
@@ -165,7 +165,7 @@ export const DRepList = () => {
     // then strip 3 bytes cbor header
     return credHex ? credHex.slice(8) : null;
   }, [governanceStatus.status, governanceStatus.drep]);
-  const { delegateToDrep, loadingUnsignTx, error, setError } = useGovernanceDelegationToYoroiDrep();
+  const { delegateToDrep, loadingUnsignTx, error, setError } = useGovernanceDelegation();
   const strings = useStrings();
 
   const [dreps, setDreps] = React.useState<DrepRow[]>([]);
