@@ -220,7 +220,10 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
 
           {/* ── Footer ── */}
           <SlideFooter>
-            <DelegateButton onClick={onDelegate} disabled={isCurrentDrep || delegateDisabled}>
+            <DelegateButton
+              onClick={isCurrentDrep || delegateDisabled ? undefined : onDelegate}
+              sx={{ pointerEvents: isCurrentDrep || delegateDisabled ? 'none' : undefined, opacity: isCurrentDrep || delegateDisabled ? 0.6 : 1 }}
+            >
               <Typography
                 variant="body1"
                 fontWeight={500}

@@ -1,10 +1,9 @@
 import React from 'react';
-import { Box, Button, CircularProgress, Stack, Typography } from '@mui/material';
+import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { styled, useTheme } from '@mui/material/styles';
 import { useGovernance } from '../../module/GovernanceContextProvider';
 import { dRepToMaybeCredentialHex, dRepNormalize } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useGovernanceDelegationToYoroiDrep } from '../../common/hooks/useGovernanceDelegationToYoroiDrep';
-import { useNavigateTo } from '../../common/useNavigateTo';
 import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
@@ -167,7 +166,6 @@ export const DRepList = () => {
     return credHex ? credHex.slice(8) : null;
   }, [governanceStatus.status, governanceStatus.drep]);
   const { delegateToDrep, loadingUnsignTx } = useGovernanceDelegationToYoroiDrep();
-  const navigateTo = useNavigateTo();
   const strings = useStrings();
 
   const [dreps, setDreps] = React.useState<DrepRow[]>([]);
@@ -269,7 +267,7 @@ export const DRepList = () => {
     if (currentDrepId) {
       const idx = sorted.findIndex(d => d.id === currentDrepId);
       if (idx > 0) {
-        const [current] = sorted.splice(idx, 1);
+        const [current] = sorted.splice(idx, 1) as [DrepRow];
         sorted.unshift(current);
       }
     }
@@ -389,7 +387,7 @@ export const DRepList = () => {
                 {strings.viewDetails}
               </Typography>
             </ActionButton>
-            <ActionButton onClick={() => delegateToDrep(drep.bech32Id)} disabled={isCurrent || loadingUnsignTx}>
+            <ActionButton onClick={() => delegateToDrep(drep.bech32Id)} sx={{ pointerEvents: isCurrent || loadingUnsignTx ? 'none' : undefined, opacity: isCurrent || loadingUnsignTx ? 0.5 : 1 }}>
               <Typography variant="body2" fontWeight={500} sx={{ letterSpacing: '0.5px', textTransform: 'uppercase', color: isCurrent ? '#a0b3f2' : 'ds.text_primary_medium' }}>
                 {strings.delegateLabel}
               </Typography>
