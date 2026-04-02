@@ -183,9 +183,7 @@ export const DRepList = () => {
       const accumulated: any[] = [];
       let page = 1;
       while (true) {
-        const res = await fetch(
-          `${backendServiceZero}/dreps/active?page=${page}&pageSize=${PAGE_SIZE}`
-        );
+        const res = await fetch(`${backendServiceZero}/dreps/active?page=${page}&pageSize=${PAGE_SIZE}`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: any[] = await res.json();
         accumulated.push(...data);
