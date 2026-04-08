@@ -374,6 +374,7 @@
   "governance.legacyDrepId": "Legacy DRep ID (CIP-105)",
   "governance.motivations": "Motivations",
   "governance.needAdaForParticipation": "To participate in governance you need to have ADA in your wallet.",
+  "governance.objectives": "Objectives",
   "governance.noConfidence": "No Confidence",
   "governance.noConfidenceInfo": "You are expressing a lack of trust for all proposals now and in the future.",
   "governance.noDrepsFound": "No DReps found",

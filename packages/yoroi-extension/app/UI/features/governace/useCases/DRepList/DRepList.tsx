@@ -7,6 +7,7 @@ import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegat
 import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
+import { getDrepExplorerUrl } from '../../common/constants';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -22,6 +23,7 @@ export interface DrepRow {
   delegatorCount: number;
   imageUrl: string | null;
   twitterUrl: string | null;
+  objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
   references: Array<{ label: string | null; uri: string }>;
@@ -157,7 +159,7 @@ const XIcon = () => (
 // ── Main component ────────────────────────────────────────────────────────────
 
 export const DRepList = () => {
-  const { backendServiceZero, governanceStatus } = useGovernance();
+  const { backendServiceZero, governanceStatus, isTestnet } = useGovernance();
   const currentDrepId = React.useMemo(() => {
     if (governanceStatus.status !== 'delegate' || !governanceStatus.drep) return null;
     const credHex = dRepToMaybeCredentialHex(governanceStatus.drep);
@@ -206,6 +208,7 @@ export const DRepList = () => {
             delegatorCount: d.delegatorCount ?? 0,
             imageUrl: d.metadata?.image?.contentUrl ?? null,
             twitterUrl: getTwitterUrl(d),
+            objectives: getMetadataText(d.metadata?.objectives),
             motivations: getMetadataText(d.metadata?.motivations),
             qualifications: getMetadataText(d.metadata?.qualifications),
             references: getReferences(d),
@@ -349,9 +352,18 @@ export const DRepList = () => {
                 <DataCell width={304} sx={{ gap: '16px' }}>
                   <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
                   <Stack gap="8px">
-                    <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
-                      {drep.name}
-                    </Typography>
+                    <Box
+                      component="a"
+                      href={getDrepExplorerUrl(drep.bech32Id, isTestnet)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                    >
+                      <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
+                        {drep.name}
+                      </Typography>
+                    </Box>
                     {drep.twitterUrl && /^https:\/\//.test(drep.twitterUrl) && (
                       <Box
                         component="a"
@@ -381,8 +393,7 @@ export const DRepList = () => {
                 </DataCell>
 
                 {/* Delegators */}
-                <DataCell width={226} sx={{ gap: '8px' }}>
-                  <PieChartIcon />
+                <DataCell width={226}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {drep.delegatorCount.toLocaleString()}
                   </Typography>
@@ -461,17 +472,6 @@ export const DRepList = () => {
     </>
   );
 };
-
-// ── Pie chart icon (inline SVG) ───────────────────────────────────────────────
-
-const PieChartIcon = () => (
-  <Box sx={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 2a8 8 0 1 0 8 8h-8V2Z" fill="#6b7384" opacity="0.5" />
-      <path d="M12 2.26A8.004 8.004 0 0 1 18 10h-6V2.26Z" fill="#6b7384" />
-    </svg>
-  </Box>
-);
 
 // ── Styled components ─────────────────────────────────────────────────────────
 

@@ -3,8 +3,8 @@ import { Box, Drawer, Divider, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { dRepToPreCip129 } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useStrings } from '../../common/hooks/useStrings';
+import { truncateFormatter } from '../../../../common/helpers/formatters';
 import type { DrepRow } from './DRepList';
-import { DrepAvatar } from './DRepList';
 
 // ── Icons ────────────────────────────────────────────────────────────────────
 
@@ -36,26 +36,6 @@ const WarningIcon = () => (
   </svg>
 );
 
-const XIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-    <path
-      d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.75l7.73-8.835-8.156-10.665h6.07l4.259 5.633L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77Z"
-      fill="#6b7384"
-    />
-  </svg>
-);
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const safeHttpsUrl = (url: string): string | null => {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === 'https:' ? url : null;
-  } catch {
-    return null;
-  }
-};
-
 // ── ID field with copy ────────────────────────────────────────────────────────
 
 const IdField = ({ label, value }: { label: string; value: string }) => {
@@ -71,8 +51,8 @@ const IdField = ({ label, value }: { label: string; value: string }) => {
         {label}
       </Typography>
       <Stack direction="row" alignItems="flex-start" gap="8px" flex={1} minWidth={0}>
-        <Typography variant="body1" color="ds.text_gray_medium" sx={{ wordBreak: 'break-all', flex: 1 }}>
-          {value}
+        <Typography variant="body1" color="ds.text_gray_medium" sx={{ flex: 1 }}>
+          {truncateFormatter(value, 18)}
         </Typography>
         <Box onClick={handleCopy} sx={{ cursor: 'pointer', flexShrink: 0, mt: '2px' }}>
           <CopyIcon done={copied} />
@@ -118,11 +98,6 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
     }
   }, [drep?.bech32Id]);
 
-  const nonSocialRefs = React.useMemo(
-    () => drep?.references.filter(r => !r.uri.includes('twitter.com') && !r.uri.includes('x.com')) ?? [],
-    [drep?.references]
-  );
-
   return (
     <Drawer
       anchor="right"
@@ -137,7 +112,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
             <Typography
               variant="body1"
               fontWeight={500}
-              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#242838' }}
+              sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#242838', flex: 1, textAlign: 'center' }}
             >
               {drep.name}
             </Typography>
@@ -148,22 +123,6 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
 
           {/* ── Body ── */}
           <SlideBody>
-            {/* Avatar + name + twitter */}
-            <Stack direction="row" alignItems="center" gap="16px">
-              <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
-              <Stack gap="4px">
-                <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
-                  {drep.name}
-                </Typography>
-                {drep.twitterUrl && safeHttpsUrl(drep.twitterUrl) && (
-                  <Box component="a" href={safeHttpsUrl(drep.twitterUrl)!} target="_blank" rel="noopener noreferrer">
-                    <XIcon />
-                  </Box>
-                )}
-              </Stack>
-            </Stack>
-
-            <Divider />
 
             {/* DRep IDs */}
             <Stack gap="8px">
@@ -176,6 +135,12 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
             {/* Verified content or warning */}
             {drep.metadataVerified ? (
               <>
+                {drep.objectives && (
+                  <>
+                    <MetadataSection title={strings.objectives} content={drep.objectives} />
+                    <Divider />
+                  </>
+                )}
                 {drep.motivations && (
                   <>
                     <MetadataSection title={strings.motivations} content={drep.motivations} />
@@ -183,31 +148,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
                   </>
                 )}
                 {drep.qualifications && (
-                  <>
-                    <MetadataSection title={strings.qualifications} content={drep.qualifications} />
-                    <Divider />
-                  </>
-                )}
-                {nonSocialRefs.length > 0 && (
-                  <Stack gap="8px">
-                    {nonSocialRefs.map((ref, i) => {
-                      const safeUri = safeHttpsUrl(ref.uri);
-                      return safeUri ? (
-                        <Box
-                          key={i}
-                          component="a"
-                          href={safeUri}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          sx={{ textDecoration: 'none' }}
-                        >
-                          <Typography variant="body1" color="ds.text_primary_medium">
-                            {ref.label ?? ref.uri}
-                          </Typography>
-                        </Box>
-                      ) : null;
-                    })}
-                  </Stack>
+                  <MetadataSection title={strings.qualifications} content={drep.qualifications} />
                 )}
               </>
             ) : (

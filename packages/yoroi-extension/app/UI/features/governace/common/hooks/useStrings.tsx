@@ -281,6 +281,10 @@ export const messages = Object.freeze(
       id: 'governance.legacyDrepId',
       defaultMessage: '!!!Legacy DRep ID (CIP-105)',
     },
+    objectives: {
+      id: 'governance.objectives',
+      defaultMessage: '!!!Objectives',
+    },
     motivations: {
       id: 'governance.motivations',
       defaultMessage: '!!!Motivations',
@@ -374,6 +378,7 @@ export const useStrings = () => {
     viewDetails: intl.formatMessage(messages.viewDetails),
     noDrepsFound: intl.formatMessage(messages.noDrepsFound),
     legacyDrepId: intl.formatMessage(messages.legacyDrepId),
+    objectives: intl.formatMessage(messages.objectives),
     motivations: intl.formatMessage(messages.motivations),
     qualifications: intl.formatMessage(messages.qualifications),
     unverifiedMetadataTitle: intl.formatMessage(messages.unverifiedMetadataTitle),
