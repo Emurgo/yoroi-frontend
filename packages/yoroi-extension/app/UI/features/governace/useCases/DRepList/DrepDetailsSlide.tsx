@@ -32,7 +32,10 @@ const CopyIcon = ({ done }: { done: boolean }) => (
 
 const WarningIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="#f59e0b" />
+    <path
+      d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"
+      fill="#6b7384"
+    />
   </svg>
 );
 
@@ -109,13 +112,14 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
         <>
           {/* ── Header ── */}
           <SlideHeader>
-            <Box sx={{ width: 24, height: 24, flexShrink: 0 }} /> {/* Spacer to balance close button */}
+            {/* Spacer to balance close button */}
+            <Box sx={{ width: 24, height: 24, flexShrink: 0 }} />
             <Typography
               variant="body1"
               fontWeight={500}
               sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#242838', flex: 1, textAlign: 'center' }}
             >
-              {drep.name}
+              {drep.name.startsWith('drep1') ? truncateFormatter(drep.name, 20) : drep.name}
             </Typography>
             <CloseButton onClick={onClose}>
               <CloseIcon />
@@ -154,11 +158,11 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
               </>
             ) : (
               <Stack gap="16px">
-                <Stack direction="row" alignItems="center" gap="8px">
-                  <WarningIcon />
+                <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Typography variant="body1" fontWeight={500} color="ds.text_gray_medium">
                     {strings.unverifiedMetadataTitle}
                   </Typography>
+                  <WarningIcon />
                 </Stack>
                 <Typography variant="body1" color="ds.text_gray_medium">
                   {strings.unverifiedMetadataMessage}

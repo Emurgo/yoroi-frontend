@@ -8,6 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
 import { getDrepExplorerUrl } from '../../common/constants';
+import { truncateFormatter } from '../../../../common/helpers/formatters';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -32,10 +33,18 @@ export interface DrepRow {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function getDrepName(drep: any): string {
-  if (!drep.metadata?.givenName) return drep.id;
+function getDrepName(drep: any, bech32Id: string): string {
+  if (!drep.metadata?.givenName) return bech32Id;
   const gn = drep.metadata.givenName;
-  return typeof gn === 'string' ? gn : (gn['@value'] ?? drep.id);
+  return typeof gn === 'string' ? gn : (gn['@value'] ?? bech32Id);
+}
+
+function formatDisplayName(name: string): string {
+  // Truncate if it's a bech32 DRep ID (no givenName)
+  if (name.startsWith('drep1')) {
+    return truncateFormatter(name, 20);
+  }
+  return name;
 }
 
 function getTwitterUrl(drep: any): string | null {
@@ -199,10 +208,12 @@ export const DRepList = () => {
       .then(data => {
         const rows: DrepRow[] = data
           .filter(d => d.type === 'registered')
-          .map(d => ({
+          .map(d => {
+            const bech32Id = dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash');
+            return {
             id: d.id,
-            bech32Id: dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash'),
-            name: getDrepName(d),
+            bech32Id,
+            name: getDrepName(d, bech32Id),
             stake: d.stake ?? 0,
             registeredDate: d.registeredDate ?? null,
             delegatorCount: d.delegatorCount ?? 0,
@@ -212,9 +223,9 @@ export const DRepList = () => {
             motivations: getMetadataText(d.metadata?.motivations),
             qualifications: getMetadataText(d.metadata?.qualifications),
             references: getReferences(d),
-            // metadataStatus: 'valid' | 'invalid' | undefined — treat absent or 'valid' as verified
-            metadataVerified: d.metadataStatus == null || d.metadataStatus === 'valid' || d.metadataStatus === 'verified',
-          }));
+            // metadataVerification: 'verified' | 'unverified' | undefined
+            metadataVerified: d.metadataVerification === 'verified',
+          }});
         setDreps(rows);
       })
       .catch(err => console.error('[DRepList] fetch error', err))
@@ -300,31 +311,31 @@ export const DRepList = () => {
 
         {/* ── Column Headers ── */}
         <ColumnHeaderRow>
-          <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={2.5} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer', minWidth: 200 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColTickerAndName}
             </Typography>
             <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1.5} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer', minWidth: 120 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColVotingPower}
             </Typography>
             <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1.5} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer', minWidth: 120 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColRegistered}
             </Typography>
             <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer', minWidth: 100 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColDelegators}
             </Typography>
             <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell flex={1} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={2} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer', minWidth: 200 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColRandom}
             </Typography>
@@ -349,7 +360,7 @@ export const DRepList = () => {
                 }
               >
                 {/* Ticker and name */}
-                <DataCell width={304} sx={{ gap: '16px' }}>
+                <DataCell flex={2.5} sx={{ gap: '16px', minWidth: 200 }}>
                   <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
                   <Stack gap="8px">
                     <Box
@@ -361,7 +372,7 @@ export const DRepList = () => {
                       sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
                     >
                       <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
-                        {drep.name}
+                        {formatDisplayName(drep.name)}
                       </Typography>
                     </Box>
                     {drep.twitterUrl && /^https:\/\//.test(drep.twitterUrl) && (
@@ -379,28 +390,28 @@ export const DRepList = () => {
                 </DataCell>
 
                 {/* Voting power */}
-                <DataCell width={226}>
+                <DataCell flex={1.5} sx={{ minWidth: 120 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {formatVotingPower(drep.stake)}
                   </Typography>
                 </DataCell>
 
                 {/* Registered */}
-                <DataCell width={226}>
+                <DataCell flex={1.5} sx={{ minWidth: 120 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {drep.registeredDate ? formatRelativeDate(drep.registeredDate) : '—'}
                   </Typography>
                 </DataCell>
 
                 {/* Delegators */}
-                <DataCell width={226}>
+                <DataCell flex={1} sx={{ minWidth: 100 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {drep.delegatorCount.toLocaleString()}
                   </Typography>
                 </DataCell>
 
                 {/* View details + Delegate (aligns with Random header) */}
-                <DataCell flex={1} sx={{ gap: '8px' }}>
+                <DataCell flex={2} sx={{ gap: '8px', minWidth: 200 }}>
                   <ActionButton onClick={() => setSelectedDrep(drep)}>
                     <Typography
                       variant="body2"
