@@ -32,10 +32,7 @@ const CopyIcon = ({ done }: { done: boolean }) => (
 
 const WarningIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-    <path
-      d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z"
-      fill="#6b7384"
-    />
+    <path d="M12 5.99L19.53 19H4.47L12 5.99M12 2L1 21h22L12 2zm1 14h-2v2h2v-2zm0-6h-2v4h2v-4z" fill="#6b7384" />
   </svg>
 );
 
@@ -128,7 +125,6 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
 
           {/* ── Body ── */}
           <SlideBody>
-
             {/* DRep IDs */}
             <Stack gap="8px">
               <IdField label={strings.drepId} value={drep.bech32Id} />
@@ -152,9 +148,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
                     <Divider />
                   </>
                 )}
-                {drep.qualifications && (
-                  <MetadataSection title={strings.qualifications} content={drep.qualifications} />
-                )}
+                {drep.qualifications && <MetadataSection title={strings.qualifications} content={drep.qualifications} />}
               </>
             ) : (
               <Stack gap="16px">

@@ -54,7 +54,7 @@ function getTwitterUrl(drep: any): string | null {
     return uri?.includes('twitter.com') || uri?.includes('x.com');
   });
   if (!ref) return null;
-  return typeof ref.uri === 'string' ? ref.uri : ref.uri?.['@value'] ?? null;
+  return typeof ref.uri === 'string' ? ref.uri : (ref.uri?.['@value'] ?? null);
 }
 
 function getMetadataText(value: any): string | null {
@@ -215,21 +215,22 @@ export const DRepList = () => {
           .map(d => {
             const bech32Id = dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash');
             return {
-            id: d.id,
-            bech32Id,
-            name: getDrepName(d, bech32Id),
-            stake: d.stake ?? 0,
-            registeredDate: d.registeredDate ?? null,
-            delegatorCount: d.delegatorCount ?? 0,
-            imageUrl: d.metadata?.image?.contentUrl ?? null,
-            twitterUrl: getTwitterUrl(d),
-            objectives: getMetadataText(d.metadata?.objectives),
-            motivations: getMetadataText(d.metadata?.motivations),
-            qualifications: getMetadataText(d.metadata?.qualifications),
-            references: getReferences(d),
-            // metadataVerification: 'verified' | 'unverified' | undefined
-            metadataVerified: d.metadataVerification === 'verified',
-          }});
+              id: d.id,
+              bech32Id,
+              name: getDrepName(d, bech32Id),
+              stake: d.stake ?? 0,
+              registeredDate: d.registeredDate ?? null,
+              delegatorCount: d.delegatorCount ?? 0,
+              imageUrl: d.metadata?.image?.contentUrl ?? null,
+              twitterUrl: getTwitterUrl(d),
+              objectives: getMetadataText(d.metadata?.objectives),
+              motivations: getMetadataText(d.metadata?.motivations),
+              qualifications: getMetadataText(d.metadata?.qualifications),
+              references: getReferences(d),
+              // metadataVerification: 'verified' | 'unverified' | undefined
+              metadataVerified: d.metadataVerification === 'verified',
+            };
+          });
         setDreps(rows);
       })
       .catch(err => console.error('[DRepList] fetch error', err))
