@@ -49,8 +49,12 @@ function formatDisplayName(name: string): string {
 
 function getTwitterUrl(drep: any): string | null {
   const refs: any[] = drep.metadata?.references ?? [];
-  const ref = refs.find(r => r.uri?.['@value']?.includes('twitter.com') || r.uri?.['@value']?.includes('x.com'));
-  return ref?.uri['@value'] ?? null;
+  const ref = refs.find(r => {
+    const uri = typeof r.uri === 'string' ? r.uri : r.uri?.['@value'];
+    return uri?.includes('twitter.com') || uri?.includes('x.com');
+  });
+  if (!ref) return null;
+  return typeof ref.uri === 'string' ? ref.uri : ref.uri?.['@value'] ?? null;
 }
 
 function getMetadataText(value: any): string | null {
