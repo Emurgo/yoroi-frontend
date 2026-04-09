@@ -3,7 +3,7 @@ import { Box, Drawer, Divider, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { dRepToPreCip129 } from '../../../../../api/ada/lib/cardanoCrypto/utils';
 import { useStrings } from '../../common/hooks/useStrings';
-import { truncateFormatter } from '../../../../common/helpers/formatters';
+import { truncateFormatter, formatDrepDisplayName } from '../../../../common/helpers/formatters';
 import type { DrepRow } from './DRepList';
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
               fontWeight={500}
               sx={{ textTransform: 'uppercase', letterSpacing: '0.5px', color: '#242838', flex: 1, textAlign: 'center' }}
             >
-              {drep.name.startsWith('drep1') ? truncateFormatter(drep.name, 20) : drep.name}
+              {formatDrepDisplayName(drep.name)}
             </Typography>
             <CloseButton onClick={onClose}>
               <CloseIcon />

@@ -8,7 +8,7 @@ import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
 import { getDrepExplorerUrl } from '../../common/constants';
-import { truncateFormatter } from '../../../../common/helpers/formatters';
+import { formatDrepDisplayName } from '../../../../common/helpers/formatters';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -37,14 +37,6 @@ function getDrepName(drep: any, bech32Id: string): string {
   if (!drep.metadata?.givenName) return bech32Id;
   const gn = drep.metadata.givenName;
   return typeof gn === 'string' ? gn : (gn['@value'] ?? bech32Id);
-}
-
-function formatDisplayName(name: string): string {
-  // Truncate if it's a bech32 DRep ID (no givenName)
-  if (name.startsWith('drep1')) {
-    return truncateFormatter(name, 20);
-  }
-  return name;
 }
 
 function getTwitterUrl(drep: any): string | null {
@@ -377,7 +369,7 @@ export const DRepList = () => {
                       sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
                     >
                       <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
-                        {formatDisplayName(drep.name)}
+                        {formatDrepDisplayName(drep.name)}
                       </Typography>
                     </Box>
                     {drep.twitterUrl && /^https:\/\//.test(drep.twitterUrl) && (
