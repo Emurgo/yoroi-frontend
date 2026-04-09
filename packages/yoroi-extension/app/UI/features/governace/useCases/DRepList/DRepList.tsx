@@ -7,6 +7,8 @@ import { useGovernanceDelegation } from '../../common/hooks/useGovernanceDelegat
 import { useStrings } from '../../common/hooks/useStrings';
 import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
+import { getDrepExplorerUrl } from '../../common/constants';
+import { formatDrepDisplayName } from '../../../../common/helpers/formatters';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -22,6 +24,7 @@ export interface DrepRow {
   delegatorCount: number;
   imageUrl: string | null;
   twitterUrl: string | null;
+  objectives: string | null;
   motivations: string | null;
   qualifications: string | null;
   references: Array<{ label: string | null; uri: string }>;
@@ -30,16 +33,20 @@ export interface DrepRow {
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-function getDrepName(drep: any): string {
-  if (!drep.metadata?.givenName) return drep.id;
+function getDrepName(drep: any, bech32Id: string): string {
+  if (!drep.metadata?.givenName) return bech32Id;
   const gn = drep.metadata.givenName;
-  return typeof gn === 'string' ? gn : (gn['@value'] ?? drep.id);
+  return typeof gn === 'string' ? gn : (gn['@value'] ?? bech32Id);
 }
 
 function getTwitterUrl(drep: any): string | null {
   const refs: any[] = drep.metadata?.references ?? [];
-  const ref = refs.find(r => r.uri?.['@value']?.includes('twitter.com') || r.uri?.['@value']?.includes('x.com'));
-  return ref?.uri['@value'] ?? null;
+  const ref = refs.find(r => {
+    const uri = typeof r.uri === 'string' ? r.uri : r.uri?.['@value'];
+    return uri?.includes('twitter.com') || uri?.includes('x.com');
+  });
+  if (!ref) return null;
+  return typeof ref.uri === 'string' ? ref.uri : (ref.uri?.['@value'] ?? null);
 }
 
 function getMetadataText(value: any): string | null {
@@ -157,7 +164,7 @@ const XIcon = () => (
 // ── Main component ────────────────────────────────────────────────────────────
 
 export const DRepList = () => {
-  const { backendServiceZero, governanceStatus } = useGovernance();
+  const { backendServiceZero, governanceStatus, isTestnet } = useGovernance();
   const currentDrepId = React.useMemo(() => {
     if (governanceStatus.status !== 'delegate' || !governanceStatus.drep) return null;
     const credHex = dRepToMaybeCredentialHex(governanceStatus.drep);
@@ -197,21 +204,25 @@ export const DRepList = () => {
       .then(data => {
         const rows: DrepRow[] = data
           .filter(d => d.type === 'registered')
-          .map(d => ({
-            id: d.id,
-            bech32Id: dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash'),
-            name: getDrepName(d),
-            stake: d.stake ?? 0,
-            registeredDate: d.registeredDate ?? null,
-            delegatorCount: d.delegatorCount ?? 0,
-            imageUrl: d.metadata?.image?.contentUrl ?? null,
-            twitterUrl: getTwitterUrl(d),
-            motivations: getMetadataText(d.metadata?.motivations),
-            qualifications: getMetadataText(d.metadata?.qualifications),
-            references: getReferences(d),
-            // metadataStatus: 'valid' | 'invalid' | undefined — treat absent or 'valid' as verified
-            metadataVerified: d.metadataStatus == null || d.metadataStatus === 'valid' || d.metadataStatus === 'verified',
-          }));
+          .map(d => {
+            const bech32Id = dRepNormalize(d.id, d.drepKind === 'scripthash' ? 'scripthash' : 'keyhash');
+            return {
+              id: d.id,
+              bech32Id,
+              name: getDrepName(d, bech32Id),
+              stake: d.stake ?? 0,
+              registeredDate: d.registeredDate ?? null,
+              delegatorCount: d.delegatorCount ?? 0,
+              imageUrl: d.metadata?.image?.contentUrl ?? null,
+              twitterUrl: getTwitterUrl(d),
+              objectives: getMetadataText(d.metadata?.objectives),
+              motivations: getMetadataText(d.metadata?.motivations),
+              qualifications: getMetadataText(d.metadata?.qualifications),
+              references: getReferences(d),
+              // metadataVerification: 'verified' | 'unverified' | undefined
+              metadataVerified: d.metadataVerification === 'verified',
+            };
+          });
         setDreps(rows);
       })
       .catch(err => console.error('[DRepList] fetch error', err))
@@ -297,31 +308,31 @@ export const DRepList = () => {
 
         {/* ── Column Headers ── */}
         <ColumnHeaderRow>
-          <ColHeaderCell width={304} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={2.5} onClick={() => handleSortClick('name')} sx={{ cursor: 'pointer', minWidth: 200 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColTickerAndName}
             </Typography>
             <SortIcon field="name" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1.5} onClick={() => handleSortClick('stake')} sx={{ cursor: 'pointer', minWidth: 120 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColVotingPower}
             </Typography>
             <SortIcon field="stake" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1.5} onClick={() => handleSortClick('registeredDate')} sx={{ cursor: 'pointer', minWidth: 120 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColRegistered}
             </Typography>
             <SortIcon field="registeredDate" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell width={226} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={1} onClick={() => handleSortClick('delegatorCount')} sx={{ cursor: 'pointer', minWidth: 100 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColDelegators}
             </Typography>
             <SortIcon field="delegatorCount" sortField={sortField} sortOrder={sortOrder} />
           </ColHeaderCell>
-          <ColHeaderCell flex={1} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer' }}>
+          <ColHeaderCell flex={2} onClick={() => handleSortClick('random')} sx={{ cursor: 'pointer', minWidth: 200 }}>
             <Typography variant="body2" color="ds.text_gray_low">
               {strings.drepColRandom}
             </Typography>
@@ -346,12 +357,21 @@ export const DRepList = () => {
                 }
               >
                 {/* Ticker and name */}
-                <DataCell width={304} sx={{ gap: '16px' }}>
+                <DataCell flex={2.5} sx={{ gap: '16px', minWidth: 200 }}>
                   <DrepAvatar imageUrl={drep.imageUrl} name={drep.name} />
                   <Stack gap="8px">
-                    <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
-                      {drep.name}
-                    </Typography>
+                    <Box
+                      component="a"
+                      href={getDrepExplorerUrl(drep.bech32Id, isTestnet)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                    >
+                      <Typography variant="body1" color="ds.text_primary_medium" sx={{ wordBreak: 'break-word' }}>
+                        {formatDrepDisplayName(drep.name)}
+                      </Typography>
+                    </Box>
                     {drep.twitterUrl && /^https:\/\//.test(drep.twitterUrl) && (
                       <Box
                         component="a"
@@ -367,29 +387,28 @@ export const DRepList = () => {
                 </DataCell>
 
                 {/* Voting power */}
-                <DataCell width={226}>
+                <DataCell flex={1.5} sx={{ minWidth: 120 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {formatVotingPower(drep.stake)}
                   </Typography>
                 </DataCell>
 
                 {/* Registered */}
-                <DataCell width={226}>
+                <DataCell flex={1.5} sx={{ minWidth: 120 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {drep.registeredDate ? formatRelativeDate(drep.registeredDate) : '—'}
                   </Typography>
                 </DataCell>
 
                 {/* Delegators */}
-                <DataCell width={226} sx={{ gap: '8px' }}>
-                  <PieChartIcon />
+                <DataCell flex={1} sx={{ minWidth: 100 }}>
                   <Typography variant="body1" color="ds.text_gray_medium">
                     {drep.delegatorCount.toLocaleString()}
                   </Typography>
                 </DataCell>
 
                 {/* View details + Delegate (aligns with Random header) */}
-                <DataCell flex={1} sx={{ gap: '8px' }}>
+                <DataCell flex={2} sx={{ gap: '8px', minWidth: 200 }}>
                   <ActionButton onClick={() => setSelectedDrep(drep)}>
                     <Typography
                       variant="body2"
@@ -461,17 +480,6 @@ export const DRepList = () => {
     </>
   );
 };
-
-// ── Pie chart icon (inline SVG) ───────────────────────────────────────────────
-
-const PieChartIcon = () => (
-  <Box sx={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 2a8 8 0 1 0 8 8h-8V2Z" fill="#6b7384" opacity="0.5" />
-      <path d="M12 2.26A8.004 8.004 0 0 1 18 10h-6V2.26Z" fill="#6b7384" />
-    </svg>
-  </Box>
-);
 
 // ── Styled components ─────────────────────────────────────────────────────────
 
