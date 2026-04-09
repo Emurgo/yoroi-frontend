@@ -109,6 +109,7 @@ export const DrepDetailsSlide = ({ drep, onClose, onDelegate, isCurrentDrep, del
         <>
           {/* ── Header ── */}
           <SlideHeader>
+            <Box sx={{ width: 24, height: 24, flexShrink: 0 }} /> {/* Spacer to balance close button */}
             <Typography
               variant="body1"
               fontWeight={500}
