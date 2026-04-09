@@ -213,7 +213,7 @@ export const messages = Object.freeze(
     },
     delegatingLabel: {
       id: 'governance.delegatingLabel',
-      defaultMessage: '!!!Delegateing',
+      defaultMessage: '!!!Delegating',
     },
     delegationStatus: {
       id: 'governance.delegationStatus',
