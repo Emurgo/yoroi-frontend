@@ -511,7 +511,7 @@
   "portfolio.transactionTable.status.high": "High",
   "portfolio.transactionTable.status.low": "Low",
   "portfolio.transactionTable.timestamp.today": "Today",
-  "portfolio.transactionTable.timestamp.yesterday": "Amount",
+  "portfolio.transactionTable.timestamp.yesterday": "Yesterday",
   "portfolio.transactionTable.title": "Transaction history",
   "portfolio.welcomeBanner.description": "Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities",
   "portfolio.welcomeBanner.title": "Start your crypto journey",

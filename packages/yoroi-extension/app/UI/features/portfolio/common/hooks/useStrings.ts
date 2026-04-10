@@ -234,7 +234,7 @@ export const messages = Object.freeze(
     },
     yesterday: {
       id: 'portfolio.transactionTable.timestamp.yesterday',
-      defaultMessage: '!!!Amount',
+      defaultMessage: '!!!Yesterday',
     },
     sent: {
       id: 'portfolio.transactionTable.label.sent',
