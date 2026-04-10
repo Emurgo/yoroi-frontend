@@ -9,11 +9,6 @@ export const messages = Object.freeze(
       id: 'governance.governanceStatus',
       defaultMessage: '!!!Governance status',
     },
-    governanceStatusInfo: {
-      id: 'governance.governanceStatusInfo',
-      defaultMessage:
-        '!!!You have selected undefined as your governance status. You can change it at any time by clicking in the card bellow',
-    },
     abstain: {
       id: 'governance.abstain',
       defaultMessage: '!!!Abstain',
@@ -314,7 +309,6 @@ export const useStrings = () => {
     delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),
-    governanceStatusInfo: intl.formatMessage(messages.governanceStatusInfo),
     abstain: intl.formatMessage(messages.abstain),
     abstainInfo: intl.formatMessage(messages.abstainInfo),
     noConfidence: intl.formatMessage(messages.noConfidence),

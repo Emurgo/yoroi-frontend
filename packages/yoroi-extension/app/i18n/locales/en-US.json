@@ -367,7 +367,6 @@
   "governance.findPreferredDrep": "Find your preferred DRep and enter their ID below to delegate your vote:",
   "governance.goToGovernance": "GO to governance",
   "governance.governanceStatus": "Governance status",
-  "governance.governanceStatusInfo": "You have selected undefined as your governance status. You can change it at any time by clicking in the card bellow",
   "governance.identifyDrep": "Identify your preferred DRep and enter their ID below to delegate your vote",
   "governance.learnMore": "Learn more About Governance",
   "governance.learnMoreLabel": "Learn more about delegation options",
