@@ -194,7 +194,7 @@ export const messages = Object.freeze(
     },
     '1Y': {
       id: 'portfolio.chart.button.1Y',
-      defaultMessage: '!!!1W',
+      defaultMessage: '!!!1Y',
     },
     ALL: {
       id: 'portfolio.chart.button.ALL',
