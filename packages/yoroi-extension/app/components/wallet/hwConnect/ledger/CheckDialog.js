@@ -44,7 +44,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part1Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part1.link',
-    defaultMessage: '!!!https://shop.ledger.com/products/ledger-nano-s/',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/article/how-to-connect-a-ledger-hardware-wallet-to-yoroi-1ghfwpw/',
   },
   aboutPrerequisite1Part2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part2',
@@ -52,11 +52,11 @@ const messages = defineMessages({
   },
   aboutPrerequisite1Part3: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3',
-    defaultMessage: '!!!Ledger Nano X(Using USB cable)',
+    defaultMessage: '!!!Ledger Nano X (Using USB cable)',
   },
   aboutPrerequisite1Part3Link: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.1.part3.link',
-    defaultMessage: '!!!https://shop.ledger.com/pages/ledger-nano-x/',
+    defaultMessage: '!!!https://help.yoroi-wallet.com/en/article/how-to-connect-a-ledger-hardware-wallet-to-yoroi-1ghfwpw/',
   },
   aboutPrerequisite2: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.2',
@@ -68,7 +68,8 @@ const messages = defineMessages({
   },
   aboutPrerequisite5: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.5',
-    defaultMessage: '!!!Trezor device must remain connected to the computer throughout the process',
+    defaultMessage:
+      '!!!The Ledger device must remain connected to your computer throughout the process.',
   },
 });
 

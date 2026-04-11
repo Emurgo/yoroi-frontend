@@ -29,11 +29,11 @@ export const messages = Object.freeze(
     },
     routePath: {
       id: 'swap.routePath',
-      defaultMessage: '!!!routePath',
+      defaultMessage: '!!!Chosen path using Dexs and Pools for your swap to go through.',
     },
     priceLabel: {
       id: 'portfolio.statsTable.header.price',
-      defaultMessage: '!!!price',
+      defaultMessage: '!!!Price',
     },
     feesIncluded: {
       id: 'swap.feesIncluded',
@@ -57,7 +57,7 @@ export const messages = Object.freeze(
     },
     minReceived: {
       id: 'swap.minReceived',
-      defaultMessage: '!!!minReceived',
+      defaultMessage: '!!!Min received',
     },
     guaranteedMin: {
       id: 'swap.guaranteedMin',
@@ -187,7 +187,7 @@ export const messages = Object.freeze(
     },
     buyAndSellToken: {
       id: 'swap.buyAndSellToken',
-      defaultMessage: '!!Buy and sell tokens must be different',
+      defaultMessage: '!!!Buy and sell tokens must be different',
     },
     notEnoughBalance: {
       id: 'buysell.dialog.error.not.enough',

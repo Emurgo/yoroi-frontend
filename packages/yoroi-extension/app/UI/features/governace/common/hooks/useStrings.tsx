@@ -119,7 +119,7 @@ export const messages = Object.freeze(
     },
     selectNoConfidenc: {
       id: 'governance.selectNoConfidenc',
-      defaultMessage: '!!!Select no confidenc',
+      defaultMessage: '!!!Select no confidence',
     },
     identifyDrep: {
       id: 'governance.identifyDrep',

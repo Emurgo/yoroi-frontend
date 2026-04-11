@@ -32,12 +32,13 @@ const messages = defineMessages({
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
-    defaultMessage: '!!!I understand that my money are held securely on this device only, not on the company servers',
+    defaultMessage:
+      "!!!I understand that my secret keys are held securely on this device only, not on the company's servers.",
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
     defaultMessage: `!!!I understand that if this application is moved to another device or deleted, my money can
-    be only recovered with the backup phrase which were written down in a secure place`,
+    be only recovered with the backup phrase that I have written down and saved in a secure place.`,
   },
   phraseDoesNotMatch: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.error.phraseDoesNotMatch',

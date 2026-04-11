@@ -78,7 +78,7 @@ export const messages = Object.freeze(
     },
     deregisteringStakingKey: {
       id: 'transaction.review.deregisteringStakingKey',
-      defaultMessage: '!!!Undelegating from the pool',
+      defaultMessage: '!!!Deregistering staking key deposit',
     },
     epochProgress: {
       id: 'wallet.staking.epochProgress',
@@ -131,29 +131,29 @@ export const messages = Object.freeze(
     },
     governanceRequired: {
       id: 'staking.dialog.governanceRequired',
-      defaultMessage: '!!Keep your rewards accessible',
+      defaultMessage: '!!!Keep your rewards accessible',
     },
     toReceiveRewards: {
       id: 'staking.dialog.toReceiveRewards',
       defaultMessage:
-        '!!To receive rewards from your stake delegation, you must also delegate your voting power. Save time and fees by delegating to our Yoroi DRep now, alongside your stake pool delegation.',
+        '!!!To receive rewards from your stake delegation, you must also delegate your voting power. Save time and fees by delegating to our Yoroi DRep now, alongside your stake pool delegation.',
     },
     delegateToYoroiDRep: {
       id: 'staking.dialog.delegateToYoroiDRep',
-      defaultMessage: '!!Delegate to Yoroi DRep',
+      defaultMessage: '!!!Delegate to Yoroi DRep',
     },
     delegateStakeOnly: {
       id: 'staking.dialog.delegateStakeOnly',
-      defaultMessage: '!!Delegate stake only',
+      defaultMessage: '!!!Delegate stake only',
     },
     participationInGovUndelegate: {
       id: 'staking.dialog.participationInGovUndelegate',
-      defaultMessage: '!!One step left to make the change',
+      defaultMessage: '!!!One step left to make the change',
     },
     undelegateInfo: {
       id: 'staking.dialog.undelegateInfo',
       defaultMessage:
-        '!!Undelegating causes any pending staking  rewards to be withdrawn and participating in governance is required to withdraw rewards on Cardano. First, delegate your ADA in the governance center. Once your delegation is confirmed, you will then be able to undelegate.',
+        '!!!Undelegating causes any pending staking  rewards to be withdrawn and participating in governance is required to withdraw rewards on Cardano. First, delegate your ADA in the governance center. Once your delegation is confirmed, you will then be able to undelegate.',
     },
     governanceUpdates: {
       id: 'staking.dialog.governanceUpdates',

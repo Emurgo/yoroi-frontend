@@ -486,7 +486,7 @@ const globalMessages: * = defineMessages({
   },
   goBack: {
     id: 'global.labels.goBack',
-    defaultMessage: '!!!Go back label',
+    defaultMessage: '!!!Go back',
   },
   allowLabel: {
     id: 'global.label.allow',
@@ -1094,7 +1094,7 @@ const globalMessages: * = defineMessages({
   },
   deregisteringStakingKey: {
     id: 'transaction.review.deregisteringStakingKey',
-    defaultMessage: '!!!Undelegating from the pool',
+    defaultMessage: '!!!Deregistering staking key deposit',
   },
   manual: {
     id: 'swap.manual',

@@ -94,7 +94,7 @@ export const messages = Object.freeze(
     },
     balance: {
       id: 'portfolio.tokenInfo.balance',
-      defaultMessage: '!!!balance',
+      defaultMessage: '!!!Balance',
     },
     marketPrice: {
       id: 'portfolio.tokenInfo.marketPrice',
