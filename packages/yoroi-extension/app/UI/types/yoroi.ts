@@ -80,6 +80,9 @@ export type YoroiRemoteConfig = {
     cardanoCardAnnouncement?: {
       display: boolean;
     };
+    secondFiTeaser?: {
+      display: boolean;
+    };
   };
   dapps?: {
     recommended: {
