@@ -134,36 +134,43 @@ const RandomSortIcon = ({ active }: { active: boolean }) => (
 
 export const DrepAvatar = ({ imageUrl, name }: { imageUrl: string | null; name: string }) => {
   const theme: any = useTheme();
-  if (imageUrl) {
+  const [useInitialsFallback, setUseInitialsFallback] = React.useState(() => !imageUrl);
+
+  React.useEffect(() => {
+    setUseInitialsFallback(!imageUrl);
+  }, [imageUrl]);
+
+  if (useInitialsFallback) {
     return (
       <Box
-        component="img"
-        src={imageUrl}
-        alt={name}
-        sx={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-        onError={(e: any) => {
-          e.currentTarget.style.display = 'none';
+        sx={{
+          width: 56,
+          height: 56,
+          borderRadius: '50%',
+          background: theme.palette.ds.gray_100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
         }}
-      />
+      >
+        <Typography variant="body2" color="ds.text_gray_low" fontWeight={500}>
+          {name.slice(0, 2).toUpperCase()}
+        </Typography>
+      </Box>
     );
   }
+
   return (
     <Box
-      sx={{
-        width: 56,
-        height: 56,
-        borderRadius: '50%',
-        background: theme.palette.ds.gray_100,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
+      component="img"
+      src={imageUrl!}
+      alt={name}
+      sx={{ width: 56, height: 56, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+      onError={() => {
+        setUseInitialsFallback(true);
       }}
-    >
-      <Typography variant="body2" color="ds.text_gray_low" fontWeight={500}>
-        {name.slice(0, 2).toUpperCase()}
-      </Typography>
-    </Box>
+    />
   );
 };
 
