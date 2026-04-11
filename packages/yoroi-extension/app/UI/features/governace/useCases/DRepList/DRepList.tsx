@@ -40,11 +40,34 @@ function getDrepName(drep: any, bech32Id: string): string {
   return typeof gn === 'string' ? gn : (gn['@value'] ?? bech32Id);
 }
 
+function tryParseHostname(uriString: string): string | null {
+  try {
+    const trimmed = uriString.trim();
+    if (!trimmed) return null;
+    const hasScheme = /^[a-zA-Z][a-zA-Z\d+\-.]*:/i.test(trimmed);
+    const absolute = hasScheme ? trimmed : trimmed.startsWith('//') ? `https:${trimmed}` : `https://${trimmed}`;
+    const { hostname } = new URL(absolute);
+    return hostname || null;
+  } catch {
+    return null;
+  }
+}
+
+function isTwitterOrXHostname(hostname: string): boolean {
+  const h = hostname.toLowerCase();
+  return h === 'twitter.com' || h === 'x.com' || h.endsWith('.twitter.com') || h.endsWith('.x.com');
+}
+
+function isTwitterOrXReferenceUri(uri: string): boolean {
+  const hostname = tryParseHostname(uri);
+  return hostname != null && isTwitterOrXHostname(hostname);
+}
+
 function getTwitterUrl(drep: any): string | null {
   const refs: any[] = drep.metadata?.references ?? [];
   const ref = refs.find(r => {
     const uri = typeof r.uri === 'string' ? r.uri : r.uri?.['@value'];
-    return uri?.includes('twitter.com') || uri?.includes('x.com');
+    return typeof uri === 'string' && isTwitterOrXReferenceUri(uri);
   });
   if (!ref) return null;
   return typeof ref.uri === 'string' ? ref.uri : (ref.uri?.['@value'] ?? null);
