@@ -329,7 +329,7 @@
   "global.yoroi": "Yoroi",
   "global.yoroi.intro": "Light wallet for Cardano assets",
   "global.yoroiNightly": "Yoroi Nightly",
-  "gouvernace.delegatingInGovernance": "Delegating in Governance",
+  "governance.delegatingInGovernance": "Delegating in Governance",
   "governance.abstain": "Abstain",
   "governance.abstainInfo": "You are choosing not to cast a vote on all proposals now and in the future.",
   "governance.activeDrepsCount": "Active DReps ({count})",

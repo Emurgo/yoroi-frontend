@@ -220,7 +220,7 @@ export const messages = Object.freeze(
         '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
     },
     delegatingInGovernance: {
-      id: 'gouvernace.delegatingInGovernance',
+      id: 'governance.delegatingInGovernance',
       defaultMessage: '!!!Delegating in Governance',
     },
     dreps: {
