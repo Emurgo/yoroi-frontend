@@ -31,7 +31,7 @@ export const messages = Object.freeze(
     },
     becomeADrep: {
       id: 'governance.becomeADrep',
-      defaultMessage: '!!!Want to became a Drep?',
+      defaultMessage: '!!!Want to become a Drep?',
     },
     drepId: {
       id: 'governance.drepId',
