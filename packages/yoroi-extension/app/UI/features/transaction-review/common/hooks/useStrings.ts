@@ -23,11 +23,11 @@ export const messages = Object.freeze(
     },
     password: {
       id: 'global.labels.password',
-      defaultMessage: '!!!password',
+      defaultMessage: '!!!Password',
     },
     wrongPassword: {
       id: 'global.labels.wrongPassword',
-      defaultMessage: '!!!wrong password',
+      defaultMessage: '!!!Wrong password',
     },
     wallet: {
       id: 'settings.menu.wallet.link.label',
@@ -89,7 +89,7 @@ export const messages = Object.freeze(
     },
     confirmLabel: {
       id: 'global.labels.confirm',
-      defaultMessage: '!!!confirm',
+      defaultMessage: '!!!Confirm',
     },
     registerStakingKey: {
       id: 'transaction.review.registerStakingKey',
@@ -109,11 +109,11 @@ export const messages = Object.freeze(
     },
     submitLabel: {
       id: 'global.labels.submit',
-      defaultMessage: '!!!submit',
+      defaultMessage: '!!!Submit',
     },
     cancelLabel: {
       id: 'global.labels.cancel',
-      defaultMessage: '!!!cancel',
+      defaultMessage: '!!!Cancel',
     },
     transactionReview: {
       id: 'transaction.review.transactionReview',
@@ -154,7 +154,7 @@ export const messages = Object.freeze(
     },
     receiveLabel: {
       id: 'global.receive',
-      defaultMessage: '!!!receive',
+      defaultMessage: '!!!Receive',
     },
     forgotPassword: {
       id: 'transaction.review.forgotPassword',

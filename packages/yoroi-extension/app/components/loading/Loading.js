@@ -14,7 +14,7 @@ import { environment } from '../../environment';
 const messages = defineMessages({
   loading: {
     id: 'loading.screen.loading',
-    defaultMessage: '!!!loading components',
+    defaultMessage: '!!!Loading components',
   },
 });
 

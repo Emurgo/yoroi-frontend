@@ -9,11 +9,6 @@ export const messages = Object.freeze(
       id: 'governance.governanceStatus',
       defaultMessage: '!!!Governance status',
     },
-    governanceStatusInfo: {
-      id: 'governance.governanceStatusInfo',
-      defaultMessage:
-        '!!!You have selected undefined as your governance status. You can change it at any time by clicking in the card bellow',
-    },
     abstain: {
       id: 'governance.abstain',
       defaultMessage: '!!!Abstain',
@@ -36,7 +31,7 @@ export const messages = Object.freeze(
     },
     becomeADrep: {
       id: 'governance.becomeADrep',
-      defaultMessage: '!!!Want to became a Drep?',
+      defaultMessage: '!!!Want to become a Drep?',
     },
     drepId: {
       id: 'governance.drepId',
@@ -74,7 +69,7 @@ export const messages = Object.freeze(
     statusSelected: {
       id: 'governance.statusSelected',
       defaultMessage:
-        '!!!You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow',
+        '!!!You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow',
     },
     statusPending: {
       id: 'governance.statusPending',
@@ -124,7 +119,7 @@ export const messages = Object.freeze(
     },
     selectNoConfidenc: {
       id: 'governance.selectNoConfidenc',
-      defaultMessage: '!!!Select no confidenc',
+      defaultMessage: '!!!Select no confidence',
     },
     identifyDrep: {
       id: 'governance.identifyDrep',
@@ -136,7 +131,7 @@ export const messages = Object.freeze(
     },
     wrongPassword: {
       id: 'global.labels.wrongPassword',
-      defaultMessage: '!!!Wrong Password',
+      defaultMessage: '!!!Wrong password',
     },
     back: {
       id: 'global.labels.back',
@@ -144,7 +139,7 @@ export const messages = Object.freeze(
     },
     confirm: {
       id: 'global.labels.confirm',
-      defaultMessage: '!!!confirm',
+      defaultMessage: '!!!Confirm',
     },
     incorectFormat: {
       id: 'global.labels.incorectFormat',
@@ -207,9 +202,13 @@ export const messages = Object.freeze(
       id: 'governance.changeToDrep',
       defaultMessage: '!!!Change to DRep',
     },
+    delegateToOtherDrep: {
+      id: 'governance.delegateToOtherDrep',
+      defaultMessage: '!!!Delegate to other DRep',
+    },
     delegatingLabel: {
       id: 'governance.delegatingLabel',
-      defaultMessage: '!!!Delegateing',
+      defaultMessage: '!!!Delegating',
     },
     delegationStatus: {
       id: 'governance.delegationStatus',
@@ -221,8 +220,82 @@ export const messages = Object.freeze(
         '!!!Your voting power is currently delegated and contributing to Cardano’s decision-making. You remain free to adjust your delegation whenever you choose.',
     },
     delegatingInGovernance: {
-      id: 'gouvernace.delegatingInGovernance',
+      id: 'governance.delegatingInGovernance',
       defaultMessage: '!!!Delegating in Governance',
+    },
+    dreps: {
+      id: 'governance.dreps',
+      defaultMessage: '!!!DReps',
+    },
+    governanceNotRegisteredSubtitle: {
+      id: 'governance.notRegisteredSubtitle',
+      defaultMessage: '!!!You can pick a DRep using their ID, choose to abstain or show no confidence.',
+    },
+    governanceDelegationSubtitle: {
+      id: 'governance.delegationSubtitle',
+      defaultMessage:
+        "!!!Your delegation to DReps helps shaping Cardano's future. You may change your governance status at any time.",
+    },
+    activeDrepsCount: {
+      id: 'governance.activeDrepsCount',
+      defaultMessage: '!!!Active DReps ({count})',
+    },
+    searchDrep: {
+      id: 'governance.searchDrep',
+      defaultMessage: '!!!Search DRep',
+    },
+    drepColTickerAndName: {
+      id: 'governance.drepColTickerAndName',
+      defaultMessage: '!!!Ticker and name',
+    },
+    drepColVotingPower: {
+      id: 'governance.drepColVotingPower',
+      defaultMessage: '!!!Voting power',
+    },
+    drepColRegistered: {
+      id: 'governance.drepColRegistered',
+      defaultMessage: '!!!Registered',
+    },
+    drepColDelegators: {
+      id: 'governance.drepColDelegators',
+      defaultMessage: '!!!Delegators',
+    },
+    drepColRandom: {
+      id: 'governance.drepColRandom',
+      defaultMessage: '!!!Random',
+    },
+    viewDetails: {
+      id: 'governance.viewDetails',
+      defaultMessage: '!!!View details',
+    },
+    noDrepsFound: {
+      id: 'governance.noDrepsFound',
+      defaultMessage: '!!!No DReps found',
+    },
+    legacyDrepId: {
+      id: 'governance.legacyDrepId',
+      defaultMessage: '!!!Legacy DRep ID (CIP-105)',
+    },
+    objectives: {
+      id: 'governance.objectives',
+      defaultMessage: '!!!Objectives',
+    },
+    motivations: {
+      id: 'governance.motivations',
+      defaultMessage: '!!!Motivations',
+    },
+    qualifications: {
+      id: 'governance.qualifications',
+      defaultMessage: '!!!Qualifications',
+    },
+    unverifiedMetadataTitle: {
+      id: 'governance.unverifiedMetadataTitle',
+      defaultMessage: '!!!Unverified DRep metadata',
+    },
+    unverifiedMetadataMessage: {
+      id: 'governance.unverifiedMetadataMessage',
+      defaultMessage:
+        "!!!This information couldn't be verified against the blockchain and may have been altered. It has been hidden for your safety.",
     },
   })
 );
@@ -236,7 +309,6 @@ export const useStrings = () => {
     delegatingToDRep: intl.formatMessage(messages.delegatingToDRep),
     designatingSomeoneElse: intl.formatMessage(messages.designatingSomeoneElse),
     governanceStatus: intl.formatMessage(messages.governanceStatus),
-    governanceStatusInfo: intl.formatMessage(messages.governanceStatusInfo),
     abstain: intl.formatMessage(messages.abstain),
     abstainInfo: intl.formatMessage(messages.abstainInfo),
     noConfidence: intl.formatMessage(messages.noConfidence),
@@ -282,9 +354,28 @@ export const useStrings = () => {
     chooseAbstain: intl.formatMessage(messages.chooseAbstain),
     chooseNoConfidence: intl.formatMessage(messages.chooseNoConfidence),
     changeToDrep: intl.formatMessage(messages.changeToDrep),
+    delegateToOtherDrep: intl.formatMessage(messages.delegateToOtherDrep),
     delegatingLabel: intl.formatMessage(messages.delegatingLabel),
     delegationStatus: intl.formatMessage(messages.delegationStatus),
     votingPowerInfo: intl.formatMessage(messages.votingPowerInfo),
     delegatingInGovernance: intl.formatMessage(messages.delegatingInGovernance),
+    dreps: intl.formatMessage(messages.dreps),
+    governanceNotRegisteredSubtitle: intl.formatMessage(messages.governanceNotRegisteredSubtitle),
+    governanceDelegationSubtitle: intl.formatMessage(messages.governanceDelegationSubtitle),
+    activeDrepsCount: (count: number) => intl.formatMessage(messages.activeDrepsCount, { count }),
+    searchDrep: intl.formatMessage(messages.searchDrep),
+    drepColTickerAndName: intl.formatMessage(messages.drepColTickerAndName),
+    drepColVotingPower: intl.formatMessage(messages.drepColVotingPower),
+    drepColRegistered: intl.formatMessage(messages.drepColRegistered),
+    drepColDelegators: intl.formatMessage(messages.drepColDelegators),
+    drepColRandom: intl.formatMessage(messages.drepColRandom),
+    viewDetails: intl.formatMessage(messages.viewDetails),
+    noDrepsFound: intl.formatMessage(messages.noDrepsFound),
+    legacyDrepId: intl.formatMessage(messages.legacyDrepId),
+    objectives: intl.formatMessage(messages.objectives),
+    motivations: intl.formatMessage(messages.motivations),
+    qualifications: intl.formatMessage(messages.qualifications),
+    unverifiedMetadataTitle: intl.formatMessage(messages.unverifiedMetadataTitle),
+    unverifiedMetadataMessage: intl.formatMessage(messages.unverifiedMetadataMessage),
   }).current;
 };

@@ -486,7 +486,7 @@ const globalMessages: * = defineMessages({
   },
   goBack: {
     id: 'global.labels.goBack',
-    defaultMessage: '!!!Go back label',
+    defaultMessage: '!!!Go back',
   },
   allowLabel: {
     id: 'global.label.allow',
@@ -556,7 +556,7 @@ const globalMessages: * = defineMessages({
   },
   updatePool: {
     id: 'global.updatePool',
-    defaultMessage: '!!!  UPDATE POOL',
+    defaultMessage: '!!!UPDATE POOL',
   },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
@@ -697,7 +697,7 @@ const globalMessages: * = defineMessages({
   },
   rewardsListLabel: {
     id: 'global.labels.rewardsListLabel',
-    defaultMessage: '!!!Rewards list',
+    defaultMessage: '!!!Rewards List',
   },
   totalTokenLabel: {
     id: 'wallet.dashboard.summary.adaTitle',
@@ -1094,7 +1094,7 @@ const globalMessages: * = defineMessages({
   },
   deregisteringStakingKey: {
     id: 'transaction.review.deregisteringStakingKey',
-    defaultMessage: '!!!Undelegating from the pool',
+    defaultMessage: '!!!Deregistering staking key deposit',
   },
   manual: {
     id: 'swap.manual',

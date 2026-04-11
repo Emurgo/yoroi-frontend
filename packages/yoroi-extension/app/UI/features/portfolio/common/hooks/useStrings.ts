@@ -94,7 +94,7 @@ export const messages = Object.freeze(
     },
     balance: {
       id: 'portfolio.tokenInfo.balance',
-      defaultMessage: '!!!balance',
+      defaultMessage: '!!!Balance',
     },
     marketPrice: {
       id: 'portfolio.tokenInfo.marketPrice',
@@ -194,7 +194,7 @@ export const messages = Object.freeze(
     },
     '1Y': {
       id: 'portfolio.chart.button.1Y',
-      defaultMessage: '!!!1W',
+      defaultMessage: '!!!1Y',
     },
     ALL: {
       id: 'portfolio.chart.button.ALL',
@@ -234,7 +234,7 @@ export const messages = Object.freeze(
     },
     yesterday: {
       id: 'portfolio.transactionTable.timestamp.yesterday',
-      defaultMessage: '!!!Amount',
+      defaultMessage: '!!!Yesterday',
     },
     sent: {
       id: 'portfolio.transactionTable.label.sent',

@@ -33,7 +33,7 @@ const messages = defineMessages({
   },
   understand: {
     id: 'settings.general.testnetModal.understand',
-    defaultMessage: '!!!Learn more about networks in Cardano',
+    defaultMessage: '!!!I Understand',
   },
 });
 

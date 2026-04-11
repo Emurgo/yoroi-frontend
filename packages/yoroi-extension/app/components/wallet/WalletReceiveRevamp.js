@@ -62,7 +62,7 @@ const messages = defineMessages({
   },
   label: {
     id: 'wallet.receive.page.label',
-    defaultMessage: '!!!Label ',
+    defaultMessage: '!!!Label',
   },
 });
 

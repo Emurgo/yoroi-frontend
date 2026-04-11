@@ -34,7 +34,7 @@ export const messages = Object.freeze(
     },
     betweenVotingSubtitle: {
       id: 'wallet.registrationOver.betweenVotingSubtitle',
-      defaultMessage: '!!!"Registration has ended.  Voting ends at  {votingEnd}',
+      defaultMessage: '!!!Registration has ended.  Voting ends at  {votingEnd}',
     },
     nextFundRegistration: {
       id: 'wallet.registrationOver.nextFundRegistration',
