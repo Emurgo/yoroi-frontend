@@ -69,7 +69,7 @@ export const messages = Object.freeze(
     statusSelected: {
       id: 'governance.statusSelected',
       defaultMessage:
-        '!!!You have selected ${status} as your governance status. You can change it at any time by clicking in the card bellow',
+        '!!!You have selected {status} as your governance status. You can change it at any time by clicking in the card bellow',
     },
     statusPending: {
       id: 'governance.statusPending',

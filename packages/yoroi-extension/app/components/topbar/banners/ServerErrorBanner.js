@@ -18,7 +18,7 @@ const messages = defineMessages({
   networkErrorLabel: {
     id: 'networkError.label.message',
     defaultMessage:
-      '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <crispLink></crispLink>here</crispLink>.',
+      '!!!Server connection failed.{newLine}Please check your internet connection or reach out to our support team <crispLink>here</crispLink>.',
   },
 });
 
