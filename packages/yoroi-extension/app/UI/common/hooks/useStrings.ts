@@ -137,16 +137,16 @@ export const messages = Object.freeze(
     },
     earnRewards: {
       id: 'banners.rewards.earn',
-      defaultMessage: '!!! Earn Rewards with Yoroi',
+      defaultMessage: '!!!Earn Rewards with Yoroi',
     },
     delegateRewards: {
       id: 'banners.rewards.delegate',
       defaultMessage:
-        '!!! Delegate your ADA to our stake pool and DRep in one step. Support Cardano governance, strengthen the network, and earn rewards along the way.',
+        '!!!Delegate your ADA to our stake pool and DRep in one step. Support Cardano governance, strengthen the network, and earn rewards along the way.',
     },
     rewardsButton: {
       id: 'banners.rewards.button',
-      defaultMessage: '!!! Earn ADA',
+      defaultMessage: '!!!Earn ADA',
     },
     cardanoCard: {
       id: 'banners.cardanoCard.desc',

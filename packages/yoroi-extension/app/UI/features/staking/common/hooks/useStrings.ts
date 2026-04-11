@@ -66,7 +66,7 @@ export const messages = Object.freeze(
     },
     updatePoolLabel: {
       id: 'global.updatePool',
-      defaultMessage: '!!!  UPDATE POOL',
+      defaultMessage: '!!!UPDATE POOL',
     },
     undelegatePool: {
       id: 'transaction.review.undelegatePool',

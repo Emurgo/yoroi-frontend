@@ -131,7 +131,7 @@ export const messages = Object.freeze(
     },
     wrongPassword: {
       id: 'global.labels.wrongPassword',
-      defaultMessage: '!!!Wrong Password',
+      defaultMessage: '!!!Wrong password',
     },
     back: {
       id: 'global.labels.back',
@@ -139,7 +139,7 @@ export const messages = Object.freeze(
     },
     confirm: {
       id: 'global.labels.confirm',
-      defaultMessage: '!!!confirm',
+      defaultMessage: '!!!Confirm',
     },
     incorectFormat: {
       id: 'global.labels.incorectFormat',

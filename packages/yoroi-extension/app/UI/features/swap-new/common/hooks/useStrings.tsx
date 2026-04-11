@@ -21,7 +21,7 @@ export const messages = Object.freeze(
     },
     routeLabel: {
       id: 'global.labels.route',
-      defaultMessage: '!!!route',
+      defaultMessage: '!!!Route',
     },
     routeTvl: {
       id: 'global.labels.tvl',
@@ -107,27 +107,27 @@ export const messages = Object.freeze(
     },
     swapLabel: {
       id: 'swap.swapLabel',
-      defaultMessage: '!!! Swap',
+      defaultMessage: '!!!Swap',
     },
     buyAt: {
       id: 'swap.buyAt',
-      defaultMessage: '!!! Buy At',
+      defaultMessage: '!!!Buy At',
     },
     selectRoute: {
       id: 'swap.selectRoute',
-      defaultMessage: '!!! Select Route',
+      defaultMessage: '!!!Select Route',
     },
     placeOrder: {
       id: 'swap.placeOrder',
-      defaultMessage: '!!! Place Order',
+      defaultMessage: '!!!Place Order',
     },
     allAssets: {
       id: 'swap.allAssets',
-      defaultMessage: '!!! All Assets',
+      defaultMessage: '!!!All assets',
     },
     applyLabel: {
       id: 'global.labels.apply',
-      defaultMessage: '!!! Apply',
+      defaultMessage: '!!!Apply',
     },
     ordersPair: {
       id: 'swap.ordersPair',

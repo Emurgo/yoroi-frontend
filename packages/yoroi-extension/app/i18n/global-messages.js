@@ -556,7 +556,7 @@ const globalMessages: * = defineMessages({
   },
   updatePool: {
     id: 'global.updatePool',
-    defaultMessage: '!!!  UPDATE POOL',
+    defaultMessage: '!!!UPDATE POOL',
   },
   copyTooltipMessage: {
     id: 'global.copyTooltipMessage',
@@ -697,7 +697,7 @@ const globalMessages: * = defineMessages({
   },
   rewardsListLabel: {
     id: 'global.labels.rewardsListLabel',
-    defaultMessage: '!!!Rewards list',
+    defaultMessage: '!!!Rewards List',
   },
   totalTokenLabel: {
     id: 'wallet.dashboard.summary.adaTitle',

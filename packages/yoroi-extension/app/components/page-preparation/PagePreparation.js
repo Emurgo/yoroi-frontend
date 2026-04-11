@@ -13,7 +13,7 @@ const messages = defineMessages({
   },
   somethingWrong: {
     id: 'global.labels.contactSupport',
-    defaultMessage: '!!!If this keep happening, contact our support team. ',
+    defaultMessage: '!!!If this keep happening, contact our support team.',
   },
   goBack: {
     id: 'global.labels.pleaseGoBack',
