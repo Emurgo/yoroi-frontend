@@ -9,6 +9,7 @@ import { SearchInput } from '../../../../components';
 import { DrepDetailsSlide } from './DrepDetailsSlide';
 import { getDrepExplorerUrl } from '../../common/constants';
 import { formatDrepDisplayName } from '../../../../common/helpers/formatters';
+import { createSeededRandom } from '../../../../common/helpers/seededRandom';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -85,6 +86,22 @@ function formatRelativeDate(dateStr: string): string {
   if (months > 0) parts.push(`${months}mo`);
   if (days > 0 && years === 0) parts.push(`${days}d`);
   return parts.length ? parts.join(' ') + ' ago' : 'today';
+}
+
+/**
+ * Fisher–Yates shuffle; order is fully determined by `randomSeed`.
+ * Runs in **O(n)** time: one pass from the last index down to 1, with O(1) work per index (swap + one RNG draw).
+ */
+function fisherYatesShuffle<T>(items: readonly T[], seed: number): T[] {
+  const arr = [...items];
+  const rand = createSeededRandom(seed);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    const t = arr[i]!;
+    arr[i] = arr[j]!;
+    arr[j] = t;
+  }
+  return arr;
 }
 
 // ── Sort icon ────────────────────────────────────────────────────────────────
@@ -250,12 +267,7 @@ export const DRepList = () => {
       : dreps;
     let sorted: DrepRow[];
     if (sortField === 'random') {
-      // Seeded shuffle: hash each item's index with the seed for a stable order per seed value
-      sorted = [...filtered].sort((a, b) => {
-        const ha = Math.sin(filtered.indexOf(a) + randomSeed * 9301) * 49297;
-        const hb = Math.sin(filtered.indexOf(b) + randomSeed * 9301) * 49297;
-        return ha - hb;
-      });
+      sorted = fisherYatesShuffle(filtered, randomSeed);
     } else {
       sorted = [...filtered].sort((a, b) => {
         let cmp = 0;
