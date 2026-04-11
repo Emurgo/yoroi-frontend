@@ -86,7 +86,7 @@ export const messages = Object.freeze(
     },
     manualLabel: {
       id: 'swap.manual',
-      defaultMessage: '!!!Slippage tolerance',
+      defaultMessage: '!!!Manual',
     },
     routingPreference: {
       id: 'swap.routingPreference',
@@ -266,7 +266,7 @@ export const messages = Object.freeze(
     },
     assetDetails: {
       id: 'swap.assetDetails',
-      defaultMessage: '!!!Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities',
+      defaultMessage: '!!!Asset details',
     },
     overviewLabel: {
       id: 'portfolio.tokenInfo.menuLabel.overview',
