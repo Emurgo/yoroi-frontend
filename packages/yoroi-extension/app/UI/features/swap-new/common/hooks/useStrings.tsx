@@ -21,7 +21,7 @@ export const messages = Object.freeze(
     },
     routeLabel: {
       id: 'global.labels.route',
-      defaultMessage: '!!!route',
+      defaultMessage: '!!!Route',
     },
     routeTvl: {
       id: 'global.labels.tvl',
@@ -29,11 +29,11 @@ export const messages = Object.freeze(
     },
     routePath: {
       id: 'swap.routePath',
-      defaultMessage: '!!!routePath',
+      defaultMessage: '!!!Chosen path using Dexs and Pools for your swap to go through.',
     },
     priceLabel: {
       id: 'portfolio.statsTable.header.price',
-      defaultMessage: '!!!price',
+      defaultMessage: '!!!Price',
     },
     feesIncluded: {
       id: 'swap.feesIncluded',
@@ -57,7 +57,7 @@ export const messages = Object.freeze(
     },
     minReceived: {
       id: 'swap.minReceived',
-      defaultMessage: '!!!minReceived',
+      defaultMessage: '!!!Min received',
     },
     guaranteedMin: {
       id: 'swap.guaranteedMin',
@@ -86,7 +86,7 @@ export const messages = Object.freeze(
     },
     manualLabel: {
       id: 'swap.manual',
-      defaultMessage: '!!!Slippage tolerance',
+      defaultMessage: '!!!Manual',
     },
     routingPreference: {
       id: 'swap.routingPreference',
@@ -107,27 +107,27 @@ export const messages = Object.freeze(
     },
     swapLabel: {
       id: 'swap.swapLabel',
-      defaultMessage: '!!! Swap',
+      defaultMessage: '!!!Swap',
     },
     buyAt: {
       id: 'swap.buyAt',
-      defaultMessage: '!!! Buy At',
+      defaultMessage: '!!!Buy At',
     },
     selectRoute: {
       id: 'swap.selectRoute',
-      defaultMessage: '!!! Select Route',
+      defaultMessage: '!!!Select Route',
     },
     placeOrder: {
       id: 'swap.placeOrder',
-      defaultMessage: '!!! Place Order',
+      defaultMessage: '!!!Place Order',
     },
     allAssets: {
       id: 'swap.allAssets',
-      defaultMessage: '!!! All Assets',
+      defaultMessage: '!!!All assets',
     },
     applyLabel: {
       id: 'global.labels.apply',
-      defaultMessage: '!!! Apply',
+      defaultMessage: '!!!Apply',
     },
     ordersPair: {
       id: 'swap.ordersPair',
@@ -187,7 +187,7 @@ export const messages = Object.freeze(
     },
     buyAndSellToken: {
       id: 'swap.buyAndSellToken',
-      defaultMessage: '!!Buy and sell tokens must be different',
+      defaultMessage: '!!!Buy and sell tokens must be different',
     },
     notEnoughBalance: {
       id: 'buysell.dialog.error.not.enough',
@@ -266,7 +266,7 @@ export const messages = Object.freeze(
     },
     assetDetails: {
       id: 'swap.assetDetails',
-      defaultMessage: '!!!Get started with Cardano’s native currency, ADA. It’s your key to unlocking a world of possibilities',
+      defaultMessage: '!!!Asset details',
     },
     overviewLabel: {
       id: 'portfolio.tokenInfo.menuLabel.overview',

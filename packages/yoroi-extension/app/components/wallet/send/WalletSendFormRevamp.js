@@ -101,7 +101,7 @@ const messages = defineMessages({
   },
   dropdownAmountLabel: {
     id: 'wallet.send.form.sendAll.dropdownAmountLabel',
-    defaultMessage: '!!!Send all {coinName}',
+    defaultMessage: '!!!Send all {currency}',
   },
   allTokens: {
     id: 'wallet.send.form.sendAll.allTokens',

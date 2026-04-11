@@ -36,6 +36,8 @@ import { withYoroiRemoteConfig } from '../../UI/common/helpers/withYoroiRemoteCo
 import { StakepoolFeeIncrease } from '../../UI/components/Dialogs/StakepoolFeeIncrease';
 // $FlowIgnore: suppressing this error
 import { CardanoCardDialog } from '../../UI/components/Dialogs/CardanoCardDialog';
+// $FlowIgnore: suppressing this error
+import { SecondFiTeasingDialog } from '../../UI/components/Dialogs/SecondFiTeasingDialog';
 
 type Props = {|
   +children: Node,
@@ -142,6 +144,7 @@ class Wallet extends Component<{| ...Props, ...StoresProps |}> {
                   {this.getDialogs(intl, currentPool)}
                   <StakepoolFeeIncrease stores={stores} />
                   <CardanoCardDialog />
+                  <SecondFiTeasingDialog />
                 </ReviewTxProvider>
               </ModalProvider>
             </CurrencyProvider>

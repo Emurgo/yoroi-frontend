@@ -16,7 +16,7 @@ const messages = defineMessages({
   backupInstructions: {
     id: 'wallet.backup.recovery.phrase.display.dialog.backup.instructions',
     defaultMessage: `!!!Please, make sure you have carefully written down your recovery phrase somewhere safe.
-    You will need this phrase later for next use and recover. Phrase is case sensitive.`,
+    You will need this phrase to use and restore your wallet. Phrase is case sensitive.`,
   },
   buttonLabelIHaveWrittenItDown: {
     id: 'wallet.backup.recovery.phrase.display.dialog.button.label.iHaveWrittenItDown',

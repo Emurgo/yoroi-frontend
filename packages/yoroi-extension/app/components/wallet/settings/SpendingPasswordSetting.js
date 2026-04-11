@@ -9,7 +9,7 @@ import { Box, Button, Typography } from '@mui/material';
 const messages = defineMessages({
   passwordLastUpdated: {
     id: 'wallet.settings.passwordLastUpdated',
-    defaultMessage: '!!!Last updated',
+    defaultMessage: '!!!Last updated {lastUpdated}',
   },
   unchangedPassword: {
     id: 'wallet.settings.unchangedPassword',

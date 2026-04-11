@@ -16,8 +16,8 @@ const messages = defineMessages({
   recoveryPhraseInstructions: {
     id: 'wallet.backup.privacy.warning.dialog.recoveryPhraseInstructions',
     defaultMessage: `!!!On the following screen, you will see a set of 15 random words. This is
-    your wallet backup phrase. It can be entered in any version of Daedalus application in order
-    to back up or restore your wallet’s funds and private key.`,
+    your <strong>wallet backup phrase</strong>. It can be entered in any version of Yoroi in order
+    to back up or restore your wallet's funds and private key.`,
   },
   termNobodyWatching: {
     id: 'wallet.backup.privacy.warning.dialog.checkbox.label.nobodyWatching',

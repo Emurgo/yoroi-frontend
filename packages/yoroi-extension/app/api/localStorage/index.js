@@ -46,6 +46,7 @@ const storageKeys = {
   CATALYST_DISCLAIMER_STATE: 'CATALYST_DISCLAIMER_STATE',
   SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED: '-SWAP_DISCLAIMER_ACCEPTANCE_MODAL_CLOSED',
   STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED: 'STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED',
+  SECONDFI_TEASING_MODAL_CLOSED: 'SECONDFI_TEASING_MODAL_CLOSED',
   APP_OPENED_COUNT: 'APP_OPENED_COUNT',
 
   // ========== CONNECTOR   ========== //
@@ -164,6 +165,14 @@ export default class LocalStorageApi {
 
   unsetStakingPoolFeeIncreaseModalClosed: void => Promise<void> = () =>
     removeLocalItem(storageKeys.STAKINGPOOL_FEE_INCREASE_MODAL_CLOSED);
+
+  // ========== SecondFi Teasing Modal ========== //
+  getSecondFiTeasingModalClosed: void => Promise<?string> = () => getLocalItem(storageKeys.SECONDFI_TEASING_MODAL_CLOSED);
+
+  setSecondFiTeasingModalClosed: string => Promise<void> = closed =>
+    setLocalItem(storageKeys.SECONDFI_TEASING_MODAL_CLOSED, closed);
+
+  unsetSecondFiTeasingModalClosed: void => Promise<void> = () => removeLocalItem(storageKeys.SECONDFI_TEASING_MODAL_CLOSED);
 
   // ========== SWAP Disclaimer Modal ========== //
   getSwapDisclaimerModalClosed: void => Promise<?string> = () =>

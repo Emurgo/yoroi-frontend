@@ -47,6 +47,10 @@ import { DappCenterContextProvider } from './UI/features/dapp-center/module/Dapp
 // $FlowIgnore: suppressing this error
 import GovernanceOptionsPage from './UI/pages/Governance/GovernanceOptionsPage';
 // $FlowIgnore: suppressing this error
+import GovernanceStatusPage from './UI/pages/Governance/GovernanceStatusPage';
+// $FlowIgnore: suppressing this error
+import DRepListPage from './UI/pages/Governance/DRepListPage';
+// $FlowIgnore: suppressing this error
 import PortfolioDappsPage from './UI/pages/portfolio/PortfolioDappsPage';
 // $FlowIgnore: suppressing this error
 import NftsPage from './UI/pages/nfts/NftsPage';
@@ -251,7 +255,9 @@ export const YoroiRoutes = (stores: StoresMap): Node => {
           </Route>
 
           <Route element={<GovernanceSubpages stores={stores} />}>
-            <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceOptionsPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.ROOT} element={<GovernanceStatusPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.OPTIONS} element={<GovernanceOptionsPage stores={stores} />} />
+            <Route path={ROUTES.GOVERNANCE.DREP_LIST} element={<DRepListPage stores={stores} />} />
           </Route>
           <Route element={<StakingSubpages stores={stores} />}>
             <Route path={ROUTES.STAKING_REVAMP.ROOT} element={<StakingPageRevamp stores={stores} />} />
