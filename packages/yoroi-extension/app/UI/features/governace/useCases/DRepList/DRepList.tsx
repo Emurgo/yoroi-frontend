@@ -185,8 +185,10 @@ export const DRepList = () => {
   const currentDrepId = React.useMemo(() => {
     if (governanceStatus.status !== 'delegate' || !governanceStatus.drep) return null;
     const credHex = dRepToMaybeCredentialHex(governanceStatus.drep);
-    // credHex has a 1-byte (2 hex char) kind prefix (22 = key, 23 = script); strip it to get the raw hash
-    // then strip 3 bytes cbor header
+    // credHex is Credential.to_hex() — CBOR for a Shelley credential, not CIP-129 (22/23) hex. For typical
+    // key/script credentials that is a fixed 4-byte (8 hex char) prefix: 0x82 array, 0x00/0x01 kind, 0x581c + 28-byte hash.
+    // slice(8) yields the raw 28-byte hash hex to match API row ids. This matches today's serialization-lib output
+    // but is brittle: prefer Credential.from_hex + to_keyhash/to_scripthash if this ever diverges (silent UI mismatch).
     return credHex ? credHex.slice(8) : null;
   }, [governanceStatus.status, governanceStatus.drep]);
   const { delegateToDrep, loadingUnsignTx, error, setError } = useGovernanceDelegation();
