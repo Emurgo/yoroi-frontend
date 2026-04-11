@@ -5,7 +5,7 @@ export const messages: * = defineMessages({
   currentStakePool: {
     id: 'wallet.transitionDialog.currentStakePool',
     defaultMessage:
-      '!!!The current stake pool you\'re using will soon close. Migrate to the new EMURGO pool to sustain reward generation.',
+      "!!!The current stake pool you're using will soon close. Migrate to the new EMURGO pool to sustain reward generation.",
   },
   upgradeStakePool: {
     id: 'wallet.transitionDialog.upgradeStakePool',

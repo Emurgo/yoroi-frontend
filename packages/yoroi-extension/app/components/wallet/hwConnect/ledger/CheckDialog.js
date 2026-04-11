@@ -68,8 +68,7 @@ const messages = defineMessages({
   },
   aboutPrerequisite5: {
     id: 'wallet.connect.ledger.dialog.step.about.prerequisite.5',
-    defaultMessage:
-      '!!!The Ledger device must remain connected to your computer throughout the process.',
+    defaultMessage: '!!!The Ledger device must remain connected to your computer throughout the process.',
   },
 });
 

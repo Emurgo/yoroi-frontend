@@ -263,7 +263,10 @@ export const DRepList = () => {
   const displayed = React.useMemo(() => {
     const lower = searchText.toLowerCase();
     const filtered = lower
-      ? dreps.filter(d => d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower) || d.bech32Id.toLowerCase().includes(lower))
+      ? dreps.filter(
+          d =>
+            d.name.toLowerCase().includes(lower) || d.id.toLowerCase().includes(lower) || d.bech32Id.toLowerCase().includes(lower)
+        )
       : dreps;
     let sorted: DrepRow[];
     if (sortField === 'random') {

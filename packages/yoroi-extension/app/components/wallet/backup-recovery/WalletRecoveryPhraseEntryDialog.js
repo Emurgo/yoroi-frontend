@@ -32,8 +32,7 @@ const messages = defineMessages({
   },
   termDevice: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.device',
-    defaultMessage:
-      "!!!I understand that my secret keys are held securely on this device only, not on the company's servers.",
+    defaultMessage: "!!!I understand that my secret keys are held securely on this device only, not on the company's servers.",
   },
   termRecovery: {
     id: 'wallet.backup.recovery.phrase.entry.dialog.terms.and.condition.recovery',
