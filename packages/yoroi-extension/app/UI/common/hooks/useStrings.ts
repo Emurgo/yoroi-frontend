@@ -194,7 +194,7 @@ export const messages = Object.freeze(
     },
     secondFiPage4Description: {
       id: 'secondfi.teasing.page4.description',
-      defaultMessage: '!!!Think bank, but one that actually belongs to you.',
+      defaultMessage: '!!!Think neofinance that belongs entirely to you.',
     },
     secondFiNext: {
       id: 'secondfi.teasing.next',
