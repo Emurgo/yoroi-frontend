@@ -164,6 +164,46 @@ export const messages = Object.freeze(
       id: 'banners.cardanoCard.getTheCard',
       defaultMessage: '!!!Get the card',
     },
+    secondFiPage1Title: {
+      id: 'secondfi.teasing.page1.title',
+      defaultMessage: '!!!Yoroi is reaching further.',
+    },
+    secondFiPage1Description: {
+      id: 'secondfi.teasing.page1.description',
+      defaultMessage: '!!!More chains, more of your financial life, all in one place.',
+    },
+    secondFiPage2Title: {
+      id: 'secondfi.teasing.page2.title',
+      defaultMessage: "!!!Soon, you'll have more options to grow.",
+    },
+    secondFiPage2Description: {
+      id: 'secondfi.teasing.page2.description',
+      defaultMessage: '!!!Your assets will be ready to get to work more, for you.',
+    },
+    secondFiPage3Title: {
+      id: 'secondfi.teasing.page3.title',
+      defaultMessage: '!!!Your wallet in real life.',
+    },
+    secondFiPage3Description: {
+      id: 'secondfi.teasing.page3.description',
+      defaultMessage: '!!!Some upgrades you download. This one, you carry.',
+    },
+    secondFiPage4Title: {
+      id: 'secondfi.teasing.page4.title',
+      defaultMessage: '!!!Your Yoroi wallet is getting bigger.',
+    },
+    secondFiPage4Description: {
+      id: 'secondfi.teasing.page4.description',
+      defaultMessage: '!!!Think neofinance that belongs entirely to you.',
+    },
+    secondFiNext: {
+      id: 'secondfi.teasing.next',
+      defaultMessage: '!!!Next',
+    },
+    secondFiClose: {
+      id: 'secondfi.teasing.close',
+      defaultMessage: '!!!Close',
+    },
   })
 );
 
@@ -213,5 +253,15 @@ export const useStrings = () => {
     cardanoCardTitle: intl.formatMessage(messages.cardanoCardTitle),
     cardanoCardSubtitle: intl.formatMessage(messages.cardanoCardSubtitle),
     cardanoCardGetTheCard: intl.formatMessage(messages.cardanoCardGetTheCard),
+    secondFiPage1Title: intl.formatMessage(messages.secondFiPage1Title),
+    secondFiPage1Description: intl.formatMessage(messages.secondFiPage1Description),
+    secondFiPage2Title: intl.formatMessage(messages.secondFiPage2Title),
+    secondFiPage2Description: intl.formatMessage(messages.secondFiPage2Description),
+    secondFiPage3Title: intl.formatMessage(messages.secondFiPage3Title),
+    secondFiPage3Description: intl.formatMessage(messages.secondFiPage3Description),
+    secondFiPage4Title: intl.formatMessage(messages.secondFiPage4Title),
+    secondFiPage4Description: intl.formatMessage(messages.secondFiPage4Description),
+    secondFiNext: intl.formatMessage(messages.secondFiNext),
+    secondFiClose: intl.formatMessage(messages.secondFiClose),
   }).current;
 };
