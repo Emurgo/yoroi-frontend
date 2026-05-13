@@ -1,0 +1,62 @@
+name: Devin on "devin" label
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-devin-session:
+    if: github.event.label.name == 'devin'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build prompt
+        run: |
+          cat > prompt.txt <<'EOF'
+          Work on this issue:
+          ${{ github.event.issue.html_url }}
+
+          Title: ${{ github.event.issue.title }}
+
+          Body:
+          ${{ github.event.issue.body }}
+
+          REQUIREMENTS:
+          - When you open a PR, include this exact line in the PR description:
+            Fixes ${{ github.repository }}#${{ github.event.issue.number }}
+          - For every commit message in that PR, include:
+            Refs ${{ github.repository }}#${{ github.event.issue.number }}
+          EOF
+
+      - name: Create Devin session
+        id: devin
+        env:
+          DEVIN_API_KEY: ${{ secrets.DEVIN_API_KEY }}
+        run: |
+          set -eo pipefail
+          resp=$(curl -fSs https://api.devin.ai/v1/sessions \
+            -H "Authorization: Bearer $DEVIN_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --rawfile prompt prompt.txt \
+                  --arg title "Issue #${{ github.event.issue.number }}: ${{ github.event.issue.title }}" \
+                  --arg repo "${{ github.repository }}" \
+                  --arg issue "${{ github.event.issue.number }}" \
+                  '{prompt:$prompt, title:$title, idempotent:true,
+                    tags:["src:github","label:devin","repo:"+$repo,"issue:"+$issue]}')")
+          echo "url=$(echo "$resp" | jq -er '.url')" >> "$GITHUB_OUTPUT"
+          echo "is_new_session=$(echo "$resp" | jq -r '.is_new_session // true')" >> "$GITHUB_OUTPUT"
+
+      - name: Comment session link
+        if: steps.devin.outputs.is_new_session == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          jq -n --arg url "${{ steps.devin.outputs.url }}" \
+            '{body: "Devin is on it.\n\n**Session:** \($url)"}' | \
+          curl -sS -X POST \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            --data @- \
+            "https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments"
